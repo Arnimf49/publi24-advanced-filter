@@ -1,0 +1,36 @@
+<hr style="opacity: 0.02"/>
+  <button type="button" style="background-color: #c59b2f" class="mainbg radius" data-wwid="toggle-hidden">Ascunde</button>
+  <button type="button" class="mainbg radius" data-wwid="investigate">Analizare telefon</button>
+  <button type="button" {{#unless searchLinks}} style="display:none;" {{/unless}} class="mainbg radius" data-wwid="investigate_img">Analizare imagine</button>
+  {{#if searchLinks}}
+    <div onclick="event.stopPropagation()">
+      <h4>{{phone}}</h4>
+      <h5 style="margin-top: 5px; font-size: 1.125rem">Rezultate după telefon</h5>
+      {{#if (isUndefined searchLinks)}}
+        <p style="color: rgb(34, 34, 34); font-size: .8125rem;">nerulat</p>
+      {{else}}
+        {{#unless filteredSearchLinks.length}}
+          <p style="color: rgb(34, 34, 34); font-size: .8125rem;">nu au fost găsite linkuri</p>
+        {{else}}
+          {{#each filteredSearchLinks}}
+            <div style="font-size: .8125rem;"><a onclick='event.stopPropagation()' href="{{this}}" target="_blank">{{this}}</a></div>
+          {{/each}}
+        {{/unless}}
+      {{/if}}
+
+      <h5 style="margin-top: 5px; font-size: 1.125rem">Rezultate după imagine</h5>
+      {{#if (isUndefined imageSearchLinks)}}
+        <p style="color: rgb(34, 34, 34); font-size: .8125rem;">nerulat</p>
+      {{else}}
+        {{#unless filteredImageSearchLinks.length}}
+          <p style="color: rgb(34, 34, 34); font-size: .8125rem;">nu au fost găsite linkuri</p>
+        {{else}}
+          {{#each filteredImageSearchLinks}}
+            <div style="font-size: .8125rem;"><a onclick='event.stopPropagation()' href="{{this}}" target="_blank">{{this}}</a></div>
+          {{/each}}
+        {{/unless}}
+      {{/if}}
+    </div>
+  {{else}}
+    <span>neanalizat</span>
+  {{/if}}
