@@ -2,6 +2,8 @@ if (typeof browser === "undefined") {
   var browser = chrome;
 }
 
+const runtime = browser.runtime;
+
 const BLACKLISTED_LINKS = [
   'https://meiwakucheck.com/',
   'https://www.jpnumber.com/',
@@ -106,7 +108,11 @@ async function readNumbersFromBase64Png(data) {
   return new Promise(res => {
     jimpImg.invert()
       .getBase64(Jimp.MIME_PNG, async (err, src) => {
-        const tesseractReader = await Tesseract.createWorker('eng');
+        const tesseractReader = await Tesseract.createWorker('eng', 1, {
+          corePath: runtime.getURL(`/tesseract/tesseract-core.wasm.js`),
+          workerPath: runtime.getURL(`/tesseract/worker.min.js`),
+          langPath: runtime.getURL(`/tesseract/eng.traineddata`),
+        });
         tesseractReader.setParameters({tessedit_char_whitelist: '0123456789'});
 
         const readResult = await tesseractReader.recognize(`${src}`);
