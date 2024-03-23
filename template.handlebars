@@ -1,6 +1,6 @@
 <hr style="opacity: 0.02"/>
-  <button type="button" style="background-color: #c59b2f" class="mainbg radius" data-wwid="toggle-hidden">Ascunde</button>
   <button type="button" class="mainbg radius" data-wwid="investigate">Analizare telefon</button>
+  <button type="button" style="background-color: #c59b2f{{#unless searchLinks}};display:none;{{/unless}}" class="mainbg radius" data-wwid="toggle-hidden">Ascunde</button>
   <button type="button" {{#unless searchLinks}} style="display:none;" {{/unless}} class="mainbg radius" data-wwid="investigate_img">Analizare imagine</button>
   {{#if searchLinks}}
     <div onclick="event.stopPropagation()">

@@ -177,7 +177,12 @@ function registerInvestigateImgHandler(item, id) {
     browser.storage.local.set({ [`ww:image_results:${id}`]: undefined });
 
     if (IS_AD_PAGE) {
-      const imgs = document.querySelectorAll('[id="detail-gallery"] img');
+      let imgs = document.querySelectorAll('[id="detail-gallery"] img');
+
+      // Maybe the post has only one picture. In that case gallery is not shown.
+      if (imgs.length === 0) {
+        imgs = document.querySelectorAll('[class="detailViewImg "]');
+      }
 
       browser.storage.local.set({ [`ww:img_search_started_for`]: {wwid: id, count: imgs.length} }).then(() => {
         [...imgs].forEach((img, index) => {
@@ -228,11 +233,12 @@ if (IS_AD_PAGE) {
   const item = document.body.querySelector('[itemtype="https://schema.org/Offer"]');
 
   item.removeChild(item.lastElementChild);
+  item.removeChild(item.lastElementChild);
   registerItem(item, id.toUpperCase());
 } else {
-  const items = document.body.querySelectorAll('[data-adid]');
+  const items = document.body.querySelectorAll('[data-articleid]');
   [...items].forEach((item) =>
-    registerItem(item, item.getAttribute('data-adid'))
+    registerItem(item, item.getAttribute('data-articleid'))
   );
 }
 

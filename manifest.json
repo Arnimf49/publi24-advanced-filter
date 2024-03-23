@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Publi24 advanced filter",
-  "version": "1.8",
+  "version": "1.10",
   "description": "Advanced analyzer and filter for publi24.ro ads",
   "icons": {
     "48": "icon.png"
@@ -25,7 +25,7 @@
   ],
   "content_scripts": [
     {
-      "matches": ["https://www.publi24.ro/anunturi/matrimoniale/*"],
+      "matches": ["https://www.publi24.ro/anunturi/*"],
       "js": [
         "tesseract/tesseract.min.js",
         "jimp.js",
