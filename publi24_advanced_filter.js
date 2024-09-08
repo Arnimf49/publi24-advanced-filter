@@ -9,6 +9,7 @@ const BLACKLISTED_LINKS = [
   'https://www.jpnumber.com/',
   'https://telefonforsaljare.nu/',
   'https://www.180.se/',
+  'https://www.180.dk/',
   'https://www.eniro.se/',
   'https://z1kk2ror.canina101.es/',
   'https://www.telefonforsaljare.nu/',
@@ -29,6 +30,14 @@ const BLACKLISTED_LINKS = [
   'https://denwacho.net/',
   'https://www.telefonforsaljare.nu/',
   'https://sunat.ro/',
+  'https://www.telefoncontact.online/',
+  'https://www.telefonreclamatii.online/',
+  'https://www.contact-telefon.online/',
+  'https://mobile.inelenco.com/',
+  'https://genealogic.review/',
+  'https://www.merinfo.se/',
+  'https://telefon-kontakte.ch/',
+  'http://www.telefonforsaljare.nu/',
 ]
 
 const IS_AD_PAGE = !!document.querySelector('[itemtype="https://schema.org/Offer"]');
@@ -71,14 +80,15 @@ function getItemVisibility(id) {
   return !wasItemHidden && !wasPhoneHidden;
 }
 
-function doRender(item, id, searchResults) {
+function doRender(item, id, storage) {
   const phone = localStorage.getItem(`ww:phone:${id}`);
   const visible = getItemVisibility(id);
-  const searchLinks = searchResults[`ww:search_results:${id}`];
+  const searchLinks = storage[`ww:search_results:${id}`];
+  const hasNoPhone = storage.local[`ww:no_phone:${id}`] === 'true';
   const filteredSearchLinks = sortLinks(filterLinks(searchLinks || []));
   const nimfomaneLink = filteredSearchLinks.find(l => l.indexOf('https://nimfomane.com/forum/topic/') === 0);
 
-  const imageSearchLinks = searchResults[`ww:image_results:${id}`];
+  const imageSearchLinks = storage[`ww:image_results:${id}`];
   const filteredImageSearchLinks = sortLinks(filterLinks(imageSearchLinks || []));
 
   const panelElement = document.createElement('div');
@@ -87,6 +97,7 @@ function doRender(item, id, searchResults) {
   panelElement.innerHTML = TEMPLATE({
     visible,
     phone,
+    hasNoPhone,
     searchLinks,
     filteredSearchLinks,
     imageSearchLinks,
@@ -116,7 +127,9 @@ function registerVisibilityHandler(item, id) {
     toggleVisibilityBtn.disabled = true;
 
     let phoneNumber = localStorage.getItem(`ww:phone:${id}`) || await acquirePhoneNumber(item, id);
-    localStorage.setItem(`ww:phone:${phoneNumber}:visible`, visible);
+    if (phoneNumber) {
+      localStorage.setItem(`ww:phone:${phoneNumber}:visible`, visible);
+    }
 
     setItemVisible(item, visible);
     localStorage.setItem(`ww:visibility:${id}`, visible);
@@ -152,6 +165,10 @@ async function acquirePhoneNumber(item, id) {
     ? document.querySelector('[id="EncryptedPhone"]')?.value
     : await acquireEncryptedPhoneNumber(item);
 
+  if (!phoneNumberEncrypted) {
+    return false;
+  }
+
   // Phone numbers are accessed by a separate call to the backend.
   // This gives an image result, the phone number being printed in png.
   const phoneNumberImgBase64 = await (await fetch('https://www.publi24.ro/DetailAd/PhoneNumberImages?Length=8', {
@@ -180,6 +197,12 @@ function registerInvestigateHandler(item, id) {
     investigateBtn.disabled = true;
 
     const phoneNumber = await acquirePhoneNumber(item, id);
+
+    if (!phoneNumber) {
+      localStorage.setItem(`ww:no_phone:${id}`, 'true');
+      investigateBtn.disabled = false;
+      return;
+    }
 
     if (localStorage.getItem(`ww:phone:${phoneNumber}:visible`) === 'false') {
       setItemVisible(item, false);
@@ -247,7 +270,8 @@ function registerHandlers(item, id) {
 
 async function getStorageItems(browserKeys, localKeys) {
   const browserValues = await browser.storage.local.get(browserKeys);
-  browserValues.local = localKeys.map(k => localStorage.getItem(k));
+  browserValues.local = {};
+  localKeys.forEach(k => browserValues.local[k] = localStorage.getItem(k))
   return browserValues;
 }
 
@@ -259,11 +283,12 @@ function registerItem(item, id) {
     registerHandlers(item, id);
   }
 
-  getStorageItems([`ww:search_results:${id}`, `ww:image_results:${id}`], [`ww:visibility:${id}`])
+  const storageKeys = [[`ww:search_results:${id}`, `ww:image_results:${id}`], [`ww:visibility:${id}`, `ww:no_phone:${id}`]];
+  getStorageItems(...storageKeys)
     .then(render);
 
   setInterval(() => {
-    getStorageItems([`ww:search_results:${id}`, `ww:image_results:${id}`], [`ww:visibility:${id}`]).then(r => {
+    getStorageItems(...storageKeys).then(r => {
       if (RENDER_CACHE_KEY[id] !== JSON.stringify(r)) {
         render(r);
       }
