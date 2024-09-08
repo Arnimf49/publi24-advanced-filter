@@ -4,16 +4,14 @@ if (typeof browser === "undefined") {
 
 function extractResultLinks() {
   const wwid = new URLSearchParams(window.location.search).get('wwsid');
-  const results = document.body.querySelectorAll('[href^="https://translate.google.com/"]');
+  const results = document.body.querySelectorAll('[eid] [jsaction][jscontroller] > [href]');
 
   if (results.length === 0) {
     return;
   }
 
   const resultUrls = [...results].map((n) => {
-    const href = n.getAttribute('href');
-    const parts = new URLSearchParams(href.split('?').pop());
-    return decodeURIComponent(parts.get('u'));
+    return n.getAttribute('href');
   });
 
   browser.storage.local.set({ [`ww:search_results:${wwid}`]: resultUrls })
