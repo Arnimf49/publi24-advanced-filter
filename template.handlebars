@@ -1,36 +1,58 @@
 <hr style="opacity: 0.02"/>
+  <button type="button" style="background-color: #c59b2f" class="mainbg radius" data-wwid="toggle-hidden">Ascunde</button>
   <button type="button" class="mainbg radius" data-wwid="investigate">Analizare telefon</button>
-  <button type="button" style="background-color: #c59b2f{{#unless searchLinks}};display:none;{{/unless}}" class="mainbg radius" data-wwid="toggle-hidden">Ascunde</button>
   <button type="button" {{#unless searchLinks}} style="display:none;" {{/unless}} class="mainbg radius" data-wwid="investigate_img">Analizare imagine</button>
-  {{#if searchLinks}}
-    <div onclick="event.stopPropagation()">
-      <h4>{{phone}}</h4>
-      <h5 style="margin-top: 5px; font-size: 1.125rem">Rezultate după telefon</h5>
-      {{#if (isUndefined searchLinks)}}
-        <p style="color: rgb(34, 34, 34); font-size: .8125rem;">nerulat</p>
-      {{else}}
-        {{#unless filteredSearchLinks.length}}
-          <p style="color: rgb(34, 34, 34); font-size: .8125rem;">nu au fost găsite linkuri</p>
-        {{else}}
-          {{#each filteredSearchLinks}}
-            <div style="font-size: .8125rem;"><a onclick='event.stopPropagation()' href="{{this}}" target="_blank">{{this}}</a></div>
-          {{/each}}
-        {{/unless}}
-      {{/if}}
 
-      <h5 style="margin-top: 5px; font-size: 1.125rem">Rezultate după imagine</h5>
-      {{#if (isUndefined imageSearchLinks)}}
-        <p style="color: rgb(34, 34, 34); font-size: .8125rem;">nerulat</p>
+  {{#if nimfomaneLink}}
+  <a href='{{nimfomaneLink}}' target='_blank' style='position: relative'>
+      <svg
+        style='position: absolute;
+               width: 20px;
+               height: 20px;
+               margin-top: 2px;
+               margin-left: 2px;'
+        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><polygon fill='#17c160' points="2.67 7.63 5.46 10.41 13.33 2.54 14.85 4.06 5.46 13.46 1.15 9.15 2.67 7.63"/></svg>
+      <img style='background: #2f4979;
+                  height: 45px;
+                  border-radius: 4px;
+                  padding: 12px;'
+      src='https://nimfomane.com/forum/uploads/monthly_2024_01/logo2.png.d461ead015b3eddf20bc0a9b70668583.png'/>
+  </a>
+  {{/if}}
+
+  {{#if visible }}
+      {{#if searchLinks}}
+        <div>
+          <h4 style='font-weight: bold; padding-top: 10px;'>{{phone}}</h4>
+          <h5 style="margin-top: 5px; font-size: 1.125rem">Rezultate după telefon</h5>
+          {{#if (isUndefined searchLinks)}}
+            <p style="color: rgb(34, 34, 34); font-size: .8125rem;">nerulat</p>
+          {{else}}
+            {{#unless filteredSearchLinks.length}}
+              <p style="color: rgb(34, 34, 34); font-size: .8125rem;">nu au fost găsite linkuri relevante</p>
+            {{else}}
+              {{#each filteredSearchLinks}}
+                <div style="font-size: .8125rem; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;"><a onclick='event.stopPropagation()' href="{{this}}" target="_blank">{{this}}</a></div>
+              {{/each}}
+            {{/unless}}
+          {{/if}}
+
+          <h5 style="margin-top: 5px; font-size: 1.125rem">Rezultate după imagine</h5>
+          {{#if (isUndefined imageSearchLinks)}}
+            <p style="color: rgb(34, 34, 34); font-size: .8125rem;">nerulat</p>
+          {{else}}
+            {{#unless filteredImageSearchLinks.length}}
+              <p style="color: rgb(34, 34, 34); font-size: .8125rem;">nu au fost găsite linkuri relevante</p>
+            {{else}}
+              {{#each filteredImageSearchLinks}}
+                <div style="font-size: .8125rem; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;"><a onclick='event.stopPropagation()' href="{{this}}" target="_blank">{{this}}</a></div>
+              {{/each}}
+            {{/unless}}
+          {{/if}}
+        </div>
       {{else}}
-        {{#unless filteredImageSearchLinks.length}}
-          <p style="color: rgb(34, 34, 34); font-size: .8125rem;">nu au fost găsite linkuri</p>
-        {{else}}
-          {{#each filteredImageSearchLinks}}
-            <div style="font-size: .8125rem;"><a onclick='event.stopPropagation()' href="{{this}}" target="_blank">{{this}}</a></div>
-          {{/each}}
-        {{/unless}}
+        <span>neanalizat</span>
       {{/if}}
-    </div>
-  {{else}}
-    <span>neanalizat</span>
+  {{else }}
+
   {{/if}}
