@@ -73,7 +73,7 @@ function doRender(item, id, searchResults) {
     filteredImageSearchLinks,
   });
 
-  item.appendChild(panelElement);
+  (item.querySelector('.article-txt') || item).appendChild(panelElement);
 }
 
 function setItemVisible(item, v) {
@@ -134,7 +134,7 @@ function registerInvestigateHandler(item, id) {
 
     const phoneNumberEncrypted = IS_AD_PAGE
       ? document.querySelector('[id="EncryptedPhone"]')?.value
-      : item.getAttribute('data-phencrypted');
+      : await acquireEncryptedPhoneNumber(item);
 
     // Phone numbers are accessed by a separate call to the backend.
     // This gives an image result, the phone number being printed in png.
@@ -159,6 +159,15 @@ function registerInvestigateHandler(item, id) {
     const encodedPhoneNumber = encodeURIComponent(phoneNumber);
     window.open(`https://www.google.com/search?wwsid=${encodedId}&q=${encodedPhoneNumber}`);
   }
+}
+
+async function acquireEncryptedPhoneNumber(item) {
+  const url = item.getAttribute('onclick').replace(/^.*\.href='([^']+)'.*/, '$1');
+  const pageResponse = await fetch(url);
+  const html = await pageResponse.text();
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+  return temp.querySelector('[id="EncryptedPhone"]')?.value;
 }
 
 function registerInvestigateImgHandler(item, id) {
@@ -190,8 +199,7 @@ function registerInvestigateImgHandler(item, id) {
         });
       });
     } else {
-      const imgLink = item.querySelector('[class="listing-image"]').getAttribute('style')
-        .replace(/.*(https:\/\/[^']+).*/, '$1');
+      const imgLink = item.querySelector('img').getAttribute('src');
 
       browser.storage.local.set({ [`ww:img_search_started_for`]: {wwid: id, count: 1} }).then(() => {
         openImageInvestigation(imgLink);
