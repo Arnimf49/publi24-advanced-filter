@@ -45,6 +45,7 @@ const IS_AD_PAGE = !!document.querySelector('[itemtype="https://schema.org/Offer
 const RENDER_CACHE_KEY = {};
 
 const TEMPLATE = Handlebars.templates.template;
+const SLIDER_TEMPLATE = Handlebars.templates.slider_template;
 
 Handlebars.registerHelper('isUndefined', function(value) {
   return value === undefined;
@@ -59,6 +60,9 @@ const sortLinks = (links) => {
     if (l1.indexOf('https://nimfomane.com/forum') === -1) {
       return 1;
     }
+    if (l2.indexOf('https://nimfomane.com/forum') === -1) {
+      return -1;
+    }
 
     return l1.localeCompare(l2);
   })
@@ -69,6 +73,15 @@ function cleanupExistingRender(item) {
   if (existing) {
     existing.parentNode.removeChild(existing);
   }
+}
+
+function isDueToPhoneHidden(id) {
+  const wasItemHidden = localStorage.getItem(`ww:visibility:${id}`) === 'false';
+  const wasPhoneHidden =  localStorage.getItem(`ww:phone:${id}`) ?
+    localStorage.getItem(`ww:phone:${localStorage.getItem(`ww:phone:${id}`)}:visible`) === 'false' :
+    false;
+
+  return !wasItemHidden && wasPhoneHidden;
 }
 
 function getItemVisibility(id) {
@@ -83,11 +96,11 @@ function getItemVisibility(id) {
 function doRender(item, id, storage) {
   const phone = localStorage.getItem(`ww:phone:${id}`);
   const visible = getItemVisibility(id);
+  const dueToPhoneHidden = isDueToPhoneHidden(id);
   const searchLinks = storage[`ww:search_results:${id}`];
   const hasNoPhone = storage.local[`ww:no_phone:${id}`] === 'true';
   const filteredSearchLinks = sortLinks(filterLinks(searchLinks || []));
   const nimfomaneLink = filteredSearchLinks.find(l => l.indexOf('https://nimfomane.com/forum/topic/') === 0);
-
   const imageSearchLinks = storage[`ww:image_results:${id}`];
   const filteredImageSearchLinks = sortLinks(filterLinks(imageSearchLinks || []));
 
@@ -95,7 +108,9 @@ function doRender(item, id, storage) {
   panelElement.className = 'ww-container';
   panelElement.onclick = (e) => e.stopPropagation();
   panelElement.innerHTML = TEMPLATE({
+    isAdPage: IS_AD_PAGE,
     visible,
+    dueToPhoneHidden,
     phone,
     hasNoPhone,
     searchLinks,
@@ -114,17 +129,14 @@ function setItemVisible(item, v) {
   item.style.opacity = v ? '1' : '0.3';
 }
 
-function registerVisibilityHandler(item, id) {
-  const toggleVisibilityBtn = item.querySelector('[data-wwid="toggle-hidden"]');
-  setItemVisible(item, getItemVisibility(id));
-
-  toggleVisibilityBtn.onclick = async (e) => {
+function createVisibilityClickHandler(item, id) {
+  return async function (e) {
     e.preventDefault();
     e.stopPropagation();
 
     let visible = getItemVisibility(id);
     visible = !visible;
-    toggleVisibilityBtn.disabled = true;
+    this.disabled = true;
 
     let phoneNumber = localStorage.getItem(`ww:phone:${id}`) || await acquirePhoneNumber(item, id);
     if (phoneNumber) {
@@ -133,8 +145,15 @@ function registerVisibilityHandler(item, id) {
 
     setItemVisible(item, visible);
     localStorage.setItem(`ww:visibility:${id}`, visible);
-    toggleVisibilityBtn.disabled = false;
+    this.disabled = false;
   };
+}
+
+function registerVisibilityHandler(item, id) {
+  const toggleVisibilityBtn = item.querySelector('[data-wwid="toggle-hidden"]');
+  setItemVisible(item, getItemVisibility(id));
+
+  toggleVisibilityBtn.onclick = createVisibilityClickHandler(item, id);
 }
 
 async function readNumbersFromBase64Png(data) {
@@ -187,6 +206,23 @@ async function acquirePhoneNumber(item, id) {
   return phoneNumber;
 }
 
+async function investigateNumber(item, id) {
+  const phoneNumber = await acquirePhoneNumber(item, id);
+
+  if (!phoneNumber) {
+    localStorage.setItem(`ww:no_phone:${id}`, 'true');
+    return;
+  }
+
+  if (localStorage.getItem(`ww:phone:${phoneNumber}:visible`) === 'false') {
+    setItemVisible(item, false);
+  }
+
+  const encodedId = encodeURIComponent(id);
+  const encodedPhoneNumber = encodeURIComponent(phoneNumber);
+  window.open(`https://www.google.com/search?wwsid=${encodedId}&q=${encodedPhoneNumber}`);
+}
+
 function registerInvestigateHandler(item, id) {
   const investigateBtn = item.querySelector('[data-wwid="investigate"]');
 
@@ -195,70 +231,129 @@ function registerInvestigateHandler(item, id) {
     e.stopPropagation();
 
     investigateBtn.disabled = true;
-
-    const phoneNumber = await acquirePhoneNumber(item, id);
-
-    if (!phoneNumber) {
-      localStorage.setItem(`ww:no_phone:${id}`, 'true');
-      investigateBtn.disabled = false;
-      return;
-    }
-
-    if (localStorage.getItem(`ww:phone:${phoneNumber}:visible`) === 'false') {
-      setItemVisible(item, false);
-    }
-
-    const encodedId = encodeURIComponent(id);
-    const encodedPhoneNumber = encodeURIComponent(phoneNumber);
-    window.open(`https://www.google.com/search?wwsid=${encodedId}&q=${encodedPhoneNumber}`);
+    await investigateNumber(item, id);
     investigateBtn.disabled = false;
   }
 }
 
-async function acquireEncryptedPhoneNumber(item) {
+async function loadInAdPage(item) {
   const url = item.getAttribute('onclick').replace(/^.*\.href='([^']+)'.*/, '$1');
   const pageResponse = await fetch(url);
   const html = await pageResponse.text();
   const temp = document.createElement('div');
   temp.innerHTML = html;
-  return temp.querySelector('[id="EncryptedPhone"]')?.value;
+  return temp;
 }
 
-function registerInvestigateImgHandler(item, id) {
-  const investigateImgBtn = item.querySelector('[data-wwid="investigate_img"]');
+async function acquireEncryptedPhoneNumber(item) {
+  const adPage = await loadInAdPage(item);
+  return adPage.querySelector('[id="EncryptedPhone"]')?.value;
+}
 
+async function acquireSliderImages(item) {
+  const adPage = await loadInAdPage(item);
+  const items = [...adPage.querySelectorAll('[id="detail-gallery"] img')]
+    .map((item) => item.getAttribute('src').replace('/top/', '/extralarge/'));
+
+  if (items.length) {
+    return items;
+  }
+
+  return [...adPage.querySelectorAll('.imgZone img')]
+    .map((item) => item.getAttribute('src'));
+}
+
+function createInvestigateImgClickHandler(id, images) {
   const openImageInvestigation = (imgLink, index = 0) => {
     const encodedId = encodeURIComponent(id);
     const encodedLink = encodeURIComponent(imgLink);
     window.open(`https://www.google.com/?wwiid=${encodedId}&wwimg=${encodedLink}&wwindex=${index}`)
   }
 
-  investigateImgBtn.onclick = (e) => {
+  return (e) => {
     e.preventDefault();
     e.stopPropagation();
 
     browser.storage.local.set({ [`ww:image_results:${id}`]: undefined });
 
-    if (IS_AD_PAGE) {
+    let imgs;
+
+    if (images) {
+      imgs = images;
+    }
+    else if (IS_AD_PAGE) {
       let imgs = document.querySelectorAll('[id="detail-gallery"] img');
 
       // Maybe the post has only one picture. In that case gallery is not shown.
       if (imgs.length === 0) {
         imgs = document.querySelectorAll('[class="detailViewImg "]');
       }
-
-      browser.storage.local.set({ [`ww:img_search_started_for`]: {wwid: id, count: imgs.length} }).then(() => {
-        [...imgs].forEach((img, index) => {
-          openImageInvestigation(img.getAttribute('src'), index);
-        });
-      });
-    } else {
-      const imgLink = item.querySelector('img').getAttribute('src');
-
-      browser.storage.local.set({ [`ww:img_search_started_for`]: {wwid: id, count: 1} }).then(() => {
-        openImageInvestigation(imgLink);
-      });
     }
+
+    browser.storage.local.set({ [`ww:img_search_started_for`]: {wwid: id, count: imgs.length} }).then(() => {
+      [...imgs].forEach((img, index) => {
+        openImageInvestigation(img.getAttribute('src'), index);
+      });
+    });
+  };
+}
+
+function registerInvestigateImgHandler(item, id) {
+  const investigateImgBtn = item.querySelector('[data-wwid="investigate_img"]');
+
+  investigateImgBtn.onclick = createInvestigateImgClickHandler(id, item.querySelectorAll('.art-img img'));
+}
+
+function registerOpenImagesSliderHandler(item, id) {
+  const button = item.querySelector('.art-img a');
+  console.log(button)
+
+  button.onclick = async (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const images = await acquireSliderImages(item);
+    const visible = getItemVisibility(id);
+
+    const sliderContainer = document.createElement('div');
+    sliderContainer.id = '_ww_slider';
+    sliderContainer.innerHTML = SLIDER_TEMPLATE({images, visible});
+
+    document.body.appendChild(sliderContainer);
+    new Splide( '#_ww_slider .splide', { focus: 'center', type: 'loop', keyboard: 'global' }).mount();
+
+    const close = () => {
+      document.body.removeChild(sliderContainer);
+      window.addEventListener('keydown',  closeOnKey);
+    };
+    const closeOnKey = (e) => {
+      if (e.key === 'Escape') close();
+    };
+
+    window.addEventListener('keydown',  closeOnKey);
+
+    const visibilityButton = sliderContainer.querySelector('[data-wwid="toggle-hidden"]');
+    const visibilityHandler = createVisibilityClickHandler(item, id);
+    visibilityButton.onclick = function (e) {
+      visibilityHandler.apply(this, [e]);
+      close();
+    };
+
+    const analyzeImagesButton = sliderContainer.querySelector('[data-wwid="analyze-images"]');
+    const imageInvestigateHandler = createInvestigateImgClickHandler(id, sliderContainer.querySelectorAll('li:not(.splide__slide--clone) img'));
+    analyzeImagesButton.onclick = async (e) => {
+      if (!localStorage.getItem(`ww:phone:${id}`)) {
+        await investigateNumber(item, id);
+      }
+      imageInvestigateHandler.apply(this, [e]);
+    };
+
+    const closeButton = sliderContainer.querySelector('[data-wwid="close"]');
+    closeButton.onclick = close;
+    sliderContainer.onclick = close;
+
+    sliderContainer.querySelectorAll('.splide__arrow')
+      .forEach((el) => el.addEventListener('click', (e) => e.stopPropagation()));
   }
 }
 
@@ -266,6 +361,10 @@ function registerHandlers(item, id) {
   registerVisibilityHandler(item, id);
   registerInvestigateHandler(item, id);
   registerInvestigateImgHandler(item, id);
+
+  if (!IS_AD_PAGE) {
+    registerOpenImagesSliderHandler(item, id);
+  }
 }
 
 async function getStorageItems(browserKeys, localKeys) {

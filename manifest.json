@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Publi24 advanced filter",
-  "version": "1.11",
+  "version": "1.12",
   "description": "Advanced analyzer and filter for publi24.ro ads",
   "icons": {
     "48": "icon.png"
@@ -31,7 +31,12 @@
         "jimp.js",
         "handlebars.js",
         "template.precompiled.js",
-        "publi24_advanced_filter.js"
+        "slider_template.precompiled.js",
+        "publi24_advanced_filter.js",
+        "splide/splide.min.js"
+      ],
+      "css": [
+        "splide/splide.min.css"
       ]
     },
     {

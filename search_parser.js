@@ -2,11 +2,14 @@ if (typeof browser === "undefined") {
   var browser = chrome;
 }
 
+let tries = 0;
+
 function extractResultLinks() {
   const wwid = new URLSearchParams(window.location.search).get('wwsid');
   const results = document.body.querySelectorAll('[eid] [jsaction][jscontroller] > [href]');
 
-  if (results.length === 0) {
+  if (results.length === 0 && tries < 5) {
+    ++tries;
     return;
   }
 
@@ -19,4 +22,4 @@ function extractResultLinks() {
 }
 
 // @TODO: Improve to wait for elements.
-setInterval(extractResultLinks, 500);
+setInterval(extractResultLinks, 300);
