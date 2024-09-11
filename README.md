@@ -4,8 +4,7 @@
 
 - Compile template:
   ```bash
-  handlebars template.handlebars -f template.precompiled.js
-  handlebars slider_template.handlebars -f slider_template.precompiled.js
+  handlebars src/template -f src/template/templates.precompiled.js
   ```
 - Pack plugin:
   ```bash

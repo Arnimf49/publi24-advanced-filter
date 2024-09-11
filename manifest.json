@@ -16,9 +16,9 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "tesseract/worker.min.js",
-        "tesseract/tesseract-core.wasm.js",
-        "tesseract/*.traineddata"
+        "library/tesseract/worker.min.js",
+        "library/tesseract/tesseract-core.wasm.js",
+        "library/tesseract/*.traineddata"
       ],
       "matches": ["*://www.publi24.ro/*"]
     }
@@ -27,34 +27,33 @@
     {
       "matches": ["https://www.publi24.ro/anunturi/*"],
       "js": [
-        "tesseract/tesseract.min.js",
-        "jimp.js",
-        "handlebars.js",
-        "template.precompiled.js",
-        "slider_template.precompiled.js",
-        "publi24_advanced_filter.js",
-        "splide/splide.min.js"
+        "library/tesseract/tesseract.min.js",
+        "library/jimp.js",
+        "library/handlebars.js",
+        "library/splide/splide.min.js",
+        "src/template/templates.precompiled.js",
+        "src/index.js"
       ],
       "css": [
-        "splide/splide.min.css"
+        "library/splide/splide.min.css"
       ]
     },
     {
       "matches": ["https://www.google.com/search?wwsid=*"],
       "js": [
-        "search_parser.js"
+        "src/search_parser.js"
       ]
     },
     {
       "matches": ["https://www.google.com/?wwiid=*"],
       "js": [
-        "image_parser.js"
+        "src/image_parser.js"
       ]
     },
     {
       "matches": ["https://lens.google.com/*"],
       "js": [
-        "image_parser_lens.js"
+        "src/image_parser_lens.js"
       ],
       "run_at": "document_idle"
     }
