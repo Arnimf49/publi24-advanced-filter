@@ -1,0 +1,29 @@
+<style>
+    .ww-saves-button {
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: 180px;
+        font-weight: bold;
+        background: #cb2727;
+        border-radius: 6px;
+        border: 1px solid white;
+        padding: 12px;
+        box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, .2);
+    }
+    .ww-saves-button:hover {
+        background: #df4a4a;
+    }
+</style>
+
+<button class="ww-saves-button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 30" fill="white" style="
+        vertical-align: middle;
+        position: absolute;
+        transform: scale(1.4);
+        left: 12px;
+    ">
+        <polygon points="12,2 15,10 23,10 17,14 19,22 12,17 5,22 7,14 1,10 9,10"/>
+    </svg> Favorite ({{count}})
+</button>

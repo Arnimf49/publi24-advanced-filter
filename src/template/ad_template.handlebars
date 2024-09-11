@@ -1,11 +1,19 @@
 <hr style="opacity: 0.02"/>
 <button type="button" style="background-color: #c59b2f" class="mainbg radius" data-wwid="toggle-hidden">Ascunde</button>
+
+<button style="vertical-align: middle; padding: 9px" data-wwid="temp-save">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+         fill="{{#if isTempSaved}}#cb2727{{else}}none{{/if}}"
+         stroke="{{#if isTempSaved}}none{{else}}#333{{/if}}" stroke-width="1">
+        <polygon points="12,2 15,10 23,10 17,14 19,22 12,17 5,22 7,14 1,10 9,10"/>
+    </svg>
+</button>
+
 {{#if hasNoPhone}}
     <span>anuntul nu are nr telefon;</span>
 {{/if}}
 <button type="button" {{#if hasNoPhone}}style="display:none;" {{/if}} class="mainbg radius" data-wwid="investigate">Analiza telefon</button>
-<button type="button" {{#unless searchLinks}}style="display:none;" {{/unless}} class="mainbg radius" data-wwid="investigate_img">Analiza imagine
-</button>
+<button type="button" {{#unless searchLinks}}style="display:none;" {{/unless}} class="mainbg radius" data-wwid="investigate_img">Analiza imagine</button>
 
 {{#if nimfomaneLink}}
     <a href='{{nimfomaneLink}}' target='_blank' style='position: relative'>

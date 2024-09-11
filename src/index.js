@@ -44,10 +44,13 @@ const BLACKLISTED_LINKS = [
 
 const IS_AD_PAGE = !!document.querySelector('[itemtype="https://schema.org/Offer"]');
 
+const STORAGE_KEYS = (id) => [[`ww:search_results:${id}`, `ww:image_results:${id}`], [`ww:visibility:${id}`, `ww:no_phone:${id}`]];
 const RENDER_CACHE_KEY = {};
 
-const TEMPLATE = Handlebars.templates.template;
+const AD_TEMPLATE = Handlebars.templates.ad_template;
+const ADS_TEMPLATE = Handlebars.templates.ads_template;
 const SLIDER_TEMPLATE = Handlebars.templates.slider_template;
+const SAVES_BUTTON_TEMPLATE = Handlebars.templates.saves_button_template;
 
 Handlebars.registerHelper('isUndefined', function(value) {
   return value === undefined;
@@ -70,7 +73,7 @@ const sortLinks = (links) => {
   })
 }
 
-function cleanupExistingRender(item) {
+function cleanupAdRender(item) {
   const existing = item.querySelector('.ww-container');
   if (existing) {
     existing.parentNode.removeChild(existing);
@@ -95,12 +98,8 @@ function getItemVisibility(id) {
   return !wasItemHidden && !wasPhoneHidden;
 }
 
-function doRender(item, id, storage) {
-  const phone = localStorage.getItem(`ww:phone:${id}`);
-  const visible = getItemVisibility(id);
-  const dueToPhoneHidden = isDueToPhoneHidden(id);
+function renderAdElement(item, id, storage) {
   const searchLinks = storage[`ww:search_results:${id}`];
-  const hasNoPhone = storage.local[`ww:no_phone:${id}`] === 'true';
   const filteredSearchLinks = sortLinks(filterLinks(searchLinks || []));
   const nimfomaneLink = filteredSearchLinks.find(l => l.indexOf('https://nimfomane.com/forum/topic/') === 0);
   const imageSearchLinks = storage[`ww:image_results:${id}`];
@@ -109,12 +108,13 @@ function doRender(item, id, storage) {
   const panelElement = document.createElement('div');
   panelElement.className = 'ww-container';
   panelElement.onclick = (e) => e.stopPropagation();
-  panelElement.innerHTML = TEMPLATE({
+  panelElement.innerHTML = AD_TEMPLATE({
     isAdPage: IS_AD_PAGE,
-    visible,
-    dueToPhoneHidden,
-    phone,
-    hasNoPhone,
+    isTempSaved: isTempSaved(itemToTempSaveId(item)),
+    visible: getItemVisibility(id),
+    dueToPhoneHidden: isDueToPhoneHidden(id),
+    hasNoPhone: storage.local[`ww:no_phone:${id}`] === 'true',
+    phone: localStorage.getItem(`ww:phone:${id}`),
     searchLinks,
     filteredSearchLinks,
     imageSearchLinks,
@@ -238,8 +238,15 @@ function registerInvestigateHandler(item, id) {
   }
 }
 
-async function loadInAdPage(item) {
-  const url = item.getAttribute('onclick').replace(/^.*\.href='([^']+)'.*/, '$1');
+function getItemUrl(itemOrUrl) {
+  if (typeof itemOrUrl === 'string') {
+    return itemOrUrl;
+  }
+  return itemOrUrl.getAttribute('onclick').replace(/^.*'(http[^']+)'.*/, '$1');
+}
+
+async function loadInAdPage(itemOrId) {
+  const url = getItemUrl(itemOrId);
   const pageResponse = await fetch(url);
   const html = await pageResponse.text();
   const temp = document.createElement('div');
@@ -306,9 +313,46 @@ function registerInvestigateImgHandler(item, id) {
   investigateImgBtn.onclick = createInvestigateImgClickHandler(id, item.querySelectorAll('.art-img img'));
 }
 
+function itemToTempSaveId(item) {
+  return item.getAttribute('data-articleid') + '|' + getItemUrl(item);
+}
+
+function tempSaveValueParts(id) {
+  return id.split('|');
+}
+
+function getTempSaved() {
+  return JSON.parse(sessionStorage.getItem('ww:temp_save') || '[]');
+}
+
+function toggleTempSave(id) {
+  let items = getTempSaved();
+
+  if (items.includes(id)) {
+    items = items.filter(it => it !== id);
+  } else {
+    items.push(id);
+  }
+
+  sessionStorage.setItem('ww:temp_save', JSON.stringify(items));
+}
+
+function isTempSaved(id) {
+  return getTempSaved().includes(id);
+}
+
+function registerTemporarySaveHandler(item, id) {
+  const tempSaveBtn = item.querySelector('[data-wwid="temp-save"]');
+  const tempSaveId = itemToTempSaveId(item);
+
+  tempSaveBtn.onclick = () => {
+    toggleTempSave(tempSaveId);
+    renderAdItem(item, id);
+  }
+}
+
 function registerOpenImagesSliderHandler(item, id) {
   const button = item.querySelector('.art-img a');
-  console.log(button)
 
   button.onclick = async (e) => {
     e.stopPropagation();
@@ -326,7 +370,7 @@ function registerOpenImagesSliderHandler(item, id) {
 
     const close = () => {
       document.body.removeChild(sliderContainer);
-      window.addEventListener('keydown',  closeOnKey);
+      window.removeEventListener('keydown',  closeOnKey);
     };
     const closeOnKey = (e) => {
       if (e.key === 'Escape') close();
@@ -337,6 +381,7 @@ function registerOpenImagesSliderHandler(item, id) {
     const visibilityButton = sliderContainer.querySelector('[data-wwid="toggle-hidden"]');
     const visibilityHandler = createVisibilityClickHandler(item, id);
     visibilityButton.onclick = function (e) {
+      e.stopPropagation();
       visibilityHandler.apply(this, [e]);
       close();
     };
@@ -344,6 +389,7 @@ function registerOpenImagesSliderHandler(item, id) {
     const analyzeImagesButton = sliderContainer.querySelector('[data-wwid="analyze-images"]');
     const imageInvestigateHandler = createInvestigateImgClickHandler(id, sliderContainer.querySelectorAll('li:not(.splide__slide--clone) img'));
     analyzeImagesButton.onclick = async (e) => {
+      e.stopPropagation();
       if (!localStorage.getItem(`ww:phone:${id}`)) {
         await investigateNumber(item, id);
       }
@@ -363,6 +409,7 @@ function registerHandlers(item, id) {
   registerVisibilityHandler(item, id);
   registerInvestigateHandler(item, id);
   registerInvestigateImgHandler(item, id);
+  registerTemporarySaveHandler(item, id);
 
   if (!IS_AD_PAGE) {
     registerOpenImagesSliderHandler(item, id);
@@ -376,25 +423,100 @@ async function getStorageItems(browserKeys, localKeys) {
   return browserValues;
 }
 
-function registerItem(item, id) {
-  const render = (searchResults) => {
-    RENDER_CACHE_KEY[id] = JSON.stringify(searchResults);
-    cleanupExistingRender(item);
-    doRender(item, id, searchResults);
-    registerHandlers(item, id);
+async function renderTemporarySavesModal() {
+  const items = getTempSaved();
+  const itemData = await Promise.all(
+    items.map((tempSaveId) => {
+      const [id, url] = tempSaveValueParts(tempSaveId);
+      return loadInAdPage(url).then((itemPage) => ({
+        id,
+        url,
+        title: itemPage.querySelector('[itemscope] h1[itemprop="name"]').innerHTML,
+        description: itemPage.querySelector('[itemscope] [itemprop="description"]').innerHTML,
+        image: itemPage.querySelector('[itemprop="image"]').src,
+      }))
+    }));
+
+  let itemRenderCleaners;
+  const container = document.createElement('div');
+  container.innerHTML = ADS_TEMPLATE({itemData});
+  document.body.appendChild(container);
+
+  const close = () => {
+    itemRenderCleaners.forEach(c => c());
+    document.body.removeChild(container);
+    window.removeEventListener('keydown',  closeOnKey);
+  };
+  const closeOnKey = (e) => {
+    if (e.key === 'Escape') close();
+  };
+
+  window.addEventListener('keydown',  closeOnKey);
+  const closeButton = container.querySelector('[data-wwid="close"]');
+  closeButton.onclick = close;
+  container.onclick = close;
+
+  itemRenderCleaners = registerAdsInContext(container);
+}
+
+function renderTemporarySavesButton() {
+  const existing = document.body.querySelector('[data-ww="saves-button"]');
+  existing && existing.parentNode.removeChild(existing);
+
+  const saves = getTempSaved();
+  if (saves.length === 0) {
+    return;
   }
 
-  const storageKeys = [[`ww:search_results:${id}`, `ww:image_results:${id}`], [`ww:visibility:${id}`, `ww:no_phone:${id}`]];
-  getStorageItems(...storageKeys)
-    .then(render);
+  const element = document.createElement('div');
+  element.innerHTML = SAVES_BUTTON_TEMPLATE({count: saves.length});
+  element.setAttribute('data-ww', 'saves-button');
+  document.body.appendChild(element);
 
+  element.querySelector('button').onclick = renderTemporarySavesModal;
+}
+
+function registerTemporarySavesButton() {
+  renderTemporarySavesButton();
+
+  let lastCount = getTempSaved().length;
   setInterval(() => {
-    getStorageItems(...storageKeys).then(r => {
+    if (lastCount !== getTempSaved().length) {
+      lastCount = getTempSaved().length;
+      renderTemporarySavesButton()
+    }
+  }, 1000);
+}
+
+function renderAdWithCleanupAndCache(item, id, searchResults) {
+  RENDER_CACHE_KEY[id] = JSON.stringify(searchResults);
+  cleanupAdRender(item);
+  renderAdElement(item, id, searchResults);
+  registerHandlers(item, id);
+}
+
+function renderAdItem(item, id) {
+  getStorageItems(...STORAGE_KEYS(id))
+    .then((r) => renderAdWithCleanupAndCache(item, id, r));
+}
+
+function registerAdItem(item, id) {
+  renderAdItem(item, id);
+
+  const interval = setInterval(() => {
+    getStorageItems(...STORAGE_KEYS(id)).then(r => {
       if (RENDER_CACHE_KEY[id] !== JSON.stringify(r)) {
-        render(r);
+        renderAdWithCleanupAndCache(item, id, r);
       }
     });
   }, 800);
+
+  return () => clearInterval(interval);
+}
+
+function registerAdsInContext(context) {
+  const items = context.querySelectorAll('[data-articleid]');
+  return [...items].map((item) => registerAdItem(item, item.getAttribute('data-articleid')));
 }
 
 if (IS_AD_PAGE) {
@@ -405,11 +527,9 @@ if (IS_AD_PAGE) {
 
   item.removeChild(item.lastElementChild);
   item.removeChild(item.lastElementChild);
-  registerItem(item, id.toUpperCase());
+  registerAdItem(item, id.toUpperCase());
 } else {
-  const items = document.body.querySelectorAll('[data-articleid]');
-  [...items].forEach((item) =>
-    registerItem(item, item.getAttribute('data-articleid'))
-  );
+  registerAdsInContext(document.body);
 }
 
+registerTemporarySavesButton();
