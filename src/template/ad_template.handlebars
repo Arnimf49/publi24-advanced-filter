@@ -24,7 +24,7 @@
                margin-top: 2px;
                margin-left: 2px;'
                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-            <polygon fill='#17c160' points="2.67 7.63 5.46 10.41 13.33 2.54 14.85 4.06 5.46 13.46 1.15 9.15 2.67 7.63"/>
+            <polygon fill='#8fc38f' points="2.67 7.63 5.46 10.41 13.33 2.54 14.85 4.06 5.46 13.46 1.15 9.15 2.67 7.63"/>
         </svg>
         <img style='background: #2f4979;
                   height: 45px;
@@ -44,12 +44,12 @@
     {{#if searchLinks}}
         <div>
             <h4 style='font-weight: bold; padding-top: 10px;'>{{phone}}</h4>
-            <h5 style="margin-top: 5px; font-size: 1.125rem">Rezultate după telefon</h5>
+            <h5 style="margin-top: 5px; margin-bottom: 3px; font-size: 1.125rem">Rezultate după telefon</h5>
             {{#if (isUndefined searchLinks)}}
                 <p style="color: rgb(34, 34, 34); font-size: .8125rem;">nerulat</p>
             {{else}}
                 {{#unless filteredSearchLinks.length}}
-                    <p style="color: rgb(123 91 91); font-size: .8125rem;">nu au fost găsite linkuri relevante</p>
+                    <p style="color: rgb(103,109,92); font-size: .8125rem;">nu au fost găsite linkuri relevante</p>
                 {{else}}
                     {{#each filteredSearchLinks}}
                         <div style="font-size: .8125rem; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
@@ -58,19 +58,37 @@
                 {{/unless}}
             {{/if}}
 
-            <h5 style="margin-top: 5px; font-size: 1.125rem">Rezultate după imagine</h5>
-            {{#if (isUndefined imageSearchLinks)}}
+            <h5 style="margin-top: 5px; margin-bottom: 3px; font-size: 1.125rem">Rezultate dupa imagine</h5>
+            {{#unless imageSearchDomains.length}}
                 <p style="color: rgb(34, 34, 34); font-size: .8125rem;">nerulat</p>
             {{else}}
-                {{#unless filteredImageSearchLinks.length}}
-                    <p style="color: rgb(123 91 91); font-size: .8125rem;">nu au fost găsite linkuri relevante</p>
+                {{#unless imageSearchDomains.length}}
+                    <p style="color: rgb(103,109,92); font-size: .8125rem;">nu au fost găsite linkuri relevante</p>
                 {{else}}
-                    {{#each filteredImageSearchLinks}}
-                        <div style="font-size: .8125rem; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
-                            <a onclick='event.stopPropagation()' href="{{this}}" target="_blank">{{this}}</a></div>
-                    {{/each}}
+                    <div style="font-size: .8125rem;">
+                        {{#each imageSearchDomains}}
+                            {{#each this.links}}
+                                <a href="{{this}}" target="_blank"
+                                   style="display: inline-block;
+                                           background-color: {{#if ../isSafe}}#d1e1d1{{else}}#efe2e2{{/if}};
+                                           padding: 5px;
+                                           margin-right: 3px;
+                                           margin-bottom: 6px;
+                                           border-radius: 5px;
+                                           text-decoration: none;
+                                           color: rgb(55 55 55);
+                               ">
+                                    {{#if @first}}
+                                        {{../domain}}
+                                    {{else}}
+                                        <span style="font-size: .6rem">#</span>{{inc @index}}
+                                    {{/if}}
+                                </a>
+                            {{/each}}
+                        {{/each}}
+                    </div>
                 {{/unless}}
-            {{/if}}
+            {{/unless}}
         </div>
     {{else}}
         <span>neanalizat</span>

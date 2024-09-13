@@ -53,9 +53,13 @@ const SLIDER_TEMPLATE = Handlebars.templates.slider_template;
 const SAVES_BUTTON_TEMPLATE = Handlebars.templates.saves_button_template;
 
 const modalsOpen = [];
+const SAFE_LAST_DOMAIN_PARTS = ['.ro', 'nimfomane.com', 'escorte.pro'];
 
 Handlebars.registerHelper('isUndefined', function(value) {
   return value === undefined;
+});
+Handlebars.registerHelper('inc', function(value) {
+  return ++value;
 });
 
 const filterLinks = (links) => {
@@ -100,12 +104,31 @@ function getItemVisibility(id) {
   return !wasItemHidden && !wasPhoneHidden;
 }
 
+function extractUniqueDomains(links) {
+  const domainMap = {};
+
+  links.forEach((link, index) => {
+    const domain = new URL(link).hostname.split('.').slice(-2).join('.');
+    if (!domainMap[domain]) {
+      domainMap[domain] = {
+        links: [link],
+        isSafe: SAFE_LAST_DOMAIN_PARTS.some((part) => domain.includes(part) )
+      };
+    } else {
+      domainMap[domain].links.push(link);
+    }
+  });
+
+  return Object.entries(domainMap).map(([domain, { links, isSafe }]) => ({ domain, links, isSafe }));
+}
+
+
 function renderAdElement(item, id, storage) {
   const searchLinks = storage[`ww:search_results:${id}`];
   const filteredSearchLinks = sortLinks(filterLinks(searchLinks || []));
   const nimfomaneLink = filteredSearchLinks.find(l => l.indexOf('https://nimfomane.com/forum/topic/') === 0);
-  const imageSearchLinks = storage[`ww:image_results:${id}`];
-  const filteredImageSearchLinks = sortLinks(filterLinks(imageSearchLinks || []));
+  const imageSearchLinks = storage[`ww:image_results:${id}`] || [];
+  const imageSearchDomains = extractUniqueDomains(imageSearchLinks);
 
   const panelElement = document.createElement('div');
   panelElement.className = 'ww-container';
@@ -119,8 +142,7 @@ function renderAdElement(item, id, storage) {
     phone: localStorage.getItem(`ww:phone:${id}`),
     searchLinks,
     filteredSearchLinks,
-    imageSearchLinks,
-    filteredImageSearchLinks,
+    imageSearchDomains,
     nimfomaneLink
   });
 
