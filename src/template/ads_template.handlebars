@@ -52,7 +52,6 @@
                         <div class="article-content-wrap" style="overflow: visible">
                             <div class="art-img">
                                 <a><img src="{{this.image}}" width="200" height="200"/></a>
-                                <p class="article-location" style="font-style: italic; color: #555;">{{this.location}}</p>
                             </div>
 
                             <div class="article-content">
@@ -61,6 +60,13 @@
                                 {{/if}}
                                 <h2 class="article-title"><a href="{{this.url}}" target="_blank">{{title}}</a></h2>
                                 <p class="article-description">{{{this.description}}}</p>
+
+                                <p class="article-location">
+                                    <i class="svg-icon svg-icon-article">
+                                        <svg viewBox="0 0 50 50" aria-hidden="true"><use xlink:href="#svg-icon-location"></use></svg>
+                                    </i>
+                                    <span>{{this.location}}</span>
+                                </p>
                             </div>
                         </div>
                     </div>
