@@ -10,7 +10,7 @@
             padding-bottom: 100px;
             overflow-y: scroll;
 ">
-    <div style="width: 100%; max-width: 1000px; padding: 20px; background: #ececec; border-radius: 10px; margin: auto; position: relative;" onclick="event.stopPropagation()">
+    <div class="rmd-container-search-results" style="width: 100%; max-width: 1000px; padding: 20px !important; background: #ececec; border-radius: 10px; margin: auto; position: relative;" onclick="event.stopPropagation()">
         <div style="position: absolute; top: -70px; width: 100%; margin-left: -20px;">
             <h2 style=" font-weight: bold;
                         color: #edd492;
@@ -59,14 +59,20 @@
                                     <h3 class="article-title" style="color: #c59b2f">(duplicat)</h3>
                                 {{/if}}
                                 <h2 class="article-title"><a href="{{this.url}}" target="_blank">{{title}}</a></h2>
-                                <p class="article-description">{{{this.description}}}</p>
+                                <p style="display: block" class="article-description">{{{this.description}}}</p>
 
-                                <p class="article-location">
+                                <p class="article-location" style="float: left">
                                     <i class="svg-icon svg-icon-article">
                                         <svg viewBox="0 0 50 50" aria-hidden="true"><use xlink:href="#svg-icon-location"></use></svg>
                                     </i>
                                     <span>{{this.location}}</span>
                                 </p>
+
+                                {{#if this.qrCode}}
+                                    <div class="qr-code" style="float: right">
+                                        <img src="{{this.qrCode}}" title="scaneaza pt telefon" width="85"/>
+                                    </div>
+                                {{/if}}
                             </div>
                         </div>
                     </div>

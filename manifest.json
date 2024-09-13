@@ -31,6 +31,7 @@
         "library/jimp.js",
         "library/handlebars.js",
         "library/splide/splide.min.js",
+        "library/qrcode.js",
         "src/template/templates.precompiled.js",
         "src/index.js"
       ],

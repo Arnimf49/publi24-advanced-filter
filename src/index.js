@@ -473,18 +473,40 @@ async function getStorageItems(browserKeys, localKeys) {
   return browserValues;
 }
 
+async function getPhoneQrCode(phone) {
+  return new Promise((res, rej) => {
+    try {
+      QRCode.toDataURL(`tel:${phone}`, (err, url) => {
+        if (err) {
+          rej(err);
+        } else {
+          res(url);
+        }
+      });
+    } catch (error) {
+      rej(error);
+    }
+  });
+}
+
 async function loadTempSaveAdsData() {
   const items = getTempSaved().reverse();
   let itemData = await Promise.all(
     items.map((tempSaveId) => {
       const [id, url] = tempSaveValueParts(tempSaveId);
+
       return loadInAdPage(url)
-        .then((itemPage) => ({
+        .then(async (itemPage) => ({
           id,
           url,
           phone: localStorage.getItem(`ww:phone:${id}`),
+          qrCode: localStorage.getItem(`ww:phone:${id}`) && await getPhoneQrCode(localStorage.getItem(`ww:phone:${id}`)),
           title: itemPage.querySelector('[itemscope] h1[itemprop="name"]').innerHTML,
-          description: itemPage.querySelector('[itemscope] [itemprop="description"]').innerHTML,
+          description: itemPage.querySelector('[itemscope] [itemprop="description"]').innerHTML
+            .replace(/<[^>]*>/gi, ' ')
+            .replace(/\s+/g, ' ')
+            .replace(/Publi24_\d+/, '')
+            .trim().substring(0, 290),
           image: itemPage.querySelector('[itemprop="image"]').src,
           location: itemPage.querySelector('[itemtype="https://schema.org/Place"]')?.textContent.trim(),
         }))
