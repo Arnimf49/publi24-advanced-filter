@@ -561,6 +561,13 @@ async function renderTemporarySavesModal() {
   };
 
   window.addEventListener('keydown',  closeOnKey);
+
+  const clearFavoritesButton = container.querySelector('[data-wwid="clear-favorites"]');
+  clearFavoritesButton.onclick = () => {
+    localStorage.removeItem('ww:temp_save');
+    close();
+  };
+
   const closeButton = container.querySelector('[data-wwid="close"]');
   closeButton.onclick = close;
   container.onclick = close;
