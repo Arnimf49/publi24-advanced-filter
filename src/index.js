@@ -349,7 +349,7 @@ function tempSaveValueParts(id) {
 }
 
 function getTempSaved() {
-  return JSON.parse(sessionStorage.getItem('ww:temp_save') || '[]');
+  return JSON.parse(localStorage.getItem('ww:temp_save') || '[]');
 }
 
 function toggleTempSave(id) {
@@ -361,7 +361,7 @@ function toggleTempSave(id) {
     items.push(id);
   }
 
-  sessionStorage.setItem('ww:temp_save', JSON.stringify(items));
+  localStorage.setItem('ww:temp_save', JSON.stringify(items));
 }
 
 function isTempSaved(id) {
@@ -462,17 +462,25 @@ async function loadTempSaveAdsData() {
   let itemData = await Promise.all(
     items.map((tempSaveId) => {
       const [id, url] = tempSaveValueParts(tempSaveId);
-      return loadInAdPage(url).then((itemPage) => ({
-        id,
-        url,
-        phone: localStorage.getItem(`ww:phone:${id}`),
-        title: itemPage.querySelector('[itemscope] h1[itemprop="name"]').innerHTML,
-        description: itemPage.querySelector('[itemscope] [itemprop="description"]').innerHTML,
-        image: itemPage.querySelector('[itemprop="image"]').src,
-      })).catch((e) => {
-        console.error(e);
-        return null;
-      })
+      return loadInAdPage(url)
+        .then((itemPage) => {
+          if (!itemPage.querySelector('[itemscope] h1[itemprop="name"]')) {
+            throw new Error('404 Not Found');
+          }
+          return {
+            id,
+            url,
+            phone: localStorage.getItem(`ww:phone:${id}`),
+            title: itemPage.querySelector('[itemscope] h1[itemprop="name"]').innerHTML,
+            description: itemPage.querySelector('[itemscope] [itemprop="description"]').innerHTML,
+            image: itemPage.querySelector('[itemprop="image"]').src,
+          };
+        })
+        .catch((e) => {
+          console.error(e);
+          toggleTempSave(id + '|' + url); // Remove from temp saves if 404
+          return null;
+        });
     }));
 
   itemData = itemData.filter((f) => !!f);
