@@ -375,6 +375,11 @@ function registerTemporarySaveHandler(item, id) {
   tempSaveBtn.onclick = () => {
     toggleTempSave(tempSaveId);
     renderAdItem(item, id);
+
+    const modalParent = item.closest('[data-ww="favorites-modal"]');
+    if (modalParent && typeof modalParent.removeAd === 'function') {
+      modalParent.removeAd(item);
+    }
   }
 }
 
@@ -493,9 +498,15 @@ async function loadTempSaveAdsData() {
 async function renderTemporarySavesModal() {
   let itemRenderCleaners;
   const container = document.createElement('div');
+  container.setAttribute('data-ww', 'favorites-modal');
   container.innerHTML = ADS_TEMPLATE({itemData: await loadTempSaveAdsData()});
   document.body.appendChild(container);
   modalsOpen.push(container);
+
+  container.removeAd = (adElement) => {
+    adElement.remove();
+    adElement.stopRender();
+  };
 
   const close = () => {
     itemRenderCleaners.forEach(c => c());
@@ -567,7 +578,10 @@ function registerAdItem(item, id) {
     });
   }, 800);
 
-  return () => clearInterval(interval);
+  const stopRender = () => clearInterval(interval);
+  item.stopRender = stopRender;
+
+  return stopRender;
 }
 
 function registerAdsInContext(context) {
