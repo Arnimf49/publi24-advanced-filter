@@ -650,5 +650,7 @@ if (IS_AD_PAGE) {
   registerAdItem(item, id.toUpperCase());
 } else {
   registerAdsInContext(document.body);
-  registerTemporarySavesButton();
+  if (location.pathname.startsWith('/anunturi/matrimoniale')) {
+    registerTemporarySavesButton();
+  }
 }
