@@ -125,7 +125,7 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
     + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"visible") : depth0),{"name":"if","hash":{},"fn":container.program(15, data, 0),"inverse":container.program(30, data, 0),"data":data,"loc":{"start":{"line":43,"column":0},"end":{"line":80,"column":7}}})) != null ? stack1 : "");
 },"useData":true});
 templates['ads_template'] = template({"1":function(container,depth0,helpers,partials,data) {
-    var stack1, helper, alias1=container.lambda, alias2=container.escapeExpression, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+    var stack1, helper, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
         }
@@ -134,17 +134,25 @@ templates['ads_template'] = template({"1":function(container,depth0,helpers,part
 
   return "            <div class=\"article-item\" data-articleid=\""
     + alias2(alias1((depth0 != null ? lookupProperty(depth0,"id") : depth0), depth0))
-    + "\" style=\"margin-bottom: 30px\" onclick=\"window.open('"
+    + "\"\n                 style=\"margin-bottom: 30px;\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"duplicate") : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":41,"column":24},"end":{"line":46,"column":31}}})) != null ? stack1 : "")
+    + "                        \"\n                 onclick=\"window.open('"
     + alias2(alias1((depth0 != null ? lookupProperty(depth0,"url") : depth0), depth0))
-    + "', '_blank')\">\n                <div class=\"article-txt-wrap\">\n                    <div class=\"article-txt\" style=\"padding-right: 20px\">\n                        <div class=\"article-content-wrap\" style=\"overflow: visible\">\n                            <div class=\"art-img\">\n                                <a><img src=\""
+    + "', '_blank')\"\n            >\n                <div class=\"article-txt-wrap\">\n                    <div class=\"article-txt\" style=\"padding-right: 20px\">\n                        <div class=\"article-content-wrap\" style=\"overflow: visible\">\n                            <div class=\"art-img\">\n                                <a><img src=\""
     + alias2(alias1((depth0 != null ? lookupProperty(depth0,"image") : depth0), depth0))
-    + "\" width=\"200\" height=\"200\"/></a>\n                            </div>\n\n                            <div class=\"article-content\">\n                                <h2 class=\"article-title\"><a href=\""
+    + "\" width=\"200\" height=\"200\"/></a>\n                            </div>\n\n                            <div class=\"article-content\">\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"duplicate") : depth0),{"name":"if","hash":{},"fn":container.program(4, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":58,"column":32},"end":{"line":60,"column":39}}})) != null ? stack1 : "")
+    + "                                <h2 class=\"article-title\"><a href=\""
     + alias2(alias1((depth0 != null ? lookupProperty(depth0,"url") : depth0), depth0))
     + "\" target=\"_blank\">"
-    + alias2(((helper = (helper = lookupProperty(helpers,"title") || (depth0 != null ? lookupProperty(depth0,"title") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"title","hash":{},"data":data,"loc":{"start":{"line":48,"column":97},"end":{"line":48,"column":106}}}) : helper)))
+    + alias2(((helper = (helper = lookupProperty(helpers,"title") || (depth0 != null ? lookupProperty(depth0,"title") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(alias3,{"name":"title","hash":{},"data":data,"loc":{"start":{"line":61,"column":97},"end":{"line":61,"column":106}}}) : helper)))
     + "</a></h2>\n                                <p class=\"article-description\">"
     + ((stack1 = alias1((depth0 != null ? lookupProperty(depth0,"description") : depth0), depth0)) != null ? stack1 : "")
     + "</p>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n";
+},"2":function(container,depth0,helpers,partials,data) {
+    return "                            margin-top: -35px;\n                            border-top-right-radius: 0;\n                            border-top-left-radius: 0;\n                            border-top: none;\n";
+},"4":function(container,depth0,helpers,partials,data) {
+    return "                                    <h3 class=\"article-title\" style=\"color: #c59b2f\">(duplicat)</h3>\n";
 },"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
@@ -154,7 +162,7 @@ templates['ads_template'] = template({"1":function(container,depth0,helpers,part
     };
 
   return "<div style=\"position: fixed;\n            top: 0;\n            left: 0;\n            width: 100%;\n            height: 100%;\n            background: rgba(0,0,0,0.85);\n            z-index: 10000;\n            padding: 30px;\n            padding-top: 100px;\n            padding-bottom: 100px;\n            overflow-y: scroll;\n\">\n    <div style=\"width: 100%; max-width: 1000px; padding: 20px; background: #ececec; border-radius: 10px; margin: auto; position: relative;\" onclick=\"event.stopPropagation()\">\n        <div style=\"position: absolute; top: -70px; width: 100%; margin-left: -20px;\">\n            <h2 style=\" font-weight: bold;\n                        color: #edd492;\n                        float: left;\n                        text-shadow: 2px 2px 2px rgba(0, 0, 0, .2);\n                        background: #bd3636;\n                        padding: 5px 20px;\n                        border-radius: 10px;\n                        margin-top: -10px;\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 30\" fill=\"#edd492\" style=\"\n                        vertical-align: middle;\n                        transform: scale(2);\n                    \">\n                    <polygon points=\"12,2 15,10 23,10 17,14 19,22 12,17 5,22 7,14 1,10 9,10\"/>\n                </svg> Favorite\n            </h2>\n            <button type=\"button\" class=\"mainbg radius\" style=\"float: right; border-radius: 1000px; padding: 11px; line-height: 0; background: rgba(255,255,255,0.6)\" data-wwid=\"close\">\n                <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\">\n                    <line x1=\"4\" y1=\"4\" x2=\"20\" y2=\"20\" stroke=\"black\" stroke-width=\"2\"/>\n                    <line x1=\"20\" y1=\"4\" x2=\"4\" y2=\"20\" stroke=\"black\" stroke-width=\"2\"/>\n                </svg>\n            </button>\n        </div>\n\n"
-    + ((stack1 = lookupProperty(helpers,"each").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"itemData") : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":38,"column":8},"end":{"line":55,"column":17}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"each").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"itemData") : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":38,"column":8},"end":{"line":68,"column":17}}})) != null ? stack1 : "")
     + "    </div>\n</div>\n";
 },"useData":true});
 templates['saves_button_template'] = template({"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {

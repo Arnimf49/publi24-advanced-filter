@@ -52,6 +52,8 @@ const ADS_TEMPLATE = Handlebars.templates.ads_template;
 const SLIDER_TEMPLATE = Handlebars.templates.slider_template;
 const SAVES_BUTTON_TEMPLATE = Handlebars.templates.saves_button_template;
 
+const modalsOpen = [];
+
 Handlebars.registerHelper('isUndefined', function(value) {
   return value === undefined;
 });
@@ -239,6 +241,9 @@ function registerInvestigateHandler(item, id) {
 }
 
 function getItemUrl(itemOrUrl) {
+  if (IS_AD_PAGE) {
+    return location.toString();
+  }
   if (typeof itemOrUrl === 'string') {
     return itemOrUrl;
   }
@@ -287,15 +292,15 @@ function createInvestigateImgClickHandler(id, images) {
 
     let imgs;
 
-    if (images) {
+    if (images && images.length) {
       imgs = images;
     }
     else if (IS_AD_PAGE) {
-      let imgs = document.querySelectorAll('[id="detail-gallery"] img');
+      imgs = document.body.querySelectorAll('[id="detail-gallery"] img');
 
       // Maybe the post has only one picture. In that case gallery is not shown.
       if (imgs.length === 0) {
-        imgs = document.querySelectorAll('[class="detailViewImg "]');
+        imgs = document.body.querySelectorAll('[class="detailViewImg "]');
       }
     }
 
@@ -364,16 +369,18 @@ function registerOpenImagesSliderHandler(item, id) {
     const sliderContainer = document.createElement('div');
     sliderContainer.id = '_ww_slider';
     sliderContainer.innerHTML = SLIDER_TEMPLATE({images, visible});
+    modalsOpen.push(sliderContainer);
 
     document.body.appendChild(sliderContainer);
     new Splide( '#_ww_slider .splide', { focus: 'center', type: 'loop', keyboard: 'global' }).mount();
 
     const close = () => {
       document.body.removeChild(sliderContainer);
+      modalsOpen.pop();
       window.removeEventListener('keydown',  closeOnKey);
     };
     const closeOnKey = (e) => {
-      if (e.key === 'Escape') close();
+      if (e.key === 'Escape' && modalsOpen[modalsOpen.length-1] === sliderContainer) close();
     };
 
     window.addEventListener('keydown',  closeOnKey);
@@ -423,32 +430,59 @@ async function getStorageItems(browserKeys, localKeys) {
   return browserValues;
 }
 
-async function renderTemporarySavesModal() {
-  const items = getTempSaved();
-  const itemData = await Promise.all(
+async function loadTempSaveAdsData() {
+  const items = getTempSaved().reverse();
+  let itemData = await Promise.all(
     items.map((tempSaveId) => {
       const [id, url] = tempSaveValueParts(tempSaveId);
       return loadInAdPage(url).then((itemPage) => ({
         id,
         url,
+        phone: localStorage.getItem(`ww:phone:${id}`),
         title: itemPage.querySelector('[itemscope] h1[itemprop="name"]').innerHTML,
         description: itemPage.querySelector('[itemscope] [itemprop="description"]').innerHTML,
         image: itemPage.querySelector('[itemprop="image"]').src,
-      }))
+      })).catch((e) => {
+        console.error(e);
+        return null;
+      })
     }));
 
+  itemData = itemData.filter((f) => !!f);
+
+  for (let i = 0; i < itemData.length; i++) {
+    if (!itemData[i].phone) {
+      continue;
+    }
+    let duplicateIndex = itemData.findIndex((f, j) => j > i && f.phone === itemData[i].phone);
+    if (duplicateIndex !== -1) {
+      const duplicate = itemData[duplicateIndex];
+      duplicate.duplicate = true;
+      for (let j = duplicateIndex; j > i + 1; j--) {
+        itemData[j] = itemData[j - 1];
+      }
+      itemData[i + 1] = duplicate;
+    }
+  }
+
+  return itemData;
+}
+
+async function renderTemporarySavesModal() {
   let itemRenderCleaners;
   const container = document.createElement('div');
-  container.innerHTML = ADS_TEMPLATE({itemData});
+  container.innerHTML = ADS_TEMPLATE({itemData: await loadTempSaveAdsData()});
   document.body.appendChild(container);
+  modalsOpen.push(container);
 
   const close = () => {
     itemRenderCleaners.forEach(c => c());
     document.body.removeChild(container);
+    modalsOpen.pop();
     window.removeEventListener('keydown',  closeOnKey);
   };
   const closeOnKey = (e) => {
-    if (e.key === 'Escape') close();
+    if (e.key === 'Escape' && modalsOpen[modalsOpen.length-1] === container) close();
   };
 
   window.addEventListener('keydown',  closeOnKey);
@@ -524,12 +558,12 @@ if (IS_AD_PAGE) {
     .getAttribute('data-url')
     .replace(/^.*?adid=([^&]+)&.*$/, "$1");
   const item = document.body.querySelector('[itemtype="https://schema.org/Offer"]');
+  item.setAttribute('data-articleid', id);
 
   item.removeChild(item.lastElementChild);
   item.removeChild(item.lastElementChild);
   registerAdItem(item, id.toUpperCase());
 } else {
   registerAdsInContext(document.body);
+  registerTemporarySavesButton();
 }
-
-registerTemporarySavesButton();

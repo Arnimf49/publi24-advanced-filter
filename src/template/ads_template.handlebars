@@ -36,7 +36,17 @@
         </div>
 
         {{#each itemData}}
-            <div class="article-item" data-articleid="{{this.id}}" style="margin-bottom: 30px" onclick="window.open('{{this.url}}', '_blank')">
+            <div class="article-item" data-articleid="{{this.id}}"
+                 style="margin-bottom: 30px;
+                        {{#if this.duplicate}}
+                            margin-top: -35px;
+                            border-top-right-radius: 0;
+                            border-top-left-radius: 0;
+                            border-top: none;
+                        {{/if}}
+                        "
+                 onclick="window.open('{{this.url}}', '_blank')"
+            >
                 <div class="article-txt-wrap">
                     <div class="article-txt" style="padding-right: 20px">
                         <div class="article-content-wrap" style="overflow: visible">
@@ -45,6 +55,9 @@
                             </div>
 
                             <div class="article-content">
+                                {{#if this.duplicate}}
+                                    <h3 class="article-title" style="color: #c59b2f">(duplicat)</h3>
+                                {{/if}}
                                 <h2 class="article-title"><a href="{{this.url}}" target="_blank">{{title}}</a></h2>
                                 <p class="article-description">{{{this.description}}}</p>
                             </div>
