@@ -486,6 +486,7 @@ async function loadTempSaveAdsData() {
           title: itemPage.querySelector('[itemscope] h1[itemprop="name"]').innerHTML,
           description: itemPage.querySelector('[itemscope] [itemprop="description"]').innerHTML,
           image: itemPage.querySelector('[itemprop="image"]').src,
+          location: itemPage.querySelector('[itemtype="https://schema.org/Place"]')?.textContent.trim(),
         }))
         .catch(async (e) => {
           console.error(e);
