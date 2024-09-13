@@ -42,6 +42,18 @@ const BLACKLISTED_LINKS = [
   'http://www.telefonforsaljare.nu/',
 ]
 
+const SAFE_LAST_DOMAIN_PARTS = [
+  '.ro',
+  'nimfomane.com',
+  'ddcforum.com',
+  'escorte.pro',
+  'escortsromania.net',
+  'excorte.net',
+  'brailaescorte.com',
+  'sexyro.com',
+  'xlamma.com',
+];
+
 const IS_AD_PAGE = !!document.querySelector('[itemtype="https://schema.org/Offer"]');
 
 const STORAGE_KEYS = (id) => [[`ww:search_results:${id}`, `ww:image_results:${id}`], [`ww:visibility:${id}`, `ww:no_phone:${id}`]];
@@ -53,7 +65,6 @@ const SLIDER_TEMPLATE = Handlebars.templates.slider_template;
 const SAVES_BUTTON_TEMPLATE = Handlebars.templates.saves_button_template;
 
 const modalsOpen = [];
-const SAFE_LAST_DOMAIN_PARTS = ['.ro', 'nimfomane.com', 'escorte.pro'];
 
 Handlebars.registerHelper('isUndefined', function(value) {
   return value === undefined;
@@ -108,7 +119,7 @@ function extractUniqueDomains(links) {
   const domainMap = {};
 
   links.forEach((link, index) => {
-    const domain = new URL(link).hostname.split('.').slice(-2).join('.');
+    const domain = new URL(link).hostname.replace('www.', '');
     if (!domainMap[domain]) {
       domainMap[domain] = {
         links: [link],
@@ -275,6 +286,11 @@ function getItemUrl(itemOrUrl) {
 async function loadInAdPage(itemOrId) {
   const url = getItemUrl(itemOrId);
   const pageResponse = await fetch(url);
+
+  if (!pageResponse.ok) {
+    throw new Error(`Failed to load ${url}`);
+  }
+
   const html = await pageResponse.text();
   const temp = document.createElement('div');
   temp.innerHTML = html;
@@ -463,22 +479,17 @@ async function loadTempSaveAdsData() {
     items.map((tempSaveId) => {
       const [id, url] = tempSaveValueParts(tempSaveId);
       return loadInAdPage(url)
-        .then((itemPage) => {
-          if (!itemPage.querySelector('[itemscope] h1[itemprop="name"]')) {
-            throw new Error('404 Not Found');
-          }
-          return {
-            id,
-            url,
-            phone: localStorage.getItem(`ww:phone:${id}`),
-            title: itemPage.querySelector('[itemscope] h1[itemprop="name"]').innerHTML,
-            description: itemPage.querySelector('[itemscope] [itemprop="description"]').innerHTML,
-            image: itemPage.querySelector('[itemprop="image"]').src,
-          };
-        })
-        .catch((e) => {
+        .then((itemPage) => ({
+          id,
+          url,
+          phone: localStorage.getItem(`ww:phone:${id}`),
+          title: itemPage.querySelector('[itemscope] h1[itemprop="name"]').innerHTML,
+          description: itemPage.querySelector('[itemscope] [itemprop="description"]').innerHTML,
+          image: itemPage.querySelector('[itemprop="image"]').src,
+        }))
+        .catch(async (e) => {
           console.error(e);
-          toggleTempSave(id + '|' + url); // Remove from temp saves if 404
+          toggleTempSave(id + '|' + url);
           return null;
         });
     }));
