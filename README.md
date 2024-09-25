@@ -4,7 +4,7 @@
 
 - Compile template:
   ```bash
-  handlebars src/template -f src/template/templates.precompiled.js
+  npx watch "handlebars src/template -f src/template/templates.precompiled.js" src/template
   ```
 - Pack plugin:
   ```bash

@@ -52,12 +52,13 @@ const SAFE_LAST_DOMAIN_PARTS = [
   'brailaescorte.com',
   'sexyro.com',
   'xlamma.com',
+  'escorte-cluj.com',
 ];
 
+const IS_MOBILE_VIEW = ('ontouchstart' in document.documentElement);
 const IS_AD_PAGE = !!document.querySelector('[itemtype="https://schema.org/Offer"]');
 
 const STORAGE_KEYS = (id) => [[`ww:search_results:${id}`, `ww:image_results:${id}`], [`ww:visibility:${id}`, `ww:no_phone:${id}`]];
-const RENDER_CACHE_KEY = {};
 
 const AD_TEMPLATE = Handlebars.templates.ad_template;
 const ADS_TEMPLATE = Handlebars.templates.ads_template;
@@ -138,14 +139,15 @@ function renderAdElement(item, id, storage) {
   const searchLinks = storage[`ww:search_results:${id}`];
   const filteredSearchLinks = sortLinks(filterLinks(searchLinks || []));
   const nimfomaneLink = filteredSearchLinks.find(l => l.indexOf('https://nimfomane.com/forum/topic/') === 0);
-  const imageSearchLinks = storage[`ww:image_results:${id}`] || [];
-  const imageSearchDomains = extractUniqueDomains(imageSearchLinks);
+  const imageSearchLinks = storage[`ww:image_results:${id}`];
+  const imageSearchDomains = imageSearchLinks ? extractUniqueDomains(imageSearchLinks) : undefined;
 
   const panelElement = document.createElement('div');
   panelElement.className = 'ww-container';
   panelElement.onclick = (e) => e.stopPropagation();
   panelElement.innerHTML = AD_TEMPLATE({
-    isAdPage: IS_AD_PAGE,
+    IS_MOBILE_VIEW,
+    IS_AD_PAGE,
     isTempSaved: isTempSaved(itemToTempSaveId(item)),
     visible: getItemVisibility(id),
     dueToPhoneHidden: isDueToPhoneHidden(id),
@@ -161,8 +163,6 @@ function renderAdElement(item, id, storage) {
 }
 
 function setItemVisible(item, v) {
-  const toggleVisibilityBtn = item.querySelector('[data-wwid="toggle-hidden"]');
-  toggleVisibilityBtn.innerHTML = v ? 'Ascunde' : 'Ma-m răzgândit';
   item.style.opacity = v ? '1' : '0.3';
 }
 
@@ -217,6 +217,18 @@ async function readNumbersFromBase64Png(data) {
 }
 
 async function acquirePhoneNumber(item, id) {
+  if (IS_MOBILE_VIEW) {
+    const adPage = await loadInAdPage(item, id);
+    const phoneNumber = adPage.innerHTML.match(/var cnt = ['"](\d+)['"]/);
+
+    if (!phoneNumber) {
+      return false;
+    }
+
+    localStorage.setItem(`ww:phone:${id}`, phoneNumber[1]);
+    return phoneNumber[1];
+  }
+
   const phoneNumberEncrypted = IS_AD_PAGE
     ? document.querySelector('[id="EncryptedPhone"]')?.value
     : await acquireEncryptedPhoneNumber(item);
@@ -243,21 +255,25 @@ async function acquirePhoneNumber(item, id) {
   return phoneNumber;
 }
 
-async function investigateNumber(item, id) {
+async function investigateNumber(item, id, open = true) {
   const phoneNumber = await acquirePhoneNumber(item, id);
 
   if (!phoneNumber) {
     localStorage.setItem(`ww:no_phone:${id}`, 'true');
-    return;
+    return false;
   }
 
   if (localStorage.getItem(`ww:phone:${phoneNumber}:visible`) === 'false') {
     setItemVisible(item, false);
   }
 
-  const encodedId = encodeURIComponent(id);
-  const encodedPhoneNumber = encodeURIComponent(phoneNumber);
-  window.open(`https://www.google.com/search?wwsid=${encodedId}&q=${encodedPhoneNumber}`);
+  if (open) {
+    const encodedId = encodeURIComponent(id);
+    const encodedPhoneNumber = encodeURIComponent(phoneNumber);
+    window.open(`https://www.google.com/search?wwsid=${encodedId}&q=${encodedPhoneNumber}`);
+  }
+
+  return true;
 }
 
 function registerInvestigateHandler(item, id) {
@@ -304,6 +320,11 @@ async function acquireEncryptedPhoneNumber(item) {
 
 async function acquireSliderImages(item) {
   const adPage = await loadInAdPage(item);
+
+  if (IS_MOBILE_VIEW) {
+    return [...new Set(adPage.innerHTML.match(/https:\/\/s3\.publi24\.ro\/[^.]+\.jpg/g))];
+  }
+
   const items = [...adPage.querySelectorAll('[id="detail-gallery"] img')]
     .map((item) => item.getAttribute('src').replace('/top/', '/extralarge/'));
 
@@ -315,37 +336,59 @@ async function acquireSliderImages(item) {
     .map((item) => item.getAttribute('src'));
 }
 
-function createInvestigateImgClickHandler(id, images) {
+function createInvestigateImgClickHandler(id, item) {
   const openImageInvestigation = (imgLink, index = 0) => {
     const encodedId = encodeURIComponent(id);
     const encodedLink = encodeURIComponent(imgLink);
-    window.open(`https://www.google.com/?wwiid=${encodedId}&wwimg=${encodedLink}&wwindex=${index}`)
+    window.open(`https://lens.google.com/uploadbyurl?url=${encodedLink}&wwiid=${encodedId}&wwindex=${index}`)
   }
 
-  return (e) => {
+  return async (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (!localStorage.getItem(`ww:phone:${id}`) && !(await investigateNumber(item, id, false))) {
+      return;
+    }
 
     browser.storage.local.set({ [`ww:image_results:${id}`]: undefined });
 
     let imgs;
 
-    if (images && images.length) {
-      imgs = images;
+    if (IS_AD_PAGE && IS_MOBILE_VIEW) {
+      imgs = [...new Set(document.body.innerHTML.match(/https:\/\/s3\.publi24\.ro\/[^\/]+\/large\/[^.]+\.jpg/g))];
     }
     else if (IS_AD_PAGE) {
-      imgs = document.body.querySelectorAll('[id="detail-gallery"] img');
+      imgs = [...document.body.querySelectorAll('[id="detail-gallery"] img')]
+        .map(img => img.getAttribute('src'));
 
       // Maybe the post has only one picture. In that case gallery is not shown.
       if (imgs.length === 0) {
-        imgs = document.body.querySelectorAll('[class="detailViewImg "]');
+        imgs = [...document.body.querySelectorAll('[class="detailViewImg "]')]
+          .map(img => img.getAttribute('src'));
       }
+    }
+    else {
+      imgs = await acquireSliderImages(item);
     }
 
     browser.storage.local.set({ [`ww:img_search_started_for`]: {wwid: id, count: imgs.length} }).then(() => {
-      [...imgs].forEach((img, index) => {
-        openImageInvestigation(img.getAttribute('src'), index);
-      });
+      if (!IS_MOBILE_VIEW) {
+        imgs.forEach((img, index) => openImageInvestigation(img, index));
+      } else {
+        // Open tabs for investigate one by one since on mobile opening all at once does not work.
+        let index = 0;
+        const openNext = () => {
+          if (!imgs[index]) {
+            document.removeEventListener('visibilitychange', openNext);
+          }
+          else if (document.visibilityState === 'visible') {
+            openImageInvestigation(imgs[index], index++);
+          }
+        };
+        document.addEventListener('visibilitychange', openNext);
+        openNext();
+      }
     });
   };
 }
@@ -353,7 +396,7 @@ function createInvestigateImgClickHandler(id, images) {
 function registerInvestigateImgHandler(item, id) {
   const investigateImgBtn = item.querySelector('[data-wwid="investigate_img"]');
 
-  investigateImgBtn.onclick = createInvestigateImgClickHandler(id, item.querySelectorAll('.art-img img'));
+  investigateImgBtn.onclick = createInvestigateImgClickHandler(id, item);
 }
 
 function itemToTempSaveId(item) {
@@ -437,13 +480,11 @@ function registerOpenImagesSliderHandler(item, id) {
     };
 
     const analyzeImagesButton = sliderContainer.querySelector('[data-wwid="analyze-images"]');
-    const imageInvestigateHandler = createInvestigateImgClickHandler(id, sliderContainer.querySelectorAll('li:not(.splide__slide--clone) img'));
+    const imageInvestigateHandler = createInvestigateImgClickHandler(id, item);
     analyzeImagesButton.onclick = async (e) => {
       e.stopPropagation();
-      if (!localStorage.getItem(`ww:phone:${id}`)) {
-        await investigateNumber(item, id);
-      }
-      imageInvestigateHandler.apply(this, [e]);
+      await imageInvestigateHandler.apply(this, [e]);
+      close();
     };
 
     const closeButton = sliderContainer.querySelector('[data-wwid="close"]');
@@ -497,6 +538,7 @@ async function loadTempSaveAdsData() {
 
       return loadInAdPage(url)
         .then(async (itemPage) => ({
+          IS_MOBILE_VIEW,
           id,
           url,
           phone: localStorage.getItem(`ww:phone:${id}`),
@@ -507,8 +549,12 @@ async function loadTempSaveAdsData() {
             .replace(/\s+/g, ' ')
             .replace(/Publi24_\d+/, '')
             .trim().substring(0, 290),
-          image: itemPage.querySelector('[itemprop="image"]').src,
-          location: itemPage.querySelector('[itemtype="https://schema.org/Place"]')?.textContent.trim(),
+          image: IS_MOBILE_VIEW
+            ? itemPage.querySelector('[itemprop="associatedMedia"] li').style.background.match(/url\(['"]([^'"]+)['"]\)/)[1]
+            : itemPage.querySelector('[itemprop="image"]').src,
+          location: IS_MOBILE_VIEW
+            ? itemPage.querySelector('[class="location"]')?.textContent.trim()
+            : itemPage.querySelector('[itemtype="https://schema.org/Place"]')?.textContent.trim(),
         }))
         .catch(async (e) => {
           console.error(e);
@@ -541,7 +587,7 @@ async function renderTemporarySavesModal() {
   let itemRenderCleaners;
   const container = document.createElement('div');
   container.setAttribute('data-ww', 'favorites-modal');
-  container.innerHTML = ADS_TEMPLATE({itemData: await loadTempSaveAdsData()});
+  container.innerHTML = ADS_TEMPLATE({itemData: await loadTempSaveAdsData(), IS_MOBILE_VIEW});
   document.body.appendChild(container);
   modalsOpen.push(container);
 
@@ -585,7 +631,7 @@ function renderTemporarySavesButton() {
   }
 
   const element = document.createElement('div');
-  element.innerHTML = SAVES_BUTTON_TEMPLATE({count: saves.length});
+  element.innerHTML = SAVES_BUTTON_TEMPLATE({count: saves.length, IS_MOBILE_VIEW});
   element.setAttribute('data-ww', 'saves-button');
   document.body.appendChild(element);
 
@@ -605,7 +651,6 @@ function registerTemporarySavesButton() {
 }
 
 function renderAdWithCleanupAndCache(item, id, searchResults) {
-  RENDER_CACHE_KEY[id] = JSON.stringify(searchResults);
   cleanupAdRender(item);
   renderAdElement(item, id, searchResults);
   registerHandlers(item, id);
@@ -618,10 +663,12 @@ function renderAdItem(item, id) {
 
 function registerAdItem(item, id) {
   renderAdItem(item, id);
+  const renderCache = {};
 
   const interval = setInterval(() => {
     getStorageItems(...STORAGE_KEYS(id)).then(r => {
-      if (RENDER_CACHE_KEY[id] !== JSON.stringify(r)) {
+      if (renderCache[id] !== JSON.stringify(r)) {
+        renderCache[id] = JSON.stringify(r);
         renderAdWithCleanupAndCache(item, id, r);
       }
     });
@@ -645,7 +692,9 @@ if (IS_AD_PAGE) {
   const item = document.body.querySelector('[itemtype="https://schema.org/Offer"]');
   item.setAttribute('data-articleid', id);
 
-  item.removeChild(item.lastElementChild);
+  if (!IS_MOBILE_VIEW) {
+    item.removeChild(item.lastElementChild);
+  }
   item.removeChild(item.lastElementChild);
   registerAdItem(item, id.toUpperCase());
 } else {

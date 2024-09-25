@@ -19,6 +19,8 @@ function readImageLinks(wwid) {
       data = [...(data[`ww:image_results:${wwid}`] || []), ...resultUrls];
       data = data.filter((item, pos) => data.indexOf(item) === pos);
       browser.storage.local.set({ [`ww:image_results:${wwid}`]: data });
+
+      window.close();
     });
   }, 500);
 }

@@ -5,13 +5,19 @@
             height: 100%;
             background: rgba(0,0,0,0.85);
             z-index: 10000;
-            padding: 30px;
+            padding: {{#if IS_MOBILE_VIEW}}5px{{else}}30px{{/if}};
             padding-top: 100px;
             padding-bottom: 100px;
             overflow-y: scroll;
 ">
-    <div class="rmd-container-search-results" style="width: 100%; max-width: 1000px; padding: 20px !important; background: #ececec; border-radius: 10px; margin: auto; position: relative;" onclick="event.stopPropagation()">
-        <div style="position: absolute; top: -70px; width: 100%; margin-left: -20px;">
+    <div class="rmd-container-search-results" style="width: 100%;
+                                                    max-width: 1000px;
+                                                    padding: {{#if IS_MOBILE_VIEW}}10px{{else}}20px{{/if}} !important;
+                                                    background: #ececec;
+                                                    border-radius: 10px;
+                                                    margin: auto;
+                                                    position: relative;" onclick="event.stopPropagation()">
+        <div style="position: absolute; top: -70px; width: 100%; margin-left: {{#if IS_MOBILE_VIEW}}-10px{{else}}-20px{{/if}};">
             <h2 style=" font-weight: bold;
                         color: #edd492;
                         float: left;
@@ -19,7 +25,7 @@
                         background: #bd3636;
                         padding: 5px 20px;
                         border-radius: 10px;
-                        margin-top: -10px;">
+                        margin-top: {{#if IS_MOBILE_VIEW}}-1px{{else}}-10px{{/if}};">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 30" fill="#edd492" style="
                         vertical-align: middle;
                         transform: scale(2);
@@ -33,7 +39,8 @@
                     <line x1="20" y1="4" x2="4" y2="20" stroke="black" stroke-width="2"/>
                 </svg>
             </button>
-            <button type="button" class="radius" style="color: black;float: right;line-height: 0;background: rgba(255,255,255,0.6);margin-right: 25px;padding: 13px;" data-wwid="clear-favorites">
+            <button type="button" class="radius" style="color: black;float: right;line-height: 0;background: rgba(255,255,255,0.6);
+                                                        margin-right: {{#if IS_MOBILE_VIEW}}13px{{else}}25px{{/if}};padding: 13px;" data-wwid="clear-favorites">
                 <b>șterge lista</b>
             </button>
         </div>
@@ -71,11 +78,13 @@
                                     <span>{{this.location}}</span>
                                 </p>
 
-                                {{#if this.qrCode}}
-                                    <div class="qr-code" style="float: right">
-                                        <img src="{{this.qrCode}}" title="scaneaza pt telefon" width="85"/>
-                                    </div>
-                                {{/if}}
+                                {{#unless IS_MOBILE_VIEW}}
+                                    {{#if this.qrCode}}
+                                        <div class="qr-code" style="float: right">
+                                            <img src="{{this.qrCode}}" title="scaneaza pt telefon" width="85"/>
+                                        </div>
+                                    {{/if}}
+                                {{/unless}}
                             </div>
                         </div>
                     </div>
