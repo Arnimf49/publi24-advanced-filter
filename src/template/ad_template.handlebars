@@ -31,7 +31,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
     </button>
 
-    <button title="Adaugă la favorite" style="border-radius: 3px; vertical-align: middle; padding: 9px; padding-bottom: 7px; background-color: #e0dada" data-wwid="temp-save">
+    <button title="{{#if isTempSaved}}Șterge din favorite{{else}}Adaugă la favorite{{/if}}" style="border-radius: 3px; vertical-align: middle; padding: 9px; padding-bottom: 7px; background-color: #e0dada" data-wwid="temp-save">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
              fill="{{#if isTempSaved}}#cb2727{{else}}none{{/if}}"
              stroke="{{#if isTempSaved}}none{{else}}#333{{/if}}" stroke-width="2">

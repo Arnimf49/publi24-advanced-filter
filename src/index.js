@@ -40,6 +40,17 @@ const BLACKLISTED_LINKS = [
   'https://www.merinfo.se/',
   'https://telefon-kontakte.ch/',
   'http://www.telefonforsaljare.nu/',
+  'https://www.telnavi.jp/',
+  'https://www.reverseau.com/',
+  'https://www.telguarder.com/',
+  'https://information.com/people/',
+  'https://health.information.com/reverse-phone-lookup/',
+  'https://www.reverseaustralia.com/',
+  'https://unmask.com/',
+  'https://www.e-aidem.com/',
+  'https://phone-book.tw/',
+  'https://escorte.lol/',
+  'https://haisalut.ro/',
 ]
 
 const SAFE_LAST_DOMAIN_PARTS = [
@@ -116,31 +127,38 @@ function getItemVisibility(id) {
   return !wasItemHidden && !wasPhoneHidden;
 }
 
-function extractUniqueDomains(links) {
+function processImageLinks(links, itemUrl) {
   const domainMap = {};
 
-  links.forEach((link, index) => {
-    const domain = new URL(link).hostname.replace('www.', '');
-    if (!domainMap[domain]) {
-      domainMap[domain] = {
-        links: [link],
-        isSafe: SAFE_LAST_DOMAIN_PARTS.some((part) => domain.includes(part) )
-      };
-    } else {
-      domainMap[domain].links.push(link);
-    }
-  });
+  links
+    .filter(link => {
+      return !(link.indexOf("https://www.publi24.ro/") === 0 && link.indexOf('/?q=') !== -1) &&
+        link !== itemUrl;
+    })
+    .forEach((link) => {
+      const domain = new URL(link).hostname.replace('www.', '');
+      if (!domainMap[domain]) {
+        domainMap[domain] = {
+          links: [link],
+          isSafe: SAFE_LAST_DOMAIN_PARTS.some((part) => domain.includes(part) )
+        };
+      } else {
+        domainMap[domain].links.push(link);
+      }
+    });
 
   return Object.entries(domainMap).map(([domain, { links, isSafe }]) => ({ domain, links, isSafe }));
 }
 
 
 function renderAdElement(item, id, storage) {
+  const itemUrl = item.querySelector('[class="article-title"] [href]').href;
+
   const searchLinks = storage[`ww:search_results:${id}`];
   const filteredSearchLinks = sortLinks(filterLinks(searchLinks || []));
   const nimfomaneLink = filteredSearchLinks.find(l => l.indexOf('https://nimfomane.com/forum/topic/') === 0);
   const imageSearchLinks = storage[`ww:image_results:${id}`];
-  const imageSearchDomains = imageSearchLinks ? extractUniqueDomains(imageSearchLinks) : undefined;
+  const imageSearchDomains = imageSearchLinks ? processImageLinks(imageSearchLinks, itemUrl) : undefined;
 
   const panelElement = document.createElement('div');
   panelElement.className = 'ww-container';
@@ -250,9 +268,9 @@ async function acquirePhoneNumber(item, id) {
   })).text();
 
   const phoneNumber = await readNumbersFromBase64Png(phoneNumberImgBase64);
-  localStorage.setItem(`ww:phone:${id}`, phoneNumber);
+  localStorage.setItem(`ww:phone:${id}`, phoneNumber.trim());
 
-  return phoneNumber;
+  return phoneNumber.trim();
 }
 
 async function investigateNumber(item, id, open = true) {
@@ -555,6 +573,7 @@ async function loadTempSaveAdsData() {
           location: IS_MOBILE_VIEW
             ? itemPage.querySelector('[class="location"]')?.textContent.trim()
             : itemPage.querySelector('[itemtype="https://schema.org/Place"]')?.textContent.trim(),
+          date: itemPage.querySelector('[itemprop="validFrom"]')?.textContent.trim(),
         }))
         .catch(async (e) => {
           console.error(e);
@@ -569,7 +588,7 @@ async function loadTempSaveAdsData() {
     if (!itemData[i].phone) {
       continue;
     }
-    let duplicateIndex = itemData.findIndex((f, j) => j > i && f.phone === itemData[i].phone);
+    let duplicateIndex = itemData.findIndex((f, j) => j > i && f.phone.trim() === itemData[i].phone.trim());
     if (duplicateIndex !== -1) {
       const duplicate = itemData[duplicateIndex];
       duplicate.duplicate = true;

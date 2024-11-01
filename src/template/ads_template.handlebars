@@ -58,7 +58,7 @@
                  onclick="window.open('{{this.url}}', '_blank')"
             >
                 <div class="article-txt-wrap">
-                    <div class="article-txt" style="padding-right: 20px">
+                    <div class="article-txt">
                         <div class="article-content-wrap" style="overflow: visible">
                             <div class="art-img">
                                 <a><img src="{{this.image}}" width="200" height="200"/></a>
@@ -71,12 +71,21 @@
                                 <h2 class="article-title"><a href="{{this.url}}" target="_blank">{{title}}</a></h2>
                                 <p style="display: block" class="article-description">{{{this.description}}}</p>
 
-                                <p class="article-location" style="float: left">
-                                    <i class="svg-icon svg-icon-article">
-                                        <svg viewBox="0 0 50 50" aria-hidden="true"><use xlink:href="#svg-icon-location"></use></svg>
-                                    </i>
-                                    <span>{{this.location}}</span>
-                                </p>
+                                <div style="float: left">
+                                    <p class="article-location">
+                                        <i class="svg-icon svg-icon-article">
+                                            <svg viewBox="0 0 50 50" aria-hidden="true"><use xlink:href="#svg-icon-location"></use></svg>
+                                        </i>
+                                        <span>{{this.location}}</span>
+                                    </p>
+
+                                    <p class="article-date">
+                                        <i class="svg-icon svg-icon-article">
+                                            <svg viewBox="0 0 50 50" aria-hidden="true"><use xlink:href="#svg-icon-calendar"></use></svg>
+                                        </i>
+                                        <span>{{this.date}}</span>
+                                    </p>
+                                </div>
 
                                 {{#unless IS_MOBILE_VIEW}}
                                     {{#if this.qrCode}}
