@@ -70,19 +70,24 @@
     <p style="" class="ww-message">ai mai ascuns un anunț cu acceeași numar de telefon; ascuns automat</p>
 {{/if}}
 
-{{#if visible }}
-    {{#if hasNoPhone}}
-        <p style="color: rgb(34, 34, 34); font-size: .8125rem;" class="ww-message">anuntul nu are nr telefon;</p>
-    {{else}}
-        {{#if phone}}
-            <div class="ww-results">
-                <h4 style='font-weight: bold; padding-top: 10px;'>
-                    {{#if IS_MOBILE_VIEW}}
-                        <a href="tel:{{phone}}">{{phone}}</a>
-                    {{else}}
-                        {{phone}}
-                    {{/if}}
-                </h4>
+
+{{#if hasNoPhone}}
+    <p style="color: rgb(34, 34, 34); font-size: .8125rem;" class="ww-message">anuntul nu are nr telefon;</p>
+{{else}}
+    {{#if phone}}
+        <div class="ww-results">
+            <h4 style='font-weight: bold; padding-top: 10px;'>
+                {{#if IS_MOBILE_VIEW}}
+                    <a href="tel:{{phone}}">{{phone}}</a>
+                {{else}}
+                    {{phone}}
+                {{/if}}
+            </h4>
+            {{# if hasDuplicateAdsWithSamePhone }}
+                <p style="color: #8b5454; font-size: .8125rem;"><strong>{{numberOfAdsWithSamePhone}}</strong> anunțuri cu acest telefon <a data-wwid="duplicates">(vizualizează)</a></p>
+            {{/if}}
+
+            {{#if visible }}
                 <h5 style="margin-top: 5px; margin-bottom: 3px; font-size: 1.125rem">Rezultate după telefon</h5>
                 {{#if (isUndefined searchLinks)}}
                     <p style="color: #8b5454; font-size: .8125rem;">nerulat</p>
@@ -128,11 +133,11 @@
                         </div>
                     {{/unless}}
                 {{/if}}
-            </div>
-        {{else}}
-            <p style="color: rgb(34, 34, 34); font-size: .8125rem;" class="ww-message">neanalizat</p>
-        {{/if}}
-    {{/if}}
-{{else }}
+            {{else }}
 
+            {{/if}}
+        </div>
+    {{else}}
+        <p style="color: rgb(34, 34, 34); font-size: .8125rem;" class="ww-message">neanalizat</p>
+    {{/if}}
 {{/if}}

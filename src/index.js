@@ -69,10 +69,12 @@ const SAFE_LAST_DOMAIN_PARTS = [
 const IS_MOBILE_VIEW = ('ontouchstart' in document.documentElement);
 const IS_AD_PAGE = !!document.querySelector('[itemtype="https://schema.org/Offer"]');
 
-const STORAGE_KEYS = (id) => [[`ww:search_results:${id}`, `ww:image_results:${id}`], [`ww:visibility:${id}`, `ww:no_phone:${id}`]];
+const STORAGE_KEYS = (id) => [[`ww:search_results:${id}`, `ww:image_results:${id}`], [WWStorage.getAdStoreKey(id)]];
 
 const AD_TEMPLATE = Handlebars.templates.ad_template;
 const ADS_TEMPLATE = Handlebars.templates.ads_template;
+const FAVORITES_MODAL_TEMPLATE = Handlebars.templates.favorites_modal_template;
+const DUPLICATES_MODAL_TEMPLATE = Handlebars.templates.duplicates_modal_template;
 const SLIDER_TEMPLATE = Handlebars.templates.slider_template;
 const SAVES_BUTTON_TEMPLATE = Handlebars.templates.saves_button_template;
 
@@ -110,18 +112,18 @@ function cleanupAdRender(item) {
 }
 
 function isDueToPhoneHidden(id) {
-  const wasItemHidden = localStorage.getItem(`ww:visibility:${id}`) === 'false';
-  const wasPhoneHidden =  localStorage.getItem(`ww:phone:${id}`) ?
-    localStorage.getItem(`ww:phone:${localStorage.getItem(`ww:phone:${id}`)}:visible`) === 'false' :
+  const wasItemHidden = WWStorage.isAdVisible(id);
+  const wasPhoneHidden =  WWStorage.getAdPhone(id) ?
+    WWStorage.isPhoneHidden(WWStorage.getAdPhone(id)) :
     false;
 
   return !wasItemHidden && wasPhoneHidden;
 }
 
 function getItemVisibility(id) {
-  const wasItemHidden = localStorage.getItem(`ww:visibility:${id}`) === 'false';
-  const wasPhoneHidden =  localStorage.getItem(`ww:phone:${id}`) ?
-    localStorage.getItem(`ww:phone:${localStorage.getItem(`ww:phone:${id}`)}:visible`) === 'false' :
+  const wasItemHidden = WWStorage.isAdVisible(id);
+  const wasPhoneHidden =  WWStorage.getAdPhone(id) ?
+    WWStorage.isPhoneHidden(WWStorage.getAdPhone(id)) :
     false;
 
   return !wasItemHidden && !wasPhoneHidden;
@@ -132,7 +134,7 @@ function processImageLinks(links, itemUrl) {
 
   links
     .filter(link => {
-      return !(link.indexOf("https://www.publi24.ro/") === 0 && link.indexOf('/?q=') !== -1) &&
+      return !(link.indexOf("https://www.publi24.ro/") === 0 && link.match(/\/\?q=|&q=/)) &&
         link !== itemUrl;
     })
     .forEach((link) => {
@@ -147,12 +149,52 @@ function processImageLinks(links, itemUrl) {
       }
     });
 
-  return Object.entries(domainMap).map(([domain, { links, isSafe }]) => ({ domain, links, isSafe }));
+  return Object.entries(domainMap)
+    .map(([domain, { links, isSafe }]) => ({ domain, links, isSafe }))
+    .sort(({isSafe: isSafeA}, {isSafe: isSafeB}) => isSafeA && !isSafeB ? -1 : 0);
+}
+
+function renderModal(html) {
+  let itemRenderCleaners;
+
+  const container = document.createElement('div');
+  container.innerHTML = html;
+  document.body.appendChild(container);
+  modalsOpen.push(container);
+
+  container.removeAd = (adElement) => {
+    adElement.remove();
+    adElement.stopRender();
+  };
+
+  const close = () => {
+    itemRenderCleaners.forEach(c => c());
+    document.body.removeChild(container);
+    modalsOpen.pop();
+    window.removeEventListener('keydown',  closeOnKey);
+  };
+  const closeOnKey = (e) => {
+    if (e.key === 'Escape' && modalsOpen[modalsOpen.length-1] === container) close();
+  };
+
+  window.addEventListener('keydown',  closeOnKey);
+
+  const closeButton = container.querySelector('[data-wwid="close"]');
+  closeButton.onclick = close;
+  container.onclick = close;
+
+  itemRenderCleaners = registerAdsInContext(container);
+
+  return {container, close};
 }
 
 
 function renderAdElement(item, id, storage) {
-  const itemUrl = item.querySelector('[class="article-title"] [href]').href;
+  const itemUrl = getItemUrl(item);
+  const phone = WWStorage.getAdPhone(id);
+
+  // @TODO: Artifact from storage migration. To be removed in a following version.
+  WWStorage.addPhoneAd(phone, id, itemUrl);
 
   const searchLinks = storage[`ww:search_results:${id}`];
   const filteredSearchLinks = sortLinks(filterLinks(searchLinks || []));
@@ -166,11 +208,13 @@ function renderAdElement(item, id, storage) {
   panelElement.innerHTML = AD_TEMPLATE({
     IS_MOBILE_VIEW,
     IS_AD_PAGE,
-    isTempSaved: isTempSaved(itemToTempSaveId(item)),
+    hasDuplicateAdsWithSamePhone: WWStorage.getPhoneAds(phone).length > 1,
+    numberOfAdsWithSamePhone: WWStorage.getPhoneAds(phone).length,
+    isTempSaved: WWStorage.isTempSaved(itemToTempSaveId(item)),
     visible: getItemVisibility(id),
     dueToPhoneHidden: isDueToPhoneHidden(id),
-    hasNoPhone: storage.local[`ww:no_phone:${id}`] === 'true',
-    phone: localStorage.getItem(`ww:phone:${id}`),
+    hasNoPhone: WWStorage.hasAdNoPhone(id),
+    phone,
     searchLinks,
     filteredSearchLinks,
     imageSearchDomains,
@@ -193,13 +237,13 @@ function createVisibilityClickHandler(item, id) {
     visible = !visible;
     this.disabled = true;
 
-    let phoneNumber = localStorage.getItem(`ww:phone:${id}`) || await acquirePhoneNumber(item, id);
+    let phoneNumber = WWStorage.getAdPhone(id) || await acquirePhoneNumber(item, id);
     if (phoneNumber) {
-      localStorage.setItem(`ww:phone:${phoneNumber}:visible`, visible);
+      WWStorage.setPhoneHidden(phoneNumber, !visible);
     }
 
     setItemVisible(item, visible);
-    localStorage.setItem(`ww:visibility:${id}`, visible);
+    WWStorage.setAdVisibility(id, visible);
     this.disabled = false;
   };
 }
@@ -235,53 +279,60 @@ async function readNumbersFromBase64Png(data) {
 }
 
 async function acquirePhoneNumber(item, id) {
+  let phone;
+
   if (IS_MOBILE_VIEW) {
     const adPage = await loadInAdPage(item, id);
     const phoneNumber = adPage.innerHTML.match(/var cnt = ['"](\d+)['"]/);
 
-    if (!phoneNumber) {
-      return false;
+    if (phoneNumber) {
+      phone = phoneNumber[1];
     }
+  } else {
+    const phoneNumberEncrypted = IS_AD_PAGE
+      ? document.querySelector('[id="EncryptedPhone"]')?.value
+      : await acquireEncryptedPhoneNumber(item);
 
-    localStorage.setItem(`ww:phone:${id}`, phoneNumber[1]);
-    return phoneNumber[1];
+    if (phoneNumberEncrypted) {
+      // Phone numbers are accessed by a separate call to the backend.
+      // This gives an image result, the phone number being printed in png.
+      const phoneNumberImgBase64 = await (await fetch('https://www.publi24.ro/DetailAd/PhoneNumberImages?Length=8', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: new URLSearchParams({
+          'EncryptedPhone': phoneNumberEncrypted,
+          'body': '',
+          'X-Requested-With': 'XMLHttpRequest'
+        })
+      })).text();
+
+      phone = await readNumbersFromBase64Png(phoneNumberImgBase64);
+    }
   }
 
-  const phoneNumberEncrypted = IS_AD_PAGE
-    ? document.querySelector('[id="EncryptedPhone"]')?.value
-    : await acquireEncryptedPhoneNumber(item);
-
-  if (!phoneNumberEncrypted) {
+  if (!phone) {
+    WWStorage.setAdNoPhone(id);
     return false;
   }
 
-  // Phone numbers are accessed by a separate call to the backend.
-  // This gives an image result, the phone number being printed in png.
-  const phoneNumberImgBase64 = await (await fetch('https://www.publi24.ro/DetailAd/PhoneNumberImages?Length=8', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-    body: new URLSearchParams({
-      'EncryptedPhone': phoneNumberEncrypted,
-      'body': '',
-      'X-Requested-With': 'XMLHttpRequest'
-    })
-  })).text();
+  WWStorage.setAdPhone(id, phone.trim());
+  WWStorage.addPhoneAd(phone.trim(), id, getItemUrl(item))
 
-  const phoneNumber = await readNumbersFromBase64Png(phoneNumberImgBase64);
-  localStorage.setItem(`ww:phone:${id}`, phoneNumber.trim());
+  if (WWStorage.hasAdNoPhone(id)) {
+    WWStorage.setAdNoPhone(id, false);
+  }
 
-  return phoneNumber.trim();
+  return phone.trim();
 }
 
 async function investigateNumber(item, id, open = true) {
   const phoneNumber = await acquirePhoneNumber(item, id);
 
   if (!phoneNumber) {
-    localStorage.setItem(`ww:no_phone:${id}`, 'true');
     return false;
   }
 
-  if (localStorage.getItem(`ww:phone:${phoneNumber}:visible`) === 'false') {
+  if (WWStorage.isPhoneHidden(phoneNumber)) {
     setItemVisible(item, false);
   }
 
@@ -365,7 +416,7 @@ function createInvestigateImgClickHandler(id, item) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!localStorage.getItem(`ww:phone:${id}`) && !(await investigateNumber(item, id, false))) {
+    if (!WWStorage.getAdPhone(id) && !(await investigateNumber(item, id, false))) {
       return;
     }
 
@@ -421,28 +472,8 @@ function itemToTempSaveId(item) {
   return item.getAttribute('data-articleid') + '|' + getItemUrl(item);
 }
 
-function tempSaveValueParts(id) {
+function adUuidParts(id) {
   return id.split('|');
-}
-
-function getTempSaved() {
-  return JSON.parse(localStorage.getItem('ww:temp_save') || '[]');
-}
-
-function toggleTempSave(id) {
-  let items = getTempSaved();
-
-  if (items.includes(id)) {
-    items = items.filter(it => it !== id);
-  } else {
-    items.push(id);
-  }
-
-  localStorage.setItem('ww:temp_save', JSON.stringify(items));
-}
-
-function isTempSaved(id) {
-  return getTempSaved().includes(id);
 }
 
 function registerTemporarySaveHandler(item, id) {
@@ -450,12 +481,44 @@ function registerTemporarySaveHandler(item, id) {
   const tempSaveId = itemToTempSaveId(item);
 
   tempSaveBtn.onclick = () => {
-    toggleTempSave(tempSaveId);
+    WWStorage.toggleTempSave(tempSaveId);
     renderAdItem(item, id);
 
     const modalParent = item.closest('[data-ww="favorites-modal"]');
     if (modalParent && typeof modalParent.removeAd === 'function') {
       modalParent.removeAd(item);
+    }
+  }
+}
+
+function registerDuplicatesModalHandler(item, id) {
+  const duplicatesBtn = item.querySelector('[data-wwid="duplicates"]');
+
+  if (!duplicatesBtn) {
+    return;
+  }
+
+  duplicatesBtn.onclick = async () => {
+    const phone = WWStorage.getAdPhone(id);
+    const duplicateUuids = WWStorage.getPhoneAds(phone);
+
+    const html = DUPLICATES_MODAL_TEMPLATE({
+      IS_MOBILE_VIEW,
+      content: ADS_TEMPLATE({
+        IS_MOBILE_VIEW,
+        itemData: await loadInAdsData(duplicateUuids),
+      }),
+      count: duplicateUuids.length,
+      phone,
+    });
+    const {container, close} = renderModal(html);
+
+    const hideAllBtn = container.querySelector('[data-wwid="hide-all"]');
+    hideAllBtn.onclick = () => {
+      duplicateUuids.forEach((adUuid) => {
+        WWStorage.setAdVisibility(adUuidParts(adUuid)[0], false);
+      });
+      close();
     }
   }
 }
@@ -472,7 +535,7 @@ function registerOpenImagesSliderHandler(item, id) {
 
     const sliderContainer = document.createElement('div');
     sliderContainer.id = '_ww_slider';
-    sliderContainer.innerHTML = SLIDER_TEMPLATE({images, visible});
+    sliderContainer.innerHTML = SLIDER_TEMPLATE({images, visible, IS_MOBILE_VIEW});
     modalsOpen.push(sliderContainer);
 
     document.body.appendChild(sliderContainer);
@@ -519,6 +582,7 @@ function registerHandlers(item, id) {
   registerInvestigateHandler(item, id);
   registerInvestigateImgHandler(item, id);
   registerTemporarySaveHandler(item, id);
+  registerDuplicatesModalHandler(item, id);
 
   if (!IS_AD_PAGE) {
     registerOpenImagesSliderHandler(item, id);
@@ -548,19 +612,18 @@ async function getPhoneQrCode(phone) {
   });
 }
 
-async function loadTempSaveAdsData() {
-  const items = getTempSaved().reverse();
+async function loadInAdsData(adUuids) {
   let itemData = await Promise.all(
-    items.map((tempSaveId) => {
-      const [id, url] = tempSaveValueParts(tempSaveId);
+    adUuids.map((adUuid) => {
+      const [id, url] = adUuidParts(adUuid);
 
       return loadInAdPage(url)
         .then(async (itemPage) => ({
           IS_MOBILE_VIEW,
           id,
           url,
-          phone: localStorage.getItem(`ww:phone:${id}`),
-          qrCode: localStorage.getItem(`ww:phone:${id}`) && await getPhoneQrCode(localStorage.getItem(`ww:phone:${id}`)),
+          phone: WWStorage.getAdPhone(id),
+          qrCode: WWStorage.getAdPhone(id) && await getPhoneQrCode(WWStorage.getAdPhone(id)),
           title: itemPage.querySelector('[itemscope] h1[itemprop="name"]').innerHTML,
           description: itemPage.querySelector('[itemscope] [itemprop="description"]').innerHTML
             .replace(/<[^>]*>/gi, ' ')
@@ -577,12 +640,17 @@ async function loadTempSaveAdsData() {
         }))
         .catch(async (e) => {
           console.error(e);
-          toggleTempSave(id + '|' + url);
+          WWStorage.toggleTempSave(id + '|' + url);
           return null;
         });
     }));
 
-  itemData = itemData.filter((f) => !!f);
+  return itemData.filter((f) => !!f);
+}
+
+async function loadTempSaveAdsData() {
+  const adUuids = WWStorage.getTempSaved().reverse();
+  let itemData = loadInAdsData(adUuids);
 
   for (let i = 0; i < itemData.length; i++) {
     if (!itemData[i].phone) {
@@ -603,48 +671,23 @@ async function loadTempSaveAdsData() {
 }
 
 async function renderTemporarySavesModal() {
-  let itemRenderCleaners;
-  const container = document.createElement('div');
+  let html = FAVORITES_MODAL_TEMPLATE({content: ADS_TEMPLATE({itemData: await loadTempSaveAdsData(), IS_MOBILE_VIEW}), IS_MOBILE_VIEW});
+  let {container, close} = renderModal(html);
+
   container.setAttribute('data-ww', 'favorites-modal');
-  container.innerHTML = ADS_TEMPLATE({itemData: await loadTempSaveAdsData(), IS_MOBILE_VIEW});
-  document.body.appendChild(container);
-  modalsOpen.push(container);
-
-  container.removeAd = (adElement) => {
-    adElement.remove();
-    adElement.stopRender();
-  };
-
-  const close = () => {
-    itemRenderCleaners.forEach(c => c());
-    document.body.removeChild(container);
-    modalsOpen.pop();
-    window.removeEventListener('keydown',  closeOnKey);
-  };
-  const closeOnKey = (e) => {
-    if (e.key === 'Escape' && modalsOpen[modalsOpen.length-1] === container) close();
-  };
-
-  window.addEventListener('keydown',  closeOnKey);
 
   const clearFavoritesButton = container.querySelector('[data-wwid="clear-favorites"]');
   clearFavoritesButton.onclick = () => {
-    localStorage.removeItem('ww:temp_save');
+    WWStorage.clearTempSave();
     close();
   };
-
-  const closeButton = container.querySelector('[data-wwid="close"]');
-  closeButton.onclick = close;
-  container.onclick = close;
-
-  itemRenderCleaners = registerAdsInContext(container);
 }
 
 function renderTemporarySavesButton() {
   const existing = document.body.querySelector('[data-ww="saves-button"]');
   existing && existing.parentNode.removeChild(existing);
 
-  const saves = getTempSaved();
+  const saves = WWStorage.getTempSaved();
   if (saves.length === 0) {
     return;
   }
@@ -660,10 +703,10 @@ function renderTemporarySavesButton() {
 function registerTemporarySavesButton() {
   renderTemporarySavesButton();
 
-  let lastCount = getTempSaved().length;
+  let lastCount = WWStorage.getTempSaved().length;
   setInterval(() => {
-    if (lastCount !== getTempSaved().length) {
-      lastCount = getTempSaved().length;
+    if (lastCount !== WWStorage.getTempSaved().length) {
+      lastCount = WWStorage.getTempSaved().length;
       renderTemporarySavesButton()
     }
   }, 1000);
@@ -704,21 +747,24 @@ function registerAdsInContext(context) {
   return [...items].map((item) => registerAdItem(item, item.getAttribute('data-articleid')));
 }
 
-if (IS_AD_PAGE) {
-  const id = document.body.querySelector('[data-url^="/DetailAd/IncrementViewHit"]')
-    .getAttribute('data-url')
-    .replace(/^.*?adid=([^&]+)&.*$/, "$1");
-  const item = document.body.querySelector('[itemtype="https://schema.org/Offer"]');
-  item.setAttribute('data-articleid', id);
+WWStorage.upgrade()
+  .then(() => {
+    if (IS_AD_PAGE) {
+      const id = document.body.querySelector('[data-url^="/DetailAd/IncrementViewHit"]')
+        .getAttribute('data-url')
+        .replace(/^.*?adid=([^&]+)&.*$/, "$1");
+      const item = document.body.querySelector('[itemtype="https://schema.org/Offer"]');
+      item.setAttribute('data-articleid', id);
 
-  if (!IS_MOBILE_VIEW) {
-    item.removeChild(item.lastElementChild);
-  }
-  item.removeChild(item.lastElementChild);
-  registerAdItem(item, id.toUpperCase());
-} else {
-  registerAdsInContext(document.body);
-  if (location.pathname.startsWith('/anunturi/matrimoniale')) {
-    registerTemporarySavesButton();
-  }
-}
+      if (!IS_MOBILE_VIEW) {
+        item.removeChild(item.lastElementChild);
+      }
+      item.removeChild(item.lastElementChild);
+      registerAdItem(item, id.toUpperCase());
+    } else {
+      registerAdsInContext(document.body);
+      if (location.pathname.startsWith('/anunturi/matrimoniale')) {
+        registerTemporarySavesButton();
+      }
+    }
+  })

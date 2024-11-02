@@ -33,6 +33,7 @@
         "library/splide/splide.min.js",
         "library/qrcode.js",
         "src/template/templates.precompiled.js",
+        "src/storage.js",
         "src/index.js"
       ],
       "css": [
