@@ -135,7 +135,7 @@ function processImageLinks(links, itemUrl) {
 
   links
     .filter(link => {
-      return !(link.indexOf("https://www.publi24.ro/") === 0 && link.match(/\/\?q=|&q=/)) &&
+      return !(link.indexOf("https://www.publi24.ro/") === 0 && link.indexOf("/anunt/") === -1) &&
         link !== itemUrl;
     })
     .forEach((link) => {
@@ -237,6 +237,7 @@ function renderAdElement(item, id, storage) {
     filteredSearchLinks,
     imageSearchDomains,
     nimfomaneLink,
+    hasImagesInOtherLocation: WWStorage.hasAdImagesInOtherLocation(id),
     phoneInvestigatedSinceDays,
     imageInvestigatedSinceDays,
     phoneInvestigateStale,
@@ -304,7 +305,7 @@ async function acquirePhoneNumber(item, id) {
   let phone;
 
   if (IS_MOBILE_VIEW) {
-    const adPage = await loadInAdPage(item, id);
+    const adPage = await loadInAdPage(item);
     const phoneNumber = adPage.innerHTML.match(/var cnt = ['"](\d+)['"]/);
 
     if (phoneNumber) {
@@ -391,8 +392,8 @@ function getItemUrl(itemOrUrl) {
   return itemOrUrl.getAttribute('onclick').replace(/^.*'(http[^']+)'.*/, '$1');
 }
 
-async function loadInAdPage(itemOrId) {
-  const url = getItemUrl(itemOrId);
+async function loadInAdPage(itemOrId, _url) {
+  const url = _url || getItemUrl(itemOrId);
   const pageResponse = await fetch(url);
 
   if (!pageResponse.ok) {
@@ -464,16 +465,28 @@ function createInvestigateImgClickHandler(id, item) {
       imgs = await acquireSliderImages(item);
     }
 
-    WWStorage.setAdImagesInvestigatedTime(id, Date.now());
+    const done = () => {
+      WWStorage.setAdImagesInvestigatedTime(id, Date.now());
+      analyzeFoundImages(id, item);
+    }
+
     browser.storage.local.set({ [`ww:img_search_started_for`]: {wwid: id, count: imgs.length} }).then(() => {
       if (!IS_MOBILE_VIEW) {
         imgs.forEach((img, index) => openImageInvestigation(img, index));
+        const interval = setInterval(async() => {
+          const results = (await browser.storage.local.get(`ww:img_search_started_for`));
+          if (results[`ww:img_search_started_for`].count === 0) {
+            done();
+            clearInterval(interval);
+          }
+        }, 500);
       } else {
         // Open tabs for investigate one by one since on mobile opening all at once does not work.
         let index = 0;
         const openNext = () => {
           if (!imgs[index]) {
             document.removeEventListener('visibilitychange', openNext);
+            done();
           }
           else if (document.visibilityState === 'visible') {
             openImageInvestigation(imgs[index], index++);
@@ -484,6 +497,43 @@ function createInvestigateImgClickHandler(id, item) {
       }
     });
   };
+}
+
+function getItemLocation(item) {
+  let location;
+  if (typeof item === "string") {
+    location = item;
+  } else if (IS_AD_PAGE) {
+    location = item.querySelector('[itemtype="https://schema.org/Place"]').textContent.trim();
+  } else {
+    location = item.querySelector('[class="article-location"]').textContent.trim();
+  }
+
+  return location.split(',').map(l => l.replace(/[ \n]+/g, '')).sort().join(', ');
+}
+
+async function analyzeFoundImages(id, item) {
+  const results = await browser.storage.local.get(`ww:image_results:${id}`)
+  const publi24AdLinks = results[`ww:image_results:${id}`]
+    .filter(link => link.match(/^https:\/\/(www\.)?publi24\.ro\/.+\/anunt\/.+$/));
+
+  const currentAdLocation = getItemLocation(item);
+
+  await Promise.all(publi24AdLinks.map((l =>
+    loadInAdPage(null, l).catch((e) => {
+      console.error(e);
+      return null;
+    }))))
+    .then((pages) => {
+      const locations = pages
+        .filter(p => !!p)
+        .map(page => getItemLocation(page.querySelector('[itemtype="https://schema.org/Place"]').textContent.trim()));
+      if (locations.some(loc => loc !== currentAdLocation)) {
+        WWStorage.setAdImagesInOtherLocation(id);
+      } else if (WWStorage.hasAdImagesInOtherLocation(id)) {
+        WWStorage.setAdImagesInOtherLocation(id, false);
+      }
+    })
 }
 
 function registerInvestigateImgHandler(item, id) {

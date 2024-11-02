@@ -45,6 +45,13 @@ const WWStorage = {
     return WWStorage.getAdProp(id, 'noPhone') === true;
   },
 
+  setAdImagesInOtherLocation(id, value = true) {
+    WWStorage.setAdProp(id, 'imagesInOtherLoc', value);
+  },
+  hasAdImagesInOtherLocation(id) {
+    return WWStorage.getAdProp(id, 'imagesInOtherLoc');
+  },
+
   setAdPhoneInvestigatedTime(id, timestamp) {
     WWStorage.setAdProp(id, 'phoneTime', timestamp);
   },
@@ -95,9 +102,8 @@ const WWStorage = {
     }
 
     const ads = WWStorage.getPhoneAds(phone);
-    const value = id + '|' + url;
-    if (!ads.includes(value)) {
-      ads.push(value);
+    if (!ads.find(v => v.split('|')[0] === id)) { // url can be different due to seo
+      ads.push(id + '|' + url);
       localStorage.setItem(`ww2:phone-ads:${phone}`, JSON.stringify(ads));
       _WW_STORE_CACHE.phoneAds[phone] = ads;
     }
