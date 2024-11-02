@@ -17,7 +17,18 @@
                                                     border-radius: 10px;
                                                     margin: auto;
                                                     position: relative;" onclick="event.stopPropagation()">
-        <div style="position: absolute; top: -70px; width: 100%; margin-left: {{#if IS_MOBILE_VIEW}}-10px{{else}}-20px{{/if}};">
+        <div style="position: fixed;
+                z-index: 1;
+                top: 0;
+                width: {{#if IS_MOBILE_VIEW}}calc(100% - 10px){{else}}calc(100% - 20px){{/if}};
+                max-width: 1000px;
+                margin-left: {{#if IS_MOBILE_VIEW}}-10px{{else}}-20px{{/if}};
+                margin-right: {{#if IS_MOBILE_VIEW}}-10px{{else}}-20px{{/if}};
+                padding-top: 20px;
+                padding-bottom: 15px;
+                background: #27272794;
+                backdrop-filter: blur(10px);
+                border-radius: 0 0 15px 15px">
             <h2 style=" font-weight: bold;
                         color: #edd492;
                         float: left;

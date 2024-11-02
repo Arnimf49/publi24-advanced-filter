@@ -51,6 +51,7 @@ const BLACKLISTED_LINKS = [
   'https://phone-book.tw/',
   'https://escorte.lol/',
   'https://haisalut.ro/',
+  'https://tel-search.net/',
 ]
 
 const SAFE_LAST_DOMAIN_PARTS = [
@@ -518,6 +519,7 @@ function registerDuplicatesModalHandler(item, id) {
       duplicateUuids.forEach((adUuid) => {
         WWStorage.setAdVisibility(adUuidParts(adUuid)[0], false);
       });
+      WWStorage.setPhoneHidden(phone);
       close();
     }
   }
@@ -574,6 +576,13 @@ function registerOpenImagesSliderHandler(item, id) {
 
     sliderContainer.querySelectorAll('.splide__arrow')
       .forEach((el) => el.addEventListener('click', (e) => e.stopPropagation()));
+
+    setTimeout(() => {
+      // We can pre-analyze the ad if the user looks at the picture. They are most likely interested.
+      if (!WWStorage.getAdPhone(id)) {
+        acquirePhoneNumber(item, id);
+      }
+    }, 10);
   }
 }
 

@@ -17,15 +17,27 @@
                                                     border-radius: 10px;
                                                     margin: auto;
                                                     position: relative;" onclick="event.stopPropagation()">
-        <div style="position: absolute; top: -70px; width: 100%; margin-left: {{#if IS_MOBILE_VIEW}}-10px{{else}}-20px{{/if}};">
+        <p style="color: rgb(55 55 55); font-size: .95rem; padding-bottom: 30px"><strong>Sunt {{count}} anunțuri cu numărul de telefon {{phone}}.</strong> Pot sa fie și mai multe care încă nu au fost analizate.</p>
+        <div style="position: fixed;
+                z-index: 1;
+                top: 0;
+                width: {{#if IS_MOBILE_VIEW}}calc(100% - 10px){{else}}calc(100% - 20px){{/if}};
+                max-width: 1000px;
+                margin-left: {{#if IS_MOBILE_VIEW}}-10px{{else}}-20px{{/if}};
+                margin-right: {{#if IS_MOBILE_VIEW}}-10px{{else}}-20px{{/if}};
+                padding-top: 20px;
+                padding-bottom: 15px;
+                background: #27272794;
+                backdrop-filter: blur(10px);
+                border-radius: 0 0 15px 15px">
             <h2 style=" font-weight: bold;
-                        color: #ffffff;
-                        float: left;
-                        text-shadow: 2px 2px 2px rgba(0, 0, 0, .2);
-                        background: #979797;
-                        padding: 5px 20px;
-                        border-radius: 10px;
-                        margin-top: {{#if IS_MOBILE_VIEW}}-1px{{else}}-10px{{/if}};">
+                    color: #ffffff;
+                    float: left;
+                    text-shadow: 2px 2px 2px rgba(0, 0, 0, .2);
+                    background: #979797;
+                    padding: 5px 20px;
+                    border-radius: 10px;
+                    margin-top: {{#if IS_MOBILE_VIEW}}-1px{{else}}-5px{{/if}};">
                 Duplicate
             </h2>
             <button type="button" class="mainbg radius" style="float: right; border-radius: 1000px; padding: 11px; line-height: 0; background: rgba(255,255,255,0.6)" data-wwid="close">
@@ -39,9 +51,6 @@
                 <b>ascunde toate</b>
             </button>
         </div>
-
-        <p style="color: rgb(55 55 55); font-size: .95rem; padding-bottom: 30px"><strong>Sunt {{count}} anunțuri cu numărul de telefon {{phone}}.</strong> Pot sa fie și mai multe care încă nu au fost analizate.</p>
-
         {{{content}}}
     </div>
 </div>

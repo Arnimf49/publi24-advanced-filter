@@ -33,7 +33,7 @@ const WWStorage = {
     return WWStorage.getAdProp(id, 'noPhone') === true;
   },
 
-  setPhoneHidden(phone, h) {
+  setPhoneHidden(phone, h = true) {
     let hidden = JSON.parse(localStorage.getItem(`ww2:hidden-phones`) || '[]');
     if (!hidden.includes(phone) && h) {
       hidden.push(phone);
