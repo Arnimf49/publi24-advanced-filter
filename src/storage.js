@@ -1,14 +1,26 @@
+const _WW_STORE_CACHE = {item: {}, save: null, phoneAds: {}, phoneHidden: null};
+
 const WWStorage = {
   getAdStoreKey(id) {
     return `ww2:${id}`;
   },
-  setAdProp(id, prop, value) {
+  getAdItem(id) {
+    if (_WW_STORE_CACHE.item[id]) {
+      return _WW_STORE_CACHE.item[id];
+    }
+
     const item = JSON.parse(localStorage.getItem(`ww2:${id}`) || '{}');
+    _WW_STORE_CACHE.item[id] = item;
+    return item;
+  },
+  setAdProp(id, prop, value) {
+    const item = this.getAdItem(id);
     item[prop] = value;
     localStorage.setItem(`ww2:${id}`, JSON.stringify(item));
+    _WW_STORE_CACHE.item[id] = item;
   },
   getAdProp(id, prop) {
-    const item = JSON.parse(localStorage.getItem(`ww2:${id}`) || '{}');
+    const item = this.getAdItem(id);
     return item[prop];
   },
 
@@ -47,22 +59,35 @@ const WWStorage = {
     return WWStorage.getAdProp(id, 'imagesTime');
   },
 
+  getHiddenPhones() {
+    if (_WW_STORE_CACHE.phoneHidden) {
+      return _WW_STORE_CACHE.phoneHidden;
+    }
+    const hidden = JSON.parse(localStorage.getItem(`ww2:hidden-phones`) || '[]');
+    _WW_STORE_CACHE.phoneHidden = hidden;
+    return hidden;
+  },
   setPhoneHidden(phone, h = true) {
-    let hidden = JSON.parse(localStorage.getItem(`ww2:hidden-phones`) || '[]');
+    let hidden = WWStorage.getHiddenPhones();
     if (!hidden.includes(phone) && h) {
       hidden.push(phone);
     } else if (hidden.includes(phone) && !h) {
       hidden = hidden.filter(p => p !== phone)
     }
     localStorage.setItem(`ww2:hidden-phones`, JSON.stringify(hidden));
+    _WW_STORE_CACHE.phoneHidden = hidden;
   },
   isPhoneHidden(phone) {
-    const hidden = JSON.parse(localStorage.getItem(`ww2:hidden-phones`) || '[]');
-    return hidden.includes(phone);
+    return WWStorage.getHiddenPhones().includes(phone);
   },
 
   getPhoneAds(phone) {
-    return JSON.parse(localStorage.getItem(`ww2:phone-ads:${phone}`) || '[]')
+    if (_WW_STORE_CACHE.phoneAds[phone]) {
+      return _WW_STORE_CACHE.phoneAds[phone];
+    }
+    const phoneAds = JSON.parse(localStorage.getItem(`ww2:phone-ads:${phone}`) || '[]');
+    _WW_STORE_CACHE.phoneAds[phone] = phoneAds;
+    return phoneAds;
   },
   addPhoneAd(phone, id, url) {
     if (!phone || !id || !url) {
@@ -74,14 +99,21 @@ const WWStorage = {
     if (!ads.includes(value)) {
       ads.push(value);
       localStorage.setItem(`ww2:phone-ads:${phone}`, JSON.stringify(ads));
+      _WW_STORE_CACHE.phoneAds[phone] = ads;
     }
   },
 
   getTempSaved() {
-    return JSON.parse(localStorage.getItem('ww:temp_save') || '[]');
+    if (_WW_STORE_CACHE.save) {
+      return _WW_STORE_CACHE.save;
+    }
+    const save = JSON.parse(localStorage.getItem('ww:temp_save') || '[]');
+    _WW_STORE_CACHE.save = save;
+    return save;
   },
   clearTempSave() {
     localStorage.removeItem('ww:temp_save');
+    _WW_STORE_CACHE.save = null;
   },
   toggleTempSave(id) {
     let items = WWStorage.getTempSaved();
@@ -96,6 +128,7 @@ const WWStorage = {
     }
 
     localStorage.setItem('ww:temp_save', JSON.stringify(items));
+    _WW_STORE_CACHE.save = items;
   },
   isTempSaved(id) {
     return WWStorage.getTempSaved().includes(id);
