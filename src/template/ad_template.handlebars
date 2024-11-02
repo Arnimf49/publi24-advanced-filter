@@ -88,7 +88,14 @@
             {{/if}}
 
             {{#if visible }}
-                <h5 style="margin-top: 5px; margin-bottom: 3px; font-size: 1.125rem">Rezultate după telefon</h5>
+                <h5 style="margin-top: 5px; margin-bottom: 3px; font-size: 1.125rem">
+                    Rezultate după telefon
+                    {{#if phoneInvestigatedSinceDays}}
+                        <span style="{{#if phoneInvestigateStale}}color: #8b5454;{{else}}color: rgb(103,109,92);{{/if}}font-size: 0.825rem;">
+                            ({{phoneInvestigatedSinceDays}})
+                        </span>
+                    {{/if}}
+                </h5>
                 {{#if (isUndefined searchLinks)}}
                     <p style="color: #8b5454; font-size: .8125rem;">nerulat</p>
                 {{else}}
@@ -102,7 +109,14 @@
                     {{/unless}}
                 {{/if}}
 
-                <h5 style="margin-top: 5px; margin-bottom: 3px; font-size: 1.125rem">Rezultate după imagine</h5>
+                <h5 style="margin-top: 5px; margin-bottom: 3px; font-size: 1.125rem">
+                    Rezultate după imagine
+                    {{#if imageInvestigatedSinceDays}}
+                        <span style="{{#if imageInvestigateStale}}color: #8b5454;{{else}}color: rgb(103,109,92);{{/if}}font-size: 0.825rem;">
+                            ({{imageInvestigatedSinceDays}})
+                        </span>
+                    {{/if}}
+                </h5>
                 {{#if (isUndefined imageSearchDomains)}}
                     <p style="color: #8b5454; font-size: .8125rem;">nerulat</p>
                 {{else}}

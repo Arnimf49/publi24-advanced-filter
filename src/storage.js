@@ -33,6 +33,20 @@ const WWStorage = {
     return WWStorage.getAdProp(id, 'noPhone') === true;
   },
 
+  setAdPhoneInvestigatedTime(id, timestamp) {
+    WWStorage.setAdProp(id, 'phoneTime', timestamp);
+  },
+  getAdPhoneInvestigatedTime(id) {
+    return WWStorage.getAdProp(id, 'phoneTime');
+  },
+
+  setAdImagesInvestigatedTime(id, timestamp) {
+    WWStorage.setAdProp(id, 'imagesTime', timestamp);
+  },
+  getAdImagesInvestigatedTime(id) {
+    return WWStorage.getAdProp(id, 'imagesTime');
+  },
+
   setPhoneHidden(phone, h = true) {
     let hidden = JSON.parse(localStorage.getItem(`ww2:hidden-phones`) || '[]');
     if (!hidden.includes(phone) && h) {

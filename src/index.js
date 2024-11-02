@@ -203,6 +203,23 @@ function renderAdElement(item, id, storage) {
   const imageSearchLinks = storage[`ww:image_results:${id}`];
   const imageSearchDomains = imageSearchLinks ? processImageLinks(imageSearchLinks, itemUrl) : undefined;
 
+  const now = Date.now();
+  const phoneTime = WWStorage.getAdPhoneInvestigatedTime(id);
+  const imageTime = WWStorage.getAdImagesInvestigatedTime(id);
+  let phoneInvestigatedSinceDays, imageInvestigatedSinceDays;
+  let phoneInvestigateStale, imageInvestigateStale;
+
+  if (phoneTime) {
+    const days = Math.floor((now - phoneTime) / 8.64e+7);
+    phoneInvestigatedSinceDays = days === 0 ? 'recent' : days === 1 ? `de o zi` : `de ${days} zile`;
+    phoneInvestigateStale = days > 30;
+  }
+  if (imageTime) {
+    const days = Math.floor((now - imageTime) / 8.64e+7);
+    imageInvestigatedSinceDays = days === 0 ? 'recent' : days === 1 ? `de o zi` : `de ${days} zile`;
+    imageInvestigateStale = days > 30;
+  }
+
   const panelElement = document.createElement('div');
   panelElement.className = 'ww-container';
   panelElement.onclick = (e) => e.stopPropagation();
@@ -219,7 +236,11 @@ function renderAdElement(item, id, storage) {
     searchLinks,
     filteredSearchLinks,
     imageSearchDomains,
-    nimfomaneLink
+    nimfomaneLink,
+    phoneInvestigatedSinceDays,
+    imageInvestigatedSinceDays,
+    phoneInvestigateStale,
+    imageInvestigateStale,
   });
 
   (item.querySelector('.article-txt') || item).appendChild(panelElement);
@@ -341,6 +362,7 @@ async function investigateNumber(item, id, open = true) {
     const encodedId = encodeURIComponent(id);
     const encodedPhoneNumber = encodeURIComponent(phoneNumber);
     window.open(`https://www.google.com/search?wwsid=${encodedId}&q=${encodedPhoneNumber}`);
+    WWStorage.setAdPhoneInvestigatedTime(id, Date.now());
   }
 
   return true;
@@ -442,6 +464,7 @@ function createInvestigateImgClickHandler(id, item) {
       imgs = await acquireSliderImages(item);
     }
 
+    WWStorage.setAdImagesInvestigatedTime(id, Date.now());
     browser.storage.local.set({ [`ww:img_search_started_for`]: {wwid: id, count: imgs.length} }).then(() => {
       if (!IS_MOBILE_VIEW) {
         imgs.forEach((img, index) => openImageInvestigation(img, index));
