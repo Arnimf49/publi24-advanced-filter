@@ -102,6 +102,18 @@ const WWStorage = {
       _WW_STORE_CACHE.phoneAds[phone] = ads;
     }
   },
+  removePhoneAd(phone, uuid) {
+    if (!phone || !uuid) {
+      return;
+    }
+
+    let ads = WWStorage.getPhoneAds(phone);
+    if (ads.includes(uuid)) {
+      ads = ads.filter(id => id !== uuid);
+      localStorage.setItem(`ww2:phone-ads:${phone}`, JSON.stringify(ads));
+      _WW_STORE_CACHE.phoneAds[phone] = ads;
+    }
+  },
 
   getTempSaved() {
     if (_WW_STORE_CACHE.save) {

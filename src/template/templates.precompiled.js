@@ -363,7 +363,7 @@ templates['duplicates_modal_template'] = template({"1":function(container,depth0
 },"9":function(container,depth0,helpers,partials,data) {
     return "calc(100% - 10px)";
 },"11":function(container,depth0,helpers,partials,data) {
-    return "calc(100% - 20px)";
+    return "calc(100% - 70px)";
 },"13":function(container,depth0,helpers,partials,data) {
     return "-10px";
 },"15":function(container,depth0,helpers,partials,data) {
@@ -417,7 +417,7 @@ templates['favorites_modal_template'] = template({"1":function(container,depth0,
 },"9":function(container,depth0,helpers,partials,data) {
     return "calc(100% - 10px)";
 },"11":function(container,depth0,helpers,partials,data) {
-    return "calc(100% - 20px)";
+    return "calc(100% - 70px)";
 },"13":function(container,depth0,helpers,partials,data) {
     return "-10px";
 },"15":function(container,depth0,helpers,partials,data) {

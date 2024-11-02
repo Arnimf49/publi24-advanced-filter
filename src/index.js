@@ -524,13 +524,17 @@ function registerDuplicatesModalHandler(item, id) {
 
   duplicatesBtn.onclick = async () => {
     const phone = WWStorage.getAdPhone(id);
+    const itemData = await loadInAdsData(
+      WWStorage.getPhoneAds(phone),
+      (uuid) => WWStorage.removePhoneAd(phone, uuid)
+    );
     const duplicateUuids = WWStorage.getPhoneAds(phone);
 
     const html = DUPLICATES_MODAL_TEMPLATE({
       IS_MOBILE_VIEW,
       content: ADS_TEMPLATE({
         IS_MOBILE_VIEW,
-        itemData: await loadInAdsData(duplicateUuids),
+        itemData,
       }),
       count: duplicateUuids.length,
       phone,
@@ -644,7 +648,7 @@ async function getPhoneQrCode(phone) {
   });
 }
 
-async function loadInAdsData(adUuids) {
+async function loadInAdsData(adUuids, clean) {
   let itemData = await Promise.all(
     adUuids.map((adUuid) => {
       const [id, url] = adUuidParts(adUuid);
@@ -672,7 +676,7 @@ async function loadInAdsData(adUuids) {
         }))
         .catch(async (e) => {
           console.error(e);
-          WWStorage.toggleTempSave(id + '|' + url);
+          clean(id + '|' + url);
           return null;
         });
     }));
@@ -682,7 +686,7 @@ async function loadInAdsData(adUuids) {
 
 async function loadTempSaveAdsData() {
   const adUuids = WWStorage.getTempSaved().reverse();
-  let itemData = loadInAdsData(adUuids);
+  let itemData = loadInAdsData(adUuids, (uuid) => WWStorage.toggleTempSave(uuid));
 
   for (let i = 0; i < itemData.length; i++) {
     if (!itemData[i].phone) {
