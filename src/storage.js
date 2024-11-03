@@ -2,9 +2,11 @@ const _WW_STORE_CACHE = {item: {}, save: null, phoneAds: {}, phoneHidden: null};
 
 const WWStorage = {
   getAdStoreKey(id) {
+    id = id.toUpperCase();
     return `ww2:${id}`;
   },
   getAdItem(id) {
+    id = id.toUpperCase();
     if (_WW_STORE_CACHE.item[id]) {
       return _WW_STORE_CACHE.item[id];
     }
@@ -14,12 +16,14 @@ const WWStorage = {
     return item;
   },
   setAdProp(id, prop, value) {
+    id = id.toUpperCase();
     const item = this.getAdItem(id);
     item[prop] = value;
     localStorage.setItem(`ww2:${id}`, JSON.stringify(item));
     _WW_STORE_CACHE.item[id] = item;
   },
   getAdProp(id, prop) {
+    id = id.toUpperCase();
     const item = this.getAdItem(id);
     return item[prop];
   },
@@ -45,11 +49,31 @@ const WWStorage = {
     return WWStorage.getAdProp(id, 'noPhone') === true;
   },
 
-  setAdImagesInOtherLocation(id, value = true) {
-    WWStorage.setAdProp(id, 'imagesInOtherLoc', value);
+  addAdDuplicateInOtherLocation(id, link) {
+    const list = WWStorage.getAdProp(id, 'duplicatesInOtherLoc') || [];
+    list.push(link);
+    WWStorage.setAdProp(id, 'duplicatesInOtherLoc', list);
   },
-  hasAdImagesInOtherLocation(id) {
-    return WWStorage.getAdProp(id, 'imagesInOtherLoc');
+  clearAdDuplicatesInOtherLocation(id) {
+    WWStorage.setAdProp(id, 'duplicatesInOtherLoc', null);
+  },
+  hasAdDuplicatesInOtherLocation(id) {
+    return !!WWStorage.getAdProp(id, 'duplicatesInOtherLoc');
+  },
+  getAdDuplicatesInOtherLocation(id) {
+    return WWStorage.getAdProp(id, 'duplicatesInOtherLoc') || [];
+  },
+
+  addAdDeadLink(id, link) {
+    const list = WWStorage.getAdProp(id, 'deadLinks') || [];
+    list.push(link);
+    WWStorage.setAdProp(id, 'deadLinks', list);
+  },
+  clearAdDeadLinks(id) {
+    WWStorage.setAdProp(id, 'deadLinks', null);
+  },
+  getAdDeadLinks(id) {
+    return WWStorage.getAdProp(id, 'deadLinks') || [];
   },
 
   setAdPhoneInvestigatedTime(id, timestamp) {
@@ -123,11 +147,11 @@ const WWStorage = {
 
   getTempSaved() {
     if (_WW_STORE_CACHE.save) {
-      return _WW_STORE_CACHE.save;
+      return [..._WW_STORE_CACHE.save];
     }
     const save = JSON.parse(localStorage.getItem('ww:temp_save') || '[]');
     _WW_STORE_CACHE.save = save;
-    return save;
+    return [...save];
   },
   clearTempSave() {
     localStorage.removeItem('ww:temp_save');

@@ -67,6 +67,13 @@ const SAFE_LAST_DOMAIN_PARTS = [
   'escorte-cluj.com',
 ];
 
+const PRIO_DOMAINS = [
+  'publi24.ro',
+  'www.publi24.ro',
+  'nimfomane.com',
+  'ddcforum.com',
+];
+
 const IS_MOBILE_VIEW = ('ontouchstart' in document.documentElement);
 const IS_AD_PAGE = !!document.querySelector('[itemtype="https://schema.org/Offer"]');
 
@@ -94,10 +101,15 @@ const filterLinks = (links) => {
 
 const sortLinks = (links) => {
   return links.sort((l1, l2) => {
-    if (l1.indexOf('https://nimfomane.com/forum') === -1) {
+    const d1 = PRIO_DOMAINS.findIndex(d => l1.indexOf('//'+d) !== -1);
+    const d2 = PRIO_DOMAINS.findIndex(d => l2.indexOf('//'+d) !== -1)
+    if (d1 !== -1 && d2 !== -1) {
+      return d1 - d2;
+    }
+    if (d2 !== -1) {
       return 1;
     }
-    if (l2.indexOf('https://nimfomane.com/forum') === -1) {
+    if (d1 !== -1) {
       return -1;
     }
 
@@ -130,8 +142,10 @@ function getItemVisibility(id) {
   return !wasItemHidden && !wasPhoneHidden;
 }
 
-function processImageLinks(links, itemUrl) {
+function processImageLinks(id, links, itemUrl) {
   const domainMap = {};
+  const duplicatesInOtherLoc = WWStorage.getAdDuplicatesInOtherLocation(id);
+  const deadLinks = WWStorage.getAdDeadLinks(id);
 
   links
     .filter(link => {
@@ -140,19 +154,24 @@ function processImageLinks(links, itemUrl) {
     })
     .forEach((link) => {
       const domain = new URL(link).hostname.replace('www.', '');
+      const isDomainSafe = SAFE_LAST_DOMAIN_PARTS.some((part) => domain.includes(part) );
+      const linkObj = {
+        link,
+        isDead: deadLinks.includes(link),
+        isSafe:  isDomainSafe && !duplicatesInOtherLoc.includes(link)
+      };
+
       if (!domainMap[domain]) {
-        domainMap[domain] = {
-          links: [link],
-          isSafe: SAFE_LAST_DOMAIN_PARTS.some((part) => domain.includes(part) )
-        };
+        domainMap[domain] = {links: [linkObj], isSafe: isDomainSafe };
       } else {
-        domainMap[domain].links.push(link);
+        domainMap[domain].links.push(linkObj);
       }
     });
 
+  console.log(Object.entries(domainMap));
   return Object.entries(domainMap)
     .map(([domain, { links, isSafe }]) => ({ domain, links, isSafe }))
-    .sort(({isSafe: isSafeA}, {isSafe: isSafeB}) => isSafeA && !isSafeB ? -1 : 0);
+    .sort(({isSafe: isSafeA, domain}, {isSafe: isSafeB}) => PRIO_DOMAINS.includes(domain) || isSafeA && !isSafeB ? -1 : 0);
 }
 
 function renderModal(html) {
@@ -201,7 +220,7 @@ function renderAdElement(item, id, storage) {
   const filteredSearchLinks = sortLinks(filterLinks(searchLinks || []));
   const nimfomaneLink = filteredSearchLinks.find(l => l.indexOf('https://nimfomane.com/forum/topic/') === 0);
   const imageSearchLinks = storage[`ww:image_results:${id}`];
-  const imageSearchDomains = imageSearchLinks ? processImageLinks(imageSearchLinks, itemUrl) : undefined;
+  const imageSearchDomains = imageSearchLinks ? processImageLinks(id, imageSearchLinks, itemUrl) : undefined;
 
   const now = Date.now();
   const phoneTime = WWStorage.getAdPhoneInvestigatedTime(id);
@@ -237,7 +256,7 @@ function renderAdElement(item, id, storage) {
     filteredSearchLinks,
     imageSearchDomains,
     nimfomaneLink,
-    hasImagesInOtherLocation: WWStorage.hasAdImagesInOtherLocation(id),
+    hasImagesInOtherLocation: WWStorage.hasAdDuplicatesInOtherLocation(id),
     phoneInvestigatedSinceDays,
     imageInvestigatedSinceDays,
     phoneInvestigateStale,
@@ -397,7 +416,9 @@ async function loadInAdPage(itemOrId, _url) {
   const pageResponse = await fetch(url);
 
   if (!pageResponse.ok) {
-    throw new Error(`Failed to load ${url}`);
+    const error = new Error(`Failed to load ${url}`);
+    error.code = pageResponse.status;
+    throw error;
   }
 
   const html = await pageResponse.text();
@@ -457,7 +478,7 @@ function createInvestigateImgClickHandler(id, item) {
 
       // Maybe the post has only one picture. In that case gallery is not shown.
       if (imgs.length === 0) {
-        imgs = [...document.body.querySelectorAll('[class="detailViewImg "]')]
+        imgs = [...document.body.querySelectorAll('.detailViewImg')]
           .map(img => img.getAttribute('src'));
       }
     }
@@ -522,22 +543,32 @@ async function analyzeFoundImages(id, item) {
   const publi24AdLinks = results[`ww:image_results:${id}`]
     .filter(link => link.match(/^https:\/\/(www\.)?publi24\.ro\/.+\/anunt\/.+$/));
 
+  WWStorage.clearAdDeadLinks(id);
+  WWStorage.clearAdDuplicatesInOtherLocation(id);
   const currentAdLocation = getItemLocation(item);
 
   await Promise.all(publi24AdLinks.map((l =>
     loadInAdPage(null, l).catch((e) => {
       console.error(e);
-      return null;
+      return e.code;
     }))))
     .then((pages) => {
-      const locations = pages
-        .filter(p => !!p)
-        .map(page => getItemLocation(page, true));
-      if (locations.some(loc => loc !== currentAdLocation)) {
-        WWStorage.setAdImagesInOtherLocation(id);
-      } else if (WWStorage.hasAdImagesInOtherLocation(id)) {
-        WWStorage.setAdImagesInOtherLocation(id, false);
-      }
+      pages
+        .forEach((page, index) => {
+          if (typeof page === 'number') {
+            console.log(page);
+            if (page === 410) {
+              WWStorage.addAdDeadLink(id, publi24AdLinks[index]);
+            }
+            return;
+          }
+
+          const location = getItemLocation(page, true);
+
+          if (location !== currentAdLocation) {
+            WWStorage.addAdDuplicateInOtherLocation(id, publi24AdLinks[index]);
+          }
+        });
     })
 }
 
@@ -548,7 +579,7 @@ function registerInvestigateImgHandler(item, id) {
 }
 
 function itemToTempSaveId(item) {
-  return item.getAttribute('data-articleid') + '|' + getItemUrl(item);
+  return item.getAttribute('data-articleid').toUpperCase() + '|' + getItemUrl(item);
 }
 
 function adUuidParts(id) {
@@ -747,7 +778,7 @@ async function loadTempSaveAdsData() {
     if (!itemData[i].phone) {
       continue;
     }
-    let duplicateIndex = itemData.findIndex((f, j) => j > i && f.phone.trim() === itemData[i].phone.trim());
+    let duplicateIndex = itemData.findIndex((f, j) => j > i && (f.phone || '').trim() === itemData[i].phone.trim());
     if (duplicateIndex !== -1) {
       const duplicate = itemData[duplicateIndex];
       duplicate.duplicate = true;
@@ -845,7 +876,7 @@ WWStorage.upgrade()
         .getAttribute('data-url')
         .replace(/^.*?adid=([^&]+)&.*$/, "$1");
       const item = document.body.querySelector('[itemtype="https://schema.org/Offer"]');
-      item.setAttribute('data-articleid', id);
+      item.setAttribute('data-articleid', id.toUpperCase());
 
       if (!IS_MOBILE_VIEW) {
         item.removeChild(item.lastElementChild);

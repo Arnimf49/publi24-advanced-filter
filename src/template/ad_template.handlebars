@@ -129,9 +129,9 @@
                         <div style="font-size: .8125rem;">
                             {{#each imageSearchDomains}}
                                 {{#each this.links}}
-                                    <a href="{{this}}" target="_blank"
+                                    <a href="{{this.link}}" target="_blank"
                                        style="display: inline-block;
-                                               background-color: {{#if ../isSafe}}#d1e1d1{{else}}#efe2e2{{/if}};
+                                               background-color: {{#if this.isDead}}#d6d8dd{{else}}{{#if this.isSafe}}#d1e1d1{{else}}#efe2e2{{/if}}{{/if}};
                                                padding: 5px;
                                                margin-right: 3px;
                                                margin-bottom: 6px;
