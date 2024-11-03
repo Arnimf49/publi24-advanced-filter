@@ -383,11 +383,11 @@ function registerInvestigateHandler(item, id) {
 }
 
 function getItemUrl(itemOrUrl) {
-  if (IS_AD_PAGE) {
-    return location.toString();
-  }
   if (typeof itemOrUrl === 'string') {
     return itemOrUrl;
+  }
+  if (itemOrUrl.className.indexOf('article-item') === -1) {
+    return location.toString();
   }
   return itemOrUrl.getAttribute('onclick').replace(/^.*'(http[^']+)'.*/, '$1');
 }
@@ -430,10 +430,9 @@ async function acquireSliderImages(item) {
 }
 
 function createInvestigateImgClickHandler(id, item) {
-  const openImageInvestigation = (imgLink, index = 0) => {
-    const encodedId = encodeURIComponent(id);
+  const openImageInvestigation = (imgLink) => {
     const encodedLink = encodeURIComponent(imgLink);
-    window.open(`https://lens.google.com/uploadbyurl?url=${encodedLink}&wwiid=${encodedId}&wwindex=${index}`)
+    window.open(`https://lens.google.com/uploadbyurl?url=${encodedLink}`)
   }
 
   return async (e) => {
@@ -444,7 +443,8 @@ function createInvestigateImgClickHandler(id, item) {
       return;
     }
 
-    browser.storage.local.set({ [`ww:image_results:${id}`]: undefined });
+    if (e.currentTarget) e.currentTarget.disabled = true;
+    browser.storage.local.set({ [`ww:image_results:${id}`]: null });
 
     let imgs;
 
@@ -468,16 +468,17 @@ function createInvestigateImgClickHandler(id, item) {
     const done = () => {
       WWStorage.setAdImagesInvestigatedTime(id, Date.now());
       analyzeFoundImages(id, item);
+      if (e.currentTarget) e.currentTarget.disabled = false;
     }
 
     browser.storage.local.set({ [`ww:img_search_started_for`]: {wwid: id, count: imgs.length} }).then(() => {
       if (!IS_MOBILE_VIEW) {
-        imgs.forEach((img, index) => openImageInvestigation(img, index));
+        imgs.forEach(img => openImageInvestigation(img));
         const interval = setInterval(async() => {
-          const results = (await browser.storage.local.get(`ww:img_search_started_for`));
-          if (results[`ww:img_search_started_for`].count === 0) {
-            done();
+          const results = (await browser.storage.local.get(`ww:img_search_started_for`))[`ww:img_search_started_for`];
+          if (results.count === 0) {
             clearInterval(interval);
+            done();
           }
         }, 500);
       } else {
@@ -489,7 +490,7 @@ function createInvestigateImgClickHandler(id, item) {
             done();
           }
           else if (document.visibilityState === 'visible') {
-            openImageInvestigation(imgs[index], index++);
+            openImageInvestigation(imgs[index]);
           }
         };
         document.addEventListener('visibilitychange', openNext);
@@ -499,12 +500,16 @@ function createInvestigateImgClickHandler(id, item) {
   };
 }
 
-function getItemLocation(item) {
+function getItemLocation(item, itemIsOnAdPage = false) {
   let location;
   if (typeof item === "string") {
     location = item;
-  } else if (IS_AD_PAGE) {
-    location = item.querySelector('[itemtype="https://schema.org/Place"]').textContent.trim();
+  } else if (IS_AD_PAGE || itemIsOnAdPage) {
+    if (IS_MOBILE_VIEW) {
+      location = item.querySelector('[class="location"]').textContent.trim();
+    } else {
+      location = item.querySelector('[itemtype="https://schema.org/Place"]').textContent.trim();
+    }
   } else {
     location = item.querySelector('[class="article-location"]').textContent.trim();
   }
@@ -527,7 +532,7 @@ async function analyzeFoundImages(id, item) {
     .then((pages) => {
       const locations = pages
         .filter(p => !!p)
-        .map(page => getItemLocation(page.querySelector('[itemtype="https://schema.org/Place"]').textContent.trim()));
+        .map(page => getItemLocation(page, true));
       if (locations.some(loc => loc !== currentAdLocation)) {
         WWStorage.setAdImagesInOtherLocation(id);
       } else if (WWStorage.hasAdImagesInOtherLocation(id)) {
@@ -670,7 +675,7 @@ function registerHandlers(item, id) {
   registerTemporarySaveHandler(item, id);
   registerDuplicatesModalHandler(item, id);
 
-  if (!IS_AD_PAGE) {
+  if (item.className.indexOf('article-item') !== -1) {
     registerOpenImagesSliderHandler(item, id);
   }
 }
@@ -736,7 +741,7 @@ async function loadInAdsData(adUuids, clean) {
 
 async function loadTempSaveAdsData() {
   const adUuids = WWStorage.getTempSaved().reverse();
-  let itemData = loadInAdsData(adUuids, (uuid) => WWStorage.toggleTempSave(uuid));
+  let itemData = await loadInAdsData(adUuids, (uuid) => WWStorage.toggleTempSave(uuid));
 
   for (let i = 0; i < itemData.length; i++) {
     if (!itemData[i].phone) {
