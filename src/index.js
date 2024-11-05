@@ -74,6 +74,8 @@ const PRIO_DOMAINS = [
   'ddcforum.com',
 ];
 
+const AD_LOAD_CACHE = {};
+
 const IS_MOBILE_VIEW = ('ontouchstart' in document.documentElement);
 const IS_AD_PAGE = !!document.querySelector('[itemtype="https://schema.org/Offer"]');
 
@@ -168,7 +170,6 @@ function processImageLinks(id, links, itemUrl) {
       }
     });
 
-  console.log(Object.entries(domainMap));
   return Object.entries(domainMap)
     .map(([domain, { links, isSafe }]) => ({ domain, links, isSafe }))
     .sort(({isSafe: isSafeA, domain}, {isSafe: isSafeB}) => PRIO_DOMAINS.includes(domain) || isSafeA && !isSafeB ? -1 : 0);
@@ -187,11 +188,14 @@ function renderModal(html) {
     adElement.stopRender();
   };
 
+  document.body.style.overflow = 'hidden';
+
   const close = () => {
     itemRenderCleaners.forEach(c => c());
     document.body.removeChild(container);
     modalsOpen.pop();
     window.removeEventListener('keydown',  closeOnKey);
+    document.body.style.overflow = "initial";
   };
   const closeOnKey = (e) => {
     if (e.key === 'Escape' && modalsOpen[modalsOpen.length-1] === container) close();
@@ -413,6 +417,11 @@ function getItemUrl(itemOrUrl) {
 
 async function loadInAdPage(itemOrId, _url) {
   const url = _url || getItemUrl(itemOrId);
+
+  if (AD_LOAD_CACHE[url]) {
+    return AD_LOAD_CACHE[url];
+  }
+
   const pageResponse = await fetch(url);
 
   if (!pageResponse.ok) {
@@ -424,6 +433,9 @@ async function loadInAdPage(itemOrId, _url) {
   const html = await pageResponse.text();
   const temp = document.createElement('div');
   temp.innerHTML = html;
+
+  AD_LOAD_CACHE[url] = temp;
+
   return temp;
 }
 
@@ -495,28 +507,29 @@ function createInvestigateImgClickHandler(id, item) {
     browser.storage.local.set({ [`ww:img_search_started_for`]: {wwid: id, count: imgs.length} }).then(() => {
       if (!IS_MOBILE_VIEW) {
         imgs.forEach(img => openImageInvestigation(img));
-        const interval = setInterval(async() => {
-          const results = (await browser.storage.local.get(`ww:img_search_started_for`))[`ww:img_search_started_for`];
-          if (results.count === 0) {
-            clearInterval(interval);
-            done();
-          }
-        }, 500);
       } else {
         // Open tabs for investigate one by one since on mobile opening all at once does not work.
         let index = 0;
         const openNext = () => {
           if (!imgs[index]) {
             document.removeEventListener('visibilitychange', openNext);
-            done();
           }
           else if (document.visibilityState === 'visible') {
             openImageInvestigation(imgs[index]);
+            ++index;
           }
         };
         document.addEventListener('visibilitychange', openNext);
         openNext();
       }
+
+      const interval = setInterval(async() => {
+        const results = (await browser.storage.local.get(`ww:img_search_started_for`))[`ww:img_search_started_for`];
+        if (results.count === 0) {
+          clearInterval(interval);
+          done();
+        }
+      }, 500);
     });
   };
 }
@@ -556,7 +569,6 @@ async function analyzeFoundImages(id, item) {
       pages
         .forEach((page, index) => {
           if (typeof page === 'number') {
-            console.log(page);
             if (page === 410) {
               WWStorage.addAdDeadLink(id, publi24AdLinks[index]);
             }
@@ -690,12 +702,13 @@ function registerOpenImagesSliderHandler(item, id) {
     sliderContainer.querySelectorAll('.splide__arrow')
       .forEach((el) => el.addEventListener('click', (e) => e.stopPropagation()));
 
-    setTimeout(() => {
-      // We can pre-analyze the ad if the user looks at the picture. They are most likely interested.
-      if (!WWStorage.getAdPhone(id)) {
-        acquirePhoneNumber(item, id);
+    // We can pre-analyze the ad if the user looks at the picture. They are most likely interested.
+    if (!WWStorage.getAdPhone(id)) {
+      await investigateNumber(item, id, false);
+      if (!getItemVisibility(id)) {
+        visibilityButton.style.backgroundColor = '#696969';
       }
-    }, 10);
+    }
   }
 }
 

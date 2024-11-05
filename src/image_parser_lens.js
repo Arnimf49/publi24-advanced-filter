@@ -54,7 +54,7 @@ function readImageLinks(wwid, done) {
         browser.storage.local.set({ [`ww:image_results:${wwid}`]: data });
 
         releaseStorageLock();
-        done();
+        setTimeout(done, Math.round(Math.random() * 100)); // randomized done helps avoid race conditions
       });
     });
   }, 500);

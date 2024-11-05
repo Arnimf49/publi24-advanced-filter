@@ -10,7 +10,7 @@
             backdrop-filter: blur(10px);
 ">
         <div style="position: absolute; bottom: 30px;{{#if IS_MOBILE_VIEW}}right: 30px;{{else}}left: 50%; transform: translate(-50%, 0);{{/if}}">
-        <button type="button" style="vertical-align: middle; background-color: #c59b2f; padding: 9px; padding-bottom: 7px; position: absolute; right: 70px;" class="mainbg radius" data-wwid="toggle-hidden">
+        <button type="button" style="vertical-align: middle; background-color: {{#unless visible}}#696969{{else}}#c59b2f{{/unless}}; padding: 9px; padding-bottom: 7px; position: absolute; right: 70px;" class="mainbg radius" data-wwid="toggle-hidden">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
         </button>
         <button type="button" style="position: absolute; {{#if IS_MOBILE_VIEW}}right: 120px;{{else}}left: 70px;{{/if}} vertical-align: middle; padding: 9px; padding-bottom: 7px;" class="mainbg radius" data-wwid="analyze-images">

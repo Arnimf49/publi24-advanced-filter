@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Publi24 advanced filter",
-  "version": "2.10",
+  "version": "2.12",
   "description": "Advanced analyzer and filter for publi24.ro ads",
   "icons": {
     "48": "icon.png"
