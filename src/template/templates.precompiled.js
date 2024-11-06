@@ -387,6 +387,8 @@ templates['duplicates_modal_template'] = template({"1":function(container,depth0
     return "10px";
 },"13":function(container,depth0,helpers,partials,data) {
     return "20px";
+},"15":function(container,depth0,helpers,partials,data) {
+    return "margin-top:105px;";
 },"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=container.hooks.helperMissing, alias3="function", alias4=container.escapeExpression, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
@@ -401,14 +403,16 @@ templates['duplicates_modal_template'] = template({"1":function(container,depth0
     + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.program(5, data, 0),"data":data,"loc":{"start":{"line":42,"column":28},"end":{"line":42,"column":73}}})) != null ? stack1 : "")
     + ";\">\n            Duplicate\n        </h2>\n        <button type=\"button\" class=\"mainbg radius\" style=\"float: right; border-radius: 1000px; padding: 11px; line-height: 0; background: rgba(255,255,255,0.6)\" data-wwid=\"close\">\n            <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\">\n                <line x1=\"4\" y1=\"4\" x2=\"20\" y2=\"20\" stroke=\"black\" stroke-width=\"2\"/>\n                <line x1=\"20\" y1=\"4\" x2=\"4\" y2=\"20\" stroke=\"black\" stroke-width=\"2\"/>\n            </svg>\n        </button>\n        <button type=\"button\" class=\"radius\" style=\"color: black;float: right;line-height: 0;background: rgba(255,255,255,0.6);\n                margin-right: "
     + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(7, data, 0),"inverse":container.program(9, data, 0),"data":data,"loc":{"start":{"line":52,"column":30},"end":{"line":52,"column":75}}})) != null ? stack1 : "")
-    + ";padding: 13px;\" data-wwid=\"hide-all\">\n            <b>ascunde toate</b>\n        </button>\n    </div>\n\n    <div class=\"rmd-container-search-results\" style=\"width: 100%;\n                                                    max-width: 1000px;\n                                                    padding: "
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(11, data, 0),"inverse":container.program(13, data, 0),"data":data,"loc":{"start":{"line":59,"column":61},"end":{"line":59,"column":106}}})) != null ? stack1 : "")
-    + " !important;\n                                                    background: #ececec;\n                                                    border-radius: 10px;\n                                                    margin: auto;\n                                                    margin-bottom: 150px;\n                                                    position: relative;\" onclick=\"event.stopPropagation()\">\n        <p style=\"color: rgb(55 55 55); font-size: .95rem; padding-bottom: 30px\"><strong>Sunt "
-    + alias4(((helper = (helper = lookupProperty(helpers,"count") || (depth0 != null ? lookupProperty(depth0,"count") : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"count","hash":{},"data":data,"loc":{"start":{"line":65,"column":94},"end":{"line":65,"column":103}}}) : helper)))
+    + ";padding: 13px;\" data-wwid=\"hide-all\">\n            <b>ascunde toate</b>\n        </button>\n    </div>\n\n    <div class=\"rmd-container-search-results\" style=\"\n        width: 100%;\n        max-width: 1000px;\n        padding: "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(11, data, 0),"inverse":container.program(13, data, 0),"data":data,"loc":{"start":{"line":60,"column":17},"end":{"line":60,"column":62}}})) != null ? stack1 : "")
+    + " !important;\n        background: #ececec;\n        border-radius: 10px;\n        margin: auto;\n        margin-bottom: 150px;\n        position: relative;\n        "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(15, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":66,"column":8},"end":{"line":66,"column":54}}})) != null ? stack1 : "")
+    + "\n    \" onclick=\"event.stopPropagation()\">\n        <p style=\"color: rgb(55 55 55); font-size: .95rem; padding-bottom: 30px\"><strong>Sunt "
+    + alias4(((helper = (helper = lookupProperty(helpers,"count") || (depth0 != null ? lookupProperty(depth0,"count") : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"count","hash":{},"data":data,"loc":{"start":{"line":68,"column":94},"end":{"line":68,"column":103}}}) : helper)))
     + " anunțuri cu numărul de telefon "
-    + alias4(((helper = (helper = lookupProperty(helpers,"phone") || (depth0 != null ? lookupProperty(depth0,"phone") : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"phone","hash":{},"data":data,"loc":{"start":{"line":65,"column":135},"end":{"line":65,"column":144}}}) : helper)))
+    + alias4(((helper = (helper = lookupProperty(helpers,"phone") || (depth0 != null ? lookupProperty(depth0,"phone") : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"phone","hash":{},"data":data,"loc":{"start":{"line":68,"column":135},"end":{"line":68,"column":144}}}) : helper)))
     + ".</strong> Pot sa fie și mai multe care încă nu au fost analizate.</p>\n\n        "
-    + ((stack1 = ((helper = (helper = lookupProperty(helpers,"content") || (depth0 != null ? lookupProperty(depth0,"content") : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"content","hash":{},"data":data,"loc":{"start":{"line":67,"column":8},"end":{"line":67,"column":21}}}) : helper))) != null ? stack1 : "")
+    + ((stack1 = ((helper = (helper = lookupProperty(helpers,"content") || (depth0 != null ? lookupProperty(depth0,"content") : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"content","hash":{},"data":data,"loc":{"start":{"line":70,"column":8},"end":{"line":70,"column":21}}}) : helper))) != null ? stack1 : "")
     + "\n    </div>\n</div>\n";
 },"useData":true});
 templates['favorites_modal_template'] = template({"1":function(container,depth0,helpers,partials,data) {
@@ -425,6 +429,8 @@ templates['favorites_modal_template'] = template({"1":function(container,depth0,
     return "10px";
 },"13":function(container,depth0,helpers,partials,data) {
     return "20px";
+},"15":function(container,depth0,helpers,partials,data) {
+    return "margin-top:105px;";
 },"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
@@ -441,8 +447,10 @@ templates['favorites_modal_template'] = template({"1":function(container,depth0,
     + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(7, data, 0),"inverse":container.program(9, data, 0),"data":data,"loc":{"start":{"line":57,"column":30},"end":{"line":57,"column":75}}})) != null ? stack1 : "")
     + ";padding: 13px;\" data-wwid=\"clear-favorites\">\n            <b>șterge lista</b>\n        </button>\n    </div>\n\n    <div class=\"rmd-container-search-results\" style=\"width: 100%;\n            max-width: 1000px;\n            padding: "
     + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(11, data, 0),"inverse":container.program(13, data, 0),"data":data,"loc":{"start":{"line":64,"column":21},"end":{"line":64,"column":66}}})) != null ? stack1 : "")
-    + " !important;\n            background: #ececec;\n            border-radius: 10px;\n            margin: auto;\n            margin-bottom: 150px;\n            position: relative;\" onclick=\"event.stopPropagation()\">\n        "
-    + ((stack1 = ((helper = (helper = lookupProperty(helpers,"content") || (depth0 != null ? lookupProperty(depth0,"content") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"content","hash":{},"data":data,"loc":{"start":{"line":70,"column":8},"end":{"line":70,"column":21}}}) : helper))) != null ? stack1 : "")
+    + " !important;\n            background: #ececec;\n            border-radius: 10px;\n            margin: auto;\n            margin-bottom: 150px;\n            position: relative;\n            "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(15, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":70,"column":12},"end":{"line":70,"column":58}}})) != null ? stack1 : "")
+    + "\n    \" onclick=\"event.stopPropagation()\">\n        "
+    + ((stack1 = ((helper = (helper = lookupProperty(helpers,"content") || (depth0 != null ? lookupProperty(depth0,"content") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"content","hash":{},"data":data,"loc":{"start":{"line":72,"column":8},"end":{"line":72,"column":21}}}) : helper))) != null ? stack1 : "")
     + "\n    </div>\n</div>\n";
 },"useData":true});
 templates['saves_button_template'] = template({"1":function(container,depth0,helpers,partials,data) {
