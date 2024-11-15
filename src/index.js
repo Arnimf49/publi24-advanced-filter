@@ -87,6 +87,7 @@ const FAVORITES_MODAL_TEMPLATE = Handlebars.templates.favorites_modal_template;
 const DUPLICATES_MODAL_TEMPLATE = Handlebars.templates.duplicates_modal_template;
 const SLIDER_TEMPLATE = Handlebars.templates.slider_template;
 const SAVES_BUTTON_TEMPLATE = Handlebars.templates.saves_button_template;
+const FOCUS_BUTTON_TEMPLATE = Handlebars.templates.focus_button_template;
 
 const modalsOpen = [];
 
@@ -268,6 +269,12 @@ function renderAdElement(item, id, storage) {
   });
 
   (item.querySelector('.article-txt') || item).appendChild(panelElement);
+
+  if (!IS_AD_PAGE && item.hasAttribute('onclick')) {
+    item.querySelector('.article-txt-wrap').onclick = (event) => event.stopPropagation();
+    item.querySelector('.article-content-wrap').setAttribute('onclick', item.getAttribute('onclick'));
+    item.removeAttribute('onclick');
+  }
 }
 
 function setItemVisible(item, v) {
@@ -412,7 +419,7 @@ function getItemUrl(itemOrUrl) {
   if (itemOrUrl.className.indexOf('article-item') === -1) {
     return location.toString();
   }
-  return itemOrUrl.getAttribute('onclick').replace(/^.*'(http[^']+)'.*/, '$1');
+  return itemOrUrl.querySelector('.article-title a').href;
 }
 
 async function loadInAdPage(itemOrId, _url) {
@@ -668,10 +675,13 @@ function registerOpenImagesSliderHandler(item, id) {
     document.body.appendChild(sliderContainer);
     new Splide( '#_ww_slider .splide', { focus: 'center', type: 'loop', keyboard: 'global' }).mount();
 
+    document.body.style.overflow = 'hidden';
+
     const close = () => {
       document.body.removeChild(sliderContainer);
       modalsOpen.pop();
       window.removeEventListener('keydown',  closeOnKey);
+      document.body.style.overflow = 'initial';
     };
     const closeOnKey = (e) => {
       if (e.key === 'Escape' && modalsOpen[modalsOpen.length-1] === sliderContainer) close();
@@ -847,6 +857,20 @@ function registerTemporarySavesButton() {
   }, 1000);
 }
 
+function registerFocusModeButton() {
+  const element = document.createElement('div');
+  element.innerHTML = FOCUS_BUTTON_TEMPLATE({isOn: WWStorage.isFocusMode(), IS_MOBILE_VIEW});
+  element.setAttribute('data-ww', 'focus-button');
+  document.body.appendChild(element);
+
+  element.querySelector('button').onclick = () => {
+    const isFocus = WWStorage.isFocusMode();
+    WWStorage.setFocusMode(!isFocus);
+    window.scrollTo({left: 0, top: 0});
+    window.location.reload();
+  };
+}
+
 function renderAdWithCleanupAndCache(item, id, searchResults) {
   cleanupAdRender(item);
   renderAdElement(item, id, searchResults);
@@ -877,8 +901,19 @@ function registerAdItem(item, id) {
   return stopRender;
 }
 
-function registerAdsInContext(context) {
-  const items = context.querySelectorAll('[data-articleid]');
+function registerAdsInContext(context, applyFocusMode = false) {
+  let items = context.querySelectorAll('[data-articleid]');
+
+  if (applyFocusMode && WWStorage.isFocusMode()) {
+    items = [...items].filter((item) => {
+      if (getItemVisibility(item.getAttribute('data-articleid'))) {
+        return true;
+      }
+      item.style.display = 'none';
+      return false;
+    })
+  }
+
   return [...items].map((item) => registerAdItem(item, item.getAttribute('data-articleid')));
 }
 
@@ -897,9 +932,13 @@ WWStorage.upgrade()
       item.removeChild(item.lastElementChild);
       registerAdItem(item, id.toUpperCase());
     } else {
-      registerAdsInContext(document.body);
+      registerAdsInContext(document.body, true);
       if (location.pathname.startsWith('/anunturi/matrimoniale')) {
         registerTemporarySavesButton();
+
+        if (!IS_AD_PAGE) {
+          registerFocusModeButton();
+        }
       }
     }
   })

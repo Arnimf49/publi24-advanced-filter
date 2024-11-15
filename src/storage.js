@@ -176,6 +176,13 @@ const WWStorage = {
     return WWStorage.getTempSaved().includes(id);
   },
 
+  setFocusMode(enabled) {
+    localStorage.setItem('ww:focus_mode', enabled ? 'true' : 'false');
+  },
+  isFocusMode() {
+    return localStorage.getItem('ww:focus_mode') === 'true';
+  },
+
   async upgrade() {
     const version = localStorage.getItem('ww:storage:version');
 
