@@ -146,9 +146,9 @@
 
                             <p class="article-date">
                                 <i class="svg-icon svg-icon-article">
-                                    <svg viewBox="0 0 50 50" aria-hidden="true"><use xlink:href="#svg-icon-calendar"></use></svg>
+                                    <svg viewBox="0 0 50 50" aria-hidden="true" {{#if isDateOld}}style="fill: #964f4f" {{/if}}><use xlink:href="#svg-icon-calendar"></use></svg>
                                 </i>
-                                <span>{{this.date}}</span>
+                                <span {{#if isDateOld}}style="color: #964f4f; font-weight: bold" {{/if}}>{{this.date}}</span>
                             </p>
                         </div>
 

@@ -84,10 +84,11 @@ const STORAGE_KEYS = (id) => [[`ww:search_results:${id}`, `ww:image_results:${id
 const AD_TEMPLATE = Handlebars.templates.ad_template;
 const ADS_TEMPLATE = Handlebars.templates.ads_template;
 const FAVORITES_MODAL_TEMPLATE = Handlebars.templates.favorites_modal_template;
-const DUPLICATES_MODAL_TEMPLATE = Handlebars.templates.duplicates_modal_template;
+const DUPLICATES_MODAL_TEMPLATE = Handlebars.templates.ads_modal_template;
 const SLIDER_TEMPLATE = Handlebars.templates.slider_template;
 const SAVES_BUTTON_TEMPLATE = Handlebars.templates.saves_button_template;
 const FOCUS_BUTTON_TEMPLATE = Handlebars.templates.focus_button_template;
+const PHONE_SEARCH_BUTTON_TEMPLATE = Handlebars.templates.phone_search_button_template;
 
 const modalsOpen = [];
 
@@ -210,7 +211,12 @@ function renderModal(html) {
 
   itemRenderCleaners = registerAdsInContext(container);
 
-  return {container, close};
+  const registerAds = () => {
+    itemRenderCleaners.forEach(c => c());
+    itemRenderCleaners = registerAdsInContext(container);
+  }
+
+  return {container, registerAds, close};
 }
 
 
@@ -711,14 +717,6 @@ function registerOpenImagesSliderHandler(item, id) {
 
     sliderContainer.querySelectorAll('.splide__arrow')
       .forEach((el) => el.addEventListener('click', (e) => e.stopPropagation()));
-
-    // We can pre-analyze the ad if the user looks at the picture. They are most likely interested.
-    if (!WWStorage.getAdPhone(id)) {
-      await investigateNumber(item, id, false);
-      if (!getItemVisibility(id)) {
-        visibilityButton.style.backgroundColor = '#696969';
-      }
-    }
   }
 }
 
@@ -763,26 +761,35 @@ async function loadInAdsData(adUuids, clean) {
       const [id, url] = adUuidParts(adUuid);
 
       return loadInAdPage(url)
-        .then(async (itemPage) => ({
-          IS_MOBILE_VIEW,
-          id,
-          url,
-          phone: WWStorage.getAdPhone(id),
-          qrCode: WWStorage.getAdPhone(id) && await getPhoneQrCode(WWStorage.getAdPhone(id)),
-          title: itemPage.querySelector('[itemscope] h1[itemprop="name"]').innerHTML,
-          description: itemPage.querySelector('[itemscope] [itemprop="description"]').innerHTML
-            .replace(/<[^>]*>/gi, ' ')
-            .replace(/\s+/g, ' ')
-            .replace(/Publi24_\d+/, '')
-            .trim().substring(0, 290),
-          image: IS_MOBILE_VIEW
-            ? itemPage.querySelector('[itemprop="associatedMedia"] li').style.background.match(/url\(['"]([^'"]+)['"]\)/)[1]
-            : itemPage.querySelector('[itemprop="image"]').src,
-          location: IS_MOBILE_VIEW
-            ? itemPage.querySelector('[class="location"]')?.textContent.trim()
-            : itemPage.querySelector('[itemtype="https://schema.org/Place"]')?.textContent.trim(),
-          date: itemPage.querySelector('[itemprop="validFrom"]')?.textContent.trim(),
-        }))
+        .then(async (itemPage) => {
+          const date = new Date(itemPage.querySelector('[itemprop="validFrom"]')?.textContent.trim()
+            .replace(/.*(\d+\.)(\d+\.)(\d+ \d+:\d+:\d+)/, "$2$1$3"));
+          const dateDiffDays = Math.floor((new Date().getTime() - date.getTime()) / 8.64e+7);
+
+          return ({
+            IS_MOBILE_VIEW,
+            id,
+            url,
+            phone: WWStorage.getAdPhone(id),
+            qrCode: WWStorage.getAdPhone(id) && await getPhoneQrCode(WWStorage.getAdPhone(id)),
+            title: itemPage.querySelector('[itemscope] h1[itemprop="name"]').innerHTML,
+            description: itemPage.querySelector('[itemscope] [itemprop="description"]').innerHTML
+              .replace(/<[^>]*>/gi, ' ')
+              .replace(/\s+/g, ' ')
+              .replace(/Publi24_\d+/, '')
+              .trim().substring(0, 290),
+            image: IS_MOBILE_VIEW
+              ? itemPage.querySelector('[itemprop="associatedMedia"] li').style.background.match(/url\(['"]([^'"]+)['"]\)/)[1]
+              : itemPage.querySelector('[itemprop="image"]').src,
+            location: IS_MOBILE_VIEW
+              ? itemPage.querySelector('[class="location"]')?.textContent.trim()
+              : itemPage.querySelector('[itemtype="https://schema.org/Place"]')?.textContent.trim(),
+            date: dateDiffDays === 0 ? `azi la ${date.getHours()}:${date.getMinutes()}`
+              : dateDiffDays === 1 ? `ieri la ${date.getHours()}:${date.getMinutes()}`
+              : `de ${dateDiffDays} zile`,
+            isDateOld: dateDiffDays >= 2
+          })
+        })
         .catch(async (e) => {
           console.error(e);
           clean(id + '|' + url);
@@ -871,6 +878,54 @@ function registerFocusModeButton() {
   };
 }
 
+function registerPhoneSearchButton() {
+  const element = document.createElement('div');
+  element.innerHTML = PHONE_SEARCH_BUTTON_TEMPLATE({IS_MOBILE_VIEW});
+  document.body.appendChild(element);
+
+  element.querySelector('button').onclick = () => {
+    let duplicateUuids, phone, timeout;
+
+    const html = DUPLICATES_MODAL_TEMPLATE({IS_MOBILE_VIEW, count: '~'});
+    const {container, close, registerAds} = renderModal(html);
+
+    const input = container.querySelector("input");
+    input.onkeyup = () => {
+      container.querySelector("[data-wwid='count']").innerHTML = "...";
+
+      if (timeout) {clearTimeout(timeout)}
+      timeout = setTimeout(async () => {
+        phone = input.value;
+        console.log(phone);
+
+        duplicateUuids = WWStorage.getPhoneAds(phone) || [];
+        const itemData = await loadInAdsData(
+          duplicateUuids,
+          (uuid) => WWStorage.removePhoneAd(phone, uuid)
+        );
+
+        container.querySelector("[data-wwid='content']").innerHTML = ADS_TEMPLATE({
+          IS_MOBILE_VIEW,
+          itemData,
+        });
+        container.querySelector("[data-wwid='count']").innerHTML = duplicateUuids.length;
+        registerAds();
+      }, 1500);
+    };
+
+    const hideAllBtn = container.querySelector('[data-wwid="hide-all"]');
+    hideAllBtn.onclick = () => {
+      if (duplicateUuids.length) {
+        duplicateUuids.forEach((adUuid) => {
+          WWStorage.setAdVisibility(adUuidParts(adUuid)[0], false);
+        });
+        WWStorage.setPhoneHidden(phone);
+        close();
+      }
+    }
+  };
+}
+
 function renderAdWithCleanupAndCache(item, id, searchResults) {
   cleanupAdRender(item);
   renderAdElement(item, id, searchResults);
@@ -885,6 +940,10 @@ function renderAdItem(item, id) {
 function registerAdItem(item, id) {
   renderAdItem(item, id);
   const renderCache = {};
+
+  if (!WWStorage.getAdPhone(id)) {
+    investigateNumber(item, id, false);
+  }
 
   const interval = setInterval(() => {
     getStorageItems(...STORAGE_KEYS(id)).then(r => {
@@ -938,6 +997,7 @@ WWStorage.upgrade()
 
         if (!IS_AD_PAGE) {
           registerFocusModeButton();
+          registerPhoneSearchButton();
         }
       }
     }

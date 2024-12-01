@@ -36,11 +36,11 @@
                 color: #ffffff;
                 float: left;
                 text-shadow: 2px 2px 2px rgba(0, 0, 0, .2);
-                background: #979797;
+                background: #17b;
                 padding: 5px 20px;
                 border-radius: 10px;
                 margin-top: {{#if IS_MOBILE_VIEW}}-1px{{else}}-5px{{/if}};">
-            Duplicate
+            Anunțuri
         </h2>
         <button type="button" class="mainbg radius" style="float: right; border-radius: 1000px; padding: 11px; line-height: 0; background: rgba(255,255,255,0.6)" data-wwid="close">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -65,8 +65,11 @@
         position: relative;
         {{#if IS_MOBILE_VIEW}}margin-top:105px;{{/if}}
     " onclick="event.stopPropagation()">
-        <p style="color: rgb(55 55 55); font-size: .95rem; padding-bottom: 30px"><strong>Sunt {{count}} anunțuri cu numărul de telefon {{phone}}.</strong> Pot sa fie și mai multe care încă nu au fost analizate.</p>
+        <input type="text" style="font-weight: bold; font-size: 1.2rem" placeholder="Număr telefon" {{#if phone}}value="{{phone}}" disabled{{/if}}/>
+        <p style="color: rgb(55 55 55); font-size: .95rem; padding-bottom: 10px; padding-top: 10px;"><strong>Rezultate: <span data-wwid="count">{{count}}</span></strong> <span style="float: right; font-style: italic">Pot sa fie mai multe care încă nu au fost analizate.</p>
 
-        {{{content}}}
+        <div data-wwid="content">
+            {{{content}}}
+        </div>
     </div>
 </div>

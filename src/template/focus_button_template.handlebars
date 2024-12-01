@@ -1,0 +1,28 @@
+<style>
+    .ww-focus-button {
+        position: fixed;
+        bottom: {{#if IS_MOBILE_VIEW }}160px{{else}}80px{{/if}};
+        {{#if IS_MOBILE_VIEW }}
+            left: 10px;
+            padding: 17px;
+        {{else}}
+            padding: 9px;
+            left: calc(50% + 120px);
+            transform: translateX(-50%);
+        {{/if}}
+        padding-bottom: 6px;
+        padding-top: 9px;
+        font-weight: bold;
+        background: {{#if isOn}}#c59b2f{{else}}#949494{{/if}};
+        border-radius: 6px;
+        border: 1px solid white;
+        box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, .2);
+    }
+    .ww-focus-button:hover {
+        background: {{#if isOn}}#c39020{{else}}#808080{{/if}};
+    }
+</style>
+
+<button class="ww-focus-button" title="Focus mode">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#FFF" d="M3,9A1,1,0,0,0,4,8V5A1,1,0,0,1,5,4H8A1,1,0,0,0,8,2H5A3,3,0,0,0,2,5V8A1,1,0,0,0,3,9ZM8,20H5a1,1,0,0,1-1-1V16a1,1,0,0,0-2,0v3a3,3,0,0,0,3,3H8a1,1,0,0,0,0-2Zm9-7a1,1,0,0,0,0-2H15.86A4,4,0,0,0,13,8.14V7a1,1,0,0,0-2,0V8.14A4,4,0,0,0,8.14,11H7a1,1,0,0,0,0,2H8.14A4,4,0,0,0,11,15.86V17a1,1,0,0,0,2,0V15.86A4,4,0,0,0,15.86,13Zm-5,1a2,2,0,1,1,2-2A2,2,0,0,1,12,14Zm9,1a1,1,0,0,0-1,1v3a1,1,0,0,1-1,1H16a1,1,0,0,0,0,2h3a3,3,0,0,0,3-3V16A1,1,0,0,0,21,15ZM19,2H16a1,1,0,0,0,0,2h3a1,1,0,0,1,1,1V8a1,1,0,0,0,2,0V5A3,3,0,0,0,19,2Z"/></svg>
+</button>
