@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Publi24 advanced filter",
-  "version": "2.14",
+  "version": "2.15",
   "description": "Advanced analyzer and filter for publi24.ro ads",
   "icons": {
     "48": "icon.png"
@@ -41,13 +41,19 @@
       ]
     },
     {
-      "matches": ["https://www.google.com/search?wwsid=*"],
+      "matches": [
+        "https://www.google.com/search?wwsid=*"
+      ],
       "js": [
         "src/search_parser.js"
       ]
     },
     {
-      "matches": ["https://lens.google.com/*"],
+      "matches": [
+        "https://lens.google.com/*",
+        "https://www.google.com/search?vsrid=*",
+        "https://www.google.com/search?sca_esv=*"
+      ],
       "js": [
         "src/image_parser_lens.js"
       ],

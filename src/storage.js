@@ -76,10 +76,10 @@ const WWStorage = {
     return WWStorage.getAdProp(id, 'deadLinks') || [];
   },
 
-  setAdPhoneInvestigatedTime(id, timestamp) {
+  setInvestigatedTime(id, timestamp) {
     WWStorage.setAdProp(id, 'phoneTime', timestamp);
   },
-  getAdPhoneInvestigatedTime(id) {
+  getInvestigatedTime(id) {
     return WWStorage.getAdProp(id, 'phoneTime');
   },
 

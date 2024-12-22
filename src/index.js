@@ -52,6 +52,7 @@ const BLACKLISTED_LINKS = [
   'https://escorte.lol/',
   'https://haisalut.ro/',
   'https://tel-search.net/',
+  'https://www.publi24.ro/cv?jobapplyid=',
 ]
 
 const SAFE_LAST_DOMAIN_PARTS = [
@@ -99,8 +100,8 @@ Handlebars.registerHelper('inc', function(value) {
   return ++value;
 });
 
-const filterLinks = (links) => {
-  return links.filter(l => !BLACKLISTED_LINKS.some(b => l.indexOf(b) === 0))
+const filterLinks = (links, itemUrl) => {
+  return links.filter(l => !BLACKLISTED_LINKS.some(b => l.indexOf(b) === 0) && itemUrl !== l)
 }
 
 const sortLinks = (links) => {
@@ -228,13 +229,13 @@ function renderAdElement(item, id, storage) {
   WWStorage.addPhoneAd(phone, id, itemUrl);
 
   const searchLinks = storage[`ww:search_results:${id}`];
-  const filteredSearchLinks = sortLinks(filterLinks(searchLinks || []));
+  const filteredSearchLinks = sortLinks(filterLinks(searchLinks || [], itemUrl));
   const nimfomaneLink = filteredSearchLinks.find(l => l.indexOf('https://nimfomane.com/forum/topic/') === 0);
   const imageSearchLinks = storage[`ww:image_results:${id}`];
   const imageSearchDomains = imageSearchLinks ? processImageLinks(id, imageSearchLinks, itemUrl) : undefined;
 
   const now = Date.now();
-  const phoneTime = WWStorage.getAdPhoneInvestigatedTime(id);
+  const phoneTime = WWStorage.getInvestigatedTime(id);
   const imageTime = WWStorage.getAdImagesInvestigatedTime(id);
   let phoneInvestigatedSinceDays, imageInvestigatedSinceDays;
   let phoneInvestigateStale, imageInvestigateStale;
@@ -384,7 +385,7 @@ async function acquirePhoneNumber(item, id) {
   return phone.trim();
 }
 
-async function investigateNumber(item, id, open = true) {
+async function investigateNumberAndSearch(item, id, search = true) {
   const phoneNumber = await acquirePhoneNumber(item, id);
 
   if (!phoneNumber) {
@@ -395,11 +396,12 @@ async function investigateNumber(item, id, open = true) {
     setItemVisible(item, false);
   }
 
-  if (open) {
+  if (search) {
     const encodedId = encodeURIComponent(id);
-    const encodedPhoneNumber = encodeURIComponent(phoneNumber);
-    window.open(`https://www.google.com/search?wwsid=${encodedId}&q=${encodedPhoneNumber}`);
-    WWStorage.setAdPhoneInvestigatedTime(id, Date.now());
+    const addUrlId = getItemUrl(item).match(/\/([^./]+)\.html/, "")[1];
+    const encodedSearch = encodeURIComponent(`"${phoneNumber}" OR "${addUrlId}"`);
+    window.open(`https://www.google.com/search?wwsid=${encodedId}&q=${encodedSearch}`);
+    WWStorage.setInvestigatedTime(id, Date.now());
   }
 
   return true;
@@ -413,7 +415,7 @@ function registerInvestigateHandler(item, id) {
     e.stopPropagation();
 
     investigateBtn.disabled = true;
-    await investigateNumber(item, id);
+    await investigateNumberAndSearch(item, id);
     investigateBtn.disabled = false;
   }
 }
@@ -485,7 +487,7 @@ function createInvestigateImgClickHandler(id, item) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!WWStorage.getAdPhone(id) && !(await investigateNumber(item, id, false))) {
+    if (!WWStorage.getAdPhone(id) && !(await investigateNumberAndSearch(item, id, false))) {
       return;
     }
 
@@ -761,9 +763,13 @@ async function loadInAdsData(adUuids, clean) {
       const [id, url] = adUuidParts(adUuid);
 
       return loadInAdPage(url)
+        .catch((e) => {
+          clean(id + '|' + url);
+          throw e;
+        })
         .then(async (itemPage) => {
           const date = new Date(itemPage.querySelector('[itemprop="validFrom"]')?.textContent.trim()
-            .replace(/.*(\d+\.)(\d+\.)(\d+ \d+:\d+:\d+)/, "$2$1$3"));
+            .replace(/.*(\d+\.)(\d+\.)(\d+ \d+:\d+:\d+)/, "$1$2$3"));
           const dateDiffDays = Math.floor((new Date().getTime() - date.getTime()) / 8.64e+7);
 
           return ({
@@ -784,17 +790,15 @@ async function loadInAdsData(adUuids, clean) {
             location: IS_MOBILE_VIEW
               ? itemPage.querySelector('[class="location"]')?.textContent.trim()
               : itemPage.querySelector('[itemtype="https://schema.org/Place"]')?.textContent.trim(),
-            date: dateDiffDays === 0 ? `azi la ${date.getHours()}:${date.getMinutes()}`
-              : dateDiffDays === 1 ? `ieri la ${date.getHours()}:${date.getMinutes()}`
+            date: dateDiffDays <= 1 ? `${date.getHours() < new Date().getHours() ? 'azi' : 'ieri'} la ${date.getHours()}:${date.getMinutes()}`
               : `de ${dateDiffDays} zile`,
             isDateOld: dateDiffDays >= 2
           })
         })
         .catch(async (e) => {
           console.error(e);
-          clean(id + '|' + url);
           return null;
-        });
+        })
     }));
 
   return itemData.filter((f) => !!f);
@@ -942,7 +946,7 @@ function registerAdItem(item, id) {
   const renderCache = {};
 
   if (!WWStorage.getAdPhone(id)) {
-    investigateNumber(item, id, false);
+    investigateNumberAndSearch(item, id, false);
   }
 
   const interval = setInterval(() => {
@@ -985,11 +989,13 @@ WWStorage.upgrade()
       const item = document.body.querySelector('[itemtype="https://schema.org/Offer"]');
       item.setAttribute('data-articleid', id.toUpperCase());
 
-      if (!IS_MOBILE_VIEW) {
-        item.removeChild(item.lastElementChild);
-      }
-      item.removeChild(item.lastElementChild);
-      registerAdItem(item, id.toUpperCase());
+      setTimeout(() => {
+        if (!IS_MOBILE_VIEW) {
+          item.removeChild(item.querySelector('.featuredArticles'));
+        }
+        item.removeChild(item.querySelector('.detailAd-login'));
+        registerAdItem(item, id.toUpperCase());
+      }, 100);
     } else {
       registerAdsInContext(document.body, true);
       if (location.pathname.startsWith('/anunturi/matrimoniale')) {

@@ -55,6 +55,7 @@
     </div>
 
     <div class="rmd-container-search-results" style="
+        border: 2px solid #17b;
         width: 100%;
         max-width: 1000px;
         padding: {{#if IS_MOBILE_VIEW}}10px{{else}}20px{{/if}} !important;
@@ -66,7 +67,7 @@
         {{#if IS_MOBILE_VIEW}}margin-top:105px;{{/if}}
     " onclick="event.stopPropagation()">
         <input type="text" style="font-weight: bold; font-size: 1.2rem" placeholder="Număr telefon" {{#if phone}}value="{{phone}}" disabled{{/if}}/>
-        <p style="color: rgb(55 55 55); font-size: .95rem; padding-bottom: 10px; padding-top: 10px;"><strong>Rezultate: <span data-wwid="count">{{count}}</span></strong> <span style="float: right; font-style: italic">Pot sa fie mai multe care încă nu au fost analizate.</p>
+        <p style="color: rgb(55 55 55); font-size: .95rem; padding-bottom: 10px; padding-top: 10px; display: table; width: 100%;"><strong>Rezultate: <span data-wwid="count">{{count}}</span></strong> <span style="float: right; font-style: italic; font-size: .85rem; opacity: 0.8">Pot sa fie mai multe care încă nu au fost analizate.</p>
 
         <div data-wwid="content">
             {{{content}}}
