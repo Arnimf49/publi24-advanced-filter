@@ -150,7 +150,9 @@ function getItemVisibility(id) {
 function processImageLinks(id, links, itemUrl) {
   const domainMap = {};
   const duplicatesInOtherLoc = WWStorage.getAdDuplicatesInOtherLocation(id);
+  const duplicatesNotOldInOtherLoc = WWStorage.getAdNotOldDuplicatesInOtherLocation(id);
   const deadLinks = WWStorage.getAdDeadLinks(id);
+
 
   links
     .filter(link => {
@@ -163,7 +165,8 @@ function processImageLinks(id, links, itemUrl) {
       const linkObj = {
         link,
         isDead: deadLinks.includes(link),
-        isSafe:  isDomainSafe && !duplicatesInOtherLoc.includes(link)
+        isSafe:  isDomainSafe && !duplicatesInOtherLoc.includes(link),
+        isSuspicious: duplicatesNotOldInOtherLoc.includes(link),
       };
 
       if (!domainMap[domain]) {
@@ -480,7 +483,7 @@ async function acquireSliderImages(item) {
 function createInvestigateImgClickHandler(id, item) {
   const openImageInvestigation = (imgLink) => {
     const encodedLink = encodeURIComponent(imgLink);
-    window.open(`https://lens.google.com/uploadbyurl?url=${encodedLink}`)
+    window.open(`https://lens.google.com/uploadbyurl?url=${encodedLink}&hl=ro`)
   }
 
   return async (e) => {
@@ -574,6 +577,7 @@ async function analyzeFoundImages(id, item) {
   WWStorage.clearAdDeadLinks(id);
   WWStorage.clearAdDuplicatesInOtherLocation(id);
   const currentAdLocation = getItemLocation(item);
+  const currentAdDate = getAdPageDate(await loadInAdPage(item));
 
   await Promise.all(publi24AdLinks.map((l =>
     loadInAdPage(null, l).catch((e) => {
@@ -593,7 +597,8 @@ async function analyzeFoundImages(id, item) {
           const location = getItemLocation(page, true);
 
           if (location !== currentAdLocation) {
-            WWStorage.addAdDuplicateInOtherLocation(id, publi24AdLinks[index]);
+            const dateDiff = dayDiff(getAdPageDate(page), currentAdDate);
+            WWStorage.addAdDuplicateInOtherLocation(id, publi24AdLinks[index], dateDiff < 2);
           }
         });
     })
@@ -630,6 +635,7 @@ function registerTemporarySaveHandler(item, id) {
 
 function registerDuplicatesModalHandler(item, id) {
   const duplicatesBtn = item.querySelector('[data-wwid="duplicates"]');
+  let removed = 0;
 
   if (!duplicatesBtn) {
     return;
@@ -639,7 +645,10 @@ function registerDuplicatesModalHandler(item, id) {
     const phone = WWStorage.getAdPhone(id);
     const itemData = await loadInAdsData(
       WWStorage.getPhoneAds(phone),
-      (uuid) => WWStorage.removePhoneAd(phone, uuid)
+      (uuid) => {
+        WWStorage.removePhoneAd(phone, uuid);
+        ++removed;
+      }
     );
     const duplicateUuids = WWStorage.getPhoneAds(phone);
 
@@ -650,6 +659,7 @@ function registerDuplicatesModalHandler(item, id) {
         itemData,
       }),
       count: duplicateUuids.length,
+      removed,
       phone,
     });
     const {container, close} = renderModal(html);
@@ -757,6 +767,15 @@ async function getPhoneQrCode(phone) {
   });
 }
 
+function getAdPageDate(itemPage) {
+  return new Date(itemPage.querySelector('[itemprop="validFrom"]')?.textContent.trim()
+    .replace(/.*(\d+\.)(\d+\.)(\d+ \d+:\d+:\d+)/, "$1$2$3"))
+}
+
+function dayDiff(date, compareDate) {
+  return Math.floor(((compareDate || new Date()).getTime() - date.getTime()) / 8.64e+7);
+}
+
 async function loadInAdsData(adUuids, clean) {
   let itemData = await Promise.all(
     adUuids.map((adUuid) => {
@@ -768,9 +787,8 @@ async function loadInAdsData(adUuids, clean) {
           throw e;
         })
         .then(async (itemPage) => {
-          const date = new Date(itemPage.querySelector('[itemprop="validFrom"]')?.textContent.trim()
-            .replace(/.*(\d+\.)(\d+\.)(\d+ \d+:\d+:\d+)/, "$1$2$3"));
-          const dateDiffDays = Math.floor((new Date().getTime() - date.getTime()) / 8.64e+7);
+          const date = getAdPageDate(itemPage);
+          const dateDiffDays = dayDiff(date);
 
           return ({
             IS_MOBILE_VIEW,

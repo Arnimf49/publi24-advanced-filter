@@ -45,7 +45,7 @@ async function readImageLinksDesktop(wwid, done) {
   searchExactBtn.click();
 
   const interval = setInterval(() => {
-    const hasNoResultsIcon = !!document.querySelector('[alt="Failure info image"]');
+    const hasNoResultsIcon = !!document.querySelector('[alt="Failure info image"], [alt="Imagine cu informații despre eroare"]');
     const linkItems = document.body.querySelectorAll('li > a');
 
     if (!hasNoResultsIcon && linkItems.length === 0) {
@@ -69,7 +69,7 @@ function readImageLinksMobile(wwid, done) {
 
   setTimeout(() => {
     const interval = setInterval(() => {
-      const hasNoResultsIcon = !!document.querySelector('[alt="Failure info image"], [id="OotqVd"]');
+      const hasNoResultsIcon = !!document.querySelector('[alt="Failure info image"], [alt="Imagine cu informații despre eroare"], [id="OotqVd"]');
       const linkItems = document.body.querySelectorAll('[id="rso"] [href]');
 
       if (!hasNoResultsIcon && linkItems.length === 0) {

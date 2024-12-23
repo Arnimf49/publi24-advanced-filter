@@ -49,19 +49,29 @@ const WWStorage = {
     return WWStorage.getAdProp(id, 'noPhone') === true;
   },
 
-  addAdDuplicateInOtherLocation(id, link) {
+  addAdDuplicateInOtherLocation(id, link, old = true) {
     const list = WWStorage.getAdProp(id, 'duplicatesInOtherLoc') || [];
     list.push(link);
     WWStorage.setAdProp(id, 'duplicatesInOtherLoc', list);
+
+    if (!old) {
+      const list = WWStorage.getAdProp(id, 'duplicatesInOtherLocNotOld') || [];
+      list.push(link);
+      WWStorage.setAdProp(id, 'duplicatesInOtherLocNotOld', list);
+    }
   },
   clearAdDuplicatesInOtherLocation(id) {
     WWStorage.setAdProp(id, 'duplicatesInOtherLoc', null);
+    WWStorage.setAdProp(id, 'duplicatesInOtherLocNotOld', null);
   },
   hasAdDuplicatesInOtherLocation(id) {
     return !!WWStorage.getAdProp(id, 'duplicatesInOtherLoc');
   },
   getAdDuplicatesInOtherLocation(id) {
     return WWStorage.getAdProp(id, 'duplicatesInOtherLoc') || [];
+  },
+  getAdNotOldDuplicatesInOtherLocation(id) {
+    return WWStorage.getAdProp(id, 'duplicatesInOtherLocNotOld') || [];
   },
 
   addAdDeadLink(id, link) {

@@ -12,8 +12,3 @@ https://chromewebstore.google.com/detail/publi24-advanced-filter/pigkjfndnpblohn
   ```bash
   web-ext build
   ```
-
-## TODO
-
-- automatically pre-analyze for number all ads from page
-- global button to display ads with number

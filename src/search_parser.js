@@ -10,7 +10,7 @@ function extractResultLinks() {
     document.body.querySelectorAll('a[role="presentation"]') ||
     document.body.querySelectorAll('[eid] [jsaction][jscontroller] > [href]');
 
-  if (results.length === 0 && tries < 5) {
+  if (results.length === 0 && tries < 15) {
     ++tries;
     return;
   }
@@ -24,4 +24,4 @@ function extractResultLinks() {
 }
 
 // @TODO: Improve to wait for elements.
-setInterval(extractResultLinks, 300);
+setInterval(extractResultLinks, 50);
