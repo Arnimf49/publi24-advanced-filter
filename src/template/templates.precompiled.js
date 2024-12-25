@@ -414,7 +414,11 @@ templates['ads_template'] = template({"1":function(container,depth0,helpers,part
     + alias2(((helper = (helper = lookupProperty(helpers,"title") || (depth0 != null ? lookupProperty(depth0,"title") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(alias3,{"name":"title","hash":{},"data":data,"loc":{"start":{"line":136,"column":89},"end":{"line":136,"column":98}}}) : helper)))
     + "</a></h2>\n                        <p style=\"display: block\" class=\"article-description\">"
     + ((stack1 = alias1((depth0 != null ? lookupProperty(depth0,"description") : depth0), depth0)) != null ? stack1 : "")
-    + "</p>\n\n                        <div style=\"float: left\">\n                            <p class=\"article-location\">\n                                <i class=\"svg-icon svg-icon-article\">\n                                    <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 384 512\"><path d=\"M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z\"></path></svg>\n                                </i>\n                                <span>"
+    + "</p>\n\n                        <div style=\"float: left\">\n                            <p class=\"article-location\">\n                                <i class=\"svg-icon svg-icon-article\">\n                                    <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 384 512\" "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"isLocationDifferent") : depth0),{"name":"if","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":142,"column":98},"end":{"line":142,"column":154}}})) != null ? stack1 : "")
+    + "><path d=\"M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z\"></path></svg>\n                                </i>\n                                <span "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"isLocationDifferent") : depth0),{"name":"if","hash":{},"fn":container.program(8, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":144,"column":38},"end":{"line":144,"column":114}}})) != null ? stack1 : "")
+    + ">"
     + alias2(alias1((depth0 != null ? lookupProperty(depth0,"location") : depth0), depth0))
     + "</span>\n                            </p>\n\n                            <p class=\"article-date\">\n                                <i class=\"svg-icon svg-icon-article\">\n                                    <svg viewBox=\"0 0 50 50\" aria-hidden=\"true\" "
     + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"isDateOld") : depth0),{"name":"if","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":149,"column":80},"end":{"line":149,"column":126}}})) != null ? stack1 : "")
@@ -502,71 +506,31 @@ templates['favorites_modal_template'] = template({"1":function(container,depth0,
     + ((stack1 = ((helper = (helper = lookupProperty(helpers,"content") || (depth0 != null ? lookupProperty(depth0,"content") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"content","hash":{},"data":data,"loc":{"start":{"line":74,"column":8},"end":{"line":74,"column":21}}}) : helper))) != null ? stack1 : "")
     + "\n    </div>\n</div>\n";
 },"useData":true});
-templates['focus_button_template'] = template({"1":function(container,depth0,helpers,partials,data) {
-    return "160px";
-},"3":function(container,depth0,helpers,partials,data) {
-    return "80px";
-},"5":function(container,depth0,helpers,partials,data) {
-    return "            left: 10px;\n            padding: 17px;\n";
-},"7":function(container,depth0,helpers,partials,data) {
-    return "            padding: 9px;\n            left: calc(50% + 120px);\n            transform: translateX(-50%);\n";
-},"9":function(container,depth0,helpers,partials,data) {
-    return "#c59b2f";
-},"11":function(container,depth0,helpers,partials,data) {
-    return "#949494";
-},"13":function(container,depth0,helpers,partials,data) {
-    return "#c39020";
-},"15":function(container,depth0,helpers,partials,data) {
-    return "#808080";
-},"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
-    var stack1, alias1=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
-        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
-          return parent[propertyName];
-        }
-        return undefined
-    };
-
-  return "<style>\n    .ww-focus-button {\n        position: fixed;\n        bottom: "
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data,"loc":{"start":{"line":4,"column":16},"end":{"line":4,"column":63}}})) != null ? stack1 : "")
-    + ";\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.program(7, data, 0),"data":data,"loc":{"start":{"line":5,"column":8},"end":{"line":12,"column":15}}})) != null ? stack1 : "")
-    + "        padding-bottom: 6px;\n        padding-top: 9px;\n        font-weight: bold;\n        background: "
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isOn") : depth0),{"name":"if","hash":{},"fn":container.program(9, data, 0),"inverse":container.program(11, data, 0),"data":data,"loc":{"start":{"line":16,"column":20},"end":{"line":16,"column":61}}})) != null ? stack1 : "")
-    + ";\n        border-radius: 6px;\n        border: 1px solid white;\n        box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, .2);\n    }\n    .ww-focus-button:hover {\n        background: "
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isOn") : depth0),{"name":"if","hash":{},"fn":container.program(13, data, 0),"inverse":container.program(15, data, 0),"data":data,"loc":{"start":{"line":22,"column":20},"end":{"line":22,"column":61}}})) != null ? stack1 : "")
-    + ";\n    }\n</style>\n\n<button class=\"ww-focus-button\" title=\"Focus mode\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\"><path fill=\"#FFF\" d=\"M3,9A1,1,0,0,0,4,8V5A1,1,0,0,1,5,4H8A1,1,0,0,0,8,2H5A3,3,0,0,0,2,5V8A1,1,0,0,0,3,9ZM8,20H5a1,1,0,0,1-1-1V16a1,1,0,0,0-2,0v3a3,3,0,0,0,3,3H8a1,1,0,0,0,0-2Zm9-7a1,1,0,0,0,0-2H15.86A4,4,0,0,0,13,8.14V7a1,1,0,0,0-2,0V8.14A4,4,0,0,0,8.14,11H7a1,1,0,0,0,0,2H8.14A4,4,0,0,0,11,15.86V17a1,1,0,0,0,2,0V15.86A4,4,0,0,0,15.86,13Zm-5,1a2,2,0,1,1,2-2A2,2,0,0,1,12,14Zm9,1a1,1,0,0,0-1,1v3a1,1,0,0,1-1,1H16a1,1,0,0,0,0,2h3a3,3,0,0,0,3-3V16A1,1,0,0,0,21,15ZM19,2H16a1,1,0,0,0,0,2h3a1,1,0,0,1,1,1V8a1,1,0,0,0,2,0V5A3,3,0,0,0,19,2Z\"/></svg>\n</button>\n";
-},"useData":true});
-templates['phone_search_button_template'] = template({"1":function(container,depth0,helpers,partials,data) {
-    return "205px";
+templates['global_buttons_template'] = template({"1":function(container,depth0,helpers,partials,data) {
+    return "64px";
 },"3":function(container,depth0,helpers,partials,data) {
     return "80px";
 },"5":function(container,depth0,helpers,partials,data) {
     return "            left: 10px;\n            padding: 17px;\n";
 },"7":function(container,depth0,helpers,partials,data) {
     return "            padding: 9px;\n            left: calc(50% - 120px);\n            transform: translateX(-50%);\n";
-},"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
-    var stack1, alias1=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
-        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
-          return parent[propertyName];
-        }
-        return undefined
-    };
-
-  return "<style>\n    .ww-phone-search-button {\n        position: fixed;\n        bottom: "
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data,"loc":{"start":{"line":4,"column":16},"end":{"line":4,"column":63}}})) != null ? stack1 : "")
-    + ";\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.program(7, data, 0),"data":data,"loc":{"start":{"line":5,"column":8},"end":{"line":12,"column":15}}})) != null ? stack1 : "")
-    + "        padding-bottom: 6px;\n        padding-top: 8px;\n        font-weight: bold;\n        background: #17b;\n        border-radius: 6px;\n        border: 1px solid white;\n        box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, .2);\n    }\n    .ww-phone-search-button:hover {\n        background: #0b629b;\n    }\n</style>\n\n<button class=\"ww-phone-search-button\" title=\"Caută după număr de telefon\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#FFF\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"11\" cy=\"11\" r=\"8\"></circle><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"></line></svg>\n</button>\n";
-},"useData":true});
-templates['saves_button_template'] = template({"1":function(container,depth0,helpers,partials,data) {
-    return "115px";
-},"3":function(container,depth0,helpers,partials,data) {
-    return "80px";
-},"5":function(container,depth0,helpers,partials,data) {
-    return "            left: 10px;\n            padding-left: 36px;\n";
-},"7":function(container,depth0,helpers,partials,data) {
-    return "            left: 50%;\n            transform: translateX(-50%);\n            min-width: 180px;\n";
 },"9":function(container,depth0,helpers,partials,data) {
+    return "            left: 76px;\n            padding: 17px;\n";
+},"11":function(container,depth0,helpers,partials,data) {
+    return "            padding: 9px;\n            left: calc(50% + 120px);\n            transform: translateX(-50%);\n";
+},"13":function(container,depth0,helpers,partials,data) {
+    return "#c59b2f";
+},"15":function(container,depth0,helpers,partials,data) {
+    return "#949494";
+},"17":function(container,depth0,helpers,partials,data) {
+    return "#c39020";
+},"19":function(container,depth0,helpers,partials,data) {
+    return "#808080";
+},"21":function(container,depth0,helpers,partials,data) {
+    return "            left: 140px;\n            padding-left: 36px;\n";
+},"23":function(container,depth0,helpers,partials,data) {
+    return "            left: 50%;\n            transform: translateX(-50%);\n            min-width: 180px;\n";
+},"25":function(container,depth0,helpers,partials,data) {
     var helper, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -574,8 +538,8 @@ templates['saves_button_template'] = template({"1":function(container,depth0,hel
         return undefined
     };
 
-  return container.escapeExpression(((helper = (helper = lookupProperty(helpers,"count") || (depth0 != null ? lookupProperty(depth0,"count") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"count","hash":{},"data":data,"loc":{"start":{"line":33,"column":34},"end":{"line":33,"column":43}}}) : helper)));
-},"11":function(container,depth0,helpers,partials,data) {
+  return container.escapeExpression(((helper = (helper = lookupProperty(helpers,"savesCount") || (depth0 != null ? lookupProperty(depth0,"savesCount") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"savesCount","hash":{},"data":data,"loc":{"start":{"line":91,"column":34},"end":{"line":91,"column":48}}}) : helper)));
+},"27":function(container,depth0,helpers,partials,data) {
     var helper, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -584,7 +548,7 @@ templates['saves_button_template'] = template({"1":function(container,depth0,hel
     };
 
   return "Favorite ("
-    + container.escapeExpression(((helper = (helper = lookupProperty(helpers,"count") || (depth0 != null ? lookupProperty(depth0,"count") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"count","hash":{},"data":data,"loc":{"start":{"line":33,"column":61},"end":{"line":33,"column":70}}}) : helper)))
+    + container.escapeExpression(((helper = (helper = lookupProperty(helpers,"savesCount") || (depth0 != null ? lookupProperty(depth0,"savesCount") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"savesCount","hash":{},"data":data,"loc":{"start":{"line":91,"column":66},"end":{"line":91,"column":80}}}) : helper)))
     + ")";
 },"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
@@ -594,12 +558,24 @@ templates['saves_button_template'] = template({"1":function(container,depth0,hel
         return undefined
     };
 
-  return "<style>\n    .ww-saves-button {\n        position: fixed;\n        bottom: "
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data,"loc":{"start":{"line":4,"column":16},"end":{"line":4,"column":63}}})) != null ? stack1 : "")
+  return "<style>\n    .ww-phone-search-button {\n        position: fixed;\n    bottom: "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data,"loc":{"start":{"line":4,"column":12},"end":{"line":4,"column":58}}})) != null ? stack1 : "")
+    + ";\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.program(7, data, 0),"data":data,"loc":{"start":{"line":5,"column":8},"end":{"line":12,"column":15}}})) != null ? stack1 : "")
+    + "        padding-bottom: 6px;\n        padding-top: 8px;\n        font-weight: bold;\n        background: #17b;\n        border-radius: 6px;\n        border: 1px solid white;\n        box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, .2);\n    }\n    .ww-phone-search-button:hover {\n        background: #0b629b;\n    }\n</style>\n\n<button class=\"ww-phone-search-button\" data-ww=\"phone-search\" title=\"Caută după număr de telefon\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#FFF\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"11\" cy=\"11\" r=\"8\"></circle><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"></line></svg>\n</button>\n\n<style>\n    .ww-focus-button {\n        position: fixed;\n        bottom: "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data,"loc":{"start":{"line":33,"column":16},"end":{"line":33,"column":62}}})) != null ? stack1 : "")
+    + ";\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(9, data, 0),"inverse":container.program(11, data, 0),"data":data,"loc":{"start":{"line":34,"column":8},"end":{"line":41,"column":15}}})) != null ? stack1 : "")
+    + "        padding-bottom: 6px;\n        padding-top: 9px;\n        font-weight: bold;\n        background: "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isFocusOn") : depth0),{"name":"if","hash":{},"fn":container.program(13, data, 0),"inverse":container.program(15, data, 0),"data":data,"loc":{"start":{"line":45,"column":20},"end":{"line":45,"column":66}}})) != null ? stack1 : "")
+    + ";\n        border-radius: 6px;\n        border: 1px solid white;\n        box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, .2);\n    }\n    .ww-focus-button:hover {\n        background: "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isFocusOn") : depth0),{"name":"if","hash":{},"fn":container.program(17, data, 0),"inverse":container.program(19, data, 0),"data":data,"loc":{"start":{"line":51,"column":20},"end":{"line":51,"column":66}}})) != null ? stack1 : "")
+    + ";\n    }\n</style>\n\n<button class=\"ww-focus-button\" data-ww=\"focus-mode\" title=\"Focus mode\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\"><path fill=\"#FFF\" d=\"M3,9A1,1,0,0,0,4,8V5A1,1,0,0,1,5,4H8A1,1,0,0,0,8,2H5A3,3,0,0,0,2,5V8A1,1,0,0,0,3,9ZM8,20H5a1,1,0,0,1-1-1V16a1,1,0,0,0-2,0v3a3,3,0,0,0,3,3H8a1,1,0,0,0,0-2Zm9-7a1,1,0,0,0,0-2H15.86A4,4,0,0,0,13,8.14V7a1,1,0,0,0-2,0V8.14A4,4,0,0,0,8.14,11H7a1,1,0,0,0,0,2H8.14A4,4,0,0,0,11,15.86V17a1,1,0,0,0,2,0V15.86A4,4,0,0,0,15.86,13Zm-5,1a2,2,0,1,1,2-2A2,2,0,0,1,12,14Zm9,1a1,1,0,0,0-1,1v3a1,1,0,0,1-1,1H16a1,1,0,0,0,0,2h3a3,3,0,0,0,3-3V16A1,1,0,0,0,21,15ZM19,2H16a1,1,0,0,0,0,2h3a1,1,0,0,1,1,1V8a1,1,0,0,0,2,0V5A3,3,0,0,0,19,2Z\"/></svg>\n</button>\n\n<style>\n    .ww-saves-button {\n        position: fixed;\n    bottom: "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data,"loc":{"start":{"line":62,"column":12},"end":{"line":62,"column":58}}})) != null ? stack1 : "")
     + ";\n        padding: 12px;\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.program(7, data, 0),"data":data,"loc":{"start":{"line":6,"column":8},"end":{"line":13,"column":15}}})) != null ? stack1 : "")
-    + "        font-weight: bold;\n        background: #b34c4c;\n        border-radius: 6px;\n        border: 1px solid white;\n        box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, .2);\n    }\n    .ww-saves-button:hover {\n        background: #a12a2a;\n    }\n</style>\n\n<button class=\"ww-saves-button\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 30\" fill=\"white\" style=\"\n        vertical-align: middle;\n        position: absolute;\n        transform: scale(1.4);\n        left: 12px;\n    \">\n        <polygon points=\"12,2 15,10 23,10 17,14 19,22 12,17 5,22 7,14 1,10 9,10\"/>\n    </svg> "
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(9, data, 0),"inverse":container.program(11, data, 0),"data":data,"loc":{"start":{"line":33,"column":11},"end":{"line":33,"column":78}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(21, data, 0),"inverse":container.program(23, data, 0),"data":data,"loc":{"start":{"line":64,"column":8},"end":{"line":71,"column":15}}})) != null ? stack1 : "")
+    + "        font-weight: bold;\n        background: #b34c4c;\n        border-radius: 6px;\n        border: 1px solid white;\n        box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, .2);\n    }\n    .ww-saves-button:hover {\n        background: #a12a2a;\n    }\n</style>\n\n<button class=\"ww-saves-button\" data-ww=\"temp-save\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 30\" fill=\"white\" style=\"\n        vertical-align: middle;\n        position: absolute;\n        transform: scale(1.4);\n        left: 12px;\n    \">\n        <polygon points=\"12,2 15,10 23,10 17,14 19,22 12,17 5,22 7,14 1,10 9,10\"/>\n    </svg> "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(25, data, 0),"inverse":container.program(27, data, 0),"data":data,"loc":{"start":{"line":91,"column":11},"end":{"line":91,"column":88}}})) != null ? stack1 : "")
     + "\n</button>\n";
 },"useData":true});
 templates['slider_template'] = template({"1":function(container,depth0,helpers,partials,data) {

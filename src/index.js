@@ -87,9 +87,7 @@ const ADS_TEMPLATE = Handlebars.templates.ads_template;
 const FAVORITES_MODAL_TEMPLATE = Handlebars.templates.favorites_modal_template;
 const DUPLICATES_MODAL_TEMPLATE = Handlebars.templates.ads_modal_template;
 const SLIDER_TEMPLATE = Handlebars.templates.slider_template;
-const SAVES_BUTTON_TEMPLATE = Handlebars.templates.saves_button_template;
-const FOCUS_BUTTON_TEMPLATE = Handlebars.templates.focus_button_template;
-const PHONE_SEARCH_BUTTON_TEMPLATE = Handlebars.templates.phone_search_button_template;
+const GLOBAL_BUTTONS_TEMPLATE = Handlebars.templates.global_buttons_template;
 
 const modalsOpen = [];
 
@@ -777,6 +775,19 @@ function dayDiff(date, compareDate) {
 }
 
 async function loadInAdsData(adUuids, clean) {
+  let locationParts = [];
+  if (!IS_AD_PAGE) {
+    const countyInput = document.querySelector('[data-faceted="county_name"]');
+    const locationInput = document.querySelector('[data-faceted="city_name"]');
+
+    if (countyInput?.value) {
+      locationParts.push(countyInput.value.toLocaleLowerCase())
+    }
+    if (locationInput?.value) {
+      locationParts.push(locationInput.value.toLocaleLowerCase());
+    }
+  }
+
   let itemData = await Promise.all(
     adUuids.map((adUuid) => {
       const [id, url] = adUuidParts(adUuid);
@@ -789,6 +800,9 @@ async function loadInAdsData(adUuids, clean) {
         .then(async (itemPage) => {
           const date = getAdPageDate(itemPage);
           const dateDiffDays = dayDiff(date);
+          const location = IS_MOBILE_VIEW
+            ? itemPage.querySelector('[class="location"]')?.textContent.trim()
+            : itemPage.querySelector('[itemtype="https://schema.org/Place"]')?.textContent.trim();
 
           return ({
             IS_MOBILE_VIEW,
@@ -805,12 +819,12 @@ async function loadInAdsData(adUuids, clean) {
             image: IS_MOBILE_VIEW
               ? itemPage.querySelector('[itemprop="associatedMedia"] li').style.background.match(/url\(['"]([^'"]+)['"]\)/)[1]
               : itemPage.querySelector('[itemprop="image"]').src,
-            location: IS_MOBILE_VIEW
-              ? itemPage.querySelector('[class="location"]')?.textContent.trim()
-              : itemPage.querySelector('[itemtype="https://schema.org/Place"]')?.textContent.trim(),
-            date: dateDiffDays <= 1 ? `${date.getHours() < new Date().getHours() ? 'azi' : 'ieri'} la ${date.getHours()}:${date.getMinutes()}`
+            location,
+            date: dateDiffDays <= 1 ? `${date.getDate() === new Date().getDate() ? 'azi' : 'ieri'} la ${date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
               : `de ${dateDiffDays} zile`,
-            isDateOld: dateDiffDays >= 2
+            timestamp: date.getTime(),
+            isDateOld: dateDiffDays >= 2,
+            isLocationDifferent: locationParts.some(l => !location.toLocaleLowerCase().includes(l))
           })
         })
         .catch(async (e) => {
@@ -819,7 +833,9 @@ async function loadInAdsData(adUuids, clean) {
         })
     }));
 
-  return itemData.filter((f) => !!f);
+  return itemData
+    .filter((f) => !!f)
+    .sort((a, b) => b.timestamp - a.timestamp);
 }
 
 async function loadTempSaveAdsData() {
@@ -844,55 +860,26 @@ async function loadTempSaveAdsData() {
   return itemData;
 }
 
-async function renderTemporarySavesModal() {
-  let html = FAVORITES_MODAL_TEMPLATE({content: ADS_TEMPLATE({itemData: await loadTempSaveAdsData(), IS_MOBILE_VIEW}), IS_MOBILE_VIEW});
-  let {container, close} = renderModal(html);
+function registerTemporarySavesButton(element) {
+  element.querySelector('[data-ww="temp-save"]').onclick = async () => {
+    let html = FAVORITES_MODAL_TEMPLATE({
+      content: ADS_TEMPLATE({itemData: await loadTempSaveAdsData(), IS_MOBILE_VIEW}),
+      IS_MOBILE_VIEW
+    });
+    let {container, close} = renderModal(html);
 
-  container.setAttribute('data-ww', 'favorites-modal');
+    container.setAttribute('data-ww', 'favorites-modal');
 
-  const clearFavoritesButton = container.querySelector('[data-wwid="clear-favorites"]');
-  clearFavoritesButton.onclick = () => {
-    WWStorage.clearTempSave();
-    close();
-  };
-}
-
-function renderTemporarySavesButton() {
-  const existing = document.body.querySelector('[data-ww="saves-button"]');
-  existing && existing.parentNode.removeChild(existing);
-
-  const saves = WWStorage.getTempSaved();
-  if (saves.length === 0) {
-    return;
+    const clearFavoritesButton = container.querySelector('[data-wwid="clear-favorites"]');
+    clearFavoritesButton.onclick = () => {
+      WWStorage.clearTempSave();
+      close();
+    };
   }
-
-  const element = document.createElement('div');
-  element.innerHTML = SAVES_BUTTON_TEMPLATE({count: saves.length, IS_MOBILE_VIEW});
-  element.setAttribute('data-ww', 'saves-button');
-  document.body.appendChild(element);
-
-  element.querySelector('button').onclick = renderTemporarySavesModal;
 }
 
-function registerTemporarySavesButton() {
-  renderTemporarySavesButton();
-
-  let lastCount = WWStorage.getTempSaved().length;
-  setInterval(() => {
-    if (lastCount !== WWStorage.getTempSaved().length) {
-      lastCount = WWStorage.getTempSaved().length;
-      renderTemporarySavesButton()
-    }
-  }, 1000);
-}
-
-function registerFocusModeButton() {
-  const element = document.createElement('div');
-  element.innerHTML = FOCUS_BUTTON_TEMPLATE({isOn: WWStorage.isFocusMode(), IS_MOBILE_VIEW});
-  element.setAttribute('data-ww', 'focus-button');
-  document.body.appendChild(element);
-
-  element.querySelector('button').onclick = () => {
+function registerFocusModeButton(element) {
+  element.querySelector('[data-ww="focus-mode"]').onclick = () => {
     const isFocus = WWStorage.isFocusMode();
     WWStorage.setFocusMode(!isFocus);
     window.scrollTo({left: 0, top: 0});
@@ -900,12 +887,8 @@ function registerFocusModeButton() {
   };
 }
 
-function registerPhoneSearchButton() {
-  const element = document.createElement('div');
-  element.innerHTML = PHONE_SEARCH_BUTTON_TEMPLATE({IS_MOBILE_VIEW});
-  document.body.appendChild(element);
-
-  element.querySelector('button').onclick = () => {
+function registerPhoneSearchButton(element) {
+  element.querySelector('[data-ww="phone-search"]').onclick = () => {
     let duplicateUuids, phone, timeout;
 
     const html = DUPLICATES_MODAL_TEMPLATE({IS_MOBILE_VIEW, count: '~'});
@@ -946,6 +929,46 @@ function registerPhoneSearchButton() {
       }
     }
   };
+}
+
+function renderGlobalButtons() {
+  const existing = document.body.querySelector('[data-ww="global-buttons"]');
+  existing && existing.parentNode.removeChild(existing);
+
+  const element = document.createElement('div');
+  element.innerHTML = GLOBAL_BUTTONS_TEMPLATE({
+    savesCount: WWStorage.getTempSaved().length,
+    isFocusOn: WWStorage.isFocusMode(),
+    IS_MOBILE_VIEW
+  });
+  element.setAttribute('data-ww', 'global-buttons');
+
+  if (IS_MOBILE_VIEW) {
+    document.querySelector('.section-bottom-nav').appendChild(element);
+  } else {
+    document.body.appendChild(element);
+  }
+
+  registerTemporarySavesButton(element);
+  registerFocusModeButton(element);
+  registerPhoneSearchButton(element);
+}
+
+function registerGlobalButtons() {
+  renderGlobalButtons();
+
+  const siteGlobalButtons = document.querySelector('.page-actions-bottom');
+  if (siteGlobalButtons) {
+    siteGlobalButtons.parentNode.removeChild(siteGlobalButtons);
+  }
+
+  let lastCount = WWStorage.getTempSaved().length;
+  setInterval(() => {
+    if (lastCount !== WWStorage.getTempSaved().length) {
+      lastCount = WWStorage.getTempSaved().length;
+      renderGlobalButtons()
+    }
+  }, 500);
 }
 
 function renderAdWithCleanupAndCache(item, id, searchResults) {
@@ -1017,12 +1040,7 @@ WWStorage.upgrade()
     } else {
       registerAdsInContext(document.body, true);
       if (location.pathname.startsWith('/anunturi/matrimoniale')) {
-        registerTemporarySavesButton();
-
-        if (!IS_AD_PAGE) {
-          registerFocusModeButton();
-          registerPhoneSearchButton();
-        }
+        registerGlobalButtons();
       }
     }
   })
