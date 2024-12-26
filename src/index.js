@@ -774,6 +774,21 @@ function dayDiff(date, compareDate) {
   return Math.floor(((compareDate || new Date()).getTime() - date.getTime()) / 8.64e+7);
 }
 
+function diffDaysToDisplay(diffDays, date) {
+  if (diffDays >= 2) {
+    return `de ${diffDays} zile`;
+  }
+
+  let prefix = 'alaltăieri';
+  if (date.getDate() === new Date().getDate()) {
+    prefix = 'azi';
+  } else if (date.getDate() === new Date(new Date().getTime() - 24 * 60 * 60 * 1000).getDate()) {
+    prefix = 'ieri';
+  }
+
+  return `${prefix} la ${date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`;
+}
+
 async function loadInAdsData(adUuids, clean) {
   let locationParts = [];
   if (!IS_AD_PAGE) {
@@ -820,8 +835,7 @@ async function loadInAdsData(adUuids, clean) {
               ? itemPage.querySelector('[itemprop="associatedMedia"] li').style.background.match(/url\(['"]([^'"]+)['"]\)/)[1]
               : itemPage.querySelector('[itemprop="image"]').src,
             location,
-            date: dateDiffDays <= 1 ? `${date.getDate() === new Date().getDate() ? 'azi' : 'ieri'} la ${date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
-              : `de ${dateDiffDays} zile`,
+            date: diffDaysToDisplay(dateDiffDays, date),
             timestamp: date.getTime(),
             isDateOld: dateDiffDays >= 2,
             isLocationDifferent: locationParts.some(l => !location.toLocaleLowerCase().includes(l))

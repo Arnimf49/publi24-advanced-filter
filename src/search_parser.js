@@ -7,7 +7,7 @@ let tries = 0;
 function extractResultLinks() {
   const wwid = new URLSearchParams(window.location.search).get('wwsid');
   const results =
-    document.body.querySelectorAll('a[role="presentation"]') ||
+    document.body.querySelectorAll('#rso a[data-ved]') ||
     document.body.querySelectorAll('[eid] [jsaction][jscontroller] > [href]');
 
   if (results.length === 0 && tries < 15) {
