@@ -80,7 +80,7 @@ const AD_LOAD_CACHE = {};
 const IS_MOBILE_VIEW = ('ontouchstart' in document.documentElement);
 const IS_AD_PAGE = !!document.querySelector('[itemtype="https://schema.org/Offer"]');
 
-const STORAGE_KEYS = (id) => [[`ww:search_results:${id}`, `ww:image_results:${id}`], [WWStorage.getAdStoreKey(id)]];
+const STORAGE_KEYS = (id) => [[`ww:search_results:${id}`, `ww:image_results:${id}`], WWStorage.getAdStoreKeys(id)];
 
 const AD_TEMPLATE = Handlebars.templates.ad_template;
 const ADS_TEMPLATE = Handlebars.templates.ads_template;
@@ -244,12 +244,12 @@ function renderAdElement(item, id, storage) {
   if (phoneTime) {
     const days = Math.floor((now - phoneTime) / 8.64e+7);
     phoneInvestigatedSinceDays = days === 0 ? 'recent' : days === 1 ? `de o zi` : `de ${days} zile`;
-    phoneInvestigateStale = days > 30;
+    phoneInvestigateStale = days > 15;
   }
   if (imageTime) {
     const days = Math.floor((now - imageTime) / 8.64e+7);
     imageInvestigatedSinceDays = days === 0 ? 'recent' : days === 1 ? `de o zi` : `de ${days} zile`;
-    imageInvestigateStale = days > 30;
+    imageInvestigateStale = days > 15;
   }
 
   const panelElement = document.createElement('div');
@@ -914,8 +914,7 @@ function registerPhoneSearchButton(element) {
 
       if (timeout) {clearTimeout(timeout)}
       timeout = setTimeout(async () => {
-        phone = input.value;
-        console.log(phone);
+        phone = input.value.replace(/^\+?40/, '0').replace(/ +/g, '');
 
         duplicateUuids = WWStorage.getPhoneAds(phone) || [];
         const itemData = await loadInAdsData(

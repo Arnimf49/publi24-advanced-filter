@@ -1,9 +1,8 @@
 const _WW_STORE_CACHE = {item: {}, save: null, phoneAds: {}, phoneHidden: null};
 
 const WWStorage = {
-  getAdStoreKey(id) {
-    id = id.toUpperCase();
-    return `ww2:${id}`;
+  getAdStoreKeys(id) {
+    return [`ww2:${id.toUpperCase()}`, `ww2:hidden-phones`];
   },
   getAdItem(id) {
     id = id.toUpperCase();
