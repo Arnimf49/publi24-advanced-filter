@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Publi24 filtru avansat",
-  "version": "2.19.1",
+  "version": "2.20",
   "description": "Publi24 filtru avansat",
   "icons": {
     "48": "icon.png"
@@ -33,7 +33,9 @@
         "library/splide/splide.min.js",
         "library/qrcode.js",
         "src/template/templates.precompiled.js",
+        "src/globals.js",
         "src/storage.js",
+        "src/browser_storage.js",
         "src/index.js"
       ],
       "css": [
@@ -45,6 +47,7 @@
         "https://www.google.com/search?wwsid=*"
       ],
       "js": [
+        "src/globals.js",
         "src/search_parser.js"
       ]
     },
@@ -55,6 +58,7 @@
         "https://www.google.com/search?sca_esv=*"
       ],
       "js": [
+        "src/globals.js",
         "src/image_parser_lens.js"
       ],
       "run_at": "document_idle"

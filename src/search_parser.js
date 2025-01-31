@@ -1,7 +1,3 @@
-if (typeof browser === "undefined") {
-  var browser = chrome;
-}
-
 let tries = 0;
 
 function extractResultLinks() {

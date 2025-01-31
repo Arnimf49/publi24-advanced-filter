@@ -1,7 +1,3 @@
-if (typeof browser === "undefined") {
-  var browser = chrome;
-}
-
 const runtime = browser.runtime;
 
 const TESSERACT_PATH = `/library/tesseract/`;
@@ -77,7 +73,6 @@ const PRIO_DOMAINS = [
 
 const AD_LOAD_CACHE = {};
 
-const IS_MOBILE_VIEW = ('ontouchstart' in document.documentElement);
 const IS_AD_PAGE = !!document.querySelector('[itemtype="https://schema.org/Offer"]');
 
 const STORAGE_KEYS = (id) => [[`ww:search_results:${id}`, `ww:image_results:${id}`], WWStorage.getAdStoreKeys(id)];
@@ -158,19 +153,23 @@ function processImageLinks(id, links, itemUrl) {
         link !== itemUrl;
     })
     .forEach((link) => {
-      const domain = new URL(link).hostname.replace('www.', '');
-      const isDomainSafe = SAFE_LAST_DOMAIN_PARTS.some((part) => domain.includes(part) );
-      const linkObj = {
-        link,
-        isDead: deadLinks.includes(link),
-        isSafe:  isDomainSafe && !duplicatesInOtherLoc.includes(link),
-        isSuspicious: duplicatesNotOldInOtherLoc.includes(link),
-      };
+      try {
+        const domain = new URL(link).hostname.replace('www.', '');
+        const isDomainSafe = SAFE_LAST_DOMAIN_PARTS.some((part) => domain.includes(part) );
+        const linkObj = {
+          link,
+          isDead: deadLinks.includes(link),
+          isSafe:  isDomainSafe && !duplicatesInOtherLoc.includes(link),
+          isSuspicious: duplicatesNotOldInOtherLoc.includes(link),
+        };
 
-      if (!domainMap[domain]) {
-        domainMap[domain] = {links: [linkObj], isSafe: isDomainSafe };
-      } else {
-        domainMap[domain].links.push(linkObj);
+        if (!domainMap[domain]) {
+          domainMap[domain] = {links: [linkObj], isSafe: isDomainSafe };
+        } else {
+          domainMap[domain].links.push(linkObj);
+        }
+      } catch (error) {
+        console.error(error);
       }
     });
 
@@ -387,8 +386,13 @@ async function acquirePhoneNumber(item, id) {
 }
 
 async function investigateNumberAndSearch(item, id, search = true) {
-  const phoneNumber = await acquirePhoneNumber(item, id);
+  let windowRef;
+  if (search) {
+    // This is also opened here due to safari issues with window.open.
+    windowRef = window.open();
+  }
 
+  const phoneNumber = await acquirePhoneNumber(item, id);
   if (!phoneNumber) {
     return false;
   }
@@ -401,8 +405,17 @@ async function investigateNumberAndSearch(item, id, search = true) {
     const encodedId = encodeURIComponent(id);
     const addUrlId = getItemUrl(item).match(/\/([^./]+)\.html/, "")[1];
     const encodedSearch = encodeURIComponent(`"${phoneNumber}" OR "${addUrlId}"`);
-    window.open(`https://www.google.com/search?wwsid=${encodedId}&q=${encodedSearch}`);
+    windowRef.location = `https://www.google.com/search?wwsid=${encodedId}&q=${encodedSearch}`;
     WWStorage.setInvestigatedTime(id, Date.now());
+
+    if (IS_SAFARI_IOS) {
+      setInterval(() => {
+        if (windowRef.closed) {
+          // On safari the browser storage api breaks after returning from another tab. Reload to reset.
+          window.location.reload();
+        }
+      }, 300);
+    }
   }
 
   return true;
@@ -479,9 +492,12 @@ async function acquireSliderImages(item) {
 }
 
 function createInvestigateImgClickHandler(id, item) {
-  const openImageInvestigation = (imgLink) => {
+  const imageToLensUrl = (imgLink) => {
     const encodedLink = encodeURIComponent(imgLink);
-    window.open(`https://lens.google.com/uploadbyurl?url=${encodedLink}&hl=ro`)
+    return `https://lens.google.com/uploadbyurl?url=${encodedLink}&hl=ro`;
+  }
+  const openImageInvestigation = (imgLink) => {
+    window.open(imageToLensUrl(imgLink));
   }
 
   return async (e) => {
@@ -493,7 +509,7 @@ function createInvestigateImgClickHandler(id, item) {
     }
 
     if (e.currentTarget) e.currentTarget.disabled = true;
-    browser.storage.local.set({ [`ww:image_results:${id}`]: null });
+    WWBrowserStorage.set(`ww:image_results:${id}`, null);
 
     let imgs;
 
@@ -520,33 +536,33 @@ function createInvestigateImgClickHandler(id, item) {
       if (e.currentTarget) e.currentTarget.disabled = false;
     }
 
-    browser.storage.local.set({ [`ww:img_search_started_for`]: {wwid: id, count: imgs.length} }).then(() => {
-      if (!IS_MOBILE_VIEW) {
-        imgs.forEach(img => openImageInvestigation(img));
-      } else {
-        // Open tabs for investigate one by one since on mobile opening all at once does not work.
-        let index = 0;
-        const openNext = () => {
-          if (!imgs[index]) {
-            document.removeEventListener('visibilitychange', openNext);
-          }
-          else if (document.visibilityState === 'visible') {
-            openImageInvestigation(imgs[index]);
-            ++index;
-          }
-        };
-        document.addEventListener('visibilitychange', openNext);
-        openNext();
-      }
-
-      const interval = setInterval(async() => {
-        const results = (await browser.storage.local.get(`ww:img_search_started_for`))[`ww:img_search_started_for`];
-        if (results.count === 0) {
-          clearInterval(interval);
-          done();
-        }
-      }, 500);
+    await WWBrowserStorage.set(`ww:img_search_started_for`, {
+      wwid: id,
+      count: imgs.length,
+      imgs: imgs.map(url => imageToLensUrl(url)),
     });
+
+    if (IS_MOBILE_VIEW) {
+      openImageInvestigation(imgs[0]);
+    }
+    else {
+      imgs.forEach(img => openImageInvestigation(img));
+    }
+
+    const interval = setInterval(async() => {
+      const results = await WWBrowserStorage.get(`ww:img_search_started_for`);
+      if (
+        results[`ww:img_search_started_for`].count === 0
+        // On safari the browser storage api breaks after returning from another tab. Reload to reset.
+        || results.__from__cache
+      ) {
+        clearInterval(interval);
+        done();
+        if (IS_SAFARI_IOS) {
+          window.location.reload();
+        }
+      }
+    }, 300);
   };
 }
 
@@ -568,7 +584,7 @@ function getItemLocation(item, itemIsOnAdPage = false) {
 }
 
 async function analyzeFoundImages(id, item) {
-  const results = await browser.storage.local.get(`ww:image_results:${id}`)
+  const results = await WWBrowserStorage.get(`ww:image_results:${id}`)
   const publi24AdLinks = results[`ww:image_results:${id}`]
     .filter(link => link.match(/^https:\/\/(www\.)?publi24\.ro\/.+\/anunt\/.+$/));
 
@@ -743,7 +759,7 @@ function registerHandlers(item, id) {
 }
 
 async function getStorageItems(browserKeys, localKeys) {
-  const browserValues = await browser.storage.local.get(browserKeys);
+  const browserValues = await WWBrowserStorage.get(browserKeys);
   browserValues.local = {};
   localKeys.forEach(k => browserValues.local[k] = localStorage.getItem(k))
   return browserValues;

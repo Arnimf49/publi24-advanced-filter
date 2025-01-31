@@ -1,9 +1,3 @@
-if (typeof browser === "undefined") {
-  var browser = chrome;
-}
-
-const IS_MOBILE_VIEW = ('ontouchstart' in document.documentElement);
-
 function getStorageLock() {
   return new Promise(r => {
     const interval = setInterval(() => {
@@ -60,7 +54,9 @@ async function readImageLinksDesktop(wwid, done) {
 }
 
 function getMobileExactLink() {
-  return document.querySelector('[role="navigation"] [role="listitem"]:nth-child(4) a');
+  const xpath = "//*[text()='Potriviri exacte']";
+  const matchingElement = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+  return matchingElement;
 }
 
 function readImageLinksMobile(wwid, done) {
@@ -95,14 +91,24 @@ async function parseResults(wwid) {
         releaseStorageLock();
         setTimeout(async () => {
           await browser.storage.local.get(`ww:img_search_started_for`).then(data => {
+            const newCount = data[`ww:img_search_started_for`].count - 1;
+            const imgs = data[`ww:img_search_started_for`].imgs;
+
             browser.storage.local.set({
               [`ww:img_search_started_for`]: {
                 wwid: data[`ww:img_search_started_for`].wwid,
-                count: data[`ww:img_search_started_for`].count - 1,
+                imgs,
+                count: newCount,
               }
             });
             console.log('Done. Found: ' + results.length);
-            window.close();
+            console.log('Found: ' + results.join('\n'));
+
+            if (IS_MOBILE_VIEW && newCount !== 0) {
+              window.location = imgs[imgs.length - newCount];
+            } else {
+              window.close();
+            }
           })
         }, Math.round(Math.random() * 100)); // randomized done helps avoid race conditions
       });
