@@ -1,0 +1,156 @@
+<svg width="0" height="0">
+    <defs>
+        <mask id="cutout-mask">
+            <rect width="5000" height="5000" fill="white"/>
+            {{#each cutouts}}
+                <rect x="{{ this.x }}" y="{{ this.y }}" width="{{ this.width }}" height="{{ this.height }}" rx="3" ry="3" fill="black"/>
+            {{/each}}
+        </mask>
+    </defs>
+</svg>
+
+<style>
+    .ww-info-container {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        background: rgba(0, 0, 0, .88);
+        top: 0;
+        left: 0;
+        z-index: 5000;
+
+        mask: url(#cutout-mask);
+    }
+    .ww-text {
+        color: #333;
+        float: left;
+        background: #e7e7e7;
+        padding: 3px 5px;
+        border-radius: 5px;
+        box-shadow: 1px 1px 3px 1px rgba(0,0,0,.8);
+        border-color: #ffffff;
+        border-width: 2px 0px 0px 2px;
+        border-style: solid;
+        margin-left: -14px;
+        font-style: italic;
+    {{#if IS_MOBILE_VIEW}}
+        font-size: 13px;
+    {{/if}}
+    }
+    .ww-text-left {
+        position: absolute;
+        transform: translateX(-100%);
+        width: 207px;
+        margin-left: 3px;
+    }
+    .ww-line {
+        float: left;
+        margin-left: -10px;
+    }
+    .ww-down {
+        transform: translateY(-100%);
+    }
+    .ww-down .ww-line {
+        transform: rotate(180deg);
+        margin-top: 12px;
+    }
+    .ww-tooltip {
+        position: absolute;
+    }
+</style>
+
+
+<div class="ww-info-container">
+    {{#if adButtonsInfo }}
+        <div class="ww-tooltip" style="left: {{ cutouts.[3].xm }}px; top: {{ cutouts.[3].yy }}px">
+            <svg class="ww-line" width="20" height="40" viewBox="0 0 20 40" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="10" y1="38" x2="10" y2="5" stroke="#e7e7e7"/>
+                <polyline points="4,10 10,4 16,10" stroke="#e7e7e7"/>
+            </svg>
+            <p class="ww-text {{#if IS_MOBILE_VIEW}}ww-text-left{{/if}}" style="margin-top: 20px;{{#if IS_MOBILE_VIEW}}width: 145px{{/if}}">Caută pozele anuțului pe Google</p>
+        </div>
+
+        <div class="ww-tooltip" style="left: {{ cutouts.[2].xm }}px; top: {{ cutouts.[2].yy }}px">
+            <svg class="ww-line" width="20" height="{{#if IS_MOBILE_VIEW}}90{{else}}70{{/if}}" viewBox="0 0 20 {{#if IS_MOBILE_VIEW}}90{{else}}70{{/if}}" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="10" y1="{{#if IS_MOBILE_VIEW}}90{{else}}70{{/if}}" x2="10" y2="5" stroke="#e7e7e7"/>
+                <polyline points="4,10 10,4 16,10" stroke="#e7e7e7"/>
+            </svg>
+            <p class="ww-text {{#if IS_MOBILE_VIEW}}ww-text-left{{/if}}" style="{{#if IS_MOBILE_VIEW}}margin-top: 75px; width: 191px;{{else}}margin-top: 55px{{/if}}">Caută anunțul și numărul de tel pe Google</p>
+        </div>
+
+        <div class="ww-tooltip" style="left: {{ cutouts.[1].xm }}px; top: {{ cutouts.[1].yy }}px">
+            <svg class="ww-line" width="20" height="{{#if IS_MOBILE_VIEW}}144{{else}}105{{/if}}" viewBox="0 0 20 {{#if IS_MOBILE_VIEW}}144{{else}}105{{/if}}" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="10" y1="{{#if IS_MOBILE_VIEW}}144{{else}}105{{/if}}" x2="10" y2="5" stroke="#e7e7e7"/>
+                <polyline points="4,10 10,4 16,10" stroke="#e7e7e7"/>
+            </svg>
+            <p class="ww-text {{#if IS_MOBILE_VIEW}}ww-text-left{{/if}}" style="{{#if IS_MOBILE_VIEW}}margin-top: 129px;{{else}}margin-top: 90px;{{/if}} ">Adaugă la lista de favorite</p>
+        </div>
+
+        <div class="ww-tooltip" style="left: {{ cutouts.[0].xm }}px; top: {{ cutouts.[0].yy }}px">
+            <svg class="ww-line" width="20" height="{{#if IS_MOBILE_VIEW}}181{{else}}140{{/if}}" viewBox="0 0 20 {{#if IS_MOBILE_VIEW}}181{{else}}140{{/if}}" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="10" y1="{{#if IS_MOBILE_VIEW}}181{{else}}140{{/if}}" x2="10" y2="5" stroke="#e7e7e7"/>
+                <polyline points="4,10 10,4 16,10" stroke="#e7e7e7"/>
+            </svg>
+            <p class="ww-text {{#if IS_MOBILE_VIEW}}ww-text-left{{/if}}" style="{{#if IS_MOBILE_VIEW}}margin-top: 166px;{{else}}margin-top: 125px;{{/if}} ">Ascunde sau arată anunțul</p>
+        </div>
+
+        <div class="ww-tooltip {{#if IS_MOBILE_VIEW}}ww-down{{/if}}" style="left: {{#if IS_MOBILE_VIEW}}{{ cutouts.[4].xlc }}{{else}}{{ cutouts.[4].xrc }}{{/if}}px; top: {{#if IS_MOBILE_VIEW}}{{ cutouts.[4].y }}{{else}}{{cutouts.[4].yy}}{{/if}}px">
+            <svg class="ww-line" width="20" height="40" viewBox="0 0 20 40" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="10" y1="40" x2="10" y2="5" stroke="#e7e7e7"/>
+                <polyline points="4,10 10,4 16,10" stroke="#e7e7e7"/>
+            </svg>
+            <p class="ww-text" style="{{#if IS_MOBILE_VIEW}}{{else}}margin-top: 20px{{/if}}">Deschide toate pozele anunțului</p>
+        </div>
+    {{/if}}
+
+
+    {{#if globalButtonsInfo }}
+        <div class="ww-tooltip ww-down" style="left: {{ cutouts.[2].xm }}px; top: {{ cutouts.[2].y }}px;">
+            {{# if IS_MOBILE_VIEW }}
+                <svg class="ww-line" width="20" height="105" viewBox="0 0 20 105" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="10" y1="105" x2="10" y2="5" stroke="#e7e7e7"/>
+                    <polyline points="4,10 10,4 16,10" stroke="#e7e7e7"/>
+                </svg>
+                <p class="ww-text" style="width: 200px">Cănd activ anunțurile ascunse nu se mai vad deloc</p>
+            {{else}}
+                <svg class="ww-line" width="20" height="40" viewBox="0 0 20 40" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="10" y1="40" x2="10" y2="5" stroke="#e7e7e7"/>
+                    <polyline points="4,10 10,4 16,10" stroke="#e7e7e7"/>
+                </svg>
+                <p class="ww-text">Cănd activ anunțurile ascunse nu se mai vad deloc</p>
+            {{/if}}
+        </div>
+
+        <div class="ww-tooltip ww-down" style="left: {{ cutouts.[1].xm }}px; top: {{ cutouts.[1].y }}px;">
+            {{# if IS_MOBILE_VIEW }}
+                <svg class="ww-line" width="20" height="50" viewBox="0 0 20 50" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="10" y1="50" x2="10" y2="5" stroke="#e7e7e7"/>
+                    <polyline points="4,10 10,4 16,10" stroke="#e7e7e7"/>
+                </svg>
+                <p class="ww-text" style="width: 136px">Accesează lista ta de favorite</p>
+            {{else}}
+                <svg class="ww-line" width="20" height="75" viewBox="0 0 20 75" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="10" y1="75" x2="10" y2="5" stroke="#e7e7e7"/>
+                    <polyline points="4,10 10,4 16,10" stroke="#e7e7e7"/>
+                </svg>
+                <p class="ww-text">Accesează lista ta de favorite</p>
+            {{/if}}
+        </div>
+
+        <div class="ww-tooltip ww-down" style="left: {{ cutouts.[0].xm }}px; top: {{ cutouts.[0].y }}px;">
+            {{# if IS_MOBILE_VIEW }}
+                <svg class="ww-line" width="20" height="142" viewBox="0 0 20 142" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="10" y1="142" x2="10" y2="5" stroke="#e7e7e7"/>
+                    <polyline points="4,10 10,4 16,10" stroke="#e7e7e7"/>
+                </svg>
+                <p class="ww-text">Caută toate anunțurile pe bază la tel</p>
+            {{else}}
+                <svg class="ww-line" width="20" height="110" viewBox="0 0 20 110" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="10" y1="110" x2="10" y2="5" stroke="#e7e7e7"/>
+                    <polyline points="4,10 10,4 16,10" stroke="#e7e7e7"/>
+                </svg>
+                <p class="ww-text">Caută toate anunțurile pe bază la tel</p>
+            {{/if}}
+        </div>
+    {{/if}}
+</div>

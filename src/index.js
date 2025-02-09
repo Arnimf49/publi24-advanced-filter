@@ -83,6 +83,7 @@ const FAVORITES_MODAL_TEMPLATE = Handlebars.templates.favorites_modal_template;
 const DUPLICATES_MODAL_TEMPLATE = Handlebars.templates.ads_modal_template;
 const SLIDER_TEMPLATE = Handlebars.templates.slider_template;
 const GLOBAL_BUTTONS_TEMPLATE = Handlebars.templates.global_buttons_template;
+const INFO_TEMPLATE = Handlebars.templates.info_template;
 
 const modalsOpen = [];
 let currentInvestigatePromise = Promise.resolve();
@@ -92,6 +93,9 @@ Handlebars.registerHelper('isUndefined', function(value) {
 });
 Handlebars.registerHelper('inc', function(value) {
   return ++value;
+});
+Handlebars.registerHelper("getIndex", function (array, index) {
+  return array[index];
 });
 
 const filterLinks = (links, itemUrl) => {
@@ -1055,6 +1059,75 @@ function registerAdsInContext(context, applyFocusMode = false) {
   return [...items].map((item) => registerAdItem(item, item.getAttribute('data-articleid')));
 }
 
+function showInfo() {
+  const firstButtons = document.querySelector('.ww-buttons');
+  window.scrollTo({top: 0, behavior: "instant"});
+  firstButtons.scrollIntoView({behavior: 'instant', block: 'start'});
+  window.scrollBy({ top: IS_MOBILE_VIEW ? -280 : -350, behavior: "instant" });
+  document.body.style.overflow = 'hidden';
+
+  setTimeout(() => {
+    let shownStep = 0;
+    const infoContainer = document.createElement('div');
+    document.body.appendChild(infoContainer);
+
+    const elToCutout = (el) => {
+      const rect = el.getBoundingClientRect();
+      return {
+        x: rect.x - 2,
+        y: rect.y - 2,
+        yy: rect.y + rect.height + 2,
+        xm: rect.x + rect.width / 2,
+        xrc: rect.x + rect.width - 15,
+        xlc: rect.x + 15,
+        width: rect.width + 4,
+        height: rect.height + 4,
+      }
+    };
+
+    const adButtonsCutouts = [
+      document.querySelector('.article-item:not([style="display: none;"]) .ww-buttons button:nth-child(1)'),
+      document.querySelector('.article-item:not([style="display: none;"]) .ww-buttons button:nth-child(2)'),
+      document.querySelector('.article-item:not([style="display: none;"]) .ww-buttons button:nth-child(3)'),
+      document.querySelector('.article-item:not([style="display: none;"]) .ww-buttons button:nth-child(4)'),
+      document.querySelector('.article-item:not([style="display: none;"]) .art-img'),
+    ].map(elToCutout);
+    const globalButtonsCutouts = [
+      document.querySelector('.ww-phone-search-button'),
+      document.querySelector('.ww-saves-button'),
+      document.querySelector('.ww-focus-button'),
+    ].map(elToCutout);
+
+    infoContainer.innerHTML = INFO_TEMPLATE({
+      cutouts: adButtonsCutouts,
+      adButtonsInfo: true,
+      IS_MOBILE_VIEW
+    });
+
+    infoContainer.addEventListener('click', () => {
+      try {
+        if (shownStep === 1) {
+          infoContainer.parentNode.removeChild(infoContainer);
+          document.body.style.overflow = 'initial';
+          return;
+        }
+
+        infoContainer.innerHTML = INFO_TEMPLATE({
+          cutouts: globalButtonsCutouts,
+          globalButtonsInfo: true,
+          IS_MOBILE_VIEW
+        });
+
+        ++shownStep;
+      } catch (error) {
+        infoContainer.parentNode.removeChild(infoContainer);
+        document.body.style.overflow = 'initial';
+        console.error(error);
+      }
+    });
+  }, 600);
+}
+
 WWStorage.upgrade()
   .then(() => {
     if (IS_AD_PAGE) {
@@ -1075,6 +1148,10 @@ WWStorage.upgrade()
       registerAdsInContext(document.body, true);
       if (location.pathname.startsWith('/anunturi/matrimoniale')) {
         registerGlobalButtons();
+      }
+      if (!WWStorage.hasBeenShownInfo()) {
+        setTimeout(showInfo, 100);
+        WWStorage.setHasBeenShownInfo();
       }
     }
   })

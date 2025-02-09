@@ -192,6 +192,13 @@ const WWStorage = {
     return localStorage.getItem('ww:focus_mode') === 'true';
   },
 
+  hasBeenShownInfo() {
+    return localStorage.getItem('ww:info-shown') === 'true';
+  },
+  setHasBeenShownInfo() {
+    return localStorage.setItem('ww:info-shown', 'true');
+  },
+
   async upgrade() {
     const version = localStorage.getItem('ww:storage:version');
 

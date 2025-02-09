@@ -572,6 +572,219 @@ templates['global_buttons_template'] = template({"1":function(container,depth0,h
     + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(25, data, 0),"inverse":container.program(27, data, 0),"data":data,"loc":{"start":{"line":91,"column":11},"end":{"line":91,"column":88}}})) != null ? stack1 : "")
     + "\n</button>\n";
 },"useData":true});
+templates['info_template'] = template({"1":function(container,depth0,helpers,partials,data) {
+    var alias1=container.lambda, alias2=container.escapeExpression, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "                <rect x=\""
+    + alias2(alias1((depth0 != null ? lookupProperty(depth0,"x") : depth0), depth0))
+    + "\" y=\""
+    + alias2(alias1((depth0 != null ? lookupProperty(depth0,"y") : depth0), depth0))
+    + "\" width=\""
+    + alias2(alias1((depth0 != null ? lookupProperty(depth0,"width") : depth0), depth0))
+    + "\" height=\""
+    + alias2(alias1((depth0 != null ? lookupProperty(depth0,"height") : depth0), depth0))
+    + "\" rx=\"3\" ry=\"3\" fill=\"black\"/>\n";
+},"3":function(container,depth0,helpers,partials,data) {
+    return "        font-size: 13px;\n";
+},"5":function(container,depth0,helpers,partials,data) {
+    var stack1, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "        <div class=\"ww-tooltip\" style=\"left: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"3") : stack1)) != null ? lookupProperty(stack1,"xm") : stack1), depth0))
+    + "px; top: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"3") : stack1)) != null ? lookupProperty(stack1,"yy") : stack1), depth0))
+    + "px\">\n            <svg class=\"ww-line\" width=\"20\" height=\"40\" viewBox=\"0 0 20 40\" fill=\"none\" stroke=\"black\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n                <line x1=\"10\" y1=\"38\" x2=\"10\" y2=\"5\" stroke=\"#e7e7e7\"/>\n                <polyline points=\"4,10 10,4 16,10\" stroke=\"#e7e7e7\"/>\n            </svg>\n            <p class=\"ww-text "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":70,"column":30},"end":{"line":70,"column":71}}})) != null ? stack1 : "")
+    + "\" style=\"margin-top: 20px;"
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(8, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":70,"column":97},"end":{"line":70,"column":138}}})) != null ? stack1 : "")
+    + "\">Caută pozele anuțului pe Google</p>\n        </div>\n\n        <div class=\"ww-tooltip\" style=\"left: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"2") : stack1)) != null ? lookupProperty(stack1,"xm") : stack1), depth0))
+    + "px; top: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"2") : stack1)) != null ? lookupProperty(stack1,"yy") : stack1), depth0))
+    + "px\">\n            <svg class=\"ww-line\" width=\"20\" height=\""
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(10, data, 0),"inverse":container.program(12, data, 0),"data":data,"loc":{"start":{"line":74,"column":52},"end":{"line":74,"column":93}}})) != null ? stack1 : "")
+    + "\" viewBox=\"0 0 20 "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(10, data, 0),"inverse":container.program(12, data, 0),"data":data,"loc":{"start":{"line":74,"column":111},"end":{"line":74,"column":152}}})) != null ? stack1 : "")
+    + "\" fill=\"none\" stroke=\"black\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n                <line x1=\"10\" y1=\""
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(10, data, 0),"inverse":container.program(12, data, 0),"data":data,"loc":{"start":{"line":75,"column":34},"end":{"line":75,"column":75}}})) != null ? stack1 : "")
+    + "\" x2=\"10\" y2=\"5\" stroke=\"#e7e7e7\"/>\n                <polyline points=\"4,10 10,4 16,10\" stroke=\"#e7e7e7\"/>\n            </svg>\n            <p class=\"ww-text "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":78,"column":30},"end":{"line":78,"column":71}}})) != null ? stack1 : "")
+    + "\" style=\""
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(14, data, 0),"inverse":container.program(16, data, 0),"data":data,"loc":{"start":{"line":78,"column":80},"end":{"line":78,"column":164}}})) != null ? stack1 : "")
+    + "\">Caută anunțul și numărul de tel pe Google</p>\n        </div>\n\n        <div class=\"ww-tooltip\" style=\"left: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"1") : stack1)) != null ? lookupProperty(stack1,"xm") : stack1), depth0))
+    + "px; top: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"1") : stack1)) != null ? lookupProperty(stack1,"yy") : stack1), depth0))
+    + "px\">\n            <svg class=\"ww-line\" width=\"20\" height=\""
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(18, data, 0),"inverse":container.program(20, data, 0),"data":data,"loc":{"start":{"line":82,"column":52},"end":{"line":82,"column":95}}})) != null ? stack1 : "")
+    + "\" viewBox=\"0 0 20 "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(18, data, 0),"inverse":container.program(20, data, 0),"data":data,"loc":{"start":{"line":82,"column":113},"end":{"line":82,"column":156}}})) != null ? stack1 : "")
+    + "\" fill=\"none\" stroke=\"black\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n                <line x1=\"10\" y1=\""
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(18, data, 0),"inverse":container.program(20, data, 0),"data":data,"loc":{"start":{"line":83,"column":34},"end":{"line":83,"column":77}}})) != null ? stack1 : "")
+    + "\" x2=\"10\" y2=\"5\" stroke=\"#e7e7e7\"/>\n                <polyline points=\"4,10 10,4 16,10\" stroke=\"#e7e7e7\"/>\n            </svg>\n            <p class=\"ww-text "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":86,"column":30},"end":{"line":86,"column":71}}})) != null ? stack1 : "")
+    + "\" style=\""
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(22, data, 0),"inverse":container.program(24, data, 0),"data":data,"loc":{"start":{"line":86,"column":80},"end":{"line":86,"column":152}}})) != null ? stack1 : "")
+    + " \">Adaugă la lista de favorite</p>\n        </div>\n\n        <div class=\"ww-tooltip\" style=\"left: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"0") : stack1)) != null ? lookupProperty(stack1,"xm") : stack1), depth0))
+    + "px; top: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"0") : stack1)) != null ? lookupProperty(stack1,"yy") : stack1), depth0))
+    + "px\">\n            <svg class=\"ww-line\" width=\"20\" height=\""
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(26, data, 0),"inverse":container.program(28, data, 0),"data":data,"loc":{"start":{"line":90,"column":52},"end":{"line":90,"column":95}}})) != null ? stack1 : "")
+    + "\" viewBox=\"0 0 20 "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(26, data, 0),"inverse":container.program(28, data, 0),"data":data,"loc":{"start":{"line":90,"column":113},"end":{"line":90,"column":156}}})) != null ? stack1 : "")
+    + "\" fill=\"none\" stroke=\"black\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n                <line x1=\"10\" y1=\""
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(26, data, 0),"inverse":container.program(28, data, 0),"data":data,"loc":{"start":{"line":91,"column":34},"end":{"line":91,"column":77}}})) != null ? stack1 : "")
+    + "\" x2=\"10\" y2=\"5\" stroke=\"#e7e7e7\"/>\n                <polyline points=\"4,10 10,4 16,10\" stroke=\"#e7e7e7\"/>\n            </svg>\n            <p class=\"ww-text "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":94,"column":30},"end":{"line":94,"column":71}}})) != null ? stack1 : "")
+    + "\" style=\""
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(30, data, 0),"inverse":container.program(32, data, 0),"data":data,"loc":{"start":{"line":94,"column":80},"end":{"line":94,"column":153}}})) != null ? stack1 : "")
+    + " \">Ascunde sau arată anunțul</p>\n        </div>\n\n        <div class=\"ww-tooltip "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(34, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":97,"column":31},"end":{"line":97,"column":67}}})) != null ? stack1 : "")
+    + "\" style=\"left: "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(36, data, 0),"inverse":container.program(38, data, 0),"data":data,"loc":{"start":{"line":97,"column":82},"end":{"line":97,"column":161}}})) != null ? stack1 : "")
+    + "px; top: "
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(40, data, 0),"inverse":container.program(42, data, 0),"data":data,"loc":{"start":{"line":97,"column":170},"end":{"line":97,"column":244}}})) != null ? stack1 : "")
+    + "px\">\n            <svg class=\"ww-line\" width=\"20\" height=\"40\" viewBox=\"0 0 20 40\" fill=\"none\" stroke=\"black\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n                <line x1=\"10\" y1=\"40\" x2=\"10\" y2=\"5\" stroke=\"#e7e7e7\"/>\n                <polyline points=\"4,10 10,4 16,10\" stroke=\"#e7e7e7\"/>\n            </svg>\n            <p class=\"ww-text\" style=\""
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(44, data, 0),"inverse":container.program(46, data, 0),"data":data,"loc":{"start":{"line":102,"column":38},"end":{"line":102,"column":91}}})) != null ? stack1 : "")
+    + "\">Deschide toate pozele anunțului</p>\n        </div>\n";
+},"6":function(container,depth0,helpers,partials,data) {
+    return "ww-text-left";
+},"8":function(container,depth0,helpers,partials,data) {
+    return "width: 145px";
+},"10":function(container,depth0,helpers,partials,data) {
+    return "90";
+},"12":function(container,depth0,helpers,partials,data) {
+    return "70";
+},"14":function(container,depth0,helpers,partials,data) {
+    return "margin-top: 75px; width: 191px;";
+},"16":function(container,depth0,helpers,partials,data) {
+    return "margin-top: 55px";
+},"18":function(container,depth0,helpers,partials,data) {
+    return "144";
+},"20":function(container,depth0,helpers,partials,data) {
+    return "105";
+},"22":function(container,depth0,helpers,partials,data) {
+    return "margin-top: 129px;";
+},"24":function(container,depth0,helpers,partials,data) {
+    return "margin-top: 90px;";
+},"26":function(container,depth0,helpers,partials,data) {
+    return "181";
+},"28":function(container,depth0,helpers,partials,data) {
+    return "140";
+},"30":function(container,depth0,helpers,partials,data) {
+    return "margin-top: 166px;";
+},"32":function(container,depth0,helpers,partials,data) {
+    return "margin-top: 125px;";
+},"34":function(container,depth0,helpers,partials,data) {
+    return "ww-down";
+},"36":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"4") : stack1)) != null ? lookupProperty(stack1,"xlc") : stack1), depth0));
+},"38":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"4") : stack1)) != null ? lookupProperty(stack1,"xrc") : stack1), depth0));
+},"40":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"4") : stack1)) != null ? lookupProperty(stack1,"y") : stack1), depth0));
+},"42":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"4") : stack1)) != null ? lookupProperty(stack1,"yy") : stack1), depth0));
+},"44":function(container,depth0,helpers,partials,data) {
+    return "";
+},"46":function(container,depth0,helpers,partials,data) {
+    return "margin-top: 20px";
+},"48":function(container,depth0,helpers,partials,data) {
+    var stack1, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "        <div class=\"ww-tooltip ww-down\" style=\"left: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"2") : stack1)) != null ? lookupProperty(stack1,"xm") : stack1), depth0))
+    + "px; top: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"2") : stack1)) != null ? lookupProperty(stack1,"y") : stack1), depth0))
+    + "px;\">\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(49, data, 0),"inverse":container.program(51, data, 0),"data":data,"loc":{"start":{"line":109,"column":12},"end":{"line":121,"column":19}}})) != null ? stack1 : "")
+    + "        </div>\n\n        <div class=\"ww-tooltip ww-down\" style=\"left: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"1") : stack1)) != null ? lookupProperty(stack1,"xm") : stack1), depth0))
+    + "px; top: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"1") : stack1)) != null ? lookupProperty(stack1,"y") : stack1), depth0))
+    + "px;\">\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(53, data, 0),"inverse":container.program(55, data, 0),"data":data,"loc":{"start":{"line":125,"column":12},"end":{"line":137,"column":19}}})) != null ? stack1 : "")
+    + "        </div>\n\n        <div class=\"ww-tooltip ww-down\" style=\"left: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"0") : stack1)) != null ? lookupProperty(stack1,"xm") : stack1), depth0))
+    + "px; top: "
+    + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? lookupProperty(depth0,"cutouts") : depth0)) != null ? lookupProperty(stack1,"0") : stack1)) != null ? lookupProperty(stack1,"y") : stack1), depth0))
+    + "px;\">\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(57, data, 0),"inverse":container.program(59, data, 0),"data":data,"loc":{"start":{"line":141,"column":12},"end":{"line":153,"column":19}}})) != null ? stack1 : "")
+    + "        </div>\n";
+},"49":function(container,depth0,helpers,partials,data) {
+    return "                <svg class=\"ww-line\" width=\"20\" height=\"105\" viewBox=\"0 0 20 105\" fill=\"none\" stroke=\"black\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n                    <line x1=\"10\" y1=\"105\" x2=\"10\" y2=\"5\" stroke=\"#e7e7e7\"/>\n                    <polyline points=\"4,10 10,4 16,10\" stroke=\"#e7e7e7\"/>\n                </svg>\n                <p class=\"ww-text\" style=\"width: 200px\">Cănd activ anunțurile ascunse nu se mai vad deloc</p>\n";
+},"51":function(container,depth0,helpers,partials,data) {
+    return "                <svg class=\"ww-line\" width=\"20\" height=\"40\" viewBox=\"0 0 20 40\" fill=\"none\" stroke=\"black\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n                    <line x1=\"10\" y1=\"40\" x2=\"10\" y2=\"5\" stroke=\"#e7e7e7\"/>\n                    <polyline points=\"4,10 10,4 16,10\" stroke=\"#e7e7e7\"/>\n                </svg>\n                <p class=\"ww-text\">Cănd activ anunțurile ascunse nu se mai vad deloc</p>\n";
+},"53":function(container,depth0,helpers,partials,data) {
+    return "                <svg class=\"ww-line\" width=\"20\" height=\"50\" viewBox=\"0 0 20 50\" fill=\"none\" stroke=\"black\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n                    <line x1=\"10\" y1=\"50\" x2=\"10\" y2=\"5\" stroke=\"#e7e7e7\"/>\n                    <polyline points=\"4,10 10,4 16,10\" stroke=\"#e7e7e7\"/>\n                </svg>\n                <p class=\"ww-text\" style=\"width: 136px\">Accesează lista ta de favorite</p>\n";
+},"55":function(container,depth0,helpers,partials,data) {
+    return "                <svg class=\"ww-line\" width=\"20\" height=\"75\" viewBox=\"0 0 20 75\" fill=\"none\" stroke=\"black\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n                    <line x1=\"10\" y1=\"75\" x2=\"10\" y2=\"5\" stroke=\"#e7e7e7\"/>\n                    <polyline points=\"4,10 10,4 16,10\" stroke=\"#e7e7e7\"/>\n                </svg>\n                <p class=\"ww-text\">Accesează lista ta de favorite</p>\n";
+},"57":function(container,depth0,helpers,partials,data) {
+    return "                <svg class=\"ww-line\" width=\"20\" height=\"142\" viewBox=\"0 0 20 142\" fill=\"none\" stroke=\"black\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n                    <line x1=\"10\" y1=\"142\" x2=\"10\" y2=\"5\" stroke=\"#e7e7e7\"/>\n                    <polyline points=\"4,10 10,4 16,10\" stroke=\"#e7e7e7\"/>\n                </svg>\n                <p class=\"ww-text\">Caută toate anunțurile pe bază la tel</p>\n";
+},"59":function(container,depth0,helpers,partials,data) {
+    return "                <svg class=\"ww-line\" width=\"20\" height=\"110\" viewBox=\"0 0 20 110\" fill=\"none\" stroke=\"black\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n                    <line x1=\"10\" y1=\"110\" x2=\"10\" y2=\"5\" stroke=\"#e7e7e7\"/>\n                    <polyline points=\"4,10 10,4 16,10\" stroke=\"#e7e7e7\"/>\n                </svg>\n                <p class=\"ww-text\">Caută toate anunțurile pe bază la tel</p>\n";
+},"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, alias1=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return "<svg width=\"0\" height=\"0\">\n    <defs>\n        <mask id=\"cutout-mask\">\n            <rect width=\"5000\" height=\"5000\" fill=\"white\"/>\n"
+    + ((stack1 = lookupProperty(helpers,"each").call(alias1,(depth0 != null ? lookupProperty(depth0,"cutouts") : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":5,"column":12},"end":{"line":7,"column":21}}})) != null ? stack1 : "")
+    + "        </mask>\n    </defs>\n</svg>\n\n<style>\n    .ww-info-container {\n        width: 100%;\n        height: 100%;\n        position: fixed;\n        background: rgba(0, 0, 0, .88);\n        top: 0;\n        left: 0;\n        z-index: 5000;\n\n        mask: url(#cutout-mask);\n    }\n    .ww-text {\n        color: #333;\n        float: left;\n        background: #e7e7e7;\n        padding: 3px 5px;\n        border-radius: 5px;\n        box-shadow: 1px 1px 3px 1px rgba(0,0,0,.8);\n        border-color: #ffffff;\n        border-width: 2px 0px 0px 2px;\n        border-style: solid;\n        margin-left: -14px;\n        font-style: italic;\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"IS_MOBILE_VIEW") : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":36,"column":4},"end":{"line":38,"column":11}}})) != null ? stack1 : "")
+    + "    }\n    .ww-text-left {\n        position: absolute;\n        transform: translateX(-100%);\n        width: 207px;\n        margin-left: 3px;\n    }\n    .ww-line {\n        float: left;\n        margin-left: -10px;\n    }\n    .ww-down {\n        transform: translateY(-100%);\n    }\n    .ww-down .ww-line {\n        transform: rotate(180deg);\n        margin-top: 12px;\n    }\n    .ww-tooltip {\n        position: absolute;\n    }\n</style>\n\n\n<div class=\"ww-info-container\">\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"adButtonsInfo") : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":64,"column":4},"end":{"line":104,"column":11}}})) != null ? stack1 : "")
+    + "\n\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"globalButtonsInfo") : depth0),{"name":"if","hash":{},"fn":container.program(48, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":107,"column":4},"end":{"line":155,"column":11}}})) != null ? stack1 : "")
+    + "</div>\n";
+},"useData":true});
 templates['slider_template'] = template({"1":function(container,depth0,helpers,partials,data) {
     return "right: 30px;";
 },"3":function(container,depth0,helpers,partials,data) {
