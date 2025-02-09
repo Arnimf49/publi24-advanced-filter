@@ -85,6 +85,7 @@ const SLIDER_TEMPLATE = Handlebars.templates.slider_template;
 const GLOBAL_BUTTONS_TEMPLATE = Handlebars.templates.global_buttons_template;
 
 const modalsOpen = [];
+let currentInvestigatePromise = Promise.resolve();
 
 Handlebars.registerHelper('isUndefined', function(value) {
   return value === undefined;
@@ -1016,7 +1017,10 @@ function registerAdItem(item, id) {
   const renderCache = {};
 
   if (!WWStorage.getAdPhone(id)) {
-    investigateNumberAndSearch(item, id, false);
+    currentInvestigatePromise = currentInvestigatePromise
+      .then(() => investigateNumberAndSearch(item, id, false))
+      // Wait a bit to avoid triggering rate limits.
+      .then(() => new Promise(r => setTimeout(r, 800)));
   }
 
   const interval = setInterval(() => {
