@@ -1,3 +1,22 @@
+<style>
+    .modal_top_border {
+        display: block;
+        height: 2px;
+        width: 100%;
+        position: sticky;
+        background: #b34c4c;
+        top: 78px;
+        z-index: 10;
+        margin: auto;
+        margin-top: -2px
+    }
+    @media screen and (max-width: 640px) {
+        .modal_top_border {
+            top: 75px;
+        }
+    }
+</style>
+
 <div style="position: fixed;
             top: 0;
             left: 0;
@@ -62,14 +81,17 @@
             border: 2px solid #b34c4c;
             width: 100%;
             max-width: 1000px;
-            padding: {{#if IS_MOBILE_VIEW}}10px{{else}}20px{{/if}} !important;
             background: #ececec;
-            border-radius: 10px;
+            border-radius: 0 0 10px 10px;
             margin: auto;
             margin-bottom: 150px;
             position: relative;
+            padding: 0 !important;
             {{#if IS_MOBILE_VIEW}}margin-top:105px;{{/if}}
     " onclick="event.stopPropagation()">
-        {{{content}}}
+        <div class="modal_top_border"></div>
+        <div style="padding: {{#if IS_MOBILE_VIEW}}10px{{else}}20px{{/if}};">
+            {{{content}}}
+        </div>
     </div>
 </div>
