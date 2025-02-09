@@ -126,8 +126,50 @@ async function parseResults(wwid) {
   }
 }
 
+function addLoader(percent) {
+  const loader = document.createElement('div');
+  document.body.appendChild(loader);
+
+  loader.style.background = 'rgb(87 82 82)';
+  loader.style.position = 'fixed';
+  loader.style.top = '60px';
+  loader.style.width = 'calc(100% - 50px)';
+  loader.style.left = '50%';
+  loader.style.transform = 'translateX(-50%)';
+  loader.style.height = '22px';
+  loader.style.padding = '4px';
+  loader.style.borderRadius = '4px';
+  loader.style.boxShadow = '2px 2px 12px 2px  rgba(0,0,0,0.4)';
+
+  const progress = document.createElement('div');
+  loader.appendChild(progress);
+
+  progress.style.width = `${percent}%`;
+  progress.style.height = '100%';
+  progress.style.background = 'rgb(97 147 59)';
+  progress.style.borderRadius = '4px';
+
+  const text = document.createElement('div');
+  text.innerHTML = 'căutare după poze ..';
+  loader.appendChild(text);
+
+  text.style.position = 'absolute';
+  text.style.top = '50%';
+  text.style.left = '50%';
+  text.style.transform = 'translate(-50%, -50%)';
+  text.style.color = 'white';
+  text.style.mixBlendMode = 'overlay';
+  text.style.fontWeight = 'bold';
+}
+
 browser.storage.local.get(`ww:img_search_started_for`).then(data => {
   if (data[`ww:img_search_started_for`].count) {
     parseResults(data[`ww:img_search_started_for`].wwid);
+
+    if (IS_MOBILE_VIEW) {
+      const count = data[`ww:img_search_started_for`].count;
+      const length = data[`ww:img_search_started_for`].imgs.length;
+      addLoader((length - count + 1) / length * 100);
+    }
   }
 })
