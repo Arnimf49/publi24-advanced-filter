@@ -286,7 +286,8 @@ function renderAdElement(item, id, storage) {
 }
 
 function setItemVisible(item, v) {
-  item.style.opacity = v ? '1' : '0.3';
+  item.style.opacity = v ? '1' : '0.5';
+  item.style.mixBlendMode = v ? 'initial' : 'luminosity';
 }
 
 function createVisibilityClickHandler(item, id) {

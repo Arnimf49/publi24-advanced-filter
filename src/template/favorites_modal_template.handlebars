@@ -15,6 +15,30 @@
             top: 75px;
         }
     }
+    .ww-modal-header {
+        position: sticky;
+        z-index: 1;
+        top: 0;
+        width: 100%;
+        max-width: 1000px;
+        margin: auto;
+        padding: 15px 10px;
+        background: #27272794;
+        backdrop-filter: blur(10px);
+        display: table;
+    }
+    @media screen and (min-width: 1000px) {
+        .ww-modal-header {
+            padding-left: 0px;
+            padding-right: 20px
+        }
+        .ww-modal-header h2 {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+        }
+    }
 </style>
 
 <div style="position: fixed;
@@ -37,25 +61,13 @@
         margin-bottom: -100vh;
     "></div>
 
-    <div style="position: sticky;
-            z-index: 1;
-            top: 0;
-            width: 100%;
-            max-width: 1000px;
-            margin: auto;
-            padding-top: 15px;
-            padding-bottom: 15px;
-            background: #27272794;
-            backdrop-filter: blur(10px);
-            display: table;
-            {{#if IS_MOBILE_VIEW}}padding-left: 10px; padding-right: 10px{{/if}}
-    ">
+    <div class="ww-modal-header">
         <h2 style=" font-weight: bold;
                 color: #edd492;
                 float: left;
                 text-shadow: 2px 2px 2px rgba(0, 0, 0, .2);
                 background: #b34c4c;
-                padding: 5px 20px;
+                padding: 5px 15px;
                 border-radius: 10px;
                 margin-top: {{#if IS_MOBILE_VIEW}}-1px{{else}}-10px{{/if}};">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 30" fill="#edd492" style="
@@ -72,7 +84,7 @@
             </svg>
         </button>
         <button type="button" class="radius" style="color: black;float: right;line-height: 0;background: rgba(255,255,255,0.6);
-                margin-right: {{#if IS_MOBILE_VIEW}}13px{{else}}25px{{/if}};padding: 13px;" data-wwid="clear-favorites">
+                margin-right: {{#if IS_MOBILE_VIEW}}13px{{else}}25px{{/if}};padding: 13px 6px;" data-wwid="clear-favorites">
             <b>șterge lista</b>
         </button>
     </div>
