@@ -11,13 +11,30 @@ function extractResultLinks() {
     return;
   }
 
-  const resultUrls = [...results].map((n) => {
-    return n.getAttribute('href');
-  });
+  clearInterval(interval);
 
-  browser.storage.local.set({ [`ww:search_results:${wwid}`]: resultUrls })
-    .then(() => window.close());
+  browser.storage.local.get(`ww:search_results:${wwid}`).then(data => {
+    const currentUrls = data[`ww:search_results:${wwid}`];
+    const resultUrls = [...results].map((n) => {
+      return n.getAttribute('href');
+    });
+    const final = [...new Set([...resultUrls, ...currentUrls])];
+
+    browser.storage.local.set({ [`ww:search_results:${wwid}`]: final })
+      .then(() => {
+        const url = new URL(window.location);
+        const q = url.searchParams.get('q');
+
+        if (q.indexOf('site:nimfomane.com') !== -1) {
+          window.close();
+        } else {
+          url.searchParams.set('q', q + ' site:nimfomane.com');
+          console.log(url.toString());
+          window.location = url.toString();
+        }
+      });
+  });
 }
 
 // @TODO: Improve to wait for elements.
-setInterval(extractResultLinks, 50);
+const interval = setInterval(extractResultLinks, 50);

@@ -408,11 +408,13 @@ async function investigateNumberAndSearch(item, id, search = true) {
   }
 
   if (search) {
-    const encodedId = encodeURIComponent(id);
-    const addUrlId = getItemUrl(item).match(/\/([^./]+)\.html/, "")[1];
-    const encodedSearch = encodeURIComponent(`"${phoneNumber}" OR "${addUrlId}"`);
-    windowRef.location = `https://www.google.com/search?wwsid=${encodedId}&q=${encodedSearch}`;
-    WWStorage.setInvestigatedTime(id, Date.now());
+    browser.storage.local.set({ [`ww:search_results:${id}`]: []}).then(() => {
+      const encodedId = encodeURIComponent(id);
+      const addUrlId = getItemUrl(item).match(/\/([^./]+)\.html/, "")[1];
+      const encodedSearch = encodeURIComponent(`"${phoneNumber}" OR "${addUrlId}"`);
+      windowRef.location = `https://www.google.com/search?wwsid=${encodedId}&q=${encodedSearch}`;
+      WWStorage.setInvestigatedTime(id, Date.now());
+    });
 
     if (IS_SAFARI_IOS) {
       setInterval(() => {
