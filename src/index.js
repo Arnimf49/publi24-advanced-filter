@@ -84,6 +84,7 @@ const DUPLICATES_MODAL_TEMPLATE = Handlebars.templates.ads_modal_template;
 const SLIDER_TEMPLATE = Handlebars.templates.slider_template;
 const GLOBAL_BUTTONS_TEMPLATE = Handlebars.templates.global_buttons_template;
 const INFO_TEMPLATE = Handlebars.templates.info_template;
+const HIDE_REASON_TEMPLATE = Handlebars.templates.hide_reason_template;
 
 const modalsOpen = [];
 let currentInvestigatePromise = Promise.resolve();
@@ -266,6 +267,7 @@ function renderAdElement(item, id, storage) {
     numberOfAdsWithSamePhone: WWStorage.getPhoneAds(phone).length,
     isTempSaved: WWStorage.isTempSaved(itemToTempSaveId(item)),
     visible: getItemVisibility(id),
+    hideReason: WWStorage.getPhoneHiddenReason(phone),
     dueToPhoneHidden: isDueToPhoneHidden(id),
     hasNoPhone: WWStorage.hasAdNoPhone(id),
     phone,
@@ -290,8 +292,44 @@ function renderAdElement(item, id, storage) {
 }
 
 function setItemVisible(item, v) {
-  item.style.opacity = v ? '1' : '0.5';
-  item.style.mixBlendMode = v ? 'initial' : 'luminosity';
+  const target = IS_AD_PAGE ? item : item.querySelector('.article-txt-wrap');
+
+  target.style.opacity = v ? '1' : '0.5';
+  target.style.mixBlendMode = v ? 'initial' : 'luminosity';
+}
+
+function renderHideReasonSelection(container, id, phoneNumber, onReason, onRevert) {
+  const reasonContainer = document.createElement('div');
+  reasonContainer.innerHTML = HIDE_REASON_TEMPLATE({ showRevert: !!onRevert });
+  reasonContainer.onclick = (e) => e.stopPropagation();
+
+  container.appendChild(reasonContainer);
+  const close = () => container.removeChild(reasonContainer);
+
+  reasonContainer.querySelectorAll('[ww-reason]').forEach((reasonButton) => {
+    reasonButton.onclick = () => {
+      WWStorage.setPhoneHiddenReason(phoneNumber, reasonButton.innerText);
+      onReason(close, reasonButton.innerText);
+    };
+  });
+
+  if (onRevert) {
+    reasonContainer.querySelector('[ww-show]').onclick = () => {
+      onRevert(close)
+    };
+  }
+}
+
+function renderHideReasonSelectionInItem(item, id, phoneNumber) {
+  renderHideReasonSelection(item, id, phoneNumber, (close) => {
+    renderAdItem(item, id);
+    close();
+  }, (close) => {
+    setItemVisible(item, true);
+    WWStorage.setPhoneHidden(phoneNumber, false);
+    WWStorage.setAdVisibility(id, true);
+    close();
+  })
 }
 
 function createVisibilityClickHandler(item, id) {
@@ -311,6 +349,10 @@ function createVisibilityClickHandler(item, id) {
     setItemVisible(item, visible);
     WWStorage.setAdVisibility(id, visible);
     this.disabled = false;
+
+    if (!visible && phoneNumber && !IS_AD_PAGE) {
+      renderHideReasonSelectionInItem(item, id, phoneNumber);
+    }
   };
 }
 
@@ -687,12 +729,18 @@ function registerDuplicatesModalHandler(item, id) {
     const {container, close} = renderModal(html);
 
     const hideAllBtn = container.querySelector('[data-wwid="hide-all"]');
-    hideAllBtn.onclick = () => {
-      duplicateUuids.forEach((adUuid) => {
-        WWStorage.setAdVisibility(adUuidParts(adUuid)[0], false);
-      });
+    hideAllBtn.onclick = (event) => {
+      event.stopPropagation();
+
+      duplicateUuids.forEach((adUuid) => WWStorage.setAdVisibility(adUuidParts(adUuid)[0], false));
       WWStorage.setPhoneHidden(phone);
-      close();
+
+      hideAllBtn.parentNode.removeChild(hideAllBtn);
+
+      renderHideReasonSelection(
+        container.querySelector('[data-wwid="container"]'),
+        id, phone, close
+      );
     }
   }
 }
@@ -1037,7 +1085,7 @@ function registerAdItem(item, id) {
         renderAdWithCleanupAndCache(item, id, r);
       }
     });
-  }, 800);
+  }, 300 + Math.round(Math.random() * 100));
 
   const stopRender = () => clearInterval(interval);
   item.stopRender = stopRender;

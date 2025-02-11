@@ -4,7 +4,8 @@
     .ww-message {
         color: rgb(34, 34, 34);
         font-size: .8125rem;
-        margin-top: 5px
+        width: 100%;
+        padding-top: 12px;
     }
 
     {{#if IS_MOBILE_VIEW}}
@@ -17,11 +18,8 @@
     .ww-buttons > *:not(:last-child) {
         margin-left: 5px;
     }
-    .ww-message {
-        float: right;
-    }
         {{#if IS_AD_PAGE}}
-        .ww-results, .ww-buttons {
+        .ww-results, .ww-buttons, .ww-message {
             padding: 0 10px;
         }
         {{/if}}
@@ -85,8 +83,13 @@
 </div>
 
 {{#if dueToPhoneHidden}}
-    <p style="" class="ww-message">ai mai ascuns un anunț cu acceeași numar de telefon; ascuns automat</p>
+    <p style="" class="ww-message">ai mai ascuns un anunț cu acceeași numar de telefon, <b>ascuns automat</b></p>
 {{/if}}
+{{#unless visible }}
+    {{#if hideReason }}
+        <p class="ww-message">motiv ascundere: <b>{{hideReason}}</b></p>
+    {{/if}}
+{{/unless}}
 
 
 {{#if hasNoPhone}}

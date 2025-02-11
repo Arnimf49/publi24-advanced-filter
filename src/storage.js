@@ -2,7 +2,8 @@ const _WW_STORE_CACHE = {item: {}, save: null, phoneAds: {}, phoneHidden: null};
 
 const WWStorage = {
   getAdStoreKeys(id) {
-    return [`ww2:${id.toUpperCase()}`, `ww2:hidden-phones`];
+    return [`ww2:${id.toUpperCase()}`, `ww2:hidden-phones`]
+      .concat(WWStorage.getAdPhone(id) ? [`ww2:phone-h-reason:${WWStorage.getAdPhone(id)}`] : []);
   },
   getAdItem(id) {
     id = id.toUpperCase();
@@ -152,6 +153,13 @@ const WWStorage = {
       localStorage.setItem(`ww2:phone-ads:${phone}`, JSON.stringify(ads));
       _WW_STORE_CACHE.phoneAds[phone] = ads;
     }
+  },
+
+  setPhoneHiddenReason(phone, reason) {
+    localStorage.setItem(`ww2:phone-h-reason:${phone}`, reason);
+  },
+  getPhoneHiddenReason(phone) {
+    return localStorage.getItem(`ww2:phone-h-reason:${phone}`);
   },
 
   getTempSaved() {
