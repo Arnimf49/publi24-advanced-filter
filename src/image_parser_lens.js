@@ -60,24 +60,35 @@ function getMobileExactLink() {
 }
 
 function readImageLinksMobile(wwid, done) {
-  const exactLink = getMobileExactLink();
-  exactLink.click();
-
-  setTimeout(() => {
+  new Promise(r => {
     const interval = setInterval(() => {
-      const hasNoResultsIcon = !!document.querySelector('[alt="Failure info image"], [alt="Imagine cu informații despre eroare"], [id="OotqVd"]');
-      const linkItems = document.body.querySelectorAll('[id="rso"] [href]');
-
-      if (!hasNoResultsIcon && linkItems.length === 0) {
-        return;
+      const link = getMobileExactLink();
+      if (link) {
+        link.click();
+        clearInterval(interval);
+        r();
       }
+    }, 100);
+  }).then(() => {
+    setTimeout(() => {
+      let attempt = 0;
 
-      clearInterval(interval);
+      const interval = setInterval(() => {
+        const hasNoResultsIcon = !!document.querySelector('[alt="Failure info image"], [alt="Imagine cu informații despre eroare"], [id="OotqVd"], [data-psd-lens-error-card]');
+        const linkItems = document.body.querySelectorAll('[id="rso"] [href]');
 
-      const resultUrls = [...linkItems].map((n) => n.getAttribute('href'));
-      done(resultUrls);
-    }, 500);
-  }, 300);
+        if ((!hasNoResultsIcon && attempt < 50) && linkItems.length === 0) {
+          ++attempt;
+          return;
+        }
+
+        clearInterval(interval);
+
+        const resultUrls = [...linkItems].map((n) => n.getAttribute('href'));
+        done(resultUrls);
+      }, 100);
+    }, 800);
+  });
 }
 
 async function parseResults(wwid) {

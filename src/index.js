@@ -184,7 +184,7 @@ function processImageLinks(id, links, itemUrl) {
     .sort(({isSafe: isSafeA, domain}, {isSafe: isSafeB}) => PRIO_DOMAINS.includes(domain) || isSafeA && !isSafeB ? -1 : 0);
 }
 
-function renderModal(html) {
+function renderModal(html, renderOptions) {
   let itemRenderCleaners;
 
   const container = document.createElement('div');
@@ -216,18 +216,18 @@ function renderModal(html) {
   closeButton.onclick = close;
   container.onclick = close;
 
-  itemRenderCleaners = registerAdsInContext(container);
+  itemRenderCleaners = registerAdsInContext(container, {renderOptions});
 
   const registerAds = () => {
     itemRenderCleaners.forEach(c => c());
-    itemRenderCleaners = registerAdsInContext(container);
+    itemRenderCleaners = registerAdsInContext(container, {renderOptions});
   }
 
   return {container, registerAds, close};
 }
 
 
-function renderAdElement(item, id, storage) {
+function renderAdElement(item, id, storage, renderOptions) {
   const itemUrl = getItemUrl(item);
   const phone = WWStorage.getAdPhone(id);
 
@@ -264,6 +264,7 @@ function renderAdElement(item, id, storage) {
     IS_MOBILE_VIEW,
     IS_AD_PAGE,
     hasDuplicateAdsWithSamePhone: WWStorage.getPhoneAds(phone).length > 1,
+    showDuplicates: renderOptions?.showDuplicates ?? true,
     numberOfAdsWithSamePhone: WWStorage.getPhoneAds(phone).length,
     isTempSaved: WWStorage.isTempSaved(itemToTempSaveId(item)),
     visible: getItemVisibility(id),
@@ -298,6 +299,18 @@ function setItemVisible(item, v) {
   target.style.mixBlendMode = v ? 'initial' : 'luminosity';
 }
 
+function getScrollParent(node) {
+  if (node == null || node === document.body) {
+    return window;
+  }
+
+  if (node.scrollHeight > node.clientHeight) {
+    return node;
+  } else {
+    return getScrollParent(node.parentNode);
+  }
+}
+
 function renderHideReasonSelection(container, id, phoneNumber, onReason, onRevert) {
   const reasonContainer = document.createElement('div');
   reasonContainer.innerHTML = HIDE_REASON_TEMPLATE({ showRevert: !!onRevert });
@@ -305,6 +318,13 @@ function renderHideReasonSelection(container, id, phoneNumber, onReason, onRever
 
   container.appendChild(reasonContainer);
   const close = () => container.removeChild(reasonContainer);
+
+  if (IS_MOBILE_VIEW) {
+    const bounding = container.getBoundingClientRect();
+    if (bounding.top < 120) {
+      getScrollParent(container).scrollBy({top: - (120 - bounding.top), behavior: "instant"});
+    }
+  }
 
   reasonContainer.querySelectorAll('[ww-reason]').forEach((reasonButton) => {
     reasonButton.onclick = () => {
@@ -726,7 +746,7 @@ function registerDuplicatesModalHandler(item, id) {
       removed,
       phone,
     });
-    const {container, close} = renderModal(html);
+    const {container, close} = renderModal(html, {showDuplicates: false});
 
     const hideAllBtn = container.querySelector('[data-wwid="hide-all"]');
     hideAllBtn.onclick = (event) => {
@@ -1056,19 +1076,19 @@ function registerGlobalButtons() {
   }, 500);
 }
 
-function renderAdWithCleanupAndCache(item, id, searchResults) {
+function renderAdWithCleanupAndCache(item, id, searchResults, renderOptions) {
   cleanupAdRender(item);
-  renderAdElement(item, id, searchResults);
+  renderAdElement(item, id, searchResults, renderOptions);
   registerHandlers(item, id);
 }
 
-function renderAdItem(item, id) {
+function renderAdItem(item, id, renderOptions) {
   getStorageItems(...STORAGE_KEYS(id))
-    .then((r) => renderAdWithCleanupAndCache(item, id, r));
+    .then((r) => renderAdWithCleanupAndCache(item, id, r, renderOptions));
 }
 
-function registerAdItem(item, id) {
-  renderAdItem(item, id);
+function registerAdItem(item, id, renderOptions) {
+  renderAdItem(item, id, renderOptions);
   const renderCache = {};
 
   if (!WWStorage.getAdPhone(id)) {
@@ -1082,7 +1102,7 @@ function registerAdItem(item, id) {
     getStorageItems(...STORAGE_KEYS(id)).then(r => {
       if (renderCache[id] !== JSON.stringify(r)) {
         renderCache[id] = JSON.stringify(r);
-        renderAdWithCleanupAndCache(item, id, r);
+        renderAdWithCleanupAndCache(item, id, r, renderOptions);
       }
     });
   }, 300 + Math.round(Math.random() * 100));
@@ -1093,7 +1113,7 @@ function registerAdItem(item, id) {
   return stopRender;
 }
 
-function registerAdsInContext(context, applyFocusMode = false) {
+function registerAdsInContext(context, {applyFocusMode = false, renderOptions} = {}) {
   let items = context.querySelectorAll('[data-articleid]');
 
   if (applyFocusMode && WWStorage.isFocusMode()) {
@@ -1106,7 +1126,7 @@ function registerAdsInContext(context, applyFocusMode = false) {
     })
   }
 
-  return [...items].map((item) => registerAdItem(item, item.getAttribute('data-articleid')));
+  return [...items].map((item) => registerAdItem(item, item.getAttribute('data-articleid'), renderOptions));
 }
 
 function showInfo() {
@@ -1195,7 +1215,7 @@ WWStorage.upgrade()
         registerAdItem(item, id.toUpperCase());
       }, 100);
     } else {
-      registerAdsInContext(document.body, true);
+      registerAdsInContext(document.body, {applyFocusMode: true});
       if (location.pathname.startsWith('/anunturi/matrimoniale')) {
         registerGlobalButtons();
       }

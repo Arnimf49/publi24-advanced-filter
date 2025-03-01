@@ -83,7 +83,7 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
         return undefined
     };
 
-  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"phone") : depth0),{"name":"if","hash":{},"fn":container.program(42, data, 0, blockParams, depths),"inverse":container.program(87, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":98,"column":4},"end":{"line":220,"column":11}}})) != null ? stack1 : "");
+  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"phone") : depth0),{"name":"if","hash":{},"fn":container.program(42, data, 0, blockParams, depths),"inverse":container.program(88, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":98,"column":4},"end":{"line":222,"column":11}}})) != null ? stack1 : "");
 },"42":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
@@ -97,9 +97,9 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
     + "                <a href=\"https://wa.me/+4"
     + container.escapeExpression(((helper = (helper = lookupProperty(helpers,"phone") || (depth0 != null ? lookupProperty(depth0,"phone") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"phone","hash":{},"data":data,"loc":{"start":{"line":106,"column":41},"end":{"line":106,"column":50}}}) : helper)))
     + "\" target=\"_blank\" style=\"margin-left: 5px\" title=\"Deschide Whatsapp\">\n                    <svg style=\"height: 26px; vertical-align: middle; margin-bottom: 4px;\" viewBox=\"235.36 400.69 325.29 325.29\" xmlns=\"http://www.w3.org/2000/svg\">\n                        <defs>\n                            <clipPath id=\"b\">\n                                <path d=\"M 0,841.89 H 595.276 V 0 H 0 Z\"/>\n                            </clipPath>\n                            <linearGradient id=\"a\" x2=\"1\" gradientTransform=\"matrix(-1.53e-5 -243.96 243.96 -1.53e-5 298.5 541.37)\" gradientUnits=\"userSpaceOnUse\">\n                                <stop stop-color=\"#7bcb32\" offset=\"0\"/>\n                                <stop stop-color=\"#5db420\" offset=\"1\"/>\n                            </linearGradient>\n                        </defs>\n                        <g transform=\"matrix(1.3333 0 0 -1.3333 0 1122.5)\">\n                            <g clip-path=\"url(#b)\">\n                                <path d=\"m420.46 359.32c0-1.336-0.041-4.232-0.121-6.47-0.197-5.475-0.63-12.54-1.286-15.76-0.988-4.837-2.477-9.403-4.418-13.204-2.297-4.496-5.228-8.523-8.71-11.998-3.474-3.469-7.497-6.388-11.987-8.676-3.82-1.947-8.415-3.437-13.28-4.419-3.187-0.644-10.199-1.069-15.64-1.263-2.24-0.08-5.137-0.12-6.467-0.12l-120.13 0.019c-1.336 0-4.232 0.041-6.47 0.121-5.475 0.197-12.541 0.631-15.76 1.287-4.837 0.986-9.404 2.476-13.204 4.417-4.496 2.298-8.523 5.228-11.998 8.71-3.469 3.475-6.388 7.498-8.676 11.987-1.947 3.821-3.437 8.415-4.42 13.281-0.643 3.186-1.068 10.199-1.262 15.639-0.08 2.239-0.12 5.137-0.12 6.468l0.019 120.12c0 1.336 0.041 4.233 0.121 6.471 0.196 5.475 0.631 12.54 1.287 15.759 0.986 4.838 2.475 9.404 4.417 13.205 2.298 4.496 5.228 8.522 8.71 11.998 3.474 3.469 7.498 6.388 11.987 8.676 3.82 1.947 8.415 3.437 13.28 4.419 3.187 0.643 10.2 1.069 15.64 1.262 2.24 0.08 5.138 0.121 6.468 0.121l120.12-0.02c1.336 0 4.233-0.04 6.47-0.121 5.476-0.196 12.541-0.63 15.761-1.287 4.837-0.986 9.403-2.475 13.204-4.417 4.495-2.297 8.522-5.228 11.998-8.71 3.469-3.474 6.388-7.497 8.676-11.986 1.947-3.821 3.436-8.415 4.419-13.281 0.643-3.187 1.069-10.199 1.262-15.64 0.08-2.24 0.12-5.137 0.12-6.468z\" fill=\"url(#a)\"/>\n                                <path d=\"m341.14 403.54c-2.187 1.094-12.934 6.38-14.937 7.109-2.004 0.73-3.461 1.094-4.919-1.093-1.457-2.188-5.645-7.11-6.922-8.569-1.274-1.458-2.549-1.64-4.735-0.547-2.186 1.094-9.229 3.402-17.579 10.846-6.498 5.794-10.885 12.951-12.16 15.139s-0.135 3.37 0.959 4.46c0.983 0.978 2.185 2.552 3.279 3.828 1.092 1.276 1.457 2.188 2.186 3.646 0.728 1.458 0.364 2.735-0.183 3.828-0.546 1.094-4.918 11.85-6.74 16.225-1.774 4.261-3.576 3.685-4.918 3.752-1.274 0.063-2.732 0.077-4.189 0.077s-3.826-0.548-5.829-2.735c-2.004-2.188-7.651-7.475-7.651-18.23 0-10.756 7.833-21.147 8.926-22.605 1.093-1.459 15.414-23.531 37.341-32.996 5.215-2.252 9.288-3.597 12.462-4.604 5.237-1.663 10.001-1.428 13.768-0.866 4.2 0.628 12.933 5.287 14.755 10.392 1.821 5.104 1.821 9.479 1.275 10.39-0.547 0.911-2.004 1.458-4.189 2.553m-39.885-54.441h-0.029c-13.048 6e-3 -25.846 3.509-37.009 10.132l-2.656 1.576-27.52-7.217 7.346 26.823-1.73 2.75c-7.278 11.573-11.122 24.95-11.116 38.685 0.015 40.078 32.634 72.685 72.742 72.685 19.421-8e-3 37.678-7.579 51.407-21.318 13.728-13.739 21.285-32.003 21.277-51.425-0.016-40.082-32.635-72.691-72.712-72.691m61.884 134.56c-16.517 16.531-38.482 25.639-61.885 25.649-48.22 0-87.464-39.23-87.484-87.45-6e-3 -15.415 4.022-30.46 11.678-43.722l-12.411-45.319 46.376 12.161c12.778-6.967 27.164-10.639 41.806-10.645h0.036c3e-3 0-3e-3 0 0 0 48.215 0 87.464 39.235 87.483 87.455 9e-3 23.368-9.082 45.341-25.599 61.871\" fill=\"#fff\"/>\n                            </g>\n                        </g>\n                    </svg>\n                </a>\n            </h4>\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"hasDuplicateAdsWithSamePhone") : depth0),{"name":"if","hash":{},"fn":container.program(47, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"loc":{"start":{"line":126,"column":12},"end":{"line":128,"column":19}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"showDuplicates") : depth0),{"name":"if","hash":{},"fn":container.program(47, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"loc":{"start":{"line":126,"column":12},"end":{"line":130,"column":19}}})) != null ? stack1 : "")
     + "\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"visible") : depth0),{"name":"if","hash":{},"fn":container.program(49, data, 0, blockParams, depths),"inverse":container.program(85, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":130,"column":12},"end":{"line":195,"column":19}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"visible") : depth0),{"name":"if","hash":{},"fn":container.program(50, data, 0, blockParams, depths),"inverse":container.program(86, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":132,"column":12},"end":{"line":197,"column":19}}})) != null ? stack1 : "")
     + "        </div>\n";
 },"43":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=container.hooks.helperMissing, alias3="function", alias4=container.escapeExpression, lookupProperty = container.lookupProperty || function(parent, propertyName) {
@@ -126,6 +126,15 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
     + container.escapeExpression(((helper = (helper = lookupProperty(helpers,"phone") || (depth0 != null ? lookupProperty(depth0,"phone") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"phone","hash":{},"data":data,"loc":{"start":{"line":104,"column":20},"end":{"line":104,"column":29}}}) : helper)))
     + "\n";
 },"47":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"hasDuplicateAdsWithSamePhone") : depth0),{"name":"if","hash":{},"fn":container.program(48, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":127,"column":12},"end":{"line":129,"column":19}}})) != null ? stack1 : "");
+},"48":function(container,depth0,helpers,partials,data) {
     var helper, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -134,9 +143,9 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
     };
 
   return "                <p style=\"color: #9d9103; font-size: .8125rem;\"><strong>"
-    + container.escapeExpression(((helper = (helper = lookupProperty(helpers,"numberOfAdsWithSamePhone") || (depth0 != null ? lookupProperty(depth0,"numberOfAdsWithSamePhone") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"numberOfAdsWithSamePhone","hash":{},"data":data,"loc":{"start":{"line":127,"column":72},"end":{"line":127,"column":100}}}) : helper)))
+    + container.escapeExpression(((helper = (helper = lookupProperty(helpers,"numberOfAdsWithSamePhone") || (depth0 != null ? lookupProperty(depth0,"numberOfAdsWithSamePhone") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"numberOfAdsWithSamePhone","hash":{},"data":data,"loc":{"start":{"line":128,"column":72},"end":{"line":128,"column":100}}}) : helper)))
     + "</strong> anunțuri cu acest telefon <a data-wwid=\"duplicates\">(vizualizează)</a></p>\n";
-},"49":function(container,depth0,helpers,partials,data,blockParams,depths) {
+},"50":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=container.hooks.helperMissing, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -145,14 +154,14 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
     };
 
   return "                <h5 style=\"margin-top: 5px; margin-bottom: 3px; font-size: 1.125rem\">\n                    Rezultate după telefon\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"phoneInvestigatedSinceDays") : depth0),{"name":"if","hash":{},"fn":container.program(50, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"loc":{"start":{"line":133,"column":20},"end":{"line":137,"column":27}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"phoneInvestigatedSinceDays") : depth0),{"name":"if","hash":{},"fn":container.program(51, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"loc":{"start":{"line":135,"column":20},"end":{"line":139,"column":27}}})) != null ? stack1 : "")
     + "                </h5>\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(lookupProperty(helpers,"isUndefined")||(depth0 && lookupProperty(depth0,"isUndefined"))||alias2).call(alias1,(depth0 != null ? lookupProperty(depth0,"searchLinks") : depth0),{"name":"isUndefined","hash":{},"data":data,"loc":{"start":{"line":139,"column":22},"end":{"line":139,"column":47}}}),{"name":"if","hash":{},"fn":container.program(55, data, 0, blockParams, depths),"inverse":container.program(57, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":139,"column":16},"end":{"line":150,"column":23}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(lookupProperty(helpers,"isUndefined")||(depth0 && lookupProperty(depth0,"isUndefined"))||alias2).call(alias1,(depth0 != null ? lookupProperty(depth0,"searchLinks") : depth0),{"name":"isUndefined","hash":{},"data":data,"loc":{"start":{"line":141,"column":22},"end":{"line":141,"column":47}}}),{"name":"if","hash":{},"fn":container.program(56, data, 0, blockParams, depths),"inverse":container.program(58, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":141,"column":16},"end":{"line":152,"column":23}}})) != null ? stack1 : "")
     + "\n                <h5 style=\"margin-top: 5px; margin-bottom: 3px; font-size: 1.125rem\">\n                    Rezultate după imagine\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"imageInvestigatedSinceDays") : depth0),{"name":"if","hash":{},"fn":container.program(63, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"loc":{"start":{"line":154,"column":20},"end":{"line":158,"column":27}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"imageInvestigatedSinceDays") : depth0),{"name":"if","hash":{},"fn":container.program(64, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"loc":{"start":{"line":156,"column":20},"end":{"line":160,"column":27}}})) != null ? stack1 : "")
     + "                </h5>\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(lookupProperty(helpers,"isUndefined")||(depth0 && lookupProperty(depth0,"isUndefined"))||alias2).call(alias1,(depth0 != null ? lookupProperty(depth0,"imageSearchDomains") : depth0),{"name":"isUndefined","hash":{},"data":data,"loc":{"start":{"line":160,"column":22},"end":{"line":160,"column":54}}}),{"name":"if","hash":{},"fn":container.program(55, data, 0, blockParams, depths),"inverse":container.program(65, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":160,"column":16},"end":{"line":192,"column":23}}})) != null ? stack1 : "");
-},"50":function(container,depth0,helpers,partials,data) {
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(lookupProperty(helpers,"isUndefined")||(depth0 && lookupProperty(depth0,"isUndefined"))||alias2).call(alias1,(depth0 != null ? lookupProperty(depth0,"imageSearchDomains") : depth0),{"name":"isUndefined","hash":{},"data":data,"loc":{"start":{"line":162,"column":22},"end":{"line":162,"column":54}}}),{"name":"if","hash":{},"fn":container.program(56, data, 0, blockParams, depths),"inverse":container.program(66, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":162,"column":16},"end":{"line":194,"column":23}}})) != null ? stack1 : "");
+},"51":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -161,28 +170,17 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
     };
 
   return "                        <span style=\""
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"phoneInvestigateStale") : depth0),{"name":"if","hash":{},"fn":container.program(51, data, 0),"inverse":container.program(53, data, 0),"data":data,"loc":{"start":{"line":134,"column":37},"end":{"line":134,"column":111}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"phoneInvestigateStale") : depth0),{"name":"if","hash":{},"fn":container.program(52, data, 0),"inverse":container.program(54, data, 0),"data":data,"loc":{"start":{"line":136,"column":37},"end":{"line":136,"column":111}}})) != null ? stack1 : "")
     + "font-size: 0.825rem;\">\n                            ("
-    + container.escapeExpression(((helper = (helper = lookupProperty(helpers,"phoneInvestigatedSinceDays") || (depth0 != null ? lookupProperty(depth0,"phoneInvestigatedSinceDays") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"phoneInvestigatedSinceDays","hash":{},"data":data,"loc":{"start":{"line":135,"column":29},"end":{"line":135,"column":59}}}) : helper)))
+    + container.escapeExpression(((helper = (helper = lookupProperty(helpers,"phoneInvestigatedSinceDays") || (depth0 != null ? lookupProperty(depth0,"phoneInvestigatedSinceDays") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"phoneInvestigatedSinceDays","hash":{},"data":data,"loc":{"start":{"line":137,"column":29},"end":{"line":137,"column":59}}}) : helper)))
     + ")\n                        </span>\n";
-},"51":function(container,depth0,helpers,partials,data) {
+},"52":function(container,depth0,helpers,partials,data) {
     return "color: #8b5454;";
-},"53":function(container,depth0,helpers,partials,data) {
+},"54":function(container,depth0,helpers,partials,data) {
     return "color: #69875c;";
-},"55":function(container,depth0,helpers,partials,data) {
+},"56":function(container,depth0,helpers,partials,data) {
     return "                    <p style=\"color: #8b5454; font-size: .8125rem;\">nerulat</p>\n";
-},"57":function(container,depth0,helpers,partials,data) {
-    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
-        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
-          return parent[propertyName];
-        }
-        return undefined
-    };
-
-  return ((stack1 = lookupProperty(helpers,"unless").call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? lookupProperty(depth0,"filteredSearchLinks") : depth0)) != null ? lookupProperty(stack1,"length") : stack1),{"name":"unless","hash":{},"fn":container.program(58, data, 0),"inverse":container.program(60, data, 0),"data":data,"loc":{"start":{"line":142,"column":20},"end":{"line":149,"column":31}}})) != null ? stack1 : "");
 },"58":function(container,depth0,helpers,partials,data) {
-    return "                        <p style=\"color: #69875c; font-size: .8125rem;\">nu au fost găsite linkuri relevante</p>\n";
-},"60":function(container,depth0,helpers,partials,data) {
     var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -190,8 +188,19 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
         return undefined
     };
 
-  return ((stack1 = lookupProperty(helpers,"each").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"filteredSearchLinks") : depth0),{"name":"each","hash":{},"fn":container.program(61, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":145,"column":24},"end":{"line":148,"column":33}}})) != null ? stack1 : "");
+  return ((stack1 = lookupProperty(helpers,"unless").call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? lookupProperty(depth0,"filteredSearchLinks") : depth0)) != null ? lookupProperty(stack1,"length") : stack1),{"name":"unless","hash":{},"fn":container.program(59, data, 0),"inverse":container.program(61, data, 0),"data":data,"loc":{"start":{"line":144,"column":20},"end":{"line":151,"column":31}}})) != null ? stack1 : "");
+},"59":function(container,depth0,helpers,partials,data) {
+    return "                        <p style=\"color: #69875c; font-size: .8125rem;\">nu au fost găsite linkuri relevante</p>\n";
 },"61":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return ((stack1 = lookupProperty(helpers,"each").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"filteredSearchLinks") : depth0),{"name":"each","hash":{},"fn":container.program(62, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":147,"column":24},"end":{"line":150,"column":33}}})) != null ? stack1 : "");
+},"62":function(container,depth0,helpers,partials,data) {
     var alias1=container.lambda, alias2=container.escapeExpression;
 
   return "                            <div style=\"font-size: .8125rem; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;\">\n                                <a onclick='event.stopPropagation()' href=\""
@@ -199,7 +208,7 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
     + "\" target=\"_blank\">"
     + alias2(alias1(depth0, depth0))
     + "</a></div>\n";
-},"63":function(container,depth0,helpers,partials,data) {
+},"64":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -208,11 +217,11 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
     };
 
   return "                        <span style=\""
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"imageInvestigateStale") : depth0),{"name":"if","hash":{},"fn":container.program(51, data, 0),"inverse":container.program(53, data, 0),"data":data,"loc":{"start":{"line":155,"column":37},"end":{"line":155,"column":111}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"imageInvestigateStale") : depth0),{"name":"if","hash":{},"fn":container.program(52, data, 0),"inverse":container.program(54, data, 0),"data":data,"loc":{"start":{"line":157,"column":37},"end":{"line":157,"column":111}}})) != null ? stack1 : "")
     + "font-size: 0.825rem;\">\n                            ("
-    + container.escapeExpression(((helper = (helper = lookupProperty(helpers,"imageInvestigatedSinceDays") || (depth0 != null ? lookupProperty(depth0,"imageInvestigatedSinceDays") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"imageInvestigatedSinceDays","hash":{},"data":data,"loc":{"start":{"line":156,"column":29},"end":{"line":156,"column":59}}}) : helper)))
+    + container.escapeExpression(((helper = (helper = lookupProperty(helpers,"imageInvestigatedSinceDays") || (depth0 != null ? lookupProperty(depth0,"imageInvestigatedSinceDays") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"imageInvestigatedSinceDays","hash":{},"data":data,"loc":{"start":{"line":158,"column":29},"end":{"line":158,"column":59}}}) : helper)))
     + ")\n                        </span>\n";
-},"65":function(container,depth0,helpers,partials,data,blockParams,depths) {
+},"66":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -220,8 +229,8 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
         return undefined
     };
 
-  return ((stack1 = lookupProperty(helpers,"unless").call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? lookupProperty(depth0,"imageSearchDomains") : depth0)) != null ? lookupProperty(stack1,"length") : stack1),{"name":"unless","hash":{},"fn":container.program(58, data, 0, blockParams, depths),"inverse":container.program(66, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":163,"column":20},"end":{"line":191,"column":31}}})) != null ? stack1 : "");
-},"66":function(container,depth0,helpers,partials,data,blockParams,depths) {
+  return ((stack1 = lookupProperty(helpers,"unless").call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? lookupProperty(depth0,"imageSearchDomains") : depth0)) != null ? lookupProperty(stack1,"length") : stack1),{"name":"unless","hash":{},"fn":container.program(59, data, 0, blockParams, depths),"inverse":container.program(67, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":165,"column":20},"end":{"line":193,"column":31}}})) != null ? stack1 : "");
+},"67":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, alias1=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -229,13 +238,13 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
         return undefined
     };
 
-  return ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"hasImagesInOtherLocation") : depth0),{"name":"if","hash":{},"fn":container.program(67, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"loc":{"start":{"line":166,"column":24},"end":{"line":168,"column":31}}})) != null ? stack1 : "")
+  return ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"hasImagesInOtherLocation") : depth0),{"name":"if","hash":{},"fn":container.program(68, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"loc":{"start":{"line":168,"column":24},"end":{"line":170,"column":31}}})) != null ? stack1 : "")
     + "                        <div style=\"font-size: .8125rem;\">\n"
-    + ((stack1 = lookupProperty(helpers,"each").call(alias1,(depth0 != null ? lookupProperty(depth0,"imageSearchDomains") : depth0),{"name":"each","hash":{},"fn":container.program(69, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"loc":{"start":{"line":170,"column":28},"end":{"line":189,"column":37}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"each").call(alias1,(depth0 != null ? lookupProperty(depth0,"imageSearchDomains") : depth0),{"name":"each","hash":{},"fn":container.program(70, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"loc":{"start":{"line":172,"column":28},"end":{"line":191,"column":37}}})) != null ? stack1 : "")
     + "                        </div>\n";
-},"67":function(container,depth0,helpers,partials,data) {
+},"68":function(container,depth0,helpers,partials,data) {
     return "                            <p style=\"color: #8b5454; font-size: .8125rem; margin-bottom: 5px;\">anunțuri active găsite in alte locații !</p>\n";
-},"69":function(container,depth0,helpers,partials,data,blockParams,depths) {
+},"70":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -243,8 +252,8 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
         return undefined
     };
 
-  return ((stack1 = lookupProperty(helpers,"each").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"links") : depth0),{"name":"each","hash":{},"fn":container.program(70, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"loc":{"start":{"line":171,"column":32},"end":{"line":188,"column":41}}})) != null ? stack1 : "");
-},"70":function(container,depth0,helpers,partials,data,blockParams,depths) {
+  return ((stack1 = lookupProperty(helpers,"each").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"links") : depth0),{"name":"each","hash":{},"fn":container.program(71, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"loc":{"start":{"line":173,"column":32},"end":{"line":190,"column":41}}})) != null ? stack1 : "");
+},"71":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, alias1=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -255,24 +264,13 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
   return "                                    <a href=\""
     + container.escapeExpression(container.lambda((depth0 != null ? lookupProperty(depth0,"link") : depth0), depth0))
     + "\" target=\"_blank\"\n                                       style=\"display: inline-block;\n                                               background-color: "
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isDead") : depth0),{"name":"if","hash":{},"fn":container.program(71, data, 0, blockParams, depths),"inverse":container.program(73, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":174,"column":65},"end":{"line":174,"column":201}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isDead") : depth0),{"name":"if","hash":{},"fn":container.program(72, data, 0, blockParams, depths),"inverse":container.program(74, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":176,"column":65},"end":{"line":176,"column":201}}})) != null ? stack1 : "")
     + ";\n                                               padding: 5px;\n                                               margin-right: 3px;\n                                               margin-bottom: 6px;\n                                               border-radius: 5px;\n                                               text-decoration: none;\n                                               color: rgb(55 55 55);\n                                   \">\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(data && lookupProperty(data,"first")),{"name":"if","hash":{},"fn":container.program(81, data, 0, blockParams, depths),"inverse":container.program(83, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":182,"column":40},"end":{"line":186,"column":47}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(data && lookupProperty(data,"first")),{"name":"if","hash":{},"fn":container.program(82, data, 0, blockParams, depths),"inverse":container.program(84, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":184,"column":40},"end":{"line":188,"column":47}}})) != null ? stack1 : "")
     + "                                    </a>\n";
-},"71":function(container,depth0,helpers,partials,data) {
+},"72":function(container,depth0,helpers,partials,data) {
     return "#d6d8dd";
-},"73":function(container,depth0,helpers,partials,data) {
-    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
-        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
-          return parent[propertyName];
-        }
-        return undefined
-    };
-
-  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"isSafe") : depth0),{"name":"if","hash":{},"fn":container.program(74, data, 0),"inverse":container.program(76, data, 0),"data":data,"loc":{"start":{"line":174,"column":99},"end":{"line":174,"column":194}}})) != null ? stack1 : "");
 },"74":function(container,depth0,helpers,partials,data) {
-    return "#d1e1d1";
-},"76":function(container,depth0,helpers,partials,data) {
     var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -280,12 +278,23 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
         return undefined
     };
 
-  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"isSuspicious") : depth0),{"name":"if","hash":{},"fn":container.program(77, data, 0),"inverse":container.program(79, data, 0),"data":data,"loc":{"start":{"line":174,"column":133},"end":{"line":174,"column":187}}})) != null ? stack1 : "");
+  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"isSafe") : depth0),{"name":"if","hash":{},"fn":container.program(75, data, 0),"inverse":container.program(77, data, 0),"data":data,"loc":{"start":{"line":176,"column":99},"end":{"line":176,"column":194}}})) != null ? stack1 : "");
+},"75":function(container,depth0,helpers,partials,data) {
+    return "#d1e1d1";
 },"77":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"isSuspicious") : depth0),{"name":"if","hash":{},"fn":container.program(78, data, 0),"inverse":container.program(80, data, 0),"data":data,"loc":{"start":{"line":176,"column":133},"end":{"line":176,"column":187}}})) != null ? stack1 : "");
+},"78":function(container,depth0,helpers,partials,data) {
     return "#e5e38e";
-},"79":function(container,depth0,helpers,partials,data) {
+},"80":function(container,depth0,helpers,partials,data) {
     return "#efe2e2";
-},"81":function(container,depth0,helpers,partials,data,blockParams,depths) {
+},"82":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -296,7 +305,7 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
   return "                                            "
     + container.escapeExpression(container.lambda((depths[1] != null ? lookupProperty(depths[1],"domain") : depths[1]), depth0))
     + "\n";
-},"83":function(container,depth0,helpers,partials,data) {
+},"84":function(container,depth0,helpers,partials,data) {
     var lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -305,11 +314,11 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
     };
 
   return "                                            <span style=\"font-size: .6rem\">#</span>"
-    + container.escapeExpression((lookupProperty(helpers,"inc")||(depth0 && lookupProperty(depth0,"inc"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),(data && lookupProperty(data,"index")),{"name":"inc","hash":{},"data":data,"loc":{"start":{"line":185,"column":83},"end":{"line":185,"column":97}}}))
+    + container.escapeExpression((lookupProperty(helpers,"inc")||(depth0 && lookupProperty(depth0,"inc"))||container.hooks.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),(data && lookupProperty(data,"index")),{"name":"inc","hash":{},"data":data,"loc":{"start":{"line":187,"column":83},"end":{"line":187,"column":97}}}))
     + "\n";
-},"85":function(container,depth0,helpers,partials,data) {
+},"86":function(container,depth0,helpers,partials,data) {
     return "\n";
-},"87":function(container,depth0,helpers,partials,data) {
+},"88":function(container,depth0,helpers,partials,data) {
     return "        <style>\n            .loader {\n                margin-top: 15px;\n                height: 9px;\n                width: 60px;\n                --c:no-repeat linear-gradient(#17b 0 0);\n                background: var(--c), var(--c), var(--c), var(--c);\n                background-size: 26% 3px;\n                animation: l5 1s infinite;\n            }\n            @keyframes l5 {\n                0%,\n                70%,\n                100% {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }\n                12.5%{background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }\n                25%  {background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 100%,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }\n                37.5%{background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 100%,calc(2*100%/3) 0   ,calc(3*100%/3) 50% }\n                50%,\n                60%  {background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 100%,calc(2*100%/3) 0   ,calc(3*100%/3) 100%}\n            }\n        </style>\n        <div class=\"loader\"></div>\n";
 },"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, alias1=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
@@ -345,7 +354,7 @@ templates['ad_template'] = template({"1":function(container,depth0,helpers,parti
     + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"dueToPhoneHidden") : depth0),{"name":"if","hash":{},"fn":container.program(34, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"loc":{"start":{"line":85,"column":0},"end":{"line":87,"column":7}}})) != null ? stack1 : "")
     + ((stack1 = lookupProperty(helpers,"unless").call(alias1,(depth0 != null ? lookupProperty(depth0,"visible") : depth0),{"name":"unless","hash":{},"fn":container.program(36, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"loc":{"start":{"line":88,"column":0},"end":{"line":92,"column":11}}})) != null ? stack1 : "")
     + "\n\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"hasNoPhone") : depth0),{"name":"if","hash":{},"fn":container.program(39, data, 0, blockParams, depths),"inverse":container.program(41, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":95,"column":0},"end":{"line":221,"column":7}}})) != null ? stack1 : "");
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"hasNoPhone") : depth0),{"name":"if","hash":{},"fn":container.program(39, data, 0, blockParams, depths),"inverse":container.program(41, data, 0, blockParams, depths),"data":data,"loc":{"start":{"line":95,"column":0},"end":{"line":223,"column":7}}})) != null ? stack1 : "");
 },"useData":true,"useDepths":true});
 templates['ads_modal_template'] = template({"1":function(container,depth0,helpers,partials,data) {
     return "-1px";

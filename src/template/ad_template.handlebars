@@ -123,8 +123,10 @@
                     </svg>
                 </a>
             </h4>
+            {{# if showDuplicates }}
             {{# if hasDuplicateAdsWithSamePhone }}
                 <p style="color: #9d9103; font-size: .8125rem;"><strong>{{numberOfAdsWithSamePhone}}</strong> anunțuri cu acest telefon <a data-wwid="duplicates">(vizualizează)</a></p>
+            {{/if}}
             {{/if}}
 
             {{#if visible }}
