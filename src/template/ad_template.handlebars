@@ -24,6 +24,18 @@
         }
         {{/if}}
     {{/if}}
+    .ww-link-safe {
+        background-color: #d1e1d1;
+    }
+    .ww-link-dead {
+        background-color: #d6d8dd;
+    }
+    .ww-link-suspicious {
+        background-color: #e5e38e;
+    }
+    .ww-link-unsafe {
+        background-color: #efe2e2;
+    }
 </style>
 
 <div class="ww-buttons">
@@ -63,7 +75,7 @@
     </button>
 
     {{#if nimfomaneLink}}
-        <a href='{{nimfomaneLink}}' target='_blank' style='position: relative; display: inline-block;'>
+        <a href='{{nimfomaneLink}}' target='_blank' data-wwid="nimfomane-btn" style='position: relative; display: inline-block;'>
             <svg
                     style='position: absolute;
                         width: 16px;
@@ -83,11 +95,11 @@
 </div>
 
 {{#if dueToPhoneHidden}}
-    <p style="" class="ww-message">ai mai ascuns un anunț cu acceeași numar de telefon, <b>ascuns automat</b></p>
+    <p style="" class="ww-message" data-wwid="message">ai mai ascuns un anunț cu acceeași numar de telefon, <b>ascuns automat</b></p>
 {{/if}}
 {{#unless visible }}
     {{#if hideReason }}
-        <p class="ww-message">motiv ascundere: <b>{{hideReason}}</b></p>
+        <p class="ww-message" data-wwid="hide-reason">motiv ascundere: <b>{{hideReason}}</b></p>
     {{/if}}
 {{/unless}}
 
@@ -99,11 +111,11 @@
         <div class="ww-results">
             <h4 style='font-weight: bold; padding-top: 10px;'>
                 {{#if IS_MOBILE_VIEW}}
-                    <a href="tel:{{phone}}">{{phone}}</a>
+                    <a href="tel:{{phone}}" data-wwid="phone-number">{{phone}}</a>
                 {{else}}
-                    {{phone}}
+                    <span data-wwid="phone-number">{{phone}}</span>
                 {{/if}}
-                <a href="https://wa.me/+4{{phone}}" target="_blank" style="margin-left: 5px" title="Deschide Whatsapp">
+                <a href="https://wa.me/+4{{phone}}" target="_blank" style="margin-left: 5px" data-wwid="whatsapp" title="Deschide Whatsapp">
                     <svg style="height: 26px; vertical-align: middle; margin-bottom: 4px;" viewBox="235.36 400.69 325.29 325.29" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <clipPath id="b">
@@ -125,7 +137,7 @@
             </h4>
             {{# if showDuplicates }}
             {{# if hasDuplicateAdsWithSamePhone }}
-                <p style="color: #9d9103; font-size: .8125rem;"><strong>{{numberOfAdsWithSamePhone}}</strong> anunțuri cu acest telefon <a data-wwid="duplicates">(vizualizează)</a></p>
+                <p data-wwid="duplicates-container" style="color: #9d9103; font-size: .8125rem;"><strong>{{numberOfAdsWithSamePhone}}</strong> anunțuri cu acest telefon <a data-wwid="duplicates">(vizualizează)</a></p>
             {{/if}}
             {{/if}}
 
@@ -138,6 +150,7 @@
                         </span>
                     {{/if}}
                 </h5>
+                <div data-wwid="search-results">
                 {{#if (isUndefined searchLinks)}}
                     <p style="color: #8b5454; font-size: .8125rem;">nerulat</p>
                 {{else}}
@@ -150,6 +163,7 @@
                         {{/each}}
                     {{/unless}}
                 {{/if}}
+                </div>
 
                 <h5 style="margin-top: 5px; margin-bottom: 3px; font-size: 1.125rem">
                     Rezultate după imagine
@@ -159,6 +173,7 @@
                         </span>
                     {{/if}}
                 </h5>
+                <div data-wwid="image-results">
                 {{#if (isUndefined imageSearchDomains)}}
                     <p style="color: #8b5454; font-size: .8125rem;">nerulat</p>
                 {{else}}
@@ -166,14 +181,15 @@
                         <p style="color: #69875c; font-size: .8125rem;">nu au fost găsite linkuri relevante</p>
                     {{else}}
                         {{#if hasImagesInOtherLocation}}
-                            <p style="color: #8b5454; font-size: .8125rem; margin-bottom: 5px;">anunțuri active găsite in alte locații !</p>
+                            <p style="color: #8b5454; font-size: .8125rem; margin-bottom: 5px;" data-wwid="images-warning">anunțuri active găsite in alte locații !</p>
                         {{/if}}
                         <div style="font-size: .8125rem;">
                             {{#each imageSearchDomains}}
                                 {{#each this.links}}
-                                    <a href="{{this.link}}" target="_blank"
+                                    <a href="{{this.link}}"
+                                       class="{{#if this.isDead}}ww-link-dead{{else}}{{#if this.isSafe}}ww-link-safe{{else}}{{#if this.isSuspicious}}ww-link-suspicious{{else}}ww-link-unsafe{{/if}}{{/if}}{{/if}}"
+                                       target="_blank"
                                        style="display: inline-block;
-                                               background-color: {{#if this.isDead}}#d6d8dd{{else}}{{#if this.isSafe}}#d1e1d1{{else}}{{#if this.isSuspicious}}#e5e38e{{else}}#efe2e2{{/if}}{{/if}}{{/if}};
                                                padding: 5px;
                                                margin-right: 3px;
                                                margin-bottom: 6px;
@@ -192,13 +208,14 @@
                         </div>
                     {{/unless}}
                 {{/if}}
+                </div>
             {{else }}
 
             {{/if}}
         </div>
     {{else}}
         <style>
-            .loader {
+            .ww-loader {
                 margin-top: 15px;
                 height: 9px;
                 width: 60px;
@@ -218,6 +235,6 @@
                 60%  {background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 100%,calc(2*100%/3) 0   ,calc(3*100%/3) 100%}
             }
         </style>
-        <div class="loader"></div>
+        <div class="ww-loader"></div>
     {{/if}}
 {{/if}}

@@ -1,0 +1,23 @@
+{
+  "name": "publi24-advanced-filter",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "https://chromewebstore.google.com/detail/publi24-advanced-filter/pigkjfndnpblohnmphgbmecaelefaedn?authuser=0&hl=en",
+  "main": "index.js",
+  "scripts": {
+    "pw-open": "npx playwright test --ui",
+    "pw-debug": "npx playwright test --debug",
+    "pw-run": "npx playwright test"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cypress": "^14.1.0",
+    "fingerprint-injector": "^2.1.62"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0",
+    "@types/node": "^22.13.9",
+    "typescript": "^5.8.2"
+  }
+}

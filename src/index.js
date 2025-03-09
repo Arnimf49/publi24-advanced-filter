@@ -259,6 +259,7 @@ function renderAdElement(item, id, storage, renderOptions) {
 
   const panelElement = document.createElement('div');
   panelElement.className = 'ww-container';
+  panelElement.setAttribute('data-wwid', 'control-panel');
   panelElement.onclick = (e) => e.stopPropagation();
   panelElement.innerHTML = AD_TEMPLATE({
     IS_MOBILE_VIEW,
@@ -283,7 +284,10 @@ function renderAdElement(item, id, storage, renderOptions) {
     imageInvestigateStale,
   });
 
-  (item.querySelector('.article-txt') || item).appendChild(panelElement);
+  const container = (item.querySelector('.article-txt') || item);
+  container.appendChild(panelElement);
+
+  container.setAttribute('data-wwphone', phone);
 
   if (!IS_AD_PAGE && item.hasAttribute('onclick')) {
     item.querySelector('.article-txt-wrap').onclick = (event) => event.stopPropagation();
@@ -1200,6 +1204,8 @@ function showInfo() {
 
 WWStorage.upgrade()
   .then(() => {
+    console.log('Booting publi24-advanced-filter');
+
     if (IS_AD_PAGE) {
       const id = document.body.querySelector('[data-url^="/DetailAd/IncrementViewHit"]')
         .getAttribute('data-url')

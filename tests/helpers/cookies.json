@@ -1,0 +1,82 @@
+[
+  {
+    "name": "_ga_RBV9YWH7LB",
+    "value": "GS1.1.1741468253.1.0.1741468253.60.0.766357223",
+    "domain": ".publi24.ro",
+    "path": "/",
+    "expires": 1876028253.982726,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "_ga",
+    "value": "GA1.1.76104321.1741468254",
+    "domain": ".publi24.ro",
+    "path": "/",
+    "expires": 1876028253.982911,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "ar_debug",
+    "value": "1",
+    "domain": ".region1.google-analytics.com",
+    "path": "/",
+    "expires": 1849244254.166931,
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "None"
+  },
+  {
+    "name": "IDE",
+    "value": "AHWqTUlAXc1sKvfj67DrxzR2FztD3Wg6faVXu1l64Avs9IwMSKN15FVJjosePsEZ",
+    "domain": ".doubleclick.net",
+    "path": "/",
+    "expires": 1875164254.264899,
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "None"
+  },
+  {
+    "name": "euconsent-v2",
+    "value": "CQN81UAQN81UAAKA7AROBgFsAP_gAEPgACJwK4tX_G__bWlr8X73aftkeY1P99h77sQxBgbJE-4FzLvW_JwXx2E5NAz6tqIKmRIAu3TBIQNlHJDURVCgaogVrSDMaEyUoTNKJ6BkiFMRI2dYCFxvm4tjeQCY5vr991dx2B-t7dr83dzyy4hHn3a5_2S1WJCdAYetDfv9bROb-9IOd_x8v4v4_F7pE2-eS1l_tWvp7D9-cts_9XW99_bbff9Pn_-uF_-_X_vf_H37v94K6AEmGhUQRlkSEhAoGEECAFQVhARQIAgAASBogIATBgU5AwAXWEiAEAKAAYIAQAAgwABAAAJAAhEAFABQIAAIBAoAAwAIBgIAGBgADABYCAQAAgOgYpgQQCBYAJGZFApgSgAJBAS2VCCQBAgrhCEWeAQAIiYKAAAEAApAAEB4LA4kkBKxIIAuIJoAACAAAIIAChFJ2YAggDNlqrwZNoytMCwfMFzymAZAEQRk5JsQm_AA.YAAAAAAAAAAA",
+    "domain": ".www.publi24.ro",
+    "path": "/",
+    "expires": 1875164256.005265,
+    "httpOnly": false,
+    "secure": true,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "addtl_consent",
+    "value": "1~43.3.9.6.9.13.6.4.15.9.5.2.11.8.1.3.2.10.33.4.15.17.2.9.20.7.20.5.20.7.2.2.1.4.40.4.14.9.13.8.9.6.6.9.41.5.3.1.27.1.17.10.9.1.8.6.2.8.3.4.146.65.1.17.1.18.25.35.5.18.9.7.41.2.4.18.24.4.9.6.5.2.14.25.3.2.2.8.28.8.6.3.10.4.20.2.17.10.11.1.3.22.16.2.6.8.6.11.6.5.33.11.19.28.12.1.5.2.17.9.6.40.17.4.9.15.8.7.3.12.7.2.4.1.7.12.13.22.13.2.6.8.10.1.4.15.2.4.9.4.5.4.7.13.5.15.17.4.14.10.15.2.5.6.2.2.1.2.14.7.4.8.2.9.10.18.12.13.2.18.1.1.3.1.1.9.7.2.16.5.19.8.4.8.5.4.8.4.4.2.14.2.13.4.2.6.9.6.3.2.2.3.7.9.10.11.9.19.8.3.3.1.2.3.9.19.26.3.10.13.4.3.4.6.3.3.3.4.1.1.6.11.4.1.11.6.1.10.13.3.2.2.4.3.2.2.7.15.7.14.4.3.4.5.4.3.2.2.5.5.3.9.7.9.1.5.3.7.10.11.1.3.1.1.2.1.3.2.6.1.12.8.1.3.1.1.2.2.7.7.1.4.3.6.1.2.1.4.1.1.4.1.1.2.1.8.1.7.4.3.3.3.5.3.15.1.15.10.28.1.2.2.12.3.4.1.6.3.4.7.1.3.1.4.1.5.3.1.3.4.1.5.2.3.1.2.2.6.2.1.2.2.2.4.1.1.1.2.2.1.1.1.1.2.1.1.1.2.2.1.1.2.1.2.1.7.1.7.1.1.1.1.2.1.4.2.1.1.9.1.6.2.1.6.2.3.2.1.1.1.2.5.2.4.1.1.2.2.1.1.7.1.2.2.1.2.1.2.3.1.1.2.4.1.1.1.9.6.4.5.9.1.2.3.1.4.3.2.2.3.1.1.1.1.12.1.3.1.1.2.2.1.6.3.3.5.2.7.1.1.2.5.1.9.5.1.3.1.8.4.5.1.9.1.1.1.2.1.1.1.4.2.13.1.1.3.1.2.2.3.1.2.1.1.1.2.1.3.1.1.1.1.2.4.1.5.1.2.4.3.10.2.9.7.2.2.1.3.3.1.6.1.2.5.1.1.2.6.4.2.1.200.200.100.300.400.100.100.100.400.1700.304.596.100.1000.800.500.400.200.200.500.1300.801.99.303.203.95.1399.1100.100.4302.1798.2100.600.200.100.800.900.100.200.700.100.800.2900.1100.600.400.2200.2300.400.1101.899",
+    "domain": ".www.publi24.ro",
+    "path": "/",
+    "expires": 1775164256.005514,
+    "httpOnly": false,
+    "secure": true,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "IABGPP_HDR_GppString",
+    "value": "DBABMA~CQN81UAQN81UAAKA7AROBgFsAP_gAEPgACJwK4tX_G__bWlr8X73aftkeY1P99h77sQxBgbJE-4FzLvW_JwXx2E5NAz6tqIKmRIAu3TBIQNlHJDURVCgaogVrSDMaEyUoTNKJ6BkiFMRI2dYCFxvm4tjeQCY5vr991dx2B-t7dr83dzyy4hHn3a5_2S1WJCdAYetDfv9bROb-9IOd_x8v4v4_F7pE2-eS1l_tWvp7D9-cts_9XW99_bbff9Pn_-uF_-_X_vf_H37v94K6AEmGhUQRlkSEhAoGEECAFQVhARQIAgAASBogIATBgU5AwAXWEiAEAKAAYIAQAAgwABAAAJAAhEAFABQIAAIBAoAAwAIBgIAGBgADABYCAQAAgOgYpgQQCBYAJGZFApgSgAJBAS2VCCQBAgrhCEWeAQAIiYKAAAEAApAAEB4LA4kkBKxIIAuIJoAACAAAIIAChFJ2YAggDNlqrwZNoytMCwfMFzymAZAEQRk5JsQm_AA.YAAAAAAAAAAA",
+    "domain": ".www.publi24.ro",
+    "path": "/",
+    "expires": 1875164256.00574,
+    "httpOnly": false,
+    "secure": true,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "has18years",
+    "value": "true",
+    "domain": "www.publi24.ro",
+    "path": "/",
+    "expires": 1844060256,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  }
+]

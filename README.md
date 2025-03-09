@@ -10,5 +10,5 @@ https://chromewebstore.google.com/detail/publi24-advanced-filter/pigkjfndnpblohn
   ```
 - Pack plugin:
   ```bash
-  web-ext build
+  web-ext build --ignore-files "test/*" "package.json"
   ```

@@ -48,7 +48,7 @@
             height: 100%;
             z-index: 10000;
             overflow-y: scroll;
-">
+" data-wwid="ads-modal">
     <div style="
         pointer-events: none;
         position: sticky;
@@ -98,9 +98,9 @@
     " onclick="event.stopPropagation()">
         <div class="modal_top_border"></div>
         <div style="padding: {{#if IS_MOBILE_VIEW}}10px{{else}}20px{{/if}} ;">
-            <input type="text" style="font-weight: bold; font-size: 1.2rem" placeholder="Număr telefon" {{#if phone}}value="{{phone}}" disabled{{/if}}/>
+            <input type="text" style="font-weight: bold; font-size: 1.2rem" data-wwid="phone-input" placeholder="Număr telefon" {{#if phone}}value="{{phone}}" disabled{{/if}}/>
             <p style="color: rgb(55 55 55); font-size: .95rem; padding-bottom: 10px; padding-top: 10px; display: table; width: 100%;">
-                <strong style="float: left">Rezultate: <span data-wwid="count">{{count}}</span></strong>
+                <strong style="float: left" data-wwid="results-count">Rezultate: <span data-wwid="count">{{count}}</span></strong>
                 {{#if removed}}
                     <span style="float: left; padding-left: 5px; font-style: italic; font-size: .85rem; opacity: 0.8; color: #8b5454">
                         ({{removed}} nu sa mai încărcat)
