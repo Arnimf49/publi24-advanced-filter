@@ -84,7 +84,8 @@ test('Should search for images and show relevant results.', async ({ page, conte
     const articleImageSearchButton = await article.$('[data-wwid="investigate_img"]');
     await articleImageSearchButton.isVisible();
 
-    const imageCount = +(await (await article.$('[class="article-img-count"]')).innerText());
+    const imageCountContainer = await article.$('[class="article-img-count"]');
+    const imageCount = imageCountContainer ? +(await imageCountContainer.innerText()) : 1;
     const pageEvents =  Array.from({ length: imageCount }, () => context.waitForEvent('page'));
 
     await Promise.all([

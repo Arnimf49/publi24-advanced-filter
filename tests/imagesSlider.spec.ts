@@ -36,7 +36,7 @@ test('Should toggle visibility from slider.', async ({ page, context }) => {
 
   await page.locator('[data-wwid="images-slider"] [data-wwid="toggle-hidden"]').click();
   await expect(page.locator('[data-wwid="images-slider"]')).not.toBeVisible();
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(1000);
   await ((await firstArticle.$$('[ww-reason]'))[0]).click();
   await utils.assertArticleHidden(firstArticle);
 
