@@ -13,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "cypress": "^14.1.0",
+    "execa": "^9.5.2",
     "fingerprint-injector": "^2.1.62"
   },
   "devDependencies": {

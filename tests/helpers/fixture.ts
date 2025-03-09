@@ -4,6 +4,7 @@ import {dirname} from "node:path";
 import {fileURLToPath} from "node:url";
 import {FingerprintGenerator} from "fingerprint-generator";
 import {FingerprintInjector} from "fingerprint-injector";
+import {$} from "execa";
 
 const EXTENSION_PATH = dirname(path.join(fileURLToPath(import.meta.url), '../..'));
 
@@ -38,6 +39,10 @@ export const test = base.extend<{
       },
     });
     await new FingerprintInjector().attachFingerprintToPlaywright(context, { fingerprint, headers });
+
+    if (process.env.CI) {
+      setTimeout(() => $`xdotool key Escape`, 1100);
+    }
 
     await use(context);
     await context.close();

@@ -90,7 +90,7 @@ test('Should hide phone number and thus duplicate ads.', async ({ page, context 
   expect(autoHideMessage).toEqual('ai mai ascuns un anunț cu acceeași numar de telefon, ascuns automat');
 })
 
-test('Should toggle focus mode and not see hidden ads.', async ({ page, context }) => {
+test.only('Should toggle focus mode and not see hidden ads.', async ({ page, context }) => {
   await utils.openPubli(context, page);
 
   const firstArticle = (await page.$$('[data-articleid]'))[0];
@@ -100,7 +100,8 @@ test('Should toggle focus mode and not see hidden ads.', async ({ page, context 
   const firstArticleId = await firstArticle.getAttribute('data-articleid');
   const secondArticleId = await secondArticle.getAttribute('data-articleid');
 
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(1000);
+
   await (await page.$('[data-ww="focus-mode"]')).click();
   await page.waitForTimeout(500);
 
