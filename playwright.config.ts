@@ -7,6 +7,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: 1,
   use: {
+    video: 'on-first-retry',
     trace: 'on-first-retry',
   },
 
