@@ -40,7 +40,7 @@ export const test = base.extend<{
     });
     await new FingerprintInjector().attachFingerprintToPlaywright(context, { fingerprint, headers });
 
-    if (process.env.CI) {
+    if (process.env.CI && process.env.DISPLAY) {
       setTimeout(() => $`xdotool key Escape`, 1100);
     }
 
