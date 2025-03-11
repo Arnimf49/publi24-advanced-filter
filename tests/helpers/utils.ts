@@ -12,6 +12,7 @@ const utils = {
     await page.goto('https://www.publi24.ro/anunturi/matrimoniale/escorte/cluj/cluj-napoca/');
     await page.waitForTimeout(600);
     await (await page.$('[class="qc-cmp2-summary-buttons"] [mode="primary"]')).click();
+    await page.waitForTimeout(600);
   },
 
   async waitForInnerTextNot(page: Page, selector: string, text: string) {
