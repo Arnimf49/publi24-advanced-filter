@@ -284,7 +284,7 @@ function renderAdElement(item, id, storage, renderOptions) {
     imageInvestigateStale,
   });
 
-  const container = (item.querySelector('.article-txt') || item);
+  const container = (item.querySelector('.article-txt, .ww-inset') || item);
   container.appendChild(panelElement);
 
   container.setAttribute('data-wwphone', phone);
@@ -297,7 +297,7 @@ function renderAdElement(item, id, storage, renderOptions) {
 }
 
 function setItemVisible(item, v) {
-  const target = IS_AD_PAGE ? item : item.querySelector('.article-txt-wrap');
+  const target = item.querySelector('.article-txt-wrap, .ww-inset');
 
   target.style.opacity = v ? '1' : '0.5';
   target.style.mixBlendMode = v ? 'initial' : 'luminosity';
@@ -323,7 +323,7 @@ function renderHideReasonSelection(container, id, phoneNumber, onReason, onRever
   container.appendChild(reasonContainer);
   const close = () => container.removeChild(reasonContainer);
 
-  if (IS_MOBILE_VIEW) {
+  if (IS_MOBILE_VIEW || IS_AD_PAGE) {
     const bounding = container.getBoundingClientRect();
     if (bounding.top < 120) {
       getScrollParent(container).scrollBy({top: - (120 - bounding.top), behavior: "instant"});
@@ -374,7 +374,7 @@ function createVisibilityClickHandler(item, id) {
     WWStorage.setAdVisibility(id, visible);
     this.disabled = false;
 
-    if (!visible && phoneNumber && !IS_AD_PAGE) {
+    if (!visible && phoneNumber) {
       renderHideReasonSelectionInItem(item, id, phoneNumber);
     }
   };
@@ -1210,16 +1210,24 @@ WWStorage.upgrade()
       const id = document.body.querySelector('[data-url^="/DetailAd/IncrementViewHit"]')
         .getAttribute('data-url')
         .replace(/^.*?adid=([^&]+)&.*$/, "$1");
+
       const item = document.body.querySelector('[itemtype="https://schema.org/Offer"]');
       item.setAttribute('data-articleid', id.toUpperCase());
 
-      setTimeout(() => {
-        if (!IS_MOBILE_VIEW) {
-          item.removeChild(item.querySelector('.featuredArticles'));
+      const container = document.createElement('div');
+      container.classList.add('ww-inset')
+      const skipClasses = ['featuredArticles', 'detailAd-login'];
+      while (item.children.length) {
+        if (skipClasses.some((c) => item.children[0].classList.contains(c))) {
+          item.removeChild(item.children[0]);
+        } else {
+          container.appendChild(item.children[0]);
         }
-        item.removeChild(item.querySelector('.detailAd-login'));
-        registerAdItem(item, id.toUpperCase());
-      }, 100);
+      }
+      item.appendChild(container);
+      item.style.position = 'relative';
+
+      registerAdItem(item, id.toUpperCase());
     } else {
       registerAdsInContext(document.body, {applyFocusMode: true});
       if (location.pathname.startsWith('/anunturi/matrimoniale')) {

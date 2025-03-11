@@ -69,7 +69,7 @@ test('Should hide all duplicate ads from list.', async ({ page, context }) => {
     const article = await page.$(`[data-articleid="${id}"]`);
     const hideReason = await article.$('[data-wwid="hide-reason"]');
     expect(hideReason).not.toBeNull();
-    expect(await hideReason.innerText()).toEqual('motiv ascundere: poze false');
+    expect(await hideReason.innerText()).toEqual('motiv ascundere: scump');
   }
 })
 

@@ -57,7 +57,7 @@ test('Should hide with a reason.', async ({ page, context }) => {
   await page.waitForTimeout(1000);
 
   const hideReason = await (await firstArticle.$('[data-wwid="hide-reason"]')).innerText();
-  expect(hideReason).toEqual('motiv ascundere: poze false');
+  expect(hideReason).toEqual('motiv ascundere: scump');
 })
 
 test('Should hide phone number and thus duplicate ads.', async ({ page, context }) => {

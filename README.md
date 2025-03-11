@@ -4,11 +4,4 @@ https://chromewebstore.google.com/detail/publi24-advanced-filter/pigkjfndnpblohn
 
 ## Development
 
-- Compile template:
-  ```bash
-  npx watch "handlebars src/template -f src/template/templates.precompiled.js" src/template
-  ```
-- Pack plugin:
-  ```bash
-  web-ext build --ignore-files "tests/*" "package.json" "package-lock.json" "playwright.config.ts" "node_modules"
-  ```
+See npm scripts.

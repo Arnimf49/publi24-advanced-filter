@@ -9,9 +9,15 @@ const utils = {
     await context.addInitScript((config) => {
       window.localStorage.setItem('ww:info-shown', config.infoShown || 'true');
     }, config)
+
     await page.goto('https://www.publi24.ro/anunturi/matrimoniale/escorte/cluj/cluj-napoca/');
     await page.waitForTimeout(600);
-    await (await page.$('[class="qc-cmp2-summary-buttons"] [mode="primary"]')).click();
+
+    const consent = await page.$('[class="qc-cmp2-summary-buttons"] [mode="primary"]');
+    if (consent) {
+      await consent.click();
+    }
+
     await page.waitForTimeout(600);
   },
 
@@ -42,7 +48,7 @@ const utils = {
   },
 
   async assertArticleHidden(element: ElementHandle, hidden = true) {
-    const inner = await element.$('[class="article-txt-wrap"]') || element;
+    const inner = await element.$('.article-txt-wrap, .ww-inset') || element;
     const opacity = await inner.evaluate(el => getComputedStyle(el as Element).getPropertyValue('opacity'))
     const blendMode = await inner.evaluate(el => getComputedStyle(el as Element).getPropertyValue('mix-blend-mode'))
 

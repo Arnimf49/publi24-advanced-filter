@@ -5,18 +5,17 @@
   "description": "https://chromewebstore.google.com/detail/publi24-advanced-filter/pigkjfndnpblohnmphgbmecaelefaedn?authuser=0&hl=en",
   "main": "index.js",
   "scripts": {
+    "templates": "npx watch \"handlebars src/template -f src/template/templates.precompiled.js\" src/template",
+    "build": "web-ext build --ignore-files \"tests\" \"test-results\" \"package.json\" \"package-lock.json\" \"playwright.config.ts\" \"node_modules\" \"tsconfig.json\" --overwrite-dest",
     "pw-open": "npx playwright test --ui",
     "pw-debug": "npx playwright test --debug",
     "pw-run": "npx playwright test"
   },
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "cypress": "^14.1.0",
-    "execa": "^9.5.2",
-    "fingerprint-injector": "^2.1.62"
-  },
   "devDependencies": {
+    "execa": "^9.5.2",
+    "fingerprint-injector": "^2.1.62",
     "@playwright/test": "^1.51.0",
     "@types/node": "^22.13.9",
     "typescript": "^5.8.2"
