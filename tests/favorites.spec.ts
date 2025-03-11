@@ -6,6 +6,8 @@ test('Should add favorites and view them.', async ({ page, context }) => {
 
   await expect(page.locator('[data-ww="temp-save"]')).toHaveText('Favorite (0)');
 
+  await page.waitForTimeout(500);
+
   const articles = await page.$$(`[data-articleid]`);
   await (await articles[0].$('[data-wwid="temp-save"]')).click();
   await (await articles[1].$('[data-wwid="temp-save"]')).click();
@@ -25,6 +27,8 @@ test('Should add favorites and remove one.', async ({ page, context }) => {
 
   await expect(page.locator('[data-ww="temp-save"]')).toHaveText('Favorite (0)');
 
+  await page.waitForTimeout(500);
+
   const articles = await page.$$(`[data-articleid]`);
   await (await articles[0].$('[data-wwid="temp-save"]')).click();
   await (await articles[1].$('[data-wwid="temp-save"]')).click();
@@ -42,6 +46,8 @@ test('Should add favorites and remove all.', async ({ page, context }) => {
   await utils.openPubli(context, page);
 
   await expect(page.locator('[data-ww="temp-save"]')).toHaveText('Favorite (0)');
+
+  await page.waitForTimeout(500);
 
   const articles = await page.$$(`[data-articleid]`);
   await (await articles[0].$('[data-wwid="temp-save"]')).click();
