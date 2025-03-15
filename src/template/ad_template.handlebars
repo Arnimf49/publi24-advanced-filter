@@ -20,7 +20,10 @@
     }
         {{#if IS_AD_PAGE}}
         .ww-results, .ww-buttons, .ww-message {
-            padding: 0 10px;
+            padding: 0 16px;
+        }
+        .ww-results {
+            margin-bottom: 30px;
         }
         {{/if}}
     {{/if}}
@@ -35,6 +38,28 @@
     }
     .ww-link-unsafe {
         background-color: #efe2e2;
+    }
+
+    .ww-whatsapp {
+        margin-left: 1px;
+    }
+    .ww-whatsapp:hover {
+        text-decoration: none;
+    }
+
+    .ww-chip {
+        font-size: 13px;
+        font-weight: 500;
+        background: #e8efe6;
+        padding: 3px;
+        border-radius: 5px;
+        color: #474747;
+        vertical-align: middle;
+        margin-left: 2px;
+    }
+    .ww-chip-warn {
+        color: rgb(55 55 55);
+        background-color: #e5e38e;
     }
 </style>
 
@@ -115,7 +140,7 @@
                 {{else}}
                     <span data-wwid="phone-number">{{phone}}</span>
                 {{/if}}
-                <a href="https://wa.me/+4{{phone}}" target="_blank" style="margin-left: 5px" data-wwid="whatsapp" title="Deschide Whatsapp">
+                <a href="https://wa.me/+4{{phone}}" target="_blank" class="ww-whatsapp" data-wwid="whatsapp" title="Deschide Whatsapp">
                     <svg style="height: 26px; vertical-align: middle; margin-bottom: 4px;" viewBox="235.36 400.69 325.29 325.29" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <clipPath id="b">
@@ -134,6 +159,19 @@
                         </g>
                     </svg>
                 </a>
+
+                {{#if age }}
+                    <span class="ww-chip {{#if ageWarn}}ww-chip-warn{{/if}}" data-wwid="age"><b>{{age}}</b>ani</span>
+                {{/if}}
+                {{#if height }}
+                    <span class="ww-chip" data-wwid="height"><b>{{height}}</b>cm</span>
+                {{/if}}
+                {{#if weight }}
+                    <span class="ww-chip" data-wwid="weight"><b>{{weight}}</b>kg</span>
+                {{/if}}
+                {{#if bmi }}
+                    <span class="ww-chip {{#if bmiWarn}}ww-chip-warn{{/if}}" data-wwid="bmi"><b>{{bmi}}</b>bmi</span>
+                {{/if}}
             </h4>
             {{# if showDuplicates }}
             {{# if hasDuplicateAdsWithSamePhone }}

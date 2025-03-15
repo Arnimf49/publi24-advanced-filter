@@ -1,9 +1,15 @@
-const _WW_STORE_CACHE = {item: {}, save: null, phoneAds: {}, phoneHidden: null};
+const _WW_STORE_CACHE = {
+  item: {},
+  phone: {},
+  save: null,
+  phoneAds: {},
+  phoneHidden: null
+};
 
 const WWStorage = {
   getAdStoreKeys(id) {
-    return [`ww2:${id.toUpperCase()}`, `ww2:hidden-phones`]
-      .concat(WWStorage.getAdPhone(id) ? [`ww2:phone-h-reason:${WWStorage.getAdPhone(id)}`] : []);
+    return [`ww2:${id.toUpperCase()}`]
+      .concat(WWStorage.getAdPhone(id) ? [`ww2:phone:${WWStorage.getAdPhone(id)}`] : []);
   },
   getAdItem(id) {
     id = id.toUpperCase();
@@ -100,35 +106,35 @@ const WWStorage = {
     return WWStorage.getAdProp(id, 'imagesTime');
   },
 
-  getHiddenPhones() {
-    if (_WW_STORE_CACHE.phoneHidden) {
-      return _WW_STORE_CACHE.phoneHidden;
+  getPhoneItem(phone) {
+    if (_WW_STORE_CACHE.phone[phone]) {
+      return _WW_STORE_CACHE.phone[phone];
     }
-    const hidden = JSON.parse(localStorage.getItem(`ww2:hidden-phones`) || '[]');
-    _WW_STORE_CACHE.phoneHidden = hidden;
-    return hidden;
+
+    const item = JSON.parse(localStorage.getItem(`ww2:phone:${phone}`) || '{}');
+    _WW_STORE_CACHE.phone[phone] = item;
+    return item;
   },
+  setPhoneProp(phone, prop, value) {
+    const item = this.getPhoneItem(phone);
+    item[prop] = value;
+    localStorage.setItem(`ww2:phone:${phone}`, JSON.stringify(item));
+    _WW_STORE_CACHE.phone[phone] = item;
+  },
+  getPhoneProp(phone, prop) {
+    const item = this.getPhoneItem(phone);
+    return item[prop];
+  },
+
   setPhoneHidden(phone, h = true) {
-    let hidden = WWStorage.getHiddenPhones();
-    if (!hidden.includes(phone) && h) {
-      hidden.push(phone);
-    } else if (hidden.includes(phone) && !h) {
-      hidden = hidden.filter(p => p !== phone)
-    }
-    localStorage.setItem(`ww2:hidden-phones`, JSON.stringify(hidden));
-    _WW_STORE_CACHE.phoneHidden = hidden;
+    WWStorage.setPhoneProp(phone, 'hidden', h);
   },
   isPhoneHidden(phone) {
-    return WWStorage.getHiddenPhones().includes(phone);
+    return WWStorage.getPhoneProp(phone, 'hidden');
   },
 
   getPhoneAds(phone) {
-    if (_WW_STORE_CACHE.phoneAds[phone]) {
-      return _WW_STORE_CACHE.phoneAds[phone];
-    }
-    const phoneAds = JSON.parse(localStorage.getItem(`ww2:phone-ads:${phone}`) || '[]');
-    _WW_STORE_CACHE.phoneAds[phone] = phoneAds;
-    return phoneAds;
+    return WWStorage.getPhoneProp(phone, 'ads') || [];
   },
   addPhoneAd(phone, id, url) {
     if (!phone || !id || !url) {
@@ -138,8 +144,7 @@ const WWStorage = {
     const ads = WWStorage.getPhoneAds(phone);
     if (!ads.find(v => v.split('|')[0] === id)) { // url can be different due to seo
       ads.push(id + '|' + url);
-      localStorage.setItem(`ww2:phone-ads:${phone}`, JSON.stringify(ads));
-      _WW_STORE_CACHE.phoneAds[phone] = ads;
+      WWStorage.setPhoneProp(phone, 'ads', ads);
     }
   },
   removePhoneAd(phone, uuid) {
@@ -150,16 +155,25 @@ const WWStorage = {
     let ads = WWStorage.getPhoneAds(phone);
     if (ads.includes(uuid)) {
       ads = ads.filter(id => id !== uuid);
-      localStorage.setItem(`ww2:phone-ads:${phone}`, JSON.stringify(ads));
-      _WW_STORE_CACHE.phoneAds[phone] = ads;
+      WWStorage.setPhoneProp(phone, 'ads', ads);
     }
   },
 
   setPhoneHiddenReason(phone, reason) {
-    localStorage.setItem(`ww2:phone-h-reason:${phone}`, reason);
+    WWStorage.setPhoneProp(phone, 'hideReason', reason)
   },
   getPhoneHiddenReason(phone) {
-    return localStorage.getItem(`ww2:phone-h-reason:${phone}`);
+    return WWStorage.getPhoneProp(phone, 'hideReason');
+  },
+
+  getPhoneHeight(phone) {
+    return WWStorage.getPhoneProp(phone, 'height');
+  },
+  getPhoneWeight(phone) {
+    return WWStorage.getPhoneProp(phone, 'weight');
+  },
+  getPhoneAge(phone) {
+    return WWStorage.getPhoneProp(phone, 'age');
   },
 
   getTempSaved() {
@@ -238,6 +252,31 @@ const WWStorage = {
 
 
       localStorage.setItem('ww:storage:version', '2');
+    } else if (version === '2') {
+      const allItems = {...localStorage};
+
+      Object.entries(allItems).forEach(([key, value]) => {
+        let match;
+        try {
+          if ((match = key.match(/^ww2:hidden-phones$/))) {
+            JSON.parse(value).forEach((phone) => WWStorage.setPhoneHidden(phone));
+          }
+          else if ((match = key.match(/^ww2:phone-ads:([^:]+)$/))) {
+            console.log(JSON.parse(value));
+            JSON.parse(value).forEach(v => WWStorage.addPhoneAd(match[1], ...v.split('|')));
+          }
+          else if ((match = key.match(/^ww2:phone-h-reason:([^:]+)$/))) {
+            WWStorage.setPhoneHiddenReason(match[1], value);
+          }
+          if (match) {
+            localStorage.removeItem(match[0]);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      });
+
+      localStorage.setItem('ww:storage:version', '3');
     }
   }
 };

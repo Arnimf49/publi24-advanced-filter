@@ -62,6 +62,8 @@ const SAFE_LAST_DOMAIN_PARTS = [
   'sexyro.com',
   'xlamma.com',
   'escorte-cluj.com',
+  'escorte365.com',
+  'anunt.online'
 ];
 
 const PRIO_DOMAINS = [
@@ -88,6 +90,7 @@ const HIDE_REASON_TEMPLATE = Handlebars.templates.hide_reason_template;
 
 const modalsOpen = [];
 let currentInvestigatePromise = Promise.resolve();
+let investigateTimeout = 500;
 
 Handlebars.registerHelper('isUndefined', function(value) {
   return value === undefined;
@@ -257,6 +260,13 @@ function renderAdElement(item, id, storage, renderOptions) {
     imageInvestigateStale = days > 15;
   }
 
+  const age = WWStorage.getPhoneAge(phone);
+  const height = WWStorage.getPhoneHeight(phone);
+  const weight = WWStorage.getPhoneWeight(phone);
+  const bmi = height && weight
+    ? Math.round(weight / Math.pow(height / 100, 2) * 10) / 10
+    : null;
+
   const panelElement = document.createElement('div');
   panelElement.className = 'ww-container';
   panelElement.setAttribute('data-wwid', 'control-panel');
@@ -282,6 +292,12 @@ function renderAdElement(item, id, storage, renderOptions) {
     imageInvestigatedSinceDays,
     phoneInvestigateStale,
     imageInvestigateStale,
+    age,
+    ageWarn: age ? age > 35 : false,
+    height,
+    weight,
+    bmi,
+    bmiWarn: bmi ? bmi <= 17 || bmi >= 23 : false
   });
 
   const container = (item.querySelector('.article-txt, .ww-inset') || item);
@@ -457,6 +473,59 @@ async function acquirePhoneNumber(item, id) {
   return phone.trim();
 }
 
+function removeDiacritics(text) {
+  const diacriticMap = {
+    'Ă': 'A', 'Â': 'A', 'Î': 'I', 'Ș': 'S', 'Ţ': 'T',
+    'ă': 'a', 'â': 'a', 'î': 'i', 'ș': 's', 'ţ': 't',
+  };
+  return text.replace(/[ĂÂÎȘȘŢȚăâîșșţț]/g, match => diacriticMap[match] || match)
+}
+
+async function investigateAdDescription(item) {
+  const page = await loadInAdPage(item);
+  const description = removeDiacritics(getAdPageTitle(page) + ' ' + getAdPageDescription(page));
+
+  const data = [];
+  let match;
+
+  const attemptApplyHeight = (height) => {
+    if (height >= 135 && height <= 200) {
+      data.push(['height', height]);
+    }
+  }
+  const attemptApplyWeight = (weight) => {
+    if (weight >= 35 && weight <= 145) {
+      data.push(['weight', weight]);
+    }
+  }
+
+  if ((match = description.match(/(1[.,] ?\d{2})/))) {
+    const str = match[1].replace(/,/, '.').replace(' ', '');
+    attemptApplyHeight(Number.parseFloat(str) * 100)
+  }
+  else if ((match = description.match(/[^\d%](1\d{2})[^\d%]/))) {
+    attemptApplyHeight(Number.parseInt(match[1]));
+  } else if ((match = description.match(/inaltimea? (1\d{2})/))) {
+    attemptApplyHeight(Number.parseInt(match[1]));
+  }
+
+  if ((match = description.match(/(\d+) ?(de )?kg/))) {
+    attemptApplyWeight(Number.parseInt(match[1]));
+  }
+  if ((match = description.match(/kg ?(\d+)/))) {
+    attemptApplyWeight(Number.parseInt(match[1]));
+  }
+
+  if ((match = description.match(/(\d+) ?(de )?[Aa]ni(?! de)/))) {
+    const age = Number.parseInt(match[1]);
+    if (age >= 17 && age <= 70) {
+      data.push(['age', age]);
+    }
+  }
+
+  return data;
+}
+
 async function investigateNumberAndSearch(item, id, search = true) {
   let windowRef;
   if (search) {
@@ -464,10 +533,17 @@ async function investigateNumberAndSearch(item, id, search = true) {
     windowRef = window.open();
   }
 
-  const phoneNumber = await acquirePhoneNumber(item, id);
+  const [phoneNumber, descriptionData] = await Promise.all([
+    acquirePhoneNumber(item, id),
+    investigateAdDescription(item)
+  ]);
+
   if (!phoneNumber) {
     return false;
   }
+
+  descriptionData.forEach(([key, value]) =>
+    WWStorage.setPhoneProp(phoneNumber, key, value));
 
   if (WWStorage.isPhoneHidden(phoneNumber)) {
     setItemVisible(item, false);
@@ -885,6 +961,18 @@ function diffDaysToDisplay(diffDays, date) {
   return `${prefix} la ${date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`;
 }
 
+function getAdPageDescription(itemPage) {
+  return itemPage.querySelector('[itemscope] [itemprop="description"]').innerHTML
+    .replace(/<[^>]*>/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/Publi24_\d+/, '')
+    .trim();
+}
+
+function getAdPageTitle(itemPage) {
+  return itemPage.querySelector('[itemscope] h1[itemprop="name"]').innerHTML;
+}
+
 async function loadInAdsData(adUuids, clean) {
   let locationParts = [];
   if (!IS_AD_PAGE) {
@@ -921,15 +1009,11 @@ async function loadInAdsData(adUuids, clean) {
             url,
             phone: WWStorage.getAdPhone(id),
             qrCode: WWStorage.getAdPhone(id) && await getPhoneQrCode(WWStorage.getAdPhone(id)),
-            title: itemPage.querySelector('[itemscope] h1[itemprop="name"]').innerHTML,
-            description: itemPage.querySelector('[itemscope] [itemprop="description"]').innerHTML
-              .replace(/<[^>]*>/gi, ' ')
-              .replace(/\s+/g, ' ')
-              .replace(/Publi24_\d+/, '')
-              .trim().substring(0, 290),
+            title: getAdPageTitle(itemPage),
+            description: getAdPageDescription(itemPage).substring(0, 290),
             image: IS_MOBILE_VIEW
-              ? itemPage.querySelector('[itemprop="associatedMedia"] li').style.background.match(/url\(['"]([^'"]+)['"]\)/)[1]
-              : itemPage.querySelector('[itemprop="image"]').src,
+              ? itemPage.querySelector('[itemprop="associatedMedia"] li')?.style.background.match(/url\(['"]([^'"]+)['"]\)/)[1]
+              : itemPage.querySelector('[itemprop="image"]')?.src,
             location,
             date: diffDaysToDisplay(dateDiffDays, date),
             timestamp: date.getTime(),
@@ -1099,7 +1183,7 @@ function registerAdItem(item, id, renderOptions) {
     currentInvestigatePromise = currentInvestigatePromise
       .then(() => investigateNumberAndSearch(item, id, false))
       // Wait a bit to avoid triggering rate limits.
-      .then(() => new Promise(r => setTimeout(r, 800)));
+      .then(() => new Promise(r => setTimeout(r, Math.min(2500, investigateTimeout *= 1.3))));
   }
 
   const interval = setInterval(() => {

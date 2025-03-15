@@ -14,10 +14,11 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "execa": "^9.5.2",
-    "fingerprint-injector": "^2.1.62",
     "@playwright/test": "^1.51.0",
     "@types/node": "^22.13.9",
-    "typescript": "^5.8.2"
+    "execa": "^9.5.2",
+    "fingerprint-injector": "^2.1.62",
+    "typescript": "^5.8.2",
+    "cheerio": "^1.0.0"
   }
 }

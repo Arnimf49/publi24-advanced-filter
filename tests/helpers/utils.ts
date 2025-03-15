@@ -38,7 +38,7 @@ const utils = {
       }
 
       if (!results) {
-        await (await page.$$('.pagination .arrow')[1]).click();
+        await ((await page.$$('.pagination .arrow'))[1]).click();
       } else {
         break;
       }
