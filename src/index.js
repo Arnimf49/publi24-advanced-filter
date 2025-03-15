@@ -331,7 +331,7 @@ function getScrollParent(node) {
   }
 }
 
-function renderHideReasonSelection(container, id, phoneNumber, onReason, onRevert) {
+function renderHideReasonSelection(container, id, phoneNumber, preSelect, onReason, onRevert) {
   const reasonContainer = document.createElement('div');
   reasonContainer.innerHTML = HIDE_REASON_TEMPLATE({ showRevert: !!onRevert });
   reasonContainer.onclick = (e) => e.stopPropagation();
@@ -346,8 +346,23 @@ function renderHideReasonSelection(container, id, phoneNumber, onReason, onRever
     }
   }
 
+  if (preSelect) {
+    const selection = reasonContainer.querySelector(`[ww-reason="${preSelect}"]`);
+    if (selection) {
+      selection.classList.add('ww-reason-selected');
+      WWStorage.setPhoneHiddenReason(phoneNumber, preSelect);
+    }
+  }
+
   reasonContainer.querySelectorAll('[ww-reason]').forEach((reasonButton) => {
     reasonButton.onclick = () => {
+      const current = reasonContainer.querySelector('.ww-reason-selected');
+
+      if (current) {
+        current.classList.remove('ww-reason-selected');
+      }
+
+      reasonButton.classList.add('ww-reason-selected');
       WWStorage.setPhoneHiddenReason(phoneNumber, reasonButton.innerText);
       onReason(close, reasonButton.innerText);
     };
@@ -361,14 +376,20 @@ function renderHideReasonSelection(container, id, phoneNumber, onReason, onRever
 }
 
 function renderHideReasonSelectionInItem(item, id, phoneNumber) {
-  renderHideReasonSelection(item, id, phoneNumber, (close) => {
-    renderAdItem(item, id);
-    close();
-  }, (close) => {
-    setItemVisible(item, true);
-    WWStorage.setPhoneHidden(phoneNumber, false);
-    WWStorage.setAdVisibility(id, true);
-    close();
+  WWBrowserStorage.get([`ww:image_results:${id}`]).then(results => {
+    const imageLinks = results[`ww:image_results:${id}`] || [];
+    const processedLinks = processImageLinks(id, imageLinks, getItemUrl(item));
+    const preSelect = processedLinks.some(({links}) => links.some(({isSafe}) => !isSafe))
+      ? 'poze false' : null;
+
+    renderHideReasonSelection(item, id, phoneNumber, preSelect, () => {
+      renderAdItem(item, id);
+    }, (close) => {
+      setItemVisible(item, true);
+      WWStorage.setPhoneHidden(phoneNumber, false);
+      WWStorage.setAdVisibility(id, true);
+      close();
+    })
   })
 }
 
@@ -839,7 +860,7 @@ function registerDuplicatesModalHandler(item, id) {
 
       renderHideReasonSelection(
         container.querySelector('[data-wwid="container"]'),
-        id, phone, close
+        id, phone, null, close
       );
     }
   }

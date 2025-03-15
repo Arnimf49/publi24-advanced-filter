@@ -43,7 +43,7 @@ test('Should hide and then show.', async ({ page, context }) => {
   await utils.assertArticleHidden(article, false);
 })
 
-test('Should hide with a reason.', async ({ page, context }) => {
+test('Should hide with a reason and be able to change reason.', async ({ page, context }) => {
   await utils.openPubli(context, page);
 
   const firstArticle = (await page.$$('[data-articleid]'))[0];
@@ -55,12 +55,16 @@ test('Should hide with a reason.', async ({ page, context }) => {
 
   await hideReasons[0].click();
   await page.waitForTimeout(1000);
+  expect(await hideReasons[0].getAttribute('class')).toContain('ww-reason-selected');
+  expect(await (await firstArticle.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: scump');
 
-  const hideReason = await (await firstArticle.$('[data-wwid="hide-reason"]')).innerText();
-  expect(hideReason).toEqual('motiv ascundere: scump');
+  await hideReasons[1].click();
+  await page.waitForTimeout(1000);
+  expect(await hideReasons[1].getAttribute('class')).toContain('ww-reason-selected');
+  expect(await (await firstArticle.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: etnie');
 })
 
-test('Should hide phone number and thus duplicate ads.', async ({ page, context }) => {
+test('Should hide phone number and thus hide duplicate ads.', async ({ page, context }) => {
   await utils.openPubli(context, page);
 
   const getMultipleArticlesWithSamePhone = async () => {
