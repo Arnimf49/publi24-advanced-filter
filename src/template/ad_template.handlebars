@@ -119,10 +119,14 @@
     {{/if}}
 </div>
 
-{{#if dueToPhoneHidden}}
-    <p style="" class="ww-message" data-wwid="message">ai mai ascuns un anunț cu acceeași numar de telefon, <b>ascuns automat</b></p>
-{{/if}}
 {{#unless visible }}
+    {{#if automaticHideReason }}
+        <p class="ww-message" data-wwid="message"><b>ascuns automat</b> prin setări</p>
+    {{else}}
+        {{#if dueToPhoneHidden}}
+            <p class="ww-message" data-wwid="message">ai mai ascuns un anunț cu acceeași numar de telefon, <b>ascuns automat</b></p>
+        {{/if}}
+    {{/if}}
     {{#if hideReason }}
         <p class="ww-message" data-wwid="hide-reason">motiv ascundere: <b>{{hideReason}}</b></p>
     {{/if}}

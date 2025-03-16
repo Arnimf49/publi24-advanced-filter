@@ -214,6 +214,30 @@ const WWStorage = {
     return localStorage.getItem('ww:focus_mode') === 'true';
   },
 
+  setAutoHideEnabled(enabled) {
+    localStorage.setItem('ww:auto-hide', enabled ? 'true' : 'false');
+  },
+  isAutoHideEnabled() {
+    return localStorage.getItem('ww:auto-hide') === 'true';
+  },
+
+  setAutoHideCriteria(criteria, enabled, value) {
+    const current = WWStorage.getAutoHideCriterias();
+    if (enabled !== undefined) {
+      current[criteria] = enabled;
+    }
+    if (value !== undefined) {
+      current[criteria + 'Value'] = value;
+    }
+    localStorage.setItem('ww:auto-hide:criteria', JSON.stringify(current));
+  },
+  isAutoHideCriteriaEnabled(criteria) {
+    return !!WWStorage.getAutoHideCriterias()[criteria];
+  },
+  getAutoHideCriterias() {
+    return JSON.parse(localStorage.getItem('ww:auto-hide:criteria') || '{}');
+  },
+
   hasBeenShownInfo() {
     return localStorage.getItem('ww:info-shown') === 'true';
   },

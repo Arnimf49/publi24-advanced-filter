@@ -87,13 +87,71 @@ const SLIDER_TEMPLATE = Handlebars.templates.slider_template;
 const GLOBAL_BUTTONS_TEMPLATE = Handlebars.templates.global_buttons_template;
 const INFO_TEMPLATE = Handlebars.templates.info_template;
 const HIDE_REASON_TEMPLATE = Handlebars.templates.hide_reason_template;
+const SETTINGS_MODAL_TEMPLATE = Handlebars.templates.settings_modal_template;
+const SETTINGS_TEMPLATE = Handlebars.templates.settings_template;
 
 const modalsOpen = [];
 let currentInvestigatePromise = Promise.resolve();
 let investigateTimeout = 500;
 
+const AUTO_HIDE_CRITERIA = {
+  maxAge: {
+    condition: ({maxAgeValue}, value) => maxAgeValue < value,
+    value: 'age',
+    reason: ({maxAgeValue}) => `peste ${maxAgeValue} de ani`,
+  },
+  minHeight: {
+    condition: ({minHeightValue}, value) => minHeightValue > value,
+    value: 'height',
+    reason: ({minHeightValue}) => `sub ${minHeightValue}cm`,
+  },
+  maxHeight: {
+    condition: ({maxHeightValue}, value) => maxHeightValue < value,
+    value: 'height',
+    reason: ({maxHeightValue}) => `peste ${maxHeightValue}cm`,
+  },
+  maxWeight: {
+    condition: ({maxWeightValue}, value) => maxWeightValue < value,
+    value: 'weight',
+    reason: ({maxWeightValue}) => `peste ${maxWeightValue}kg`,
+  },
+  onlyTrips: {
+    condition: (_, value) => value,
+    value: 'onlyTrips',
+    reason: () => `numai deplasări`,
+  },
+  showWeb: {
+    condition: (_, value) => value,
+    value: 'showWeb',
+    reason: () => `oferă show web`,
+  },
+  botox: {
+    condition: (_, value) => value,
+    value: 'botox',
+    reason: () => `siliconată`,
+  },
+  party: {
+    condition: (_, value) => value,
+    value: 'party',
+    reason: () => `face party`,
+  },
+  total: {
+    condition: (_, value) => value,
+    value: 'total',
+    reason: () => `servicii totale`,
+  },
+  trans: {
+    condition: (_, value) => value,
+    value: 'trans',
+    reason: () => `transsexual`,
+  },
+};
+
 Handlebars.registerHelper('isUndefined', function(value) {
   return value === undefined;
+});
+Handlebars.registerHelper('isEmpty', function(value) {
+  return value.length === 0;
 });
 Handlebars.registerHelper('inc', function(value) {
   return ++value;
@@ -260,6 +318,12 @@ function renderAdElement(item, id, storage, renderOptions) {
     imageInvestigateStale = days > 15;
   }
 
+  let hideReason = WWStorage.getPhoneHiddenReason(phone);
+  let automaticHideReason = !!(hideReason && hideReason.match(/^automat:/));
+  if (automaticHideReason) {
+    hideReason = hideReason.replace('automat:', '');
+  }
+
   const age = WWStorage.getPhoneAge(phone);
   const height = WWStorage.getPhoneHeight(phone);
   const weight = WWStorage.getPhoneWeight(phone);
@@ -279,7 +343,8 @@ function renderAdElement(item, id, storage, renderOptions) {
     numberOfAdsWithSamePhone: WWStorage.getPhoneAds(phone).length,
     isTempSaved: WWStorage.isTempSaved(itemToTempSaveId(item)),
     visible: getItemVisibility(id),
-    hideReason: WWStorage.getPhoneHiddenReason(phone),
+    hideReason,
+    automaticHideReason,
     dueToPhoneHidden: isDueToPhoneHidden(id),
     hasNoPhone: WWStorage.hasAdNoPhone(id),
     phone,
@@ -502,9 +567,9 @@ function removeDiacritics(text) {
   return text.replace(/[ĂÂÎȘȘŢȚăâîșșţț]/g, match => diacriticMap[match] || match)
 }
 
-async function investigateAdDescription(item) {
+async function investigateAdContent(item) {
   const page = await loadInAdPage(item);
-  const description = removeDiacritics(getAdPageTitle(page) + ' ' + getAdPageDescription(page));
+  const content = removeDiacritics(getAdPageTitle(page) + ' ' + getAdPageDescription(page));
 
   const data = [];
   let match;
@@ -520,31 +585,76 @@ async function investigateAdDescription(item) {
     }
   }
 
-  if ((match = description.match(/(1[.,] ?\d{2})/))) {
+  if ((match = content.match(/(1[.,] ?\d{2})/))) {
     const str = match[1].replace(/,/, '.').replace(' ', '');
     attemptApplyHeight(Number.parseFloat(str) * 100)
   }
-  else if ((match = description.match(/[^\d%](1\d{2})[^\d%]/))) {
+  else if ((match = content.match(/[^\d%](1\d{2})[^\d%]/))) {
     attemptApplyHeight(Number.parseInt(match[1]));
-  } else if ((match = description.match(/inaltimea? (1\d{2})/))) {
+  } else if ((match = content.match(/inaltimea? (1\d{2})/i))) {
     attemptApplyHeight(Number.parseInt(match[1]));
   }
 
-  if ((match = description.match(/(\d+) ?(de )?kg/))) {
+  if ((match = content.match(/(\d+) ?(de )?kg/i))) {
     attemptApplyWeight(Number.parseInt(match[1]));
   }
-  if ((match = description.match(/kg ?(\d+)/))) {
+  if ((match = content.match(/kg ?(\d+)/i))) {
     attemptApplyWeight(Number.parseInt(match[1]));
   }
 
-  if ((match = description.match(/(\d+) ?(de )?[Aa]ni(?! de)/))) {
+  if ((match = content.match(/(\d+) ?(de )?ani(?! de)/i))
+    || (match = content.match(/anca (\d+)/i))
+    || (match = content.match(/(\d+) ?(yrs|years)/i))) {
     const age = Number.parseInt(match[1]);
     if (age >= 17 && age <= 70) {
       data.push(['age', age]);
     }
   }
 
+  if (content.match(/([ ,.;!\n]|^)(show web|web show|show la web|show erotic web)([ ,.;!\n]|$)/i)) {
+    data.push(['showWeb', true]);
+  }
+  if (content.match(/([ ,.;!\n]|^)(botox|siliconata|silicoane)([ ,.;!\n]|$)/i)) {
+    data.push(['botox', true]);
+  }
+  if (content.match(/([ ,.;!\n]|^)(party)([ ,.;!\n]|$)/i)) {
+    data.push(['party', true]);
+  }
+  if (content.match(/([ ,.;!\n]|^)(servtotale|servicii totale|tottal)([ ,.;!\n]|$)/i)) {
+    data.push(['total', true]);
+  }
+  if (content.match(/([ ,.;!\n]|^)(deplasari|deplasare|nu am locatie)([ ,.;!\n]|$)/i)
+    && !content.match(/([ ,.;!\n]|^)(la mine|locatie proprie|si deplasari|si locatie|in locatia mea|nu fac deplasari)([ ,.;!\n]|$)/i)) {
+    data.push(['onlyTrips', true]);
+  }
+  if (content.match(/([ ,.;!\n]|^)(trans|transsexuala?)([ ,.;!\n]|$)/i)) {
+    data.push(['trans', true]);
+  }
+
   return data;
+}
+
+function applyAutoHiding(phoneNumber, id, contentData) {
+  const criterias = WWStorage.getAutoHideCriterias();
+  const matched = [];
+
+  for (let [criteria, props] of Object.entries(AUTO_HIDE_CRITERIA)){
+    if (!WWStorage.isAutoHideCriteriaEnabled(criteria)) {
+      continue;
+    }
+
+    const data = contentData.find(([key]) => key === props.value);
+
+    if (data && props.condition(criterias, data[1])) {
+      matched.push(props.reason(criterias));
+    }
+  }
+
+  if (matched.length) {
+    WWStorage.setAdVisibility(id, false);
+    WWStorage.setPhoneHidden(phoneNumber, true);
+    WWStorage.setPhoneHiddenReason(phoneNumber, 'automat: ' + matched.join(' / '));
+  }
 }
 
 async function investigateNumberAndSearch(item, id, search = true) {
@@ -554,20 +664,22 @@ async function investigateNumberAndSearch(item, id, search = true) {
     windowRef = window.open();
   }
 
-  const [phoneNumber, descriptionData] = await Promise.all([
+  const [phoneNumber, contentData] = await Promise.all([
     acquirePhoneNumber(item, id),
-    investigateAdDescription(item)
+    investigateAdContent(item)
   ]);
 
   if (!phoneNumber) {
     return false;
   }
 
-  descriptionData.forEach(([key, value]) =>
+  contentData.forEach(([key, value]) =>
     WWStorage.setPhoneProp(phoneNumber, key, value));
 
   if (WWStorage.isPhoneHidden(phoneNumber)) {
     setItemVisible(item, false);
+  } else if (WWStorage.isAutoHideEnabled()) {
+    applyAutoHiding(phoneNumber, id, contentData);
   }
 
   if (search) {
@@ -1078,7 +1190,11 @@ async function loadTempSaveAdsData() {
 function registerTemporarySavesButton(element) {
   element.querySelector('[data-ww="temp-save"]').onclick = async () => {
     let html = FAVORITES_MODAL_TEMPLATE({
-      content: ADS_TEMPLATE({itemData: await loadTempSaveAdsData(), IS_MOBILE_VIEW}),
+      content: ADS_TEMPLATE({
+        itemData: await loadTempSaveAdsData(),
+        emptyText: 'Nu ai încă anunțuri favorite. Apasă pe butonul cu steluța pe anunț ca să le adaugi aici.',
+        IS_MOBILE_VIEW,
+      }),
       IS_MOBILE_VIEW
     });
     let {container, close} = renderModal(html);
@@ -1093,12 +1209,65 @@ function registerTemporarySavesButton(element) {
   }
 }
 
-function registerFocusModeButton(element) {
-  element.querySelector('[data-ww="focus-mode"]').onclick = () => {
-    const isFocus = WWStorage.isFocusMode();
-    WWStorage.setFocusMode(!isFocus);
-    window.scrollTo({left: 0, top: 0});
-    window.location.reload();
+function registerSettingsButton(element) {
+  element.querySelector('[data-ww="settings-button"]').onclick = () => {
+    const {container} = renderModal(SETTINGS_MODAL_TEMPLATE({
+      IS_MOBILE_VIEW,
+    }));
+
+    const render = () => {
+      container.querySelector('[data-wwid="content"]').innerHTML = SETTINGS_TEMPLATE({
+        focusMode: WWStorage.isFocusMode(),
+        autoHide: WWStorage.isAutoHideEnabled(),
+        ...WWStorage.getAutoHideCriterias(),
+      });
+
+      const toggleSwitch = (event) => event.currentTarget.querySelector('.ww-switch-container').classList.toggle('ww-switch-on');
+
+      container.querySelector('[data-wwid="focus-mode-switch"]').onclick = (event) => {
+        toggleSwitch(event);
+        setTimeout(() => {
+          WWStorage.setFocusMode(!WWStorage.isFocusMode());
+          window.scrollTo({left: 0, top: 0});
+          window.location.reload();
+        }, 400);
+      };
+
+      container.querySelector('[data-wwid="auto-hiding"]').onclick = () => {
+        WWStorage.setAutoHideEnabled(!WWStorage.isAutoHideEnabled());
+        render();
+      };
+
+      container.querySelectorAll('[data-wwid="auto-hide-criteria"]').forEach(switcher => {
+        const criteria = switcher.getAttribute('data-wwcriteria');
+        const input = switcher.querySelector('input');
+
+        switcher.onclick = () => {
+          WWStorage.setAutoHideCriteria(criteria, !WWStorage.isAutoHideCriteriaEnabled(criteria));
+          render();
+        }
+
+        if (input) {
+          const onChange = () => {
+            WWStorage.setAutoHideCriteria(criteria, undefined, input.type === 'number' ? Number.parseFloat(input.value) : input.value);
+          };
+          input.onkeydown = function (event) {
+            if (event.key === "Enter") {
+              this.blur();
+            }
+          };
+          input.onclick = (e) => e.stopPropagation();
+          input.oninput = onChange;
+
+          if (!input.value) {
+            input.value = input.getAttribute('data-wwdefault');
+            onChange();
+          }
+        }
+      })
+    };
+
+    render();
   };
 }
 
@@ -1152,7 +1321,6 @@ function renderGlobalButtons() {
   const element = document.createElement('div');
   element.innerHTML = GLOBAL_BUTTONS_TEMPLATE({
     savesCount: WWStorage.getTempSaved().length,
-    isFocusOn: WWStorage.isFocusMode(),
     IS_MOBILE_VIEW
   });
   element.setAttribute('data-ww', 'global-buttons');
@@ -1164,7 +1332,7 @@ function renderGlobalButtons() {
   }
 
   registerTemporarySavesButton(element);
-  registerFocusModeButton(element);
+  registerSettingsButton(element);
   registerPhoneSearchButton(element);
 }
 
@@ -1274,7 +1442,7 @@ function showInfo() {
     const globalButtonsCutouts = [
       document.querySelector('.ww-phone-search-button'),
       document.querySelector('.ww-saves-button'),
-      document.querySelector('.ww-focus-button'),
+      document.querySelector('.ww-settings-button'),
     ].map(elToCutout);
 
     infoContainer.innerHTML = INFO_TEMPLATE({

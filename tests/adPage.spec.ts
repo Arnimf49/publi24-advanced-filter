@@ -27,7 +27,7 @@ test('Should have panel functionalities on ad page.', async ({context, page}) =>
   await page.locator('[ww-reason]').first().click();
   await utils.assertArticleHidden(article);
   await page.locator('[data-wwid="toggle-hidden"]').click();
-  await utils.assertArticleHidden(article, false);
+  await utils.assertArticleHidden(article, {hidden: false});
 
   // Favorites handling test.
   await page.locator('[data-wwid="temp-save"]').click();

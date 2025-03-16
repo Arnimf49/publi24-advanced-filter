@@ -110,6 +110,9 @@
         }
     }
 </style>
+{{#if (isEmpty itemData) }}
+    <p>{{emptyText}}</p>
+{{/if}}
 {{#each itemData}}
     <div class="article-item" data-articleid="{{this.id}}"
          style="margin-bottom: 30px;

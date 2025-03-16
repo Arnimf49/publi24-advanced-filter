@@ -47,13 +47,17 @@ const utils = {
     return results;
   },
 
-  async assertArticleHidden(element: ElementHandle, hidden = true) {
+  async assertArticleHidden(element: ElementHandle, options: {hidden: boolean, reason?: string} = {hidden: true}) {
     const inner = await element.$('.article-txt-wrap, .ww-inset') || element;
     const opacity = await inner.evaluate(el => getComputedStyle(el as Element).getPropertyValue('opacity'))
     const blendMode = await inner.evaluate(el => getComputedStyle(el as Element).getPropertyValue('mix-blend-mode'))
 
-    expect(opacity).toEqual(hidden ? '0.5' : '1');
-    expect(blendMode).toEqual(hidden ? 'luminosity' : 'normal');
+    expect(opacity).toEqual(options?.hidden ? '0.5' : '1');
+    expect(blendMode).toEqual(options?.hidden ? 'luminosity' : 'normal');
+
+    if (options?.reason) {
+      expect(await (await element.$('[data-wwid="hide-reason"]')).innerText()).toEqual(`motiv ascundere: ${options.reason}`);
+    }
   }
 }
 

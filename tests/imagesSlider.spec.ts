@@ -43,7 +43,7 @@ test('Should toggle visibility from slider.', async ({ page, context }) => {
   await (await firstArticle.$('[class="art-img"]')).click();
   await page.locator('[data-wwid="images-slider"] [data-wwid="toggle-hidden"]').click();
   await expect(page.locator('[data-wwid="images-slider"]')).not.toBeVisible();
-  await utils.assertArticleHidden(firstArticle, false);
+  await utils.assertArticleHidden(firstArticle, {hidden: false});
 })
 
 test('Should search images from slider.', async ({ page, context }) => {

@@ -3,8 +3,6 @@ import {utils} from "./helpers/utils";
 import {ElementHandle} from "playwright-core";
 import {expect} from "playwright/test";
 
-
-
 test('Should hide without a reason.', async ({ page, context }) => {
   await utils.openPubli(context, page);
 
@@ -33,14 +31,14 @@ test('Should hide and then show.', async ({ page, context }) => {
 
   await (await firstArticle.$('[ww-show]')).click();
   await page.waitForTimeout(1000);
-  await utils.assertArticleHidden(firstArticle, false);
+  await utils.assertArticleHidden(firstArticle, {hidden: false});
 
   await (await firstArticle.$('[data-wwid="toggle-hidden"]')).click();
   await page.reload();
   const article = await page.$(`[data-articleid="${articleId}"]`);
   await (await article.$('[data-wwid="toggle-hidden"]')).click();
   await page.waitForTimeout(1000);
-  await utils.assertArticleHidden(article, false);
+  await utils.assertArticleHidden(article, {hidden: false});
 })
 
 test('Should hide with a reason and be able to change reason.', async ({ page, context }) => {
@@ -106,14 +104,16 @@ test('Should toggle focus mode and not see hidden ads.', async ({ page, context 
 
   await page.waitForTimeout(1000);
 
-  await (await page.$('[data-ww="focus-mode"]')).click();
-  await page.waitForTimeout(500);
+  await (await page.$('[data-ww="settings-button"]')).click();
+  await (await page.$('[data-wwid="focus-mode-switch"]')).click();
+  await page.waitForTimeout(800);
 
   await expect(page.locator(`[data-articleid="${firstArticleId}"]`)).toBeHidden();
   await expect(page.locator(`[data-articleid="${secondArticleId}"]`)).toBeHidden();
 
-  await (await page.$('[data-ww="focus-mode"]')).click();
-  await page.waitForTimeout(500);
+  await (await page.$('[data-ww="settings-button"]')).click();
+  await (await page.$('[data-wwid="focus-mode-switch"]')).click();
+  await page.waitForTimeout(800);
 
   await expect(page.locator(`[data-articleid="${firstArticleId}"]`)).toBeVisible();
   await expect(page.locator(`[data-articleid="${secondArticleId}"]`)).toBeVisible();
