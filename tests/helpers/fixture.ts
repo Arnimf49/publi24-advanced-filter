@@ -46,6 +46,8 @@ export const test = base.extend<{
 
     await use(context);
     await context.close();
+    // Loading in too many ads and searching on google can cause too many requests.
+    await new Promise(r => setTimeout(r, 5000));
   },
   extensionId: async ({ context }, use) => {
     let [background] = context.serviceWorkers();

@@ -145,6 +145,11 @@ const AUTO_HIDE_CRITERIA = {
     value: 'trans',
     reason: () => `transsexual`,
   },
+  mature: {
+    condition: (_, value) => value,
+    value: 'mature',
+    reason: () => `matură`,
+  },
 };
 
 Handlebars.registerHelper('isUndefined', function(value) {
@@ -585,8 +590,8 @@ async function investigateAdContent(item) {
     }
   }
 
-  if ((match = content.match(/(1[.,] ?\d{2})/))) {
-    const str = match[1].replace(/,/, '.').replace(' ', '');
+  if ((match = content.match(/(1[.,'" ]\d{2})/))) {
+    const str = match[1].replace(/[,'" ]/, '.').replace(' ', '');
     attemptApplyHeight(Number.parseFloat(str) * 100)
   }
   else if ((match = content.match(/[^\d%](1\d{2})[^\d%]/))) {
@@ -595,7 +600,7 @@ async function investigateAdContent(item) {
     attemptApplyHeight(Number.parseInt(match[1]));
   }
 
-  if ((match = content.match(/(\d+) ?(de )?kg/i))) {
+  if ((match = content.match(/(\d+) ?(de )?(kg|kilo)/i))) {
     attemptApplyWeight(Number.parseInt(match[1]));
   }
   if ((match = content.match(/kg ?(\d+)/i))) {
@@ -604,6 +609,7 @@ async function investigateAdContent(item) {
 
   if ((match = content.match(/(\d+) ?(de )?ani(?! de)/i))
     || (match = content.match(/anca (\d+)/i))
+    || (match = content.match(/matura (\d+)/i))
     || (match = content.match(/(\d+) ?(yrs|years)/i))) {
     const age = Number.parseInt(match[1]);
     if (age >= 17 && age <= 70) {
@@ -611,24 +617,28 @@ async function investigateAdContent(item) {
     }
   }
 
-  if (content.match(/([ ,.;!\n]|^)(show web|web show|show la web|show erotic web)([ ,.;!\n]|$)/i)) {
+  if (content.match(/(\W|^)(show web|web show|show la web|show erotic web|si webb?)(\W|$)/i)) {
     data.push(['showWeb', true]);
   }
-  if (content.match(/([ ,.;!\n]|^)(botox|siliconata|silicoane)([ ,.;!\n]|$)/i)) {
+  if (content.match(/(\W|^)(botox|siliconata|silicoane)(\W|$)/i)) {
     data.push(['botox', true]);
   }
-  if (content.match(/([ ,.;!\n]|^)(party)([ ,.;!\n]|$)/i)) {
+  if (content.match(/(\W|^)(party)(\W|$)/i)) {
     data.push(['party', true]);
   }
-  if (content.match(/([ ,.;!\n]|^)(servtotale|servicii totale|tottal)([ ,.;!\n]|$)/i)) {
+  if (content.match(/(\W|^)(servtotale|servicii totale|tottal|(?<!(devii |fii ))total|full servic(e|ii?))(\W|$)/i)
+    && !content.match(/(\W|^)(nu fac total|nu ofer total)(\W|$)/i)) {
     data.push(['total', true]);
   }
-  if (content.match(/([ ,.;!\n]|^)(deplasari|deplasare|nu am locatie)([ ,.;!\n]|$)/i)
-    && !content.match(/([ ,.;!\n]|^)(la mine|locatie proprie|si deplasari|si locatie|in locatia mea|nu fac deplasari)([ ,.;!\n]|$)/i)) {
+  if (content.match(/(\W|^)((doar|numai) (deplasar|depalsar)(ii?|e)|nu am locatie)(\W|$)/i)
+    && !content.match(/(\W|^)(la mine|locatie proprie|si deplasar[ie]|si locatie|locatia mea|in locatie|nu fac deplasari)(\W|$)/i)) {
     data.push(['onlyTrips', true]);
   }
-  if (content.match(/([ ,.;!\n]|^)(trans|transsexuala?)([ ,.;!\n]|$)/i)) {
+  if (content.match(/(\W|^)(trans|transsexuala?)(\W|$)/i)) {
     data.push(['trans', true]);
+  }
+  if (content.match(/(\W|^)(matura)(\W|$)/i)) {
+    data.push(['mature', true]);
   }
 
   return data;

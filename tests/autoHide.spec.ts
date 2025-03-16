@@ -34,12 +34,12 @@ const setupArticle = async (page: Page, title: string, description: string) => {
 
 const setupHideSetting = async (page: Page, criteria: string, options?: {defaultValue?: string | number, value?: string | number, noOpen?: boolean}) => {
   await (await page.$('[data-ww="settings-button"]')).click();
-  if (!options.noOpen) {
+  if (!options?.noOpen) {
     await (await page.$('[data-wwid="auto-hiding"]')).click();
   }
   await (await page.$(`[data-wwcriteria="${criteria}"]`)).click();
 
-  if (options.value) {
+  if (options?.value) {
     const input = await page.$(`[data-wwcriteria="${criteria}"] input`);
     expect(await input.getAttribute('value'), ''+options.defaultValue);
     await input.fill('');
@@ -49,19 +49,12 @@ const setupHideSetting = async (page: Page, criteria: string, options?: {default
   await page.locator('[data-wwid="close"]').click();
 }
 
-const pageCleanup = async (page: Page) => {
-  await page.close();
-  await new Promise(r => setTimeout(r, 12000));
-}
-
 test('Should automatically hide based on max age.', async ({ page, context }) => {
   await utils.openPubli(context, page);
 
   await setupHideSetting(page, 'maxAge', {defaultValue: 35, value: 26});
   const article = await setupArticle(page, 'Am 27 de ani', 'Buna');
   await utils.assertArticleHidden(article, {hidden: true, reason: 'peste 26 de ani'});
-
-  await pageCleanup(page);
 });
 
 test('Should automatically hide based on min height.', async ({ page, context }) => {
@@ -70,8 +63,6 @@ test('Should automatically hide based on min height.', async ({ page, context })
   await setupHideSetting(page, 'minHeight', {defaultValue: 160, value: 165});
   const article = await setupArticle(page, 'Buna', 'Am 1.64');
   await utils.assertArticleHidden(article, {hidden: true, reason: 'sub 165cm'});
-
-  await pageCleanup(page);
 });
 
 test('Should automatically hide based on max height.', async ({ page, context }) => {
@@ -80,8 +71,6 @@ test('Should automatically hide based on max height.', async ({ page, context })
   await setupHideSetting(page, 'maxHeight', {defaultValue: 175, value: 170});
   const article = await setupArticle(page, 'Buna', 'Inaltime 171cm');
   await utils.assertArticleHidden(article, {hidden: true, reason: 'peste 170cm'});
-
-  await pageCleanup(page);
 });
 
 test('Should automatically hide based on max weight.', async ({ page, context }) => {
@@ -90,8 +79,6 @@ test('Should automatically hide based on max weight.', async ({ page, context })
   await setupHideSetting(page, 'maxWeight', {defaultValue: 65, value: 55});
   const article = await setupArticle(page, 'Buna', '56KG');
   await utils.assertArticleHidden(article, {hidden: true, reason: 'peste 55kg'});
-
-  await pageCleanup(page);
 });
 
 test('Should automatically hide if trans mentioned.', async ({ page, context }) => {
@@ -100,8 +87,6 @@ test('Should automatically hide if trans mentioned.', async ({ page, context }) 
   await setupHideSetting(page, 'trans');
   const article = await setupArticle(page, 'Buna sunt transsexuala', '');
   await utils.assertArticleHidden(article, {hidden: true, reason: 'transsexual'});
-
-  await pageCleanup(page);
 });
 
 test('Should automatically hide if botoxed.', async ({ page, context }) => {
@@ -110,8 +95,6 @@ test('Should automatically hide if botoxed.', async ({ page, context }) => {
   await setupHideSetting(page, 'botox');
   const article = await setupArticle(page, 'Buna', 'Siliconata');
   await utils.assertArticleHidden(article, {hidden: true, reason: 'siliconată'});
-
-  await pageCleanup(page);
 });
 
 test('Should automatically hide if only trips.', async ({ page, context }) => {
@@ -120,8 +103,6 @@ test('Should automatically hide if only trips.', async ({ page, context }) => {
   await setupHideSetting(page, 'onlyTrips');
   const article = await setupArticle(page, 'Buna', 'Numai deplasari');
   await utils.assertArticleHidden(article, {hidden: true, reason: 'numai deplasări'});
-
-  await pageCleanup(page);
 });
 
 test('Should automatically hide if show web.', async ({ page, context }) => {
@@ -130,8 +111,6 @@ test('Should automatically hide if show web.', async ({ page, context }) => {
   await setupHideSetting(page, 'showWeb');
   const article = await setupArticle(page, 'Buna', 'Ofer show web');
   await utils.assertArticleHidden(article, {hidden: true, reason: 'oferă show web'});
-
-  await pageCleanup(page);
 });
 
 test('Should automatically hide if total service.', async ({ page, context }) => {
@@ -140,8 +119,6 @@ test('Should automatically hide if total service.', async ({ page, context }) =>
   await setupHideSetting(page, 'total');
   const article = await setupArticle(page, 'Buna', 'Servicii totale');
   await utils.assertArticleHidden(article, {hidden: true, reason: 'servicii totale'});
-
-  await pageCleanup(page);
 });
 
 test('Should automatically hide if party.', async ({ page, context }) => {
@@ -150,8 +127,14 @@ test('Should automatically hide if party.', async ({ page, context }) => {
   await setupHideSetting(page, 'party');
   const article = await setupArticle(page, 'Buna', 'Fac party si deplasari');
   await utils.assertArticleHidden(article, {hidden: true, reason: 'face party'});
+});
 
-  await pageCleanup(page);
+test('Should automatically hide if mature.', async ({ page, context }) => {
+  await utils.openPubli(context, page);
+
+  await setupHideSetting(page, 'mature');
+  const article = await setupArticle(page, 'Buna matură 40 ani', '');
+  await utils.assertArticleHidden(article, {hidden: true, reason: 'matură'});
 });
 
 test('Should automatically hide for multiple.', async ({ page, context }) => {
@@ -159,9 +142,7 @@ test('Should automatically hide for multiple.', async ({ page, context }) => {
 
   await setupHideSetting(page, 'onlyTrips');
   await setupHideSetting(page, 'party', {noOpen: true});
-  const article = await setupArticle(page, 'Deplasari', 'Fac party si deplasari');
+  const article = await setupArticle(page, 'Numai depalsari', 'Fac party');
   await utils.assertArticleHidden(article, {hidden: true, reason: 'numai deplasări / face party'});
-
-  await pageCleanup(page);
 });
 
