@@ -590,13 +590,14 @@ async function investigateAdContent(item) {
     }
   }
 
-  if ((match = content.match(/(1[.,'" ]\d{2})/))) {
+  if ((match = content.match(/(1[.,'" ] ?[3-9]\d)/))) {
     const str = match[1].replace(/[,'" ]/, '.').replace(' ', '');
     attemptApplyHeight(Number.parseFloat(str) * 100)
   }
-  else if ((match = content.match(/[^\d%](1\d{2})[^\d%]/))) {
+  if (!data.find(d => d[0] === 'height') && (match = content.match(/[^\d%](1[3-9]\d) ?[^\d%]/))) {
     attemptApplyHeight(Number.parseInt(match[1]));
-  } else if ((match = content.match(/inaltimea? (1\d{2})/i))) {
+  }
+  if (!data.find(d => d[0] === 'height') && (match = content.match(/inaltimea? (1[3-9]\d)/i))) {
     attemptApplyHeight(Number.parseInt(match[1]));
   }
 
@@ -626,11 +627,11 @@ async function investigateAdContent(item) {
   if (content.match(/(\W|^)(party)(\W|$)/i)) {
     data.push(['party', true]);
   }
-  if (content.match(/(\W|^)(servtotale|servicii totale|tottal|(?<!(devii |fii ))total|full servic(e|ii?))(\W|$)/i)
+  if (content.match(/(\W|^)(servtotale|servicii totale|tottal|(?<!(devii |fii ))total)(\W|$)|(\W|^)full (?!\s*(detail|of))/i)
     && !content.match(/(\W|^)(nu fac total|nu ofer total)(\W|$)/i)) {
     data.push(['total', true]);
   }
-  if (content.match(/(\W|^)((doar|numai) (deplasar|depalsar)(ii?|e)|nu am locatie)(\W|$)/i)
+  if (content.match(/(\W|^)((doar|numai) (deplasar|depalsar|deplsar)(i{1,3}|e)|nu am locatie)(\W|$)/i)
     && !content.match(/(\W|^)(la mine|locatie proprie|si deplasar[ie]|si locatie|locatia mea|in locatie|nu fac deplasari)(\W|$)/i)) {
     data.push(['onlyTrips', true]);
   }
@@ -1289,7 +1290,7 @@ function registerPhoneSearchButton(element) {
     const {container, close, registerAds} = renderModal(html);
 
     const input = container.querySelector("input");
-    input.onkeyup = () => {
+    input.oninput = () => {
       container.querySelector("[data-wwid='count']").innerHTML = "...";
 
       if (timeout) {clearTimeout(timeout)}
@@ -1306,7 +1307,7 @@ function registerPhoneSearchButton(element) {
           IS_MOBILE_VIEW,
           itemData,
         });
-        container.querySelector("[data-wwid='count']").innerHTML = duplicateUuids.length;
+        container.querySelector("[data-wwid='count']").innerHTML = itemData.length;
         registerAds();
       }, 1500);
     };

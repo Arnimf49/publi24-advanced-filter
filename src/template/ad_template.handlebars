@@ -48,7 +48,8 @@
     }
 
     .ww-chip {
-        font-size: 13px;
+        display: inline-block;
+        font-size: 11px;
         font-weight: 500;
         background: #e8efe6;
         padding: 3px;
@@ -57,9 +58,18 @@
         vertical-align: middle;
         margin-left: 2px;
     }
+    .ww-chip b {
+        font-size: 13px;
+    }
     .ww-chip-warn {
         color: rgb(55 55 55);
         background-color: #e5e38e;
+    }
+
+    .ww-duplicates-container {
+        color: #9d9103;
+        font-size: .8125rem;
+        margin-top: 4px;
     }
 </style>
 
@@ -163,7 +173,8 @@
                         </g>
                     </svg>
                 </a>
-
+            </h4>
+            <div>
                 {{#if age }}
                     <span class="ww-chip {{#if ageWarn}}ww-chip-warn{{/if}}" data-wwid="age"><b>{{age}}</b>ani</span>
                 {{/if}}
@@ -176,10 +187,10 @@
                 {{#if bmi }}
                     <span class="ww-chip {{#if bmiWarn}}ww-chip-warn{{/if}}" data-wwid="bmi"><b>{{bmi}}</b>bmi</span>
                 {{/if}}
-            </h4>
+            </div>
             {{# if showDuplicates }}
             {{# if hasDuplicateAdsWithSamePhone }}
-                <p data-wwid="duplicates-container" style="color: #9d9103; font-size: .8125rem;"><strong>{{numberOfAdsWithSamePhone}}</strong> anunțuri cu acest telefon <a data-wwid="duplicates">(vizualizează)</a></p>
+                <p data-wwid="duplicates-container" class="ww-duplicates-container"><strong>{{numberOfAdsWithSamePhone}}</strong> anunțuri cu acest telefon <a data-wwid="duplicates">(vizualizează)</a></p>
             {{/if}}
             {{/if}}
 
