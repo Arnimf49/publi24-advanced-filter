@@ -91,6 +91,7 @@ const HIDE_REASON_TEMPLATE = Handlebars.templates.hide_reason_template;
 const SETTINGS_MODAL_TEMPLATE = Handlebars.templates.settings_modal_template;
 const SETTINGS_TEMPLATE = Handlebars.templates.settings_template;
 const FULL_SCREEN_LOADER_TEMPLATE = Handlebars.templates.full_screen_loader_template;
+const MESSAGE_MODAL_TEMPLATE = Handlebars.templates.message_modal_template;
 
 const modalsOpen = [];
 let currentInvestigatePromise = Promise.resolve();
@@ -267,7 +268,11 @@ function renderModal(html, renderOptions) {
 
   document.body.style.overflow = 'hidden';
 
-  const close = () => {
+  const close = (event) => {
+    if (event) {
+      event.stopPropagation();
+    }
+
     itemRenderCleaners.forEach(c => c());
     modalsOpen.pop();
     container.remove();
@@ -1571,72 +1576,98 @@ async function optimizeFavorites() {
 }
 
 function showInfo() {
-  const firstButtons = document.querySelector('.ww-buttons');
-  window.scrollTo({top: 0, behavior: "instant"});
-  firstButtons.scrollIntoView({behavior: 'instant', block: 'start'});
-  window.scrollBy({ top: IS_MOBILE_VIEW ? -280 : -350, behavior: "instant" });
-  document.body.style.overflow = 'hidden';
+  const interval = setInterval(() => {
+    const firstPhone = document.querySelector('[data-wwid="phone-number"]');
 
-  setTimeout(() => {
-    let shownStep = 0;
-    const infoContainer = document.createElement('div');
-    document.body.appendChild(infoContainer);
+    if (!firstPhone) {
+      return;
+    }
 
-    const elToCutout = (el) => {
-      const rect = el.getBoundingClientRect();
-      return {
-        x: rect.x - 2,
-        y: rect.y - 2,
-        yy: rect.y + rect.height + 2,
-        xm: rect.x + rect.width / 2,
-        xrc: rect.x + rect.width - 15,
-        xlc: rect.x + 15,
-        width: rect.width + 4,
-        height: rect.height + 4,
-      }
-    };
+    const firstAd = firstPhone.closest('[data-articleid]');
+    clearInterval(interval);
 
-    const adButtonsCutouts = [
-      document.querySelector('.article-item:not([style="display: none;"]) .ww-buttons button:nth-child(1)'),
-      document.querySelector('.article-item:not([style="display: none;"]) .ww-buttons button:nth-child(2)'),
-      document.querySelector('.article-item:not([style="display: none;"]) .ww-buttons button:nth-child(3)'),
-      document.querySelector('.article-item:not([style="display: none;"]) .ww-buttons button:nth-child(4)'),
-      document.querySelector('.article-item:not([style="display: none;"]) .art-img'),
-    ].map(elToCutout);
-    const globalButtonsCutouts = [
-      document.querySelector('.ww-phone-search-button'),
-      document.querySelector('.ww-saves-button'),
-      document.querySelector('.ww-settings-button'),
-    ].map(elToCutout);
+    window.scrollTo({top: 0, behavior: "instant"});
+    firstAd.querySelector('.ww-buttons').scrollIntoView({behavior: 'instant', block: 'start'});
+    window.scrollBy({ top: IS_MOBILE_VIEW ? -280 : -350, behavior: "instant" });
 
-    infoContainer.innerHTML = INFO_TEMPLATE({
-      cutouts: adButtonsCutouts,
-      adButtonsInfo: true,
-      IS_MOBILE_VIEW
-    });
+    setTimeout(() => {
+      let shownStep = 0;
+      const infoContainer = document.createElement('div');
+      document.body.appendChild(infoContainer);
+      document.body.style.overflow = 'hidden';
 
-    infoContainer.addEventListener('click', () => {
-      try {
-        if (shownStep === 1) {
-          infoContainer.parentNode.removeChild(infoContainer);
-          document.body.style.overflow = 'initial';
-          return;
-        }
-
-        infoContainer.innerHTML = INFO_TEMPLATE({
-          cutouts: globalButtonsCutouts,
-          globalButtonsInfo: true,
-          IS_MOBILE_VIEW
-        });
-
-        ++shownStep;
-      } catch (error) {
+      const errorCleanup = (error) => {
         infoContainer.parentNode.removeChild(infoContainer);
         document.body.style.overflow = 'initial';
         console.error(error);
       }
-    });
-  }, 600);
+
+      try {
+        const elToCutout = (el) => {
+          const rect = el.getBoundingClientRect();
+          return {
+            x: rect.x - 2,
+            y: rect.y - 2,
+            yy: rect.y + rect.height + 2,
+            xm: rect.x + rect.width / 2,
+            xrc: rect.x + rect.width - 15,
+            xlc: rect.x + 15,
+            width: rect.width + 4,
+            height: rect.height + 4,
+          }
+        };
+
+        const adButtonsCutouts = [
+          firstAd.querySelector('.ww-buttons button:nth-child(1)'),
+          firstAd.querySelector('.ww-buttons button:nth-child(2)'),
+          firstAd.querySelector('.ww-buttons button:nth-child(3)'),
+          firstAd.querySelector('.ww-buttons button:nth-child(4)'),
+          firstAd.querySelector('.art-img'),
+        ].map(elToCutout);
+        const globalButtonsCutouts = [
+          document.querySelector('.ww-phone-search-button'),
+          document.querySelector('.ww-saves-button'),
+          document.querySelector('.ww-settings-button'),
+        ].map(elToCutout);
+
+        infoContainer.innerHTML = INFO_TEMPLATE({
+          cutouts: adButtonsCutouts,
+          adButtonsInfo: true,
+          IS_MOBILE_VIEW
+        });
+
+        infoContainer.addEventListener('click', () => {
+          try {
+            if (shownStep === 1) {
+              infoContainer.parentNode.removeChild(infoContainer);
+              document.body.style.overflow = 'initial';
+              return;
+            }
+
+            infoContainer.innerHTML = INFO_TEMPLATE({
+              cutouts: globalButtonsCutouts,
+              globalButtonsInfo: true,
+              IS_MOBILE_VIEW
+            });
+
+            ++shownStep;
+          } catch (error) {
+            errorCleanup(error);
+          }
+        });
+      } catch (error) {
+        errorCleanup(error);
+      }
+    }, 600);
+  }, 100);
+}
+
+// @TODO: Remove in a month.
+if (!WWStorage.hasShownMessage('account-delete')) {
+  if (WWStorage.getVersion()) {
+    renderModal(MESSAGE_MODAL_TEMPLATE({IS_MOBILE_VIEW}));
+  }
+  WWStorage.setShownMessage('account-delete');
 }
 
 WWStorage.upgrade()
@@ -1674,8 +1705,6 @@ WWStorage.upgrade()
       if (!WWStorage.hasBeenShownInfo()) {
         setTimeout(showInfo, 100);
         WWStorage.setHasBeenShownInfo();
-      }
-      if (Date.now() - WWStorage.getLastTimeOptimizedFavorites() > 7.2e+6) { // 2 hours
       }
     }
   })

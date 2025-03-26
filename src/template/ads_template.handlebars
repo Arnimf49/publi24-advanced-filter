@@ -8,6 +8,29 @@
         border-radius: 8px;
         transition: all .1s ease-in;
     }
+    .ww-article-index {
+        background: white;
+        width: 31px;
+        height: 31px;
+        border-radius: 9999px;
+        position: absolute;
+        top: -4px;
+        z-index: 2;
+        left: -4px;
+        font-size: 13px;
+        box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+    }
+    .ww-article-index > span {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2;
+        color: #666;
+    }
+    .ww-article-index > span span {
+        font-size: 10px;
+    }
     .article-txt {
         width: 100%;
         border: 16px solid #fff;
@@ -118,6 +141,7 @@
          style="margin-bottom: 30px;position: relative;"
          onclick="window.open('{{this.url}}', '_blank')"
     >
+        <div class="ww-article-index"><span><span>#</span>{{inc @index}}</span></div>
         <div class="article-txt-wrap">
             <div class="article-txt">
                 <div class="article-content-wrap" style="overflow: visible">

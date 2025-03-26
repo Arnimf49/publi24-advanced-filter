@@ -276,9 +276,19 @@ const WWStorage = {
     return localStorage.setItem('ww:info-shown', 'true');
   },
 
+  setShownMessage(name) {
+    localStorage.setItem('ww:shown-message', name);
+  },
+  hasShownMessage(name) {
+    return localStorage.getItem('ww:shown-message') === name;
+  },
+
+  getVersion() {
+    return localStorage.getItem('ww:storage:version');
+  },
 
   async upgrade() {
-    const version = localStorage.getItem('ww:storage:version');
+    const version = WWStorage.getVersion();
     const parsedVersion = version ? +version : 1;
     const currentVersion = 4;
 
