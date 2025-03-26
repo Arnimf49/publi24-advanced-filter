@@ -80,6 +80,7 @@ const IS_AD_PAGE = !!document.querySelector('[itemtype="https://schema.org/Offer
 const STORAGE_KEYS = (id) => [[`ww:search_results:${id}`, `ww:image_results:${id}`], WWStorage.getAdStoreKeys(id)];
 
 const AD_TEMPLATE = Handlebars.templates.ad_template;
+const PHONE_AND_TAGS_TEMPLATE = Handlebars.templates.phone_and_tags;
 const ADS_TEMPLATE = Handlebars.templates.ads_template;
 const FAVORITES_MODAL_TEMPLATE = Handlebars.templates.favorites_modal_template;
 const DUPLICATES_MODAL_TEMPLATE = Handlebars.templates.ads_modal_template;
@@ -89,6 +90,7 @@ const INFO_TEMPLATE = Handlebars.templates.info_template;
 const HIDE_REASON_TEMPLATE = Handlebars.templates.hide_reason_template;
 const SETTINGS_MODAL_TEMPLATE = Handlebars.templates.settings_modal_template;
 const SETTINGS_TEMPLATE = Handlebars.templates.settings_template;
+const FULL_SCREEN_LOADER_TEMPLATE = Handlebars.templates.full_screen_loader_template;
 
 const modalsOpen = [];
 let currentInvestigatePromise = Promise.resolve();
@@ -161,8 +163,8 @@ Handlebars.registerHelper('isEmpty', function(value) {
 Handlebars.registerHelper('inc', function(value) {
   return ++value;
 });
-Handlebars.registerHelper("getIndex", function (array, index) {
-  return array[index];
+Handlebars.registerHelper("len", function (array) {
+  return array.length;
 });
 
 const filterLinks = (links, itemUrl) => {
@@ -267,10 +269,13 @@ function renderModal(html, renderOptions) {
 
   const close = () => {
     itemRenderCleaners.forEach(c => c());
-    document.body.removeChild(container);
     modalsOpen.pop();
+    container.remove();
     window.removeEventListener('keydown',  closeOnKey);
-    document.body.style.overflow = "initial";
+
+    if (!modalsOpen.length) {
+      document.body.style.overflow = "initial";
+    }
   };
   const closeOnKey = (e) => {
     if (e.key === 'Escape' && modalsOpen[modalsOpen.length-1] === container) close();
@@ -292,6 +297,51 @@ function renderModal(html, renderOptions) {
   return {container, registerAds, close};
 }
 
+function renderGlobalLoader(longLoadingMessage) {
+  const container = document.createElement('div');
+  container.innerHTML = FULL_SCREEN_LOADER_TEMPLATE({});
+  document.body.appendChild(container);
+  document.body.style.overflow = 'hidden';
+
+  const timeout = setTimeout(() => {
+    container.querySelector('[data-wwid="ww-loader-message"]').innerHTML = longLoadingMessage;
+  }, 5000);
+
+  const close = () => {
+    clearTimeout(timeout);
+    document.body.removeChild(container);
+    window.removeEventListener('keydown',  closeOnKey);
+    document.body.style.overflow = "initial";
+  };
+  const closeOnKey = (e) => {
+    if (e.key === 'Escape') close();
+  };
+
+  window.addEventListener('keydown',  closeOnKey);
+
+  return {close};
+}
+
+function renderPhoneAndTags(phone, noPadding = false) {
+  const age = WWStorage.getPhoneAge(phone);
+  const height = WWStorage.getPhoneHeight(phone);
+  const weight = WWStorage.getPhoneWeight(phone);
+  const bmi = height && weight
+    ? Math.round(weight / Math.pow(height / 100, 2) * 10) / 10
+    : null;
+
+  return PHONE_AND_TAGS_TEMPLATE({
+    IS_MOBILE_VIEW,
+    noPadding,
+    phone,
+    age,
+    ageWarn: age ? age > 35 : false,
+    height,
+    weight,
+    bmi,
+    bmiWarn: bmi ? bmi <= 17 || bmi >= 23 : false,
+  });
+}
 
 function renderAdElement(item, id, storage, renderOptions) {
   const itemUrl = getItemUrl(item);
@@ -329,13 +379,6 @@ function renderAdElement(item, id, storage, renderOptions) {
     hideReason = hideReason.replace('automat:', '');
   }
 
-  const age = WWStorage.getPhoneAge(phone);
-  const height = WWStorage.getPhoneHeight(phone);
-  const weight = WWStorage.getPhoneWeight(phone);
-  const bmi = height && weight
-    ? Math.round(weight / Math.pow(height / 100, 2) * 10) / 10
-    : null;
-
   const panelElement = document.createElement('div');
   panelElement.className = 'ww-container';
   panelElement.setAttribute('data-wwid', 'control-panel');
@@ -346,7 +389,7 @@ function renderAdElement(item, id, storage, renderOptions) {
     hasDuplicateAdsWithSamePhone: WWStorage.getPhoneAds(phone).length > 1,
     showDuplicates: renderOptions?.showDuplicates ?? true,
     numberOfAdsWithSamePhone: WWStorage.getPhoneAds(phone).length,
-    isTempSaved: WWStorage.isTempSaved(itemToTempSaveId(item)),
+    isFav: WWStorage.isFavorite(phone),
     visible: getItemVisibility(id),
     hideReason,
     automaticHideReason,
@@ -362,12 +405,7 @@ function renderAdElement(item, id, storage, renderOptions) {
     imageInvestigatedSinceDays,
     phoneInvestigateStale,
     imageInvestigateStale,
-    age,
-    ageWarn: age ? age > 35 : false,
-    height,
-    weight,
-    bmi,
-    bmiWarn: bmi ? bmi <= 17 || bmi >= 23 : false
+    phoneAndTags: renderPhoneAndTags(phone),
   });
 
   const container = (item.querySelector('.article-txt, .ww-inset') || item);
@@ -738,18 +776,51 @@ function getItemUrl(itemOrUrl) {
   return itemOrUrl.querySelector('.article-title a').href;
 }
 
+let pageLoadPromises = {};
+let allPageLoadPromises = [];
+let pageLoadRequests = 0;
+
 async function loadInAdPage(itemOrId, _url) {
   const url = _url || getItemUrl(itemOrId);
 
-  if (AD_LOAD_CACHE[url]) {
-    return AD_LOAD_CACHE[url];
+  const returnFromCache = (url) => {
+    if (AD_LOAD_CACHE[url] instanceof Error) {
+      throw AD_LOAD_CACHE[url];
+    } else {
+      return AD_LOAD_CACHE[url];
+    }
   }
 
-  const pageResponse = await fetch(url);
+  if (AD_LOAD_CACHE[url]) {
+    return returnFromCache(url);
+  }
+  if (pageLoadPromises[url]) {
+    await pageLoadPromises[url];
+    await new Promise((r) => setTimeout(r,  200));
+    return returnFromCache(url);
+  }
+
+  ++pageLoadRequests;
+
+  if (pageLoadRequests > 20) {
+    allPageLoadPromises = allPageLoadPromises.filter(promise => !promise.is_resolved);
+    await Promise.all(allPageLoadPromises).then(() => {
+      return new Promise((r) => setTimeout(r,  11000));
+    })
+  }
+
+  const promise = fetch(url);
+  pageLoadPromises[url] = promise;
+  allPageLoadPromises.push(promise.then(() => {
+    promise.is_resolved = true;
+  }));
+  const pageResponse = await promise;
+  setTimeout(() => --pageLoadRequests, 10000);
 
   if (!pageResponse.ok) {
     const error = new Error(`Failed to load ${url}`);
     error.code = pageResponse.status;
+    AD_LOAD_CACHE[url] = error;
     throw error;
   }
 
@@ -918,20 +989,15 @@ function registerInvestigateImgHandler(item, id) {
   investigateImgBtn.onclick = createInvestigateImgClickHandler(id, item);
 }
 
-function itemToTempSaveId(item) {
-  return item.getAttribute('data-articleid').toUpperCase() + '|' + getItemUrl(item);
-}
-
 function adUuidParts(id) {
   return id.split('|');
 }
 
-function registerTemporarySaveHandler(item, id) {
+function registerFavoriteHandler(item, id) {
   const tempSaveBtn = item.querySelector('[data-wwid="temp-save"]');
-  const tempSaveId = itemToTempSaveId(item);
 
   tempSaveBtn.onclick = () => {
-    WWStorage.toggleTempSave(tempSaveId);
+    WWStorage.toggleFavorite(WWStorage.getAdPhone(id));
     renderAdItem(item, id);
 
     const modalParent = item.closest('[data-ww="favorites-modal"]');
@@ -943,22 +1009,22 @@ function registerTemporarySaveHandler(item, id) {
 
 function registerDuplicatesModalHandler(item, id) {
   const duplicatesBtn = item.querySelector('[data-wwid="duplicates"]');
-  let removed = 0;
 
   if (!duplicatesBtn) {
     return;
   }
 
   duplicatesBtn.onclick = async () => {
+    const {close: closeLoader} = renderGlobalLoader('La 20+ de anunțuri durează mai mult sa încarce, din cauză la limitari de Publi24.');
+
     const phone = WWStorage.getAdPhone(id);
-    const itemData = await loadInAdsData(
-      WWStorage.getPhoneAds(phone),
-      (uuid) => {
-        WWStorage.removePhoneAd(phone, uuid);
-        ++removed;
-      }
-    );
     const duplicateUuids = WWStorage.getPhoneAds(phone);
+    const itemData = await loadInAdsData(
+      duplicateUuids,
+      (uuid) => WWStorage.removePhoneAd(phone, uuid)
+    );
+
+    closeLoader();
 
     const html = DUPLICATES_MODAL_TEMPLATE({
       IS_MOBILE_VIEW,
@@ -966,8 +1032,8 @@ function registerDuplicatesModalHandler(item, id) {
         IS_MOBILE_VIEW,
         itemData,
       }),
-      count: duplicateUuids.length,
-      removed,
+      count: itemData.length,
+      removed: duplicateUuids.length - itemData.length,
       phone,
     });
     const {container, close} = renderModal(html, {showDuplicates: false});
@@ -1048,10 +1114,13 @@ function registerOpenImagesSliderHandler(item, id) {
 
 function registerHandlers(item, id) {
   registerVisibilityHandler(item, id);
-  registerInvestigateHandler(item, id);
-  registerInvestigateImgHandler(item, id);
-  registerTemporarySaveHandler(item, id);
-  registerDuplicatesModalHandler(item, id);
+
+  if (WWStorage.getAdPhone(id)) {
+    registerInvestigateHandler(item, id);
+    registerInvestigateImgHandler(item, id);
+    registerFavoriteHandler(item, id);
+    registerDuplicatesModalHandler(item, id);
+  }
 
   if (item.className.indexOf('article-item') !== -1) {
     registerOpenImagesSliderHandler(item, id);
@@ -1137,7 +1206,9 @@ async function loadInAdsData(adUuids, clean) {
 
       return loadInAdPage(url)
         .catch((e) => {
-          clean(id + '|' + url);
+          if (e.code !== 429 && clean) {
+            clean(id + '|' + url);
+          }
           throw e;
         })
         .then(async (itemPage) => {
@@ -1176,36 +1247,77 @@ async function loadInAdsData(adUuids, clean) {
     .sort((a, b) => b.timestamp - a.timestamp);
 }
 
-async function loadTempSaveAdsData() {
-  const adUuids = WWStorage.getTempSaved().reverse();
-  let itemData = await loadInAdsData(adUuids, (uuid) => WWStorage.toggleTempSave(uuid));
-
-  for (let i = 0; i < itemData.length; i++) {
-    if (!itemData[i].phone) {
-      continue;
-    }
-    let duplicateIndex = itemData.findIndex((f, j) => j > i && (f.phone || '').trim() === itemData[i].phone.trim());
-    if (duplicateIndex !== -1) {
-      const duplicate = itemData[duplicateIndex];
-      duplicate.duplicate = true;
-      for (let j = duplicateIndex; j > i + 1; j--) {
-        itemData[j] = itemData[j - 1];
-      }
-      itemData[i + 1] = duplicate;
-    }
+async function loadInFirstAvailableAd(uuids, phone) {
+  if (!uuids.length) {
+    return null;
   }
 
-  return itemData;
+  let itemData = await loadInAdsData(
+    [uuids.shift()],
+    (uuid) => WWStorage.removePhoneAd(phone, uuid),
+  );
+
+  if (!itemData.length) {
+    return loadInFirstAvailableAd(uuids);
+  }
+  return itemData[0];
 }
 
-function registerTemporarySavesButton(element) {
+async function loadFavoritesData() {
+  const phones = WWStorage.getFavorites();
+  const data = {
+    inLocation: [],
+    notInLocation: [],
+    noAds: [],
+  };
+
+  let promises = [];
+
+  for (let phone of phones) {
+    promises.push(loadInFirstAvailableAd(WWStorage.getPhoneAds(phone), phone).then((item) => {
+      if (item) {
+        if (item.isLocationDifferent) {
+          data.notInLocation.push(item);
+        } else {
+          data.inLocation.push(item);
+        }
+      } else {
+        data.noAds.push(phone);
+      }
+    }));
+  }
+
+  await Promise.all(promises);
+
+  const sorter = (a, b) => b.timestamp - a.timestamp;
+  data.inLocation = data.inLocation.sort(sorter);
+  data.notInLocation = data.notInLocation.sort(sorter);
+
+  return data;
+}
+
+function registerFavoritesButton(element) {
   element.querySelector('[data-ww="temp-save"]').onclick = async () => {
+    const {close: closeLoader} = renderGlobalLoader('La 20+ de favorite durează mai mult să încarce favoritele, din cauza limitarilor de la Publi24.');
+    const data = await loadFavoritesData();
+    closeLoader();
+
     let html = FAVORITES_MODAL_TEMPLATE({
-      content: ADS_TEMPLATE({
-        itemData: await loadTempSaveAdsData(),
-        emptyText: 'Nu ai încă anunțuri favorite. Apasă pe butonul cu steluța pe anunț ca să le adaugi aici.',
+      isEmpty: !data.notInLocation.length && !data.inLocation.length && !data.noAds.length,
+      inLocationCount: data.inLocation.length,
+      inLocation: data.inLocation.length && ADS_TEMPLATE({
+        itemData: data.inLocation,
         IS_MOBILE_VIEW,
       }),
+      notInLocationCount: data.notInLocation.length,
+      notInLocation: data.notInLocation.length && ADS_TEMPLATE({
+        itemData: data.notInLocation,
+        IS_MOBILE_VIEW,
+      }),
+      noAds: data.noAds.length && data.noAds.map(phone => ({
+        phone,
+        content: renderPhoneAndTags(phone, true),
+      })),
       IS_MOBILE_VIEW
     });
     let {container, close} = renderModal(html);
@@ -1214,9 +1326,17 @@ function registerTemporarySavesButton(element) {
 
     const clearFavoritesButton = container.querySelector('[data-wwid="clear-favorites"]');
     clearFavoritesButton.onclick = () => {
-      WWStorage.clearTempSave();
+      WWStorage.clearFavorites();
       close();
     };
+
+    [...container.querySelectorAll('[data-wwrmfav]')].forEach(button => {
+      button.onclick = () => {
+        const phone = button.getAttribute('data-wwrmfav');
+        WWStorage.toggleFavorite(phone);
+        button.closest('.article-item').remove();
+      };
+    });
   }
 }
 
@@ -1331,7 +1451,7 @@ function renderGlobalButtons() {
 
   const element = document.createElement('div');
   element.innerHTML = GLOBAL_BUTTONS_TEMPLATE({
-    savesCount: WWStorage.getTempSaved().length,
+    savesCount: WWStorage.getFavorites().length,
     IS_MOBILE_VIEW
   });
   element.setAttribute('data-ww', 'global-buttons');
@@ -1342,7 +1462,7 @@ function renderGlobalButtons() {
     document.body.appendChild(element);
   }
 
-  registerTemporarySavesButton(element);
+  registerFavoritesButton(element);
   registerSettingsButton(element);
   registerPhoneSearchButton(element);
 }
@@ -1355,10 +1475,10 @@ function registerGlobalButtons() {
     siteGlobalButtons.parentNode.removeChild(siteGlobalButtons);
   }
 
-  let lastCount = WWStorage.getTempSaved().length;
+  let lastCount = WWStorage.getFavorites().length;
   setInterval(() => {
-    if (lastCount !== WWStorage.getTempSaved().length) {
-      lastCount = WWStorage.getTempSaved().length;
+    if (lastCount !== WWStorage.getFavorites().length) {
+      lastCount = WWStorage.getFavorites().length;
       renderGlobalButtons()
     }
   }, 500);
@@ -1379,7 +1499,7 @@ function registerAdItem(item, id, renderOptions) {
   renderAdItem(item, id, renderOptions);
   const renderCache = {};
 
-  if (!WWStorage.getAdPhone(id)) {
+  if (!WWStorage.getAdPhone(id) || WWStorage.hasAdNoPhone(id)) {
     currentInvestigatePromise = currentInvestigatePromise
       .then(() => investigateNumberAndSearch(item, id, false))
       // Wait a bit to avoid triggering rate limits.
@@ -1415,6 +1535,39 @@ function registerAdsInContext(context, {applyFocusMode = false, renderOptions} =
   }
 
   return [...items].map((item) => registerAdItem(item, item.getAttribute('data-articleid'), renderOptions));
+}
+
+async function optimizeFavorites() {
+  const favs = WWStorage.getFavorites();
+  for (let phone of favs) {
+    const phoneAds = WWStorage.getPhoneAds(phone);
+
+    if (
+      phoneAds.length < 2 ||
+      Date.now() - WWStorage.getLastTimeAdsOptimized(phone) < 2.16e+7 // 6 hours
+    ) {
+      continue;
+    }
+
+    let newestTime = Math.max();
+    let newestUuid;
+
+    for (let uuid of phoneAds) {
+      const data = await loadInAdsData([uuid]);
+      await new Promise(r => setTimeout(r, 2500));
+
+      if (data.length && data[0].timestamp > newestTime) {
+        newestTime = data[0].timestamp;
+        newestUuid = uuid;
+      }
+    }
+
+    if (newestUuid) {
+      WWStorage.setPhoneAdFirst(phone, newestUuid);
+      WWStorage.setOptimizedAdsNow(phone);
+      console.log(`Optimized first ad for favorite ${phone}`);
+    }
+  }
 }
 
 function showInfo() {
@@ -1517,9 +1670,12 @@ WWStorage.upgrade()
       if (location.pathname.startsWith('/anunturi/matrimoniale')) {
         registerGlobalButtons();
       }
+      optimizeFavorites();
       if (!WWStorage.hasBeenShownInfo()) {
         setTimeout(showInfo, 100);
         WWStorage.setHasBeenShownInfo();
+      }
+      if (Date.now() - WWStorage.getLastTimeOptimizedFavorites() > 7.2e+6) { // 2 hours
       }
     }
   })

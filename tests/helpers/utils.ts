@@ -10,7 +10,7 @@ const utils = {
       window.localStorage.setItem('ww:info-shown', config.infoShown || 'true');
     }, config)
 
-    await page.goto('https://www.publi24.ro/anunturi/matrimoniale/escorte/cluj/cluj-napoca/');
+    await page.goto(`https://www.publi24.ro/anunturi/matrimoniale/escorte/${config.location || 'cluj/cluj-napoca/'}`);
     await page.waitForTimeout(600);
 
     const consent = await page.$('[class="qc-cmp2-summary-buttons"] [mode="primary"]');
@@ -34,17 +34,16 @@ const utils = {
 
     while (true) {
       while (await page.$('.ww-loader') && !(results = await conditionFn())) {
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(1500);
       }
 
-      if (!results) {
-        await ((await page.$$('.pagination .arrow'))[1]).click();
-      } else {
-        break;
+      if (results) {
+        return results;
       }
+
+      await ((await page.$$('.pagination .arrow'))[1]).click();
+      await page.waitForTimeout(2000);
     }
-
-    return results;
   },
 
   async assertArticleHidden(element: ElementHandle, options: {hidden: boolean, reason?: string} = {hidden: true}) {

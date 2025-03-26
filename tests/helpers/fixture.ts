@@ -31,8 +31,8 @@ export const test = base.extend<{
       userAgent: fingerprint.navigator.userAgent,
       colorScheme: 'dark',
       viewport: {
-        width: fingerprint.screen.width,
-        height: fingerprint.screen.height,
+        width: Math.min(fingerprint.screen.width, 1800),
+        height: Math.min(fingerprint.screen.height, 900),
       },
       extraHTTPHeaders: {
         'accept-language': headers['accept-language'],
@@ -47,7 +47,9 @@ export const test = base.extend<{
     await use(context);
     await context.close();
     // Loading in too many ads and searching on google can cause too many requests.
-    await new Promise(r => setTimeout(r, 5000));
+    if (!process.env.DEBUG && !process.env.PWDEBUG) {
+      await new Promise(r => setTimeout(r, 5000));
+    }
   },
   extensionId: async ({ context }, use) => {
     let [background] = context.serviceWorkers();
