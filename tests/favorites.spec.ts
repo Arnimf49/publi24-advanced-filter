@@ -158,7 +158,7 @@ test('Should optimize phone ads and display newest for favorite.', async ({ page
   await page.reload();
 
   const adCount = +await (await page.$(`[data-articleid="${articleId}"] [data-wwid="duplicates-count"]`)).innerText();
-  await page.waitForTimeout(adCount * 2500 + adCount * 400 + 10);
+  await page.waitForTimeout(adCount * 2500 + adCount * 600 + 10);
 
   await page.locator('[data-ww="temp-save"]').click();
   expect(await (await page.$('[data-wwid="favorites-modal"] [data-articleid]')).getAttribute('data-articleid'))

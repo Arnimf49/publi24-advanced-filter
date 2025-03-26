@@ -6,7 +6,7 @@ test('Should show age, height, weight and bmi from description.', async ({ page,
   await utils.openPubli(context, page);
 
   const articles = await page.$$('[data-articleid]');
-  const lastArticle = articles[articles.length - 1];
+  const lastArticle = articles[3];
   const url = await(await lastArticle.$('[class="article-title"] a')).getAttribute('href');
 
   await page.route(url, async (route) => {
@@ -26,8 +26,11 @@ test('Should show age, height, weight and bmi from description.', async ({ page,
     });
   });
 
+  await page.waitForResponse(response => response.url() === url);
+  await page.waitForTimeout(1200);
+
   await (await lastArticle.$('[data-wwid="investigate"]')).click();
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(100);
 
   expect(await (await lastArticle.$('[data-wwid="age"]')).innerText()).toEqual('23ani');
   expect(await (await lastArticle.$('[data-wwid="height"]')).innerText()).toEqual('155cm');

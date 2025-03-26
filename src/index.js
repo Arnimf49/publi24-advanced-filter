@@ -1054,7 +1054,7 @@ function registerDuplicatesModalHandler(item, id) {
 
       renderHideReasonSelection(
         container.querySelector('[data-wwid="container"]'),
-        id, phone, null, close
+        id, phone, null, () => close()
       );
     }
   }

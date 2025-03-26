@@ -34,7 +34,7 @@ const utils = {
 
     while (true) {
       while (await page.$('.ww-loader') && !(results = await conditionFn())) {
-        await page.waitForTimeout(1500);
+        await page.waitForTimeout(2000);
       }
 
       if (results) {

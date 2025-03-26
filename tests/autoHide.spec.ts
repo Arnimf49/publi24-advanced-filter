@@ -5,8 +5,8 @@ import {Page} from "playwright-core";
 
 const setupArticle = async (page: Page, title: string, description: string) => {
   const articles = await page.$$('[data-articleid]');
-  const lastArticle = articles[articles.length - 1];
-  const url = await(await lastArticle.$('[class="article-title"] a')).getAttribute('href');
+  const article = articles[2];
+  const url = await(await article.$('[class="article-title"] a')).getAttribute('href');
 
   await page.route(url, async (route) => {
     const response = await route.fetch();
@@ -25,11 +25,13 @@ const setupArticle = async (page: Page, title: string, description: string) => {
     });
   });
 
-  await (await lastArticle.$('[data-wwid="investigate"]')).click();
   await page.waitForResponse(response => response.url() === url);
   await page.waitForTimeout(1200);
 
-  return lastArticle;
+  await (await article.$('[data-wwid="investigate"]')).click();
+  await page.waitForTimeout(100);
+
+  return article;
 }
 
 const setupHideSetting = async (page: Page, criteria: string, options?: {defaultValue?: string | number, value?: string | number, noOpen?: boolean}) => {
