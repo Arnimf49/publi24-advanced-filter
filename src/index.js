@@ -847,7 +847,7 @@ async function acquireSliderImages(item) {
   const adPage = await loadInAdPage(item);
 
   if (IS_MOBILE_VIEW) {
-    return [...new Set(adPage.innerHTML.match(/https:\/\/s3\.publi24\.ro\/[^.]+\.jpg/g))];
+    return [...new Set(adPage.innerHTML.match(/https:\/\/s3\.publi24\.ro\/[^.]+\.(jpg|webp|png)/g))];
   }
 
   const items = [...adPage.querySelectorAll('[id="detail-gallery"] img')]
@@ -1076,14 +1076,26 @@ function registerOpenImagesSliderHandler(item, id) {
     modalsOpen.push(sliderContainer);
 
     document.body.appendChild(sliderContainer);
-    new Splide( '#_ww_slider .splide', { focus: 'center', type: 'loop', keyboard: 'global' }).mount();
-
     document.body.style.overflow = 'hidden';
+
+    const splide = new Splide( '#_ww_slider .splide', { focus: 'center', type: 'loop', keyboard: 'global' });
+
+    const onKeyDown = function (event) {
+      if (event.key.toLowerCase() === 'a') {
+        splide.go('-1');
+      } else if (event.key.toLowerCase() === 'd') {
+        splide.go('+1');
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+
+    splide.mount()
 
     const close = () => {
       document.body.removeChild(sliderContainer);
       modalsOpen.pop();
       window.removeEventListener('keydown',  closeOnKey);
+      window.removeEventListener('keydown',  onKeyDown);
       document.body.style.overflow = 'initial';
     };
     const closeOnKey = (e) => {
