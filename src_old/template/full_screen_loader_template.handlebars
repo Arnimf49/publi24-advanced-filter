@@ -1,0 +1,63 @@
+<div style="position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            overflow-y: scroll;
+" data-wwid="loader">
+    <div style="
+        pointer-events: none;
+        position: sticky;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: rgba(0,0,0,0.85);
+        backdrop-filter: blur(10px);
+        margin-bottom: -100vh;
+    "></div>
+
+    <style>
+        .ww-loader-message {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            padding-top: 120px;
+            max-width: 300px;
+            text-align: center;
+        }
+        .ww-loader {
+            margin-top: 15px;
+            height: 9px;
+            width: 60px;
+            --c:no-repeat linear-gradient(#FFF 0 0);
+            background: var(--c), var(--c), var(--c), var(--c);
+            background-size: 26% 3px;
+            animation: l5 1s infinite, fade-in 1s;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes l5 {
+            0%,
+            70%,
+            100% {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
+            12.5%{background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
+            25%  {background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 100%,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
+            37.5%{background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 100%,calc(2*100%/3) 0   ,calc(3*100%/3) 50% }
+            50%,
+            60%  {background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 100%,calc(2*100%/3) 0   ,calc(3*100%/3) 100%}
+        }
+        @keyframes fade-in {
+            0% {opacity: 0 }
+            80% {opacity: 0 }
+            100% {opacity: 1 }
+        }
+    </style>
+    <div class="ww-loader"></div>
+    <div class="ww-loader-message" data-wwid="ww-loader-message"></div>
+</div>

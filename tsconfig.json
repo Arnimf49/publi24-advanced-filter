@@ -1,11 +1,54 @@
 {
   "compilerOptions": {
-    "moduleResolution": "Node",
-    "allowSyntheticDefaultImports": true,
-    "target": "ES2023",
-    "module": "ES2022",
+    // Type Checking
+    "strict": true,                       // Enable all strict type-checking options.
+    "noImplicitAny": true,                // Raise error on expressions and declarations with an implied 'any' type.
+    "strictNullChecks": true,             // Enable strict null checks.
+    "strictFunctionTypes": true,          // Enable strict checking of function types.
+    "strictBindCallApply": true,          // Enable strict 'bind', 'call', and 'apply' methods on functions.
+    "strictPropertyInitialization": true, // Enable strict checking of property initialization in classes.
+    "noImplicitThis": true,               // Raise error on 'this' expressions with an implied 'any' type.
+    "alwaysStrict": true,                 // Parse in strict mode and emit "use strict" for each source file.
+    "noUnusedLocals": true,               // Report errors on unused locals.
+    "noUnusedParameters": true,           // Report errors on unused parameters.
+    "noImplicitReturns": true,            // Report error when not all code paths in function return a value.
+    "noFallthroughCasesInSwitch": true,   // Report errors for fallthrough cases in switch statement.
+
+    // Modules
+    "module": "ESNext",                   // Specify module code generation: 'ESNext' aligns with modern JS.
+    "moduleResolution": "node",           // Specify module resolution strategy: 'node' for Node.js/npm style resolution.
+    "resolveJsonModule": true,            // Include modules imported with '.json' extension.
+    "esModuleInterop": true,              // Enables emit interoperability between CommonJS and ES Modules. Allows default imports from CommonJS modules.
+    "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export. This does not affect code emit, just type checking.
+
+    // Emit
+    "target": "ES2020",                   // Specify ECMAScript target version: ES2020 is widely supported.
+    "outDir": "./dist",                   // Redirect output structure to the directory. (Rollup will handle actual bundling)
+    "sourceMap": true,                    // Generate corresponding '.map' file for debugging. (Set to false for production if needed)
+    "declaration": false,                 // Don't generate corresponding '.d.ts' file.
+    "removeComments": true,               // Do not emit comments to output.
+
+    // JSX
+    "jsx": "react-jsx",                   // Support JSX in '.tsx' files: 'react-jsx' uses the new JSX transform.
+
+    // JS Support
+    "allowJs": false,                     // Do not allow javascript files to be compiled.
+
+    // Other
+    "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file.
+    "skipLibCheck": true,                 // Skip type checking of declaration files.
+    "baseUrl": "./src",                   // Base directory to resolve non-absolute module names. Allows imports relative to 'src'.
+    "paths": {                            // Optional: Define module path aliases if needed later
+      // Example: "@components/*": ["components/*"]
+    },
     "lib": ["es5", "dom"],
-    "types": ["node"]
   },
-  "include": ["**/*.ts"]
+  "include": [
+    "src/**/*.ts",                        // Include all .ts files in src
+    "src/**/*.tsx"                        // Include all .tsx files in src
+  ],
+  "exclude": [
+    "node_modules",                       // Exclude node_modules
+    "dist"                                // Exclude the output directory
+  ]
 }
