@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Publi24 filtru avansat",
-  "version": "2.25.1",
+  "version": "2.26",
   "description": "Publi24 filtru avansat",
   "icons": {
-    "48": "icon.png"
+    "128": "icon.png"
   },
   "permissions": [
     "storage"
@@ -17,7 +17,7 @@
     {
       "resources": [
         "library/tesseract/worker.min.js",
-        "library/tesseract/tesseract-core.wasm.js",
+        "library/tesseract/tesseract-core-simd-lstm.wasm.js",
         "library/tesseract/*.traineddata"
       ],
       "matches": ["*://www.publi24.ro/*"]
@@ -63,5 +63,10 @@
       ],
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{7eaabf41-0515-4d5b-9c4a-6d662618b504}"
+    }
+  }
 }

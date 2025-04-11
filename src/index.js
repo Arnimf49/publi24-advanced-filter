@@ -544,7 +544,7 @@ async function readNumbersFromBase64Png(data) {
     jimpImg.invert()
       .getBase64(Jimp.MIME_PNG, async (err, src) => {
         const tesseractReader = await Tesseract.createWorker('eng', 1, {
-          corePath: runtime.getURL(`${TESSERACT_PATH}tesseract-core.wasm.js`),
+          corePath: runtime.getURL(`${TESSERACT_PATH}tesseract-core-simd-lstm.wasm.js`),
           workerPath: runtime.getURL(`${TESSERACT_PATH}worker.min.js`),
           langPath: runtime.getURL(TESSERACT_PATH),
           gzip: false,

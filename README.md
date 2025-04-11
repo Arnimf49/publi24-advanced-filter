@@ -9,7 +9,7 @@ https://chromewebstore.google.com/detail/publi24-advanced-filter/pigkjfndnpblohn
 You need to the following software to work on the project.
 
 - `nvm` - https://github.com/nvm-sh/nvm
-- `Chrome` - https://www.google.com/chrome/
+- `Chrome` or `Firefox`
 
 To install dependencies run in order:
 
