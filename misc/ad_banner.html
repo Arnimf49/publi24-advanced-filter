@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <title>Publi24 Filtru Avansat - Ad Banner</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .canvas-container {
+            width: 1200px;
+            height: 628px;
+            background-color: #f7f7fc;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            overflow: hidden;
+        }
+
+        .ad-left {
+            width: 53%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 50px;
+            gap: 20px;
+        }
+
+        .ads-header {
+            position: relative;
+            height: 60px;
+            background: white;
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .ads-header img {
+            height: 100%;
+            opacity: 0.5;
+        }
+
+        .oragne-button {
+            float: right;
+            width: 100px;
+            height: 80%;
+            margin-top: 5px;
+            display: block;
+            background: #e06720;
+            border-radius: 10px;
+            opacity: 0.5;
+        }
+
+        .ad-card {
+            width: 100%;
+            height: 200px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            padding: 10px;
+        }
+
+        .ad-card .image-box img {
+            width: 100%;
+            height: 100%;
+        }
+        .ad-card .image-box {
+            overflow: hidden;
+            width: 30%;
+            height: 100%;
+            background-color: #f7efe5;
+            border-radius: 8px;
+        }
+
+        .ad-card .text-box {
+            width: 65%;
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+        }
+
+        .ad-card .text-line:first-child {
+            background: #2e95df;
+            opacity: 0.3;
+        }
+
+        .ad-card .text-line {
+            width: 86%;
+            height: 15px;
+            background-color: #e7e7e7;
+            border-radius: 8px;
+            margin-bottom: 18px;
+        }
+
+        .ad-card.highlight {
+            border: 3px solid #4CAF50;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 50%;
+            right: -20px;
+            width: 70px;
+            height: 70px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 66px;
+            line-height: 70px;
+            font-weight: bold;
+            transform: translateY(-50%);
+        }
+
+        .xmark {
+            position: absolute;
+            top: 50%;
+            right: -20px;
+            width: 45px;
+            height: 45px;
+            background-color: #af4c4c;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 37px;
+            line-height: 41px;
+            font-family: Arial;
+            font-weight: 600;
+            transform: translateY(-50%);
+        }
+
+        .ad-right {
+            width: 47%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px;
+            background-color: #ffffff;
+            padding-left: 70px;
+        }
+
+        .ad-title {
+            font-size: 75px;
+            font-weight: bold;
+            color: #494747;
+            margin-bottom: 20px;
+            z-index: 15;
+        }
+
+        .ad-subtitle {
+            font-size: 49px;
+            color: #333;
+            margin-bottom: 30px;
+            z-index: 15;
+        }
+
+        .ad-note {
+            color: #9faeb9;
+            font-size: 22px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 80px;
+            z-index: 10;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="canvas-container">
+    <div class="ad-left">
+        <div class="ads-header">
+            <img src="publi24_logo.png"/>
+            <div class="oragne-button"></div>
+        </div>
+        <div class="ad-card">
+            <div class="xmark">x</div>
+            <div class="image-box"></div>
+            <div class="text-box">
+                <div class="text-line" style="width: 35%"></div>
+                <div class="text-line"></div>
+                <div class="text-line" style="width: 70%"></div>
+            </div>
+        </div>
+        <div class="ad-card highlight">
+            <div class="checkmark">✓</div>
+            <div class="image-box">
+                <img src="woman_in_dress.png"/>
+            </div>
+            <div class="text-box">
+                <div class="text-line" style="width: 35%"></div>
+                <div class="text-line"></div>
+                <div class="text-line" style="width: 70%"></div>
+            </div>
+        </div>
+        <div class="ad-card">
+            <div class="xmark">x</div>
+            <div class="image-box"></div>
+            <div class="text-box">
+                <div class="text-line" style="width: 35%"></div>
+                <div class="text-line"></div>
+                <div class="text-line" style="width: 80%"></div>
+            </div>
+        </div>
+    </div>
+    <div class="ad-right">
+        <div class="ad-title">Găsește ce cauți, mai rapid</div>
+        <div class="ad-subtitle">Filtru inteligent pentru anunțuri Publi24</div>
+    </div>
+</div>
+</body>
+</html>

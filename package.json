@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "templates": "npx watch \"handlebars src/template -f src/template/templates.precompiled.js\" src/template",
-    "build": "web-ext build --ignore-files \"tests\" \"test-results\" \"package.json\" \"package-lock.json\" \"playwright.config.ts\" \"node_modules\" \"tsconfig.json\" --overwrite-dest",
+    "build": "web-ext build --ignore-files \"tests\" \"test-results\" \"misc\" \"package.json\" \"package-lock.json\" \"playwright.config.ts\" \"node_modules\" \"tsconfig.json\" --overwrite-dest",
     "pw-open": "npx playwright test --ui",
     "pw-debug": "npx playwright test --debug",
     "pw-run": "npx playwright test"
