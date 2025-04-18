@@ -884,7 +884,7 @@ function createInvestigateImgClickHandler(id, item) {
     let imgs;
 
     if (IS_AD_PAGE && IS_MOBILE_VIEW) {
-      imgs = [...new Set(document.body.innerHTML.match(/https:\/\/s3\.publi24\.ro\/[^\/]+\/large\/[^.]+\.jpg/g))];
+      imgs = [...new Set(document.body.innerHTML.match(/https:\/\/s3\.publi24\.ro\/[^\/]+\/large\/[^.]+\.(jpg|webp|png)/g))];
     }
     else if (IS_AD_PAGE) {
       imgs = [...document.body.querySelectorAll('[id="detail-gallery"] img')]
