@@ -80,14 +80,14 @@ interface AdPanelRootProps {
     }
   }, [phone]);
 
-  const onVisibilityClick: MouseEventHandler = useCallback(async (e) => {
+  const onVisibilityClick: MouseEventHandler = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
 
     let newVisible = !visible;
     (e.target as HTMLButtonElement).disabled = true;
 
-    let phoneNumber = WWStorage.getAdPhone(id) || await adData.acquirePhoneNumber(item, id);
+    let phoneNumber = WWStorage.getAdPhone(id);
     if (phoneNumber) {
       WWStorage.setPhoneHidden(phoneNumber, !newVisible);
     }

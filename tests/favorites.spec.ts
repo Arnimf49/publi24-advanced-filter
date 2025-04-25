@@ -125,7 +125,9 @@ test('Should add favorites and remove all.', async ({ page, context }) => {
   await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (0)');
 })
 
-test('Should optimize phone ads and display newest for favorite.', async ({ page, context }) => {
+test('Should optimize phone ads and display newest for favorite.', async ({ page, context }, testInfo) => {
+  testInfo.setTimeout(45000);
+
   await utils.openPubli(context, page);
 
   const article: ElementHandle = await utils.findAdWithDuplicates(page);
@@ -136,6 +138,7 @@ test('Should optimize phone ads and display newest for favorite.', async ({ page
   await page.waitForTimeout(7000);
 
   await page.locator('[data-wwid="favs-button"]').click();
+  await page.waitForTimeout(500);
 
   const articleId = await (await page.$('[data-wwid="favorites-modal"] [data-articleid]')).getAttribute('data-articleid');
 

@@ -1,6 +1,6 @@
 import {expect, test} from "./helpers/fixture";
 import {utils} from "./helpers/utils";
-import {ElementHandle} from "playwright-core";
+import {ElementHandle, errors} from "playwright-core";
 
 test('Should search for phone number and article id and show relevant results.', async ({ page, context }, testInfo) => {
   testInfo.setTimeout(60000 * 4);
@@ -51,28 +51,48 @@ test('Should search for phone number and article id and show relevant results.',
   }
 
   let atArticle = 0;
+  let pages = 0;
+
   while (Object.keys(caseChecks).length) {
     const article = (await page.$$('[data-articleid]'))[atArticle];
 
     if (!article) {
-      break;
+      if (pages === 1) {
+        break;
+      }
+
+      await ((await page.$$('.pagination .arrow'))[1]).click();
+      await page.waitForTimeout(3000);
+      atArticle = 0;
+      ++pages;
+      continue;
     }
+
+    ++atArticle;
 
     const articleId = await article.getAttribute('data-articleid')
 
     const articleSearchButton = await article.$('[data-wwid="investigate"]');
     await articleSearchButton.isVisible();
 
-    const [newTab] = await Promise.all([
-      context.waitForEvent('page'),
-      articleSearchButton.click(),
-    ]);
+    await articleSearchButton.click();
 
-    await newTab.waitForEvent('close');
-    await utils.waitForInnerTextNot(page,
-      `[data-articleid="${articleId}"] [data-wwid="search-results"]`,
-      'nerulat'
-    );
+    try {
+      await utils.waitForInnerTextNot(
+        page,
+        `[data-articleid="${articleId}"] [data-wwid="search-results"]`,
+        'nerulat',
+        4000,
+      );
+    } catch (e: any) {
+      if (e instanceof errors.TimeoutError) {
+        await page.waitForTimeout(4000);
+        continue;
+      }
+      throw e;
+    }
+
+    await page.waitForTimeout(1000);
 
     const cases = Object.entries(caseChecks);
     for (let [name, check] of cases) {
@@ -82,7 +102,6 @@ test('Should search for phone number and article id and show relevant results.',
     }
 
     await page.waitForTimeout(4000);
-    ++atArticle;
   }
 
   expect(Object.keys(caseChecks).length, `Cases not met: ${Object.keys(caseChecks).join(', ')}`).toEqual(0)

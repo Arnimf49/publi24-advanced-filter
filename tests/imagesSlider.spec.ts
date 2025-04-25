@@ -37,11 +37,12 @@ test('Should toggle visibility from slider.', async ({ page, context }) => {
 
   await page.locator('[data-wwid="images-slider"] [data-wwid="toggle-hidden"]').click();
   await expect(page.locator('[data-wwid="images-slider"]')).not.toBeVisible();
-  await page.waitForTimeout(1000);
   await ((await firstArticle.$$('[data-wwid="reason"]'))[0]).click();
   await utils.assertArticleHidden(firstArticle);
 
   await page.reload();
+  await page.waitForTimeout(1000);
+
   firstArticle = await page.$(`[data-articleid="${firstArticleId}"]`);
 
   await (await firstArticle.$('[class="art-img"]')).click();
@@ -57,6 +58,9 @@ test('Should search images from slider.', async ({ page, context }) => {
 
   await page.locator('[data-wwid="images-slider"] [data-wwid="analyze-images"]').click();
   await expect(page.locator('[data-wwid="images-slider"]')).not.toBeVisible();
+
+  await (await firstArticle.$('[class="art-img"]')).click();
+  await page.locator('[data-wwid="images-slider"] [data-wwid="analyze-images"]').click();
 
   await utils.waitForInnerTextNot(page,
     `[data-articleid="${await firstArticle.getAttribute('data-articleid')}"] [data-wwid="image-results"]`,

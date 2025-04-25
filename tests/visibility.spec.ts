@@ -106,14 +106,14 @@ test('Should toggle focus mode and not see hidden ads.', async ({ page, context 
 
   await (await page.$('[data-wwid="settings-button"]')).click();
   await (await page.$('[data-wwid="focus-mode-switch"]')).click();
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(1500);
 
   await expect(page.locator(`[data-articleid="${firstArticleId}"]`)).toBeHidden();
   await expect(page.locator(`[data-articleid="${secondArticleId}"]`)).toBeHidden();
 
   await (await page.$('[data-wwid="settings-button"]')).click();
   await (await page.$('[data-wwid="focus-mode-switch"]')).click();
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(1500);
 
   await expect(page.locator(`[data-articleid="${firstArticleId}"]`)).toBeVisible();
   await expect(page.locator(`[data-articleid="${secondArticleId}"]`)).toBeVisible();

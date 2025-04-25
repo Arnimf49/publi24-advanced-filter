@@ -4,6 +4,7 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
+  reporter: process.env.CI ? 'github' : 'list',
   retries: process.env.CI ? 2 : 0,
   workers: 1,
   use: {

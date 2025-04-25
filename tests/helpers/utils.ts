@@ -86,11 +86,11 @@ const utils = {
     await page.waitForTimeout(600);
   },
 
-  async waitForInnerTextNot(page: Page, selector: string, text: string) {
+  async waitForInnerTextNot(page: Page, selector: string, text: string, timeout?: number) {
     await page.waitForFunction(
-      ({selector, text}) => (document.querySelector(selector) as HTMLElement).innerText !== text,
+      ({selector, text}) => (document.querySelector(selector) as HTMLElement).innerText.trim() !== text,
       {selector, text},
-      {timeout: 10000}
+      {timeout: timeout || 10000}
     );
   },
 

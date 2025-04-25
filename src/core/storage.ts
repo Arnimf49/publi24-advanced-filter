@@ -418,6 +418,13 @@ export const WWStorage = {
     return localStorage.getItem('ww:shown-message') === name;
   },
 
+  setFindNextVisibleAd(value: boolean = true) {
+    localStorage.setItem('ww:find-next', value ? 'true' : 'false');
+  },
+  isFindNextVisibleAd() {
+    return localStorage.getItem('ww:find-next') == 'true';
+  },
+
   getVersion(): string | null {
     return localStorage.getItem('ww:storage:version');
   },

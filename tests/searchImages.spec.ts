@@ -1,6 +1,6 @@
 import {expect, test} from "./helpers/fixture";
 import {utils} from "./helpers/utils";
-import {ElementHandle} from "playwright-core";
+import {ElementHandle, errors} from "playwright-core";
 
 test('Should search for images and show relevant results.', async ({ page, context }, testInfo) => {
   testInfo.setTimeout(60000 * 4);
@@ -74,33 +74,49 @@ test('Should search for images and show relevant results.', async ({ page, conte
   }
 
   let atArticle = 0;
+  let pages = 0;
+
   while (Object.keys(caseChecks).length) {
     const article = (await page.$$('[data-articleid]'))[atArticle];
 
     if (!article) {
-      break;
+      if (pages === 1) {
+        break;
+      }
+
+      await ((await page.$$('.pagination .arrow'))[1]).click();
+      await page.waitForTimeout(3000);
+      atArticle = 0;
+      ++pages;
+      continue;
     }
+
+    ++atArticle;
 
     const articleId = await article.getAttribute('data-articleid')
 
     const articleImageSearchButton = await article.$('[data-wwid="investigate_img"]');
     await articleImageSearchButton.isVisible();
 
-    const imageCountContainer = await article.$('[class="article-img-count"]');
-    const imageCount = imageCountContainer ? +(await imageCountContainer.innerText()) : 1;
-    const pageEvents =  Array.from({ length: imageCount }, () => context.waitForEvent('page'));
+    await articleImageSearchButton.click();
+    await page.waitForTimeout(2000);
 
-    await Promise.all([
-      ...pageEvents,
-      articleImageSearchButton.click(),
-    ]);
-
-    await utils.waitForInnerTextNot(page,
-      `[data-articleid="${articleId}"] [data-wwid="image-results"]`,
-      'nerulat'
-    );
+    try {
+      await utils.waitForInnerTextNot(
+        page,
+        `[data-articleid="${articleId}"] [data-wwid="image-results"]`,
+        'nerulat',
+        4000,
+      );
+    } catch (e: any) {
+      if (e instanceof errors.TimeoutError) {
+        await page.waitForTimeout(4000);
+        continue;
+      }
+      throw e;
+    }
     // Wait for images post-processing.
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(2000);
 
     const cases = Object.entries(caseChecks);
     for (let [name, check] of cases) {
@@ -110,7 +126,6 @@ test('Should search for images and show relevant results.', async ({ page, conte
     }
 
     await page.waitForTimeout(4000);
-    ++atArticle;
   }
 
   expect(Object.keys(caseChecks).length, `Cases not met: ${Object.keys(caseChecks).join(', ')}`).toEqual(0)

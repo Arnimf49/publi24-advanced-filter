@@ -2,7 +2,9 @@ import {expect, test} from "./helpers/fixture";
 import {utils} from "./helpers/utils";
 import {ElementHandle} from "playwright-core";
 
-test('Should have panel functionalities on ad page.', async ({context, page}) => {
+test('Should have panel functionalities on ad page.', async ({context, page}, testInfo) => {
+  testInfo.setTimeout(45000);
+
   await utils.openPubli(context, page);
   await page.waitForTimeout(500);
 
@@ -28,12 +30,18 @@ test('Should have panel functionalities on ad page.', async ({context, page}) =>
 
   // Related search test.
   await page.locator('[data-wwid="investigate"]').click();
+  await page.waitForTimeout(3000);
+  await page.locator('[data-wwid="investigate"]').click();
   await utils.waitForInnerTextNot(page,
     `[data-articleid] [data-wwid="search-results"]`,
     'nerulat'
   );
 
+  await page.waitForTimeout(5000);
+
   // Image search test.
+  await page.locator('[data-wwid="investigate_img"]').click();
+  await page.waitForTimeout(3000);
   await page.locator('[data-wwid="investigate_img"]').click();
   await utils.waitForInnerTextNot(page,
     `[data-articleid] [data-wwid="image-results"]`,

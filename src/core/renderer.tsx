@@ -110,6 +110,53 @@ export const renderer = {
     }
   },
 
+  renderNextVisibleAdButton() {
+    const nextPageArrow = document.querySelectorAll<HTMLLinkElement>('.pagination .arrow a')[1];
+
+    if (!nextPageArrow) {
+      return;
+    }
+
+    const findVisibleAd = () => {
+      setTimeout(() => {
+        // @ts-ignore
+        let ads: HTMLDivElement[] = [...document.querySelectorAll<HTMLDivElement>('[data-articleid]')];
+        for (let ad of ads) {
+          if (adData.getItemVisibility(ad.getAttribute('data-articleid') as string)) {
+            adActions.scrollIntoView(ad);
+            WWStorage.setFindNextVisibleAd(false);
+            return;
+          }
+        }
+        nextPageArrow.click();
+      }, 200);
+    };
+
+    if (WWStorage.isFindNextVisibleAd()) {
+      findVisibleAd();
+    }
+
+    const list = document.querySelector('.article-list');
+
+    if (!list) {
+      return;
+    }
+
+    const button = document.createElement('button');
+    button.classList.add('mainbg', 'radius');
+    button.setAttribute('data-wwid', 'next-visible-ad');
+    button.innerHTML = 'următorul anunț vizibil';
+    button.style.margin = 'auto';
+    button.style.display = 'block';
+
+    list.appendChild(button);
+
+    button.addEventListener('click', () => {
+      WWStorage.setFindNextVisibleAd();
+      nextPageArrow.click();
+    });
+  },
+
   renderInfo(): void {
     const interval: ReturnType<typeof setInterval> = setInterval(() => {
       const firstPhone = document.querySelector<HTMLElement>('[data-wwid="phone-number"]');
@@ -118,7 +165,7 @@ export const renderer = {
         return;
       }
 
-      const firstAd = firstPhone.closest<HTMLElement>('[data-articleid]');
+      const firstAd = firstPhone.closest<HTMLDivElement>('[data-articleid]');
       if (!firstAd) {
         clearInterval(interval); // Stop if the ad element isn't found
         return;
@@ -128,11 +175,7 @@ export const renderer = {
 
       // Wait for things around to load.
       setTimeout(() => {
-        const buttonsContainer = firstAd.querySelector<HTMLElement>('[data-wwid="control-panel"]');
-        if (buttonsContainer) {
-          buttonsContainer.scrollIntoView({behavior: 'instant', block: 'start'});
-        }
-        window.scrollBy({top: IS_MOBILE_VIEW ? -320 : -350, behavior: "instant"});
+        adActions.scrollIntoView(firstAd);
 
         // Wait for docking elements to finish animation.
         setTimeout(() => {
