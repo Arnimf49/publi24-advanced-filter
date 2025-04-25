@@ -38,7 +38,7 @@ test('Should group favorites based on location.', async ({ page, context }) => {
   expect((await page.$$('[data-wwid="favorites-modal"] [data-wwid="not-in-location"] [data-wwid="control-panel"]'))
     .length).toEqual(1);
 
-  const firstHeader = (await page.$$('[data-wwid="favorites-modal"] [data-wwid="favs-header]"'))[0];
+  const firstHeader = (await page.$$('[data-wwid="favorites-modal"] [data-wwid="favs-header"]'))[0];
   expect(await firstHeader.innerText()).toEqual('În locație (1)');
   const secondHeader = (await page.$$('[data-wwid="favorites-modal"] [data-wwid="favs-header"]'))[1];
   expect(await secondHeader.innerText()).toEqual('În alte locații (1)');
@@ -128,16 +128,7 @@ test('Should add favorites and remove all.', async ({ page, context }) => {
 test('Should optimize phone ads and display newest for favorite.', async ({ page, context }) => {
   await utils.openPubli(context, page);
 
-  const getAdWithDuplicates = async () => {
-    for (let article of await page.$$('[data-articleid]')) {
-      if (await article.$('[data-wwid="duplicates-container"]')) {
-        return article;
-      }
-    }
-    return null;
-  };
-
-  const article: ElementHandle = await utils.findAdWithCondition(page, getAdWithDuplicates);
+  const article: ElementHandle = await utils.findAdWithDuplicates(page);
   const phone = await (await article.$('[data-wwid="phone-number"]')).innerText();
   await (await article.$('[data-wwid="fav-toggle"]')).click();
 

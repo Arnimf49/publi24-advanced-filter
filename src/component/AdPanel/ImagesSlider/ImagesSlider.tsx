@@ -7,7 +7,6 @@ declare const Splide: any;
 type ImageSliderProps = {
   images: string[];
   visible: boolean;
-  isMobileView: boolean;
   close: () => void;
   onVisibilityClick: MouseEventHandler;
   onInvestigateImgClick: MouseEventHandler;
@@ -16,12 +15,10 @@ type ImageSliderProps = {
 const ImageSlider: React.FC<ImageSliderProps> = ({
   images,
   visible,
-  isMobileView,
   close,
   onVisibilityClick,
   onInvestigateImgClick,
 }) => {
-  const buttonContainerClasses = `${styles.buttonContainer} ${isMobileView ? styles.isMobile : ''}`;
   const toggleButtonClasses = `${styles.visibilityButton} ${visible ? styles.isVisible : ''}`;
 
   const handleImageClick = (event: React.MouseEvent<HTMLImageElement>) => {
@@ -67,7 +64,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
       scroll={false}
       dataWwid="images-slider"
     >
-      <div className={buttonContainerClasses}>
+      <div className={styles.buttonContainer}>
         <button
           type="button"
           className={`${toggleButtonClasses} mainbg radius`}

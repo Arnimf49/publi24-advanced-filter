@@ -1,4 +1,4 @@
-import {IS_AD_PAGE} from "./core/globals";
+import {IS_AD_PAGE, IS_MOBILE_VIEW} from "./core/globals";
 import {WWStorage} from "./core/storage";
 import {renderer} from "./core/renderer";
 import {favorites} from "./core/favorites";
@@ -7,7 +7,13 @@ WWStorage.upgrade()
   .then(() => {
     console.log('Booting publi24-advanced-filter');
 
+    if (IS_MOBILE_VIEW) {
+      document.body.classList.add('onMobile');
+    }
+
     if (IS_AD_PAGE) {
+      document.body.classList.add('onAdPage');
+
       const idElement = document.body.querySelector<HTMLElement>('[data-url^="/DetailAd/IncrementViewHit"]');
       const id = idElement!
         .getAttribute('data-url')!

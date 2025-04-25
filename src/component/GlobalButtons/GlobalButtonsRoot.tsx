@@ -1,6 +1,5 @@
 import React, {MouseEventHandler, useCallback, useEffect, useState} from 'react';
 import GlobalButtons from "./GlobalButtons";
-import {IS_MOBILE_VIEW} from "../../core/globals";
 import {WWStorage} from "../../core/storage";
 import FavoritesModalRoot from "./FavoritesModal/FavoritesModalRoot";
 import PhoneSearchModalRoot from "./PhoneSearchModal/PhoneSearchModalRoot";
@@ -30,7 +29,6 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
   return (
     <>
       <GlobalButtons
-        isMobileView={IS_MOBILE_VIEW}
         favsCount={savesCount}
         onFavsClick={onFavsClick}
         onSearchClick={onSearchClick}

@@ -1,10 +1,10 @@
 import React, { CSSProperties } from 'react';
 import styles from './PhoneAndTags.module.scss';
 import {misc} from "../../../../core/misc";
+import {IS_MOBILE_VIEW} from "../../../../core/globals";
 
 type ContactInfoProps = {
   phone: string;
-  isMobileView?: boolean;
   noPadding?: boolean;
   age?: number;
   ageWarn?: boolean;
@@ -16,7 +16,6 @@ type ContactInfoProps = {
 
 const PhoneAndTags: React.FC<ContactInfoProps> = ({
    phone,
-   isMobileView,
    noPadding = false,
    age,
    ageWarn = false,
@@ -52,7 +51,7 @@ const PhoneAndTags: React.FC<ContactInfoProps> = ({
   return (
     <>
       <h4 style={headingStyle}>
-        {isMobileView ? (
+        {IS_MOBILE_VIEW ? (
           <a href={`tel:${phone}`} data-wwid="phone-number">{phone}</a>
         ) : (
           <span data-wwid="phone-number">{phone}</span>

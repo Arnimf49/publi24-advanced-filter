@@ -1,7 +1,6 @@
 import React, {MouseEventHandler, useCallback, useEffect, useState} from 'react';
 import {adData, AdData} from "../../../../core/adData";
 import AdsModal from "./AdsModal";
-import {IS_MOBILE_VIEW} from "../../../../core/globals";
 import {WWStorage} from "../../../../core/storage";
 import HideReasonRoot from "../HideReason/HideReasonRoot";
 import GlobalLoader from "../../GlobalLoader/GlobalLoader";
@@ -51,7 +50,6 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
       adsData={adsData}
       close={close}
       onHideAll={onHideAll}
-      isMobileView={IS_MOBILE_VIEW}
       hideReasonSelector={showHideReason
         && <HideReasonRoot
           phone={phone}

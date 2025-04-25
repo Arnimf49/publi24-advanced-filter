@@ -2,7 +2,9 @@ import {expect, test} from "./helpers/fixture";
 import {utils} from "./helpers/utils";
 import {ElementHandle} from "playwright-core";
 
-test('Should search for phone number and article id and show relevant results.', async ({ page, context }) => {
+test('Should search for phone number and article id and show relevant results.', async ({ page, context }, testInfo) => {
+  testInfo.setTimeout(60000 * 4);
+
   await utils.openPubli(context, page);
 
   let caseChecks: Record<string, ((article: ElementHandle) => Promise<boolean>)> = {

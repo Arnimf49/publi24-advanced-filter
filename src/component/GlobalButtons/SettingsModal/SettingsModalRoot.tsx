@@ -1,6 +1,5 @@
 import Modal from '../../Common/Modal/Modal';
 import {AutoHideCriterias, WWStorage} from '../../../core/storage';
-import { IS_MOBILE_VIEW } from '../../../core/globals';
 import SettingsModal, {SettingsData} from "./SettingsModal";
 import React, {useCallback, useEffect, useState} from "react";
 
@@ -17,7 +16,6 @@ const DEFAULT_CRITERIA_VALUES = {
 
 const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
   const [settings, setSettings] = useState<SettingsData | null>(null);
-  const isMobileView = IS_MOBILE_VIEW;
 
   useEffect(() => {
     const focusMode = WWStorage.isFocusMode();
@@ -94,7 +92,6 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
       <SettingsModal
         onClose={onClose}
         settings={settings}
-        isMobileView={isMobileView}
         onToggleFocusMode={handleToggleFocusMode}
         onToggleAutoHide={handleToggleAutoHide}
         onToggleCriteria={handleToggleCriteria}

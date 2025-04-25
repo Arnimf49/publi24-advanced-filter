@@ -11,39 +11,44 @@
   width: 100%;
   padding-top: 12px;
   margin-bottom: 0;
-}
 
-.buttons {
-  // Base button container styles
-}
-
-.results {
-  // Base results container styles
-}
-
-.mobileButtons {
-  overflow: hidden;
-  > * {
-    float: right;
-    margin-right: 0 !important;
-    &:not(:last-child) {
-      margin-left: 5px;
+  :global(.onAdPage) & {
+    @media screen and (max-width: 640px) {
+      padding-left: 16px;
+      padding-right: 16px;
     }
   }
 }
 
-.adPagePadding {
-  padding-left: 0;
-  padding-right: 0;
+.buttons {
+  :global(.onAdPage) & {
+    @media screen and (max-width: 640px) {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  }
 
-  @media screen and (max-width: 640px) {
-    padding-left: 16px;
-    padding-right: 16px;
+  :global(body.onMobile) & {
+    overflow: hidden;
+    > * {
+      float: right;
+      margin-right: 0 !important;
+      &:not(:last-child) {
+        margin-left: 5px;
+      }
+    }
   }
 }
 
-.adPageResults {
-  margin-bottom: 30px;
+.results {
+  :global(.onAdPage) & {
+    margin-bottom: 30px;
+
+    @media screen and (max-width: 640px) {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  }
 }
 
 .linkSafe {

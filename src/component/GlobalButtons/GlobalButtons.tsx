@@ -3,9 +3,9 @@ import styles from './GlobalButtons.module.scss';
 import {PhoneIcon} from "../Common/Icons/PhoneIcon";
 import {SettingsIcon} from "../Common/Icons/SettingsIcon";
 import {StarIcon} from "../Common/Icons/StarIcon";
+import {IS_MOBILE_VIEW} from "../../core/globals";
 
 type GlobalButtonsProps = {
-  isMobileView: boolean;
   favsCount: number;
   onSearchClick: MouseEventHandler;
   onSettingsClick: MouseEventHandler;
@@ -13,21 +13,16 @@ type GlobalButtonsProps = {
 };
 
 const GlobalButtons: React.FC<GlobalButtonsProps> = ({
-  isMobileView,
   favsCount,
   onSearchClick,
   onSettingsClick,
   onFavsClick,
 }) => {
-  const searchClasses = `${styles.searchButton} ${isMobileView ? styles.isMobile : ''}`;
-  const settingsClasses = `${styles.settingsButton} ${isMobileView ? styles.isMobile : ''}`;
-  const savesClasses = `${styles.savesButton} ${isMobileView ? styles.isMobile : ''}`;
-
   return (
     <>
       <button
         type="button"
-        className={searchClasses}
+        className={styles.searchButton}
         data-wwid="phone-search"
         title="Caută după număr de telefon"
         onClick={onSearchClick}
@@ -38,7 +33,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> = ({
 
       <button
         type="button"
-        className={settingsClasses}
+        className={styles.settingsButton}
         data-wwid="settings-button"
         title="Setări"
         onClick={onSettingsClick}
@@ -49,14 +44,14 @@ const GlobalButtons: React.FC<GlobalButtonsProps> = ({
 
       <button
         type="button"
-        className={savesClasses}
+        className={styles.savesButton}
         data-wwid="favs-button"
         onClick={onFavsClick}
         title={'Favorite'}
         aria-label={`View ${favsCount} saved items`}
       >
         <StarIcon className={styles.savesIcon}/>
-        {isMobileView ? favsCount : `Favorite (${favsCount})`}
+        {IS_MOBILE_VIEW ? favsCount : `Favorite (${favsCount})`}
       </button>
     </>
   );

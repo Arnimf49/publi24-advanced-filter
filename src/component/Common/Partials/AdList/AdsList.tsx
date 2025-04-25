@@ -2,11 +2,11 @@ import React, {useEffect, useRef} from 'react';
 import styles from './AdsList.module.scss';
 import {AdData} from "../../../../core/adData";
 import {renderer} from "../../../../core/renderer";
+import {IS_MOBILE_VIEW} from "../../../../core/globals";
 
 type AdsListProps = {
   adsData: AdData[];
   emptyText?: string;
-  isMobileView?: boolean;
 };
 
 const CalendarIcon = ({ isHighlighted }: { isHighlighted?: boolean }) => (
@@ -35,7 +35,6 @@ const LocationIcon = ({isHighlighted}: { isHighlighted?: boolean }) => (
 const AdsList: React.FC<AdsListProps> = ({
   adsData,
   emptyText = 'Niciun anunț găsit pentru acest număr.',
-  isMobileView = false,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -119,7 +118,7 @@ const AdsList: React.FC<AdsListProps> = ({
                     </p>
                   </div>
 
-                  {!isMobileView && item.qrCode && (
+                  {!IS_MOBILE_VIEW && item.qrCode && (
                     <div className={`${styles.qrCode}`}>
                       <img
                         src={item.qrCode}

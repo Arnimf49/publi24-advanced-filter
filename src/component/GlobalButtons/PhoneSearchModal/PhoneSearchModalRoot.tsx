@@ -3,7 +3,6 @@ import AdsModal from '../../Common/Partials/AdsModal/AdsModal';
 import HideReasonRoot from '../../Common/Partials/HideReason/HideReasonRoot';
 import { WWStorage } from '../../../core/storage';
 import {AdData, adData} from '../../../core/adData';
-import { IS_MOBILE_VIEW } from '../../../core/globals';
 import {PhoneIcon} from "../../Common/Icons/PhoneIcon";
 
 type PhoneSearchRootProps = {
@@ -16,10 +15,9 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
   const [resultsData, setResultsData] = useState<AdData[] | null>(null);
   const [searchedPhone, setSearchedPhone] = useState<string | null>(null);
   const [associatedUuids, setAssociatedUuids] = useState<string[]>([]);
-  const [showHideReason, setShowHideReason] = useState<boolean>(false); // State for HideReason
+  const [showHideReason, setShowHideReason] = useState<boolean>(false);
 
   const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isMobileView = IS_MOBILE_VIEW;
 
   const performSearch = useCallback(async (phoneToSearch: string) => {
     setSearchedPhone(phoneToSearch);
@@ -88,7 +86,6 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
       title={<><PhoneIcon/> Anunțuri</>}
       onHideAll={resultsData?.length ? triggerHideActions : undefined}
       onInputChange={handleInputChange}
-      isMobileView={isMobileView}
       hideReasonSelector={showHideReason && searchedPhone
         && <HideReasonRoot
           phone={searchedPhone}

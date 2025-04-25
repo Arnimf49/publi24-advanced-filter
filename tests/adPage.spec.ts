@@ -4,20 +4,11 @@ import {ElementHandle} from "playwright-core";
 
 test('Should have panel functionalities on ad page.', async ({context, page}) => {
   await utils.openPubli(context, page);
+  await page.waitForTimeout(500);
 
-  const getAdWithDuplicates = async () => {
-    for (let article of await page.$$('[data-articleid]')) {
-      if (await article.$('[data-wwid="duplicates-container"]')) {
-        return article;
-      }
-    }
-    return null;
-  };
-
-  const firstArticle: ElementHandle = await utils.findAdWithCondition(page, getAdWithDuplicates);
-  await (await firstArticle.$('.article-title')).click();
-
-  await page.waitForTimeout(1000);
+  const firstArticle: ElementHandle = await utils.findAdWithDuplicates(page);
+  await (await firstArticle.$('.article-title a')).click();
+  await page.waitForTimeout(2000);
 
   const article = await page.$('[data-articleid]');
   await page.locator('[data-wwid="control-panel"]').waitFor();

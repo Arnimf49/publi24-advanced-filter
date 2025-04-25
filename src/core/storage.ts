@@ -472,8 +472,8 @@ export const WWStorage = {
 
   async upgrade(): Promise<void> {
     const version = WWStorage.getVersion();
-    const parsedVersion = version ? parseInt(version, 10) : 1;
     const currentVersion = 4;
+    const parsedVersion = version ? parseInt(version, 10) : currentVersion;
 
     type MigrationFunction = () => void;
     const migrations: Record<number, MigrationFunction> = {

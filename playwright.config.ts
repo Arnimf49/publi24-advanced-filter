@@ -11,6 +11,8 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
+  globalSetup: './tests/helpers/globalSetup.ts',
+
   projects: [
     {
       name: 'chromium',
@@ -23,7 +25,7 @@ export default defineConfig({
         headless: process.env.CI ? true : false,
         actionTimeout: 15000,
       },
-      timeout: 300000,
+      timeout: 30000,
       expect: {
         timeout: 15000,
       }

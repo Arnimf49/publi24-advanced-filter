@@ -13,7 +13,7 @@
 .contentPadding {
   padding: 20px;
 
-  &.isMobile {
+  :global(.onMobile) & {
     padding: 10px;
   }
 }

@@ -13,7 +13,6 @@ type AdsModalProps = {
   phone?: string;
   removed?: number;
   adsData: AdData[] | null;
-  isMobileView: boolean;
   hideReasonSelector?: React.ReactNode;
 };
 
@@ -25,11 +24,8 @@ const AdsModal: React.FC<AdsModalProps> = ({
   onInputChange,
   removed,
   adsData,
-  isMobileView,
   hideReasonSelector,
 }) => {
-  const hideAllButtonClasses = `${styles.hideAllButton} ${isMobileView ? styles.isMobile : styles.isDesktop}`;
-
   return (
     <Modal
       close={close}
@@ -41,7 +37,7 @@ const AdsModal: React.FC<AdsModalProps> = ({
         headerActions={
           !hideReasonSelector && onHideAll && <button
             type="button"
-            className={hideAllButtonClasses}
+            className={styles.hideAllButton}
             onClick={onHideAll}
             data-wwid="hide-all"
           >
@@ -49,7 +45,6 @@ const AdsModal: React.FC<AdsModalProps> = ({
           </button>
         }
         color={'#1177bb'}
-        isMobileView={isMobileView}
       >
         <input
           type="text"
@@ -76,10 +71,7 @@ const AdsModal: React.FC<AdsModalProps> = ({
         </p>
 
         <div className={styles.contentContainer} data-wwid="content">
-          {adsData && <AdsList
-            adsData={adsData}
-            isMobileView={isMobileView}
-          />}
+          {adsData && <AdsList adsData={adsData} />}
         </div>
 
         {hideReasonSelector}

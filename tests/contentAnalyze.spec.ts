@@ -3,7 +3,7 @@ import {utils} from "./helpers/utils";
 import * as cheerio from "cheerio";
 
 test('Should show age, height, weight and bmi from description.', async ({ page, context }) => {
-  await utils.openPubli(context, page);
+  await utils.openPubli(context, page, {loadStorage: false});
 
   const articles = await page.$$('[data-articleid]');
   const lastArticle = articles[3];

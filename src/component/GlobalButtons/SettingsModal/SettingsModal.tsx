@@ -78,7 +78,6 @@ export type SettingsData = {
 type SettingsModalProps = {
   onClose: () => void;
   settings: SettingsData;
-  isMobileView?: boolean;
   onToggleFocusMode: () => void;
   onToggleAutoHide: () => void;
   onToggleCriteria: (criteriaKey: keyof AutoHideCriterias) => void;
@@ -89,7 +88,6 @@ const SettingsModal: React.FC<SettingsModalProps> =
 ({
   onClose,
   settings,
-  isMobileView = false,
   onToggleFocusMode,
   onToggleAutoHide,
   onToggleCriteria,
@@ -117,7 +115,6 @@ const SettingsModal: React.FC<SettingsModalProps> =
       onClose={onClose}
       maxWidth={600}
       color={'#c59b2f'}
-      isMobileView={isMobileView}
     >
       <SettingControl
         title="Mod focus"

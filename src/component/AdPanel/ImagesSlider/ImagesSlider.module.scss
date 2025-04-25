@@ -7,7 +7,7 @@
   align-items: center;
   gap: 15px;
 
-  &.isMobile {
+  :global(.onMobile) & {
     left: auto;
     right: 30px;
     transform: none;

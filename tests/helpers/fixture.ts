@@ -1,54 +1,28 @@
-import { test as base, chromium, type BrowserContext } from '@playwright/test';
-import path from 'path';
-import {dirname} from "node:path";
-import {fileURLToPath} from "node:url";
-import {FingerprintGenerator} from "fingerprint-generator";
-import {FingerprintInjector} from "fingerprint-injector";
+import { test as base, type BrowserContext } from '@playwright/test';
 import {$} from "execa";
+import {utils} from "./utils";
 
-const EXTENSION_PATH = dirname(path.join(fileURLToPath(import.meta.url), '../..'));
 
 export const test = base.extend<{
   context: BrowserContext;
   extensionId: string;
 }>({
   context: async ({ }, use) => {
-    const { fingerprint, headers } = new FingerprintGenerator().getFingerprint({
-      devices: ['desktop'],
-      operatingSystems: ['linux'],
-      browsers: ['chrome']
-    });
-
-    const context = await chromium.launchPersistentContext('', {
-      channel: 'chromium',
-      args: [
-        `--disable-extensions-except=${EXTENSION_PATH}`,
-        `--load-extension=${EXTENSION_PATH}`,
-        '--disable-blink-features=AutomationControlled',
-        '--no-sandbox',
-        '--start-maximized',
-      ],
-      userAgent: fingerprint.navigator.userAgent,
-      colorScheme: 'dark',
-      viewport: {
-        width: Math.min(fingerprint.screen.width, 1800),
-        height: Math.min(fingerprint.screen.height, 900),
-      },
-      extraHTTPHeaders: {
-        'accept-language': headers['accept-language'],
-      },
-    });
-    await new FingerprintInjector().attachFingerprintToPlaywright(context, { fingerprint, headers });
+    const context = await utils.makeContext();
 
     if (process.env.CI && process.env.DISPLAY) {
       setTimeout(() => $`xdotool key Escape`, 1100);
     }
 
+    const start = Date.now();
     await use(context);
     await context.close();
-    // Loading in too many ads and searching on google can cause too many requests.
+
+    // Prevent too many requests.
     if (!process.env.DEBUG && !process.env.PWDEBUG) {
-      await new Promise(r => setTimeout(r, 5000));
+      const duration = (Date.now() - start) / 1000;
+      const delay = Math.max(0, (10 - duration) * 1000);
+      await new Promise(r => setTimeout(r, delay));
     }
   },
   extensionId: async ({ context }, use) => {

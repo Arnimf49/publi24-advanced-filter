@@ -18,8 +18,6 @@ interface ImageSearchDomain {
 }
 
 interface AdPanelProps {
-  IS_MOBILE_VIEW: boolean;
-  IS_AD_PAGE: boolean;
   visible: boolean;
   phone?: string | null;
   isFav: boolean;
@@ -50,8 +48,6 @@ interface AdPanelProps {
 
 const AdPanel: React.FC<AdPanelProps> = (props) => {
   const {
-    IS_MOBILE_VIEW,
-    IS_AD_PAGE,
     visible,
     phone,
     isFav,
@@ -86,15 +82,11 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     return styles.linkUnsafe;
   };
 
-  const buttonsClassName = `${styles.buttons} ${IS_MOBILE_VIEW ? styles.mobileButtons : ''} ${IS_AD_PAGE ? styles.adPagePadding : ''}`;
-  const messageClassName = `${styles.message} ${IS_AD_PAGE ? styles.adPagePadding : ''}`;
-  const resultsClassName = `${styles.results} ${IS_AD_PAGE ? styles.adPagePadding : ''} ${IS_AD_PAGE ? styles.adPageResults : ''}`;
-
   return (
     <div data-wwphone={phone} data-wwid="control-panel">
       <hr className={styles.hr} />
 
-      <div className={buttonsClassName}>
+      <div className={styles.buttons}>
         <button
           title={!visible ? "Ma-m razgândit" : "Ascunde"}
           type="button"
@@ -157,17 +149,17 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
       {!visible && (
         <>
           {automaticHideReason && (
-            <p className={messageClassName} data-wwid="message">
+            <p className={styles.message} data-wwid="message">
               <b>ascuns automat</b> prin setări
             </p>
           )}
           {!automaticHideReason && dueToPhoneHidden && (
-            <p className={messageClassName} data-wwid="message">
+            <p className={styles.message} data-wwid="message">
               ai mai ascuns un anunț cu acceeași numar de telefon, <b>ascuns automat</b>
             </p>
           )}
           {hideReason && (
-            <p className={messageClassName} data-wwid="hide-reason">
+            <p className={styles.message} data-wwid="hide-reason">
               motiv ascundere: <b>{hideReason}</b>
             </p>
           )}
@@ -175,13 +167,13 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
       )}
 
       {hasNoPhone && (
-        <p className={messageClassName} style={{ color: 'rgb(34, 34, 34)' }}>
+        <p className={styles.message} style={{ color: 'rgb(34, 34, 34)' }}>
           anuntul nu are nr telefon
         </p>
       )}
 
       {!hasNoPhone && phone && (
-        <div className={resultsClassName}>
+        <div className={styles.results}>
           {phoneAndTags}
 
           {showDuplicates && hasDuplicateAdsWithSamePhone && (
@@ -197,8 +189,8 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                 Rezultate după telefon
                 {phoneInvestigatedSinceDays && (
                   <span className={`${styles.investigationStatus} ${phoneInvestigateStale ? styles.stale : styles.fresh}`}>
-                                        ({phoneInvestigatedSinceDays})
-                                    </span>
+                    ({phoneInvestigatedSinceDays})
+                  </span>
                 )}
               </h5>
               <div data-wwid="search-results">
@@ -279,7 +271,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
       )}
 
       {!hasNoPhone && !phone && (
-        <div className={resultsClassName}>
+        <div className={styles.results}>
           <div className={styles.loader} data-wwid="loader"></div>
         </div>
       )}

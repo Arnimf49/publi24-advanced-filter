@@ -33,7 +33,7 @@
   font-style: italic;
   font-size: 14px;
 
-  &.isMobile {
+  :global(.onMobile) & {
     font-size: 13px;
   }
 }
@@ -59,7 +59,7 @@
   }
 }
 
-.textWidthMobile145 { &.isMobile { width: 145px; } }
-.textWidthMobile191 { &.isMobile { width: 191px; } }
-.textWidthMobile136 { &.isMobile { width: 136px; } }
-.textWidthMobile200 { &.isMobile { width: 200px; } }
+.textWidthMobile145 { :global(.onMobile) & { width: 145px; } }
+.textWidthMobile191 { :global(.onMobile) & { width: 191px; } }
+.textWidthMobile136 { :global(.onMobile) & { width: 136px; } }
+.textWidthMobile200 { :global(.onMobile) & { width: 200px; } }

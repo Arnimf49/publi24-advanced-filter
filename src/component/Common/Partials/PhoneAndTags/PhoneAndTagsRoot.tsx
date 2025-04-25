@@ -1,7 +1,6 @@
 import React from 'react';
 import {WWStorage} from "../../../../core/storage";
 import PhoneAndTags from "./PhoneAndTags";
-import {IS_MOBILE_VIEW} from "../../../../core/globals";
 
 type PhoneAndTagsRoot = {
   phone: string;
@@ -23,7 +22,6 @@ const PhoneAndTagsRoot: React.FC<PhoneAndTagsRoot> = ({
 
   return (
     <PhoneAndTags
-      isMobileView={IS_MOBILE_VIEW}
       noPadding={noPadding}
       phone={phone}
       age={age}

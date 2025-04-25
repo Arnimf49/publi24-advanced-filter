@@ -54,7 +54,6 @@ const Tooltip: React.FC<TooltipProps> =
   const tooltipClasses = `${styles.tooltip} ${isDown ? styles.isDown : ''}`;
   const textClasses = `
     ${styles.text}
-    ${IS_MOBILE_VIEW ? styles.isMobile : ''}
     ${isLeft ? styles.textLeft : ''}
     ${textWidthClass ? styles[textWidthClass] || '' : ''}
   `;

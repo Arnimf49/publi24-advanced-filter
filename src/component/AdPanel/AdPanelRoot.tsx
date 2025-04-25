@@ -4,7 +4,6 @@ import {WWStorage} from "../../core/storage";
 import {linksFilter} from "../../core/linksFilter";
 import {dateLib} from "../../core/dateLib";
 import AdPanel from "./AdPanel";
-import {IS_AD_PAGE, IS_MOBILE_VIEW} from "../../core/globals";
 import PhoneAndTagsRoot from "../Common/Partials/PhoneAndTags/PhoneAndTagsRoot";
 import {adActions} from "../../core/adActions";
 import * as ReactDOM from "react-dom";
@@ -131,8 +130,6 @@ interface AdPanelRootProps {
   return (
     <div>
       <AdPanel
-        IS_MOBILE_VIEW={IS_MOBILE_VIEW}
-        IS_AD_PAGE={IS_AD_PAGE}
         phone={phone}
         hasNoPhone={WWStorage.hasAdNoPhone(id)}
         numberOfAdsWithSamePhone={WWStorage.getPhoneAds(phone).length}
@@ -164,7 +161,6 @@ interface AdPanelRootProps {
 
       {showImagesSlider
         && <ImageSlider
-          isMobileView={IS_MOBILE_VIEW}
           images={sliderImages}
           visible={visible}
           close={() => setShowImagesSlider(false)}

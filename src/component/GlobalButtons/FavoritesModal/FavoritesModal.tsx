@@ -15,7 +15,6 @@ type FavoritesModalProps = {
   inLocationAds: AdData[];
   notInLocationAds: AdData[];
   noAdsItems: string[];
-  isMobileView?: boolean;
 };
 
 const FavoritesModal: React.FC<FavoritesModalProps> = ({
@@ -25,12 +24,8 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
   inLocationAds = [],
   notInLocationAds = [],
   noAdsItems = [],
-  isMobileView = false,
 }) => {
   const isEmpty = inLocationAds.length === 0 && notInLocationAds.length === 0 && noAdsItems.length === 0;
-
-  const clearButtonClasses = `${styles.clearFavoritesButton} ${isMobileView ? styles.isMobile : styles.isDesktop}`;
-  const favHeaderClasses = `${styles.favoritesSectionHeader} ${isMobileView ? styles.isMobile : ''}`;
 
   return (
     <Modal
@@ -41,7 +36,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
         title={<><StarIcon/> Favorite</>}
         headerActions={<button
           type="button"
-          className={clearButtonClasses}
+          className={styles.clearFavoritesButton}
           onClick={onClearFavorites}
           data-wwid="clear-favorites"
         >
@@ -49,7 +44,6 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
         </button>}
         onClose={onClose}
         color={'#b34c4c'}
-        isMobileView={isMobileView}
       >
         {isEmpty ? (
           <p className={styles.emptyMessage}>
@@ -59,31 +53,25 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
           <>
             {inLocationAds.length > 0 && (
               <div className={styles.section} data-wwid="in-location">
-                <h4 className={favHeaderClasses} data-wwid="favs-header">
+                <h4 className={styles.favoritesSectionHeader} data-wwid="favs-header">
                   În locație <span className={styles.count}>({inLocationAds.length})</span>
                 </h4>
-                <AdsList
-                  adsData={inLocationAds}
-                  isMobileView={isMobileView}
-                />
+                <AdsList adsData={inLocationAds}/>
               </div>
             )}
 
             {notInLocationAds.length > 0 && (
               <div className={styles.section} data-wwid="not-in-location">
-                <h4 className={favHeaderClasses} data-wwid="favs-header">
+                <h4 className={styles.favoritesSectionHeader} data-wwid="favs-header">
                   În alte locații <span className={styles.count}>({notInLocationAds.length})</span>
                 </h4>
-                <AdsList
-                  adsData={notInLocationAds}
-                  isMobileView={isMobileView}
-                />
+                <AdsList adsData={notInLocationAds}/>
               </div>
             )}
 
             {noAdsItems.length > 0 && (
               <div className={styles.section} data-wwid="no-ads">
-                <h4 className={favHeaderClasses} data-wwid="favs-header">
+                <h4 className={styles.favoritesSectionHeader} data-wwid="favs-header">
                   Fără anunțuri active <span className={styles.count}>({noAdsItems.length})</span>
                 </h4>
                 <p className={styles.noAdsInfoText}>

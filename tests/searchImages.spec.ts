@@ -1,8 +1,10 @@
 import {expect, test} from "./helpers/fixture";
 import {utils} from "./helpers/utils";
-import {ElementHandle, Page} from "playwright-core";
+import {ElementHandle} from "playwright-core";
 
-test('Should search for images and show relevant results.', async ({ page, context }) => {
+test('Should search for images and show relevant results.', async ({ page, context }, testInfo) => {
+  testInfo.setTimeout(60000 * 4);
+
   await utils.openPubli(context, page);
 
   let caseChecks: Record<string, ((article: ElementHandle) => Promise<boolean>)> = {

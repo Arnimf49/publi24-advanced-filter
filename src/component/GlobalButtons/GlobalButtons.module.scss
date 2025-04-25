@@ -15,7 +15,7 @@
   bottom: 80px;
   z-index: 2000;
 
-  &.isMobile {
+  :global(.onMobile) & {
     bottom: 64px;
     padding: 7px 17px 7px 17px;
   }
@@ -35,7 +35,7 @@
     background: #0b629b;
   }
 
-  &.isMobile {
+  :global(.onMobile) & {
     left: 10px;
     transform: none;
   }
@@ -55,7 +55,7 @@
     background: #ab8215;
   }
 
-  &.isMobile {
+  :global(.onMobile) & {
     left: 76px;
     transform: none;
   }
@@ -64,7 +64,7 @@
 .savesButton {
   composes: globalButton;
   background: #b34c4c;
-  padding: 12px;
+  padding: 13px 12px;
   left: 50%;
   transform: translateX(-50%);
   min-width: 180px;
@@ -74,7 +74,16 @@
     background: #a12a2a;
   }
 
-  &.isMobile {
+  .savesIcon {
+    left: 12px;
+    width: 22px;
+    height: 22px;
+    fill: white;
+    vertical-align: middle;
+    position: absolute;
+  }
+
+  :global(.onMobile) & {
     left: 140px;
     padding: 12px 12px 12px 36px;
     transform: none;
@@ -83,14 +92,5 @@
     .savesIcon {
       left: 12px;
     }
-  }
-
-  .savesIcon {
-    left: 12px;
-    width: 22px;
-    height: 22px;
-    fill: white;
-    vertical-align: middle;
-    position: absolute;
   }
 }

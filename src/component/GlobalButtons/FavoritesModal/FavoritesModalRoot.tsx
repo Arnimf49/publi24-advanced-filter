@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import GlobalLoader from '../../Common/GlobalLoader/GlobalLoader';
 import FavoritesModal from './FavoritesModal';
 import { WWStorage } from '../../../core/storage';
-import { IS_MOBILE_VIEW } from '../../../core/globals';
 import {adData, FavoritesData} from "../../../core/adData";
 
 type FavoritesModalRootProps = {
@@ -49,7 +48,6 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
 
   return (
     <FavoritesModal
-      isMobileView={IS_MOBILE_VIEW}
       onClose={onClose}
       onClearFavorites={handleClearFavorites}
       onRemoveNoAd={handleRemoveNoAd}

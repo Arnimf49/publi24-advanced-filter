@@ -49,7 +49,7 @@
     font-weight: normal;
   }
 
-  &.isMobile {
+  :global(.onMobile) & {
     top: 71px;
     margin-top: 5px;
 

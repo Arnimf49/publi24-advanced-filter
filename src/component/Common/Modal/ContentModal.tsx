@@ -8,7 +8,6 @@ type ContentModalProps = {
   color: string;
   title: string | ReactNode;
   headerActions?: ReactNode;
-  isMobileView?: boolean;
 };
 
 const CloseIcon = () => (
@@ -26,24 +25,18 @@ const ContentModal: React.FC<ContentModalProps> =
   onClose,
   title,
   headerActions,
-  isMobileView = false,
 }) => {
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
   };
 
-  const headerTitleClasses = `${styles.headerTitle} ${isMobileView ? styles.isMobile : styles.isDesktop}`;
-  const containerClasses = `${styles.container} ${isMobileView ? styles.isMobile : styles.isDesktop}`;
-  const contentPaddingClasses = `${styles.contentPadding} ${isMobileView ? styles.isMobile : ''}`;
-  const headerActionsClasses = `${styles.headerActions} ${isMobileView ? styles.isMobile : ''}`;
-
   return (
     <>
       <div className={styles.header} style={{maxWidth: `${maxWidth}px`}}>
-        <h2 className={headerTitleClasses} style={{background: color}}>
+        <h2 className={styles.headerTitle} style={{background: color}}>
           {title}
         </h2>
-        <div className={headerActionsClasses}>
+        <div className={styles.headerActions}>
           {headerActions}
           <button
             type="button"
@@ -58,12 +51,12 @@ const ContentModal: React.FC<ContentModalProps> =
       </div>
 
       <div
-        className={containerClasses}
+        className={styles.container}
         style={{maxWidth: `${maxWidth}px`, borderColor: color}}
         onClick={handleContainerClick}
       >
         <div className={styles.topBorder} style={{background: color}}></div>
-        <div className={contentPaddingClasses}>
+        <div className={styles.contentPadding}>
           {children}
         </div>
       </div>
