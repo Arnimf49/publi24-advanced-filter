@@ -352,5 +352,13 @@ export const adActions = {
         }
       }, 300);
     };
+  },
+
+  scrollIntoView(element: HTMLDivElement) {
+    const panel = element.querySelector<HTMLElement>('[data-wwid="control-panel"]');
+    if (panel) {
+      panel.scrollIntoView({behavior: 'instant', block: 'start'});
+    }
+    window.scrollBy({top: IS_MOBILE_VIEW ? -320 : -350, behavior: "instant"});
   }
 }
