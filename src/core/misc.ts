@@ -9,6 +9,10 @@ if (typeof browser === "undefined" && typeof chrome !== "undefined") {
 }
 
 export const misc = {
+  cx(...args: (string | boolean | undefined | null)[]): string {
+    return args.filter(Boolean).join(' ');
+  },
+
   removeDiacritics(text: string): string {
     const diacriticMap: { [key: string]: string } = {
       'Ă': 'A', 'Â': 'A', 'Î': 'I', 'Ș': 'S', 'Ţ': 'T', 'Ț': 'T',

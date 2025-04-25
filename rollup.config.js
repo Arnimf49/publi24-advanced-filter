@@ -18,10 +18,11 @@ export default [
       sourcemap: !isProduction,
       globals: {
         'react': 'React',
+        'react-dom/client': 'ReactDOM',
         'react-dom': 'ReactDOM'
       }
     },
-    external: ['react', 'react-dom'],
+    external: ['react', 'react-dom/client', 'react-dom'],
     plugins: [
       resolve({ browser: true }),
       commonjs(),

@@ -1,0 +1,65 @@
+.infoContainer {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background: rgba(0, 0, 0, 0.88);
+  top: 0;
+  left: 0;
+  z-index: 5000;
+  cursor: pointer;
+}
+
+.tooltip {
+  position: absolute;
+}
+
+.line {
+  float: left;
+  margin-left: -10px;
+  stroke: #e7e7e7;
+}
+
+.text {
+  color: #333;
+  float: left;
+  background: #e7e7e7;
+  padding: 3px 5px;
+  border-radius: 5px;
+  box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.8);
+  border-color: #ffffff;
+  border-width: 2px 0px 0px 2px;
+  border-style: solid;
+  margin-left: -14px;
+  font-style: italic;
+  font-size: 14px;
+
+  &.isMobile {
+    font-size: 13px;
+  }
+}
+
+.textLeft {
+  position: absolute;
+  transform: translateX(-100%);
+  width: 207px;
+  margin-left: 3px;
+}
+
+.isDown {
+  transform: translateY(-100%);
+
+  .line {
+    transform: rotate(180deg);
+    margin-top: 12px;
+  }
+
+  .text {
+    margin-top: 0;
+    margin-bottom: -10px;
+  }
+}
+
+.textWidthMobile145 { &.isMobile { width: 145px; } }
+.textWidthMobile191 { &.isMobile { width: 191px; } }
+.textWidthMobile136 { &.isMobile { width: 136px; } }
+.textWidthMobile200 { &.isMobile { width: 200px; } }

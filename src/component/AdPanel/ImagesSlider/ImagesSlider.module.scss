@@ -1,0 +1,93 @@
+.buttonContainer {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  &.isMobile {
+    left: auto;
+    right: 30px;
+    transform: none;
+    gap: 10px;
+  }
+}
+
+.actionButton {
+  padding: 9px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #4a4a4a;
+  color: white;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+
+  svg {
+    stroke: #FFF;
+  }
+}
+
+.visibilityButton {
+  composes: actionButton;
+  background-color: #696969 !important;
+
+  &.isVisible {
+    background-color: #c59b2f !important;
+  }
+}
+
+.analyzeButton {
+  composes: actionButton;
+}
+
+.closeButton {
+  composes: actionButton;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 1000px;
+  padding: 11px;
+
+  svg {
+    stroke: black;
+  }
+}
+
+.sliderSection {
+  height: 100%;
+}
+
+.sliderTrack {
+  height: 100%;
+  overflow-y: visible !important;
+}
+
+.sliderList {
+  height: 100%;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+}
+
+.sliderSlide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.slideImage {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  margin: auto;
+  box-shadow: 5px 5px 15px 3px rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  object-fit: contain;
+}

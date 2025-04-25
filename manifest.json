@@ -29,14 +29,15 @@
       "js": [
         "library/tesseract/tesseract.min.js",
         "library/jimp.js",
-        "library/handlebars.js",
+        "library/react/react.production.min.js",
+        "library/react/react-dom.production.min.js",
         "library/splide/splide.min.js",
         "library/qrcode.js",
-        "src/template/templates.precompiled.js",
         "dist/index.js"
       ],
       "css": [
-        "library/splide/splide.min.css"
+        "library/splide/splide.min.css",
+        "dist/styles.css"
       ]
     },
     {

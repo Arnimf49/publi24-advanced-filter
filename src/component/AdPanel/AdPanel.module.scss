@@ -1,0 +1,253 @@
+.hr {
+  opacity: 0.09;
+  margin-top: 10px;
+  border: none;
+  border-top: 1px solid currentColor
+}
+
+.message {
+  color: rgb(34, 34, 34);
+  font-size: 0.8125rem;
+  width: 100%;
+  padding-top: 12px;
+  margin-bottom: 0;
+}
+
+.buttons {
+  // Base button container styles
+}
+
+.results {
+  // Base results container styles
+}
+
+.mobileButtons {
+  overflow: hidden;
+  > * {
+    float: right;
+    margin-right: 0 !important;
+    &:not(:last-child) {
+      margin-left: 5px;
+    }
+  }
+}
+
+.adPagePadding {
+  padding-left: 0;
+  padding-right: 0;
+
+  @media screen and (max-width: 640px) {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+.adPageResults {
+  margin-bottom: 30px;
+}
+
+.linkSafe {
+  background-color: #d1e1d1;
+}
+.linkDead {
+  background-color: #d6d8dd;
+}
+.linkSuspicious {
+  background-color: #e5e38e;
+}
+.linkUnsafe {
+  background-color: #efe2e2;
+}
+
+.duplicatesContainer {
+  color: #9d9103;
+  font-size: 0.8125rem;
+  margin-top: 6px;
+  margin-bottom: 0;
+
+  strong {
+    font-weight: bold;
+  }
+
+  a {
+    cursor: pointer;
+  }
+}
+
+.button {
+  vertical-align: middle;
+  padding: 9px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  margin-right: 5px;
+  transition: background-color 70ms ease-out;
+
+  svg {
+    display: block;
+  }
+}
+
+.mainBgRadius {
+  border-radius: 3px;
+  color: #fff;
+
+  svg {
+    stroke: #fff;
+  }
+}
+
+.visibilityButton {
+  // Specific styles for toggle button handled inline via `style` prop based on `visible`
+}
+
+.favButton {
+  // Specific styles for fav button handled inline via `style` prop based on `isFav`
+}
+
+.investigateButton {
+  // Inherits .mainBgRadius
+}
+
+.investigateImgButton {
+  // Inherits .mainBgRadius
+}
+
+.nimfomaneLink {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+
+  svg {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    margin-left: 6px;
+    fill: #8fc38f;
+  }
+
+  img {
+    background: #2f4979;
+    width: 93px;
+    border-radius: 4px;
+    padding: 15px 6px 12px 6px;
+    display: block;
+  }
+}
+
+.resultsHeader {
+  margin-top: 5px;
+  margin-bottom: 3px;
+  font-size: 1.125rem;
+}
+
+.investigationStatus {
+  font-size: 0.825rem;
+}
+
+.stale {
+  color: #8b5454;
+}
+
+.fresh {
+  color: #69875c;
+}
+
+.noResults {
+  font-size: 0.8125rem;
+}
+
+.noResultsYet {
+  color: #8b5454;
+}
+
+.noResultsFound {
+  color: #69875c;
+}
+
+.searchResultLinkContainer {
+  font-size: 0.8125rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  margin-bottom: 3px;
+
+  a {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+    &:visited {
+      color: #660099;
+    }
+  }
+}
+
+.imageResultsContainer {
+  font-size: 0.8125rem;
+}
+
+.imagesWarning {
+  color: #8b5454;
+  font-size: .8125rem;
+  margin-bottom: 5px;
+}
+
+.imageResultLink {
+  display: inline-block;
+  padding: 5px;
+  margin-right: 3px;
+  margin-bottom: 6px;
+  border-radius: 5px;
+  text-decoration: none;
+  color: rgb(55 55 55);
+
+  &:hover {
+    color: rgb(40 40 40);
+  }
+
+  .indexIndicator {
+    font-size: .6rem;
+  }
+}
+
+.loader {
+  margin-top: 15px;
+  height: 9px;
+  width: 60px;
+  --c: no-repeat linear-gradient(#17b 0 0);
+  background: var(--c), var(--c), var(--c), var(--c);
+  background-size: 26% 3px;
+  animation: loaderAnimation 1s infinite;
+}
+
+@keyframes loaderAnimation {
+  0%,
+  70%,
+  100% {
+    background-position: calc(0 * 100% / 3) 50%, calc(1 * 100% / 3) 50%,
+    calc(2 * 100% / 3) 50%, calc(3 * 100% / 3) 50%;
+  }
+  12.5% {
+    background-position: calc(0 * 100% / 3) 0, calc(1 * 100% / 3) 50%,
+    calc(2 * 100% / 3) 50%, calc(3 * 100% / 3) 50%;
+  }
+  25% {
+    background-position: calc(0 * 100% / 3) 0, calc(1 * 100% / 3) 100%,
+    calc(2 * 100% / 3) 50%, calc(3 * 100% / 3) 50%;
+  }
+  37.5% {
+    background-position: calc(0 * 100% / 3) 0, calc(1 * 100% / 3) 100%,
+    calc(2 * 100% / 3) 0, calc(3 * 100% / 3) 50%;
+  }
+  50%,
+  60% {
+    background-position: calc(0 * 100% / 3) 0, calc(1 * 100% / 3) 100%,
+    calc(2 * 100% / 3) 0, calc(3 * 100% / 3) 100%;
+  }
+}

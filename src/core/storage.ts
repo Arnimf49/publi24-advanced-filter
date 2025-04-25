@@ -1,3 +1,5 @@
+import {WWBrowserStorage} from "./browserStorage";
+
 interface AdItem {
   visibility?: boolean;
   phone?: string | null;
@@ -27,14 +29,34 @@ interface WwStoreCache {
   save: string[] | null;
 }
 
-interface AutoHideCriterias {
-  [key: string]: boolean | number | string | undefined;
+export interface AutoHideCriterias {
+  maxAge?: boolean;
+  maxAgeValue?: number;
+  minHeight?: boolean;
+  minHeightValue?: number;
+  maxHeight?: boolean;
+  maxHeightValue?: number;
+  maxWeight?: boolean;
+  maxWeightValue?: number;
+  mature?: boolean;
+  trans?: boolean;
+  botox?: boolean;
+  onlyTrips?: boolean;
+  showWeb?: boolean;
+  total?: boolean;
+  party?: boolean;
 }
 
 const _WW_STORE_CACHE: WwStoreCache = {
   item: {},
   phone: {},
   save: null,
+};
+
+const _WW_CALLBACKS = {
+  adChanged: {} as Record<string, Array<() => void>>,
+  phoneChanged: {} as Record<string, Array<() => void>>,
+  favsChanged: [] as Array<() => void>,
 };
 
 export const WWStorage = {
@@ -66,6 +88,7 @@ export const WWStorage = {
     item[prop] = value;
     localStorage.setItem(`ww2:${upperId}`, JSON.stringify(item));
     _WW_STORE_CACHE.item[upperId] = { ...item };
+    WWStorage.triggerAdChanged(id);
   },
 
   delAdProp(id: string, prop: string): void {
@@ -75,6 +98,7 @@ export const WWStorage = {
       delete item[prop];
       localStorage.setItem(`ww2:${upperId}`, JSON.stringify(item));
       _WW_STORE_CACHE.item[upperId] = { ...item };
+      WWStorage.triggerAdChanged(id);
     }
   },
 
@@ -175,6 +199,13 @@ export const WWStorage = {
     return WWStorage.getAdProp<number>(id, 'imagesTime');
   },
 
+  async getAdSearchResults(id: string): Promise<{search?: string[], images?: []}> {
+    return WWBrowserStorage.get([`ww:search_results:${id}`, `ww:image_results:${id}`])
+      .then((results) => {
+        return {search: results[`ww:search_results:${id}`], images: results[`ww:image_results:${id}`]};
+      })
+  },
+
   getPhoneItem(phone: string): PhoneItem {
     if (_WW_STORE_CACHE.phone[phone]) {
       return _WW_STORE_CACHE.phone[phone];
@@ -191,6 +222,7 @@ export const WWStorage = {
     item[prop] = value;
     localStorage.setItem(`ww2:phone:${phone}`, JSON.stringify(item));
     _WW_STORE_CACHE.phone[phone] = { ...item };
+    WWStorage.triggerPhoneChanged(phone);
   },
 
   getPhoneProp<T = any>(phone: string, prop: string): T | undefined {
@@ -297,12 +329,17 @@ export const WWStorage = {
   },
 
   clearFavorites(): void {
+    const temp = [...(_WW_STORE_CACHE.save || [])];
+
     localStorage.removeItem('ww:favs');
     _WW_STORE_CACHE.save = null;
+
+    temp.forEach((phone) => WWStorage.triggerPhoneChanged(phone))
+    WWStorage.triggerFavsChanged();
   },
 
-  toggleFavorite(phone: string, forceAdd: boolean = false): void {
-    if (!phone) {
+  toggleFavorite(phone: string | undefined, forceAdd: boolean = false): void {
+    if (!phone || phone == '') {
       return;
     }
 
@@ -319,6 +356,9 @@ export const WWStorage = {
 
     localStorage.setItem('ww:favs', JSON.stringify(items));
     _WW_STORE_CACHE.save = items;
+
+    WWStorage.triggerPhoneChanged(phone);
+    WWStorage.triggerFavsChanged();
   },
 
   isFavorite(phone: string): boolean {
@@ -341,18 +381,19 @@ export const WWStorage = {
     return localStorage.getItem('ww:auto-hide') === 'true';
   },
 
-  setAutoHideCriteria(criteria: string, enabled?: boolean, value?: number | string): void {
+  setAutoHideCriteria(criteria: keyof AutoHideCriterias, enabled?: boolean, value?: number | string): void {
     const current = WWStorage.getAutoHideCriterias();
     if (enabled !== undefined) {
-      current[criteria] = enabled;
+      (current[criteria] as any) = enabled;
     }
     if (value !== undefined) {
-      current[criteria + 'Value'] = value;
+      // @ts-ignore
+      (current[criteria + 'Value'] as any) = value;
     }
     localStorage.setItem('ww:auto-hide:criteria', JSON.stringify(current));
   },
 
-  isAutoHideCriteriaEnabled(criteria: string): boolean {
+  isAutoHideCriteriaEnabled(criteria: keyof AutoHideCriterias): boolean {
     return !!WWStorage.getAutoHideCriterias()[criteria];
   },
 
@@ -380,6 +421,54 @@ export const WWStorage = {
   getVersion(): string | null {
     return localStorage.getItem('ww:storage:version');
   },
+
+
+  onAdChanged(id: string, callback: () => void) {
+    _WW_CALLBACKS.adChanged[id] = _WW_CALLBACKS.adChanged[id] || [];
+    _WW_CALLBACKS.adChanged[id].push(callback);
+  },
+
+  removeOnAdChanged(id: string, callback: () => void) {
+    _WW_CALLBACKS.adChanged[id] = _WW_CALLBACKS.adChanged[id].filter(c => c !== callback);
+  },
+
+  triggerAdChanged(id: string) {
+    (_WW_CALLBACKS.adChanged[id] || []).forEach(callback => callback());
+  },
+
+  onFavsChanged(callback: () => void) {
+    _WW_CALLBACKS.favsChanged.push(callback);
+  },
+
+  removeOnFavsChanged(callback: () => void) {
+    _WW_CALLBACKS.favsChanged = _WW_CALLBACKS.favsChanged.filter(c => c !== callback);
+  },
+
+  triggerFavsChanged() {
+    _WW_CALLBACKS.favsChanged.forEach(callback => callback());
+  },
+
+  onPhoneChanged(phone: string | undefined, callback: () => void) {
+    if (!phone || phone === '') {
+      return;
+    }
+
+    _WW_CALLBACKS.phoneChanged[phone] = _WW_CALLBACKS.phoneChanged[phone] || [];
+    _WW_CALLBACKS.phoneChanged[phone].push(callback);
+  },
+
+  removeOnPhoneChanged(phone: string | undefined, callback: () => void) {
+    if (!phone || phone === '') {
+      return;
+    }
+
+    _WW_CALLBACKS.phoneChanged[phone] = _WW_CALLBACKS.phoneChanged[phone].filter(c => c !== callback);
+  },
+
+  triggerPhoneChanged(phone: string) {
+    (_WW_CALLBACKS.phoneChanged[phone] || []).forEach(callback => callback());
+  },
+
 
   async upgrade(): Promise<void> {
     const version = WWStorage.getVersion();
@@ -491,3 +580,13 @@ export const WWStorage = {
     }
   }
 };
+
+WWBrowserStorage.listen((changes) => {
+  Object.keys(changes).forEach(key => {
+    let match: any;
+
+    if ((match = key.match(/^ww:(search_results|image_results):([^:]+)$/))) {
+      WWStorage.triggerAdChanged(match[2]);
+    }
+  })
+});

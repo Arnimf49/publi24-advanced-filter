@@ -29,7 +29,7 @@ test('Should hide and then show.', async ({ page, context }) => {
   await page.waitForTimeout(1000);
   await utils.assertArticleHidden(firstArticle);
 
-  await (await firstArticle.$('[ww-show]')).click();
+  await (await firstArticle.$('[data-wwid="show-button"]')).click();
   await page.waitForTimeout(1000);
   await utils.assertArticleHidden(firstArticle, {hidden: false});
 
@@ -48,17 +48,17 @@ test('Should hide with a reason and be able to change reason.', async ({ page, c
   await (await firstArticle.$('[data-wwid="toggle-hidden"]')).click();
   await page.waitForTimeout(800);
 
-  const hideReasons = await firstArticle.$$('[ww-reason]');
+  const hideReasons = await firstArticle.$$('[data-wwid="reason"]');
   expect(hideReasons).toHaveLength(9);
 
   await hideReasons[0].click();
   await page.waitForTimeout(1000);
-  expect(await hideReasons[0].getAttribute('class')).toContain('ww-reason-selected');
+  expect(await hideReasons[0].getAttribute('data-wwselected')).toEqual('true');
   expect(await (await firstArticle.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: scump');
 
   await hideReasons[1].click();
   await page.waitForTimeout(1000);
-  expect(await hideReasons[1].getAttribute('class')).toContain('ww-reason-selected');
+  expect(await hideReasons[1].getAttribute('data-wwselected')).toEqual('true');
   expect(await (await firstArticle.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: etnie');
 })
 
@@ -104,14 +104,14 @@ test('Should toggle focus mode and not see hidden ads.', async ({ page, context 
 
   await page.waitForTimeout(1000);
 
-  await (await page.$('[data-ww="settings-button"]')).click();
+  await (await page.$('[data-wwid="settings-button"]')).click();
   await (await page.$('[data-wwid="focus-mode-switch"]')).click();
   await page.waitForTimeout(800);
 
   await expect(page.locator(`[data-articleid="${firstArticleId}"]`)).toBeHidden();
   await expect(page.locator(`[data-articleid="${secondArticleId}"]`)).toBeHidden();
 
-  await (await page.$('[data-ww="settings-button"]')).click();
+  await (await page.$('[data-wwid="settings-button"]')).click();
   await (await page.$('[data-wwid="focus-mode-switch"]')).click();
   await page.waitForTimeout(800);
 

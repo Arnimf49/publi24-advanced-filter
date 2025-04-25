@@ -59,7 +59,7 @@ test('Should hide all duplicate ads from list.', async ({ page, context }) => {
   }
 
   await (await page.$('[data-wwid="ads-modal"] [data-wwid="hide-all"]')).click();
-  await ((await page.$$('[data-wwid="ads-modal"] [ww-reason]'))[0]).click();
+  await ((await page.$$('[data-wwid="ads-modal"] [data-wwid="reason"]'))[0]).click();
 
   expect(await page.$('[data-wwid="ads-modal"]')).toBeNull();
 

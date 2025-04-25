@@ -1,4 +1,4 @@
-import {WWBrowserStorage} from "./core/browser_storage";
+import {WWBrowserStorage} from "./core/browserStorage";
 import {IS_MOBILE_VIEW} from "./core/globals";
 
 interface ImageSearchData {
@@ -94,17 +94,14 @@ function getMobileExactLink(): Node | null {
 
 function readImageLinksMobile(_: string, done: (results: string[]) => void): void {
   new Promise<void>(resolve => {
-    let intervalId: number | null = null;
-    intervalId = window.setInterval(() => {
+    let intervalId = window.setInterval(() => {
       const link = getMobileExactLink();
       if (link && typeof (link as HTMLElement).click === 'function') {
         (link as HTMLElement).click();
-        if (intervalId !== null) {
-          clearInterval(intervalId);
-        }
+        clearInterval(intervalId);
         resolve();
       }
-    }, 100);
+    }, 700);
   }).then(() => {
     setTimeout(() => {
       let attempt = 0;
@@ -164,7 +161,7 @@ async function parseResults(wwid: string): Promise<void> {
                 console.log('Done. Found: ' + results.length);
                 console.log('Found: ' + results.join('\n'));
 
-                if (IS_MOBILE_VIEW && newCount !== 0) {
+                if (IS_MOBILE_VIEW  && newCount !== 0) {
                   const nextImageIndex = imgs.length - newCount;
                   if (nextImageIndex >= 0 && nextImageIndex < imgs.length) {
                     window.location.href = imgs[nextImageIndex];

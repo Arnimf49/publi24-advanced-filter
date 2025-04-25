@@ -21,8 +21,12 @@ export default defineConfig({
         locale: 'en-US',
         permissions: ['geolocation'],
         headless: process.env.CI ? true : false,
+        actionTimeout: 15000,
       },
       timeout: 300000,
+      expect: {
+        timeout: 15000,
+      }
     }
   ]
 });

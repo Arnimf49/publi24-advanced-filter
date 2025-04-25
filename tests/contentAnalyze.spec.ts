@@ -36,6 +36,6 @@ test('Should show age, height, weight and bmi from description.', async ({ page,
   expect(await (await lastArticle.$('[data-wwid="height"]')).innerText()).toEqual('155cm');
   expect(await (await lastArticle.$('[data-wwid="weight"]')).innerText()).toEqual('58kg');
   expect(await (await lastArticle.$('[data-wwid="bmi"]')).innerText()).toEqual('24.1bmi');
-  expect(await (await lastArticle.$('[data-wwid="bmi"]')).getAttribute('class')).toEqual('ww-chip ww-chip-warn');
+  expect(await (await lastArticle.$('[data-wwid="bmi"]')).getAttribute('data-wwstatus')).toEqual('warn');
 });
 

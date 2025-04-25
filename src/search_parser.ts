@@ -1,4 +1,4 @@
-import {WWBrowserStorage} from "./browser_storage";
+import {WWBrowserStorage} from "./core/browserStorage";
 
 let tries: number = 0;
 

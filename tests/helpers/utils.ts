@@ -18,6 +18,17 @@ const utils = {
       await consent.click();
     }
 
+    setInterval(async () => {
+      try {
+        const element = await page.$('.voucher-modal .close-reveal-modal');
+        if (await element?.isVisible()) {
+          await element?.click();
+        }
+      } catch (e) {
+        // noop
+      }
+    }, 1000);
+
     await page.waitForTimeout(600);
   },
 
@@ -33,7 +44,7 @@ const utils = {
     let results;
 
     while (true) {
-      while (await page.$('.ww-loader') && !(results = await conditionFn())) {
+      while (await page.$('[data-wwid="loader"]') && !(results = await conditionFn())) {
         await page.waitForTimeout(2000);
       }
 

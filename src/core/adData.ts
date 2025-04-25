@@ -19,6 +19,12 @@ export interface AdData {
   isLocationDifferent: boolean;
 }
 
+export interface FavoritesData {
+  inLocation: AdData[];
+  notInLocation: AdData[];
+  noAds: string[];
+}
+
 interface BrowserError extends Error {
   code?: number;
 }
@@ -102,16 +108,16 @@ export const adData = {
   },
 
   isDueToPhoneHidden(id: string): boolean {
-    const phone: string | null | undefined = WWStorage.getAdPhone(id);
-    const wasItemHidden: boolean = !WWStorage.isAdVisible(id); // Assuming isAdVisible returns true if visible
-    const wasPhoneHidden: boolean = phone ? WWStorage.isPhoneHidden(phone) : false;
+    const phone = WWStorage.getAdPhone(id);
+    const wasItemHidden = !WWStorage.isAdVisible(id);
+    const wasPhoneHidden = phone ? WWStorage.isPhoneHidden(phone) : false;
 
-    return wasItemHidden && wasPhoneHidden;
+    return !wasItemHidden && wasPhoneHidden;
   },
 
   getItemVisibility(id: string): boolean {
     const phone: string | null | undefined = WWStorage.getAdPhone(id);
-    const isItemVisible: boolean = WWStorage.isAdVisible(id); // Assuming isAdVisible returns true if visible
+    const isItemVisible: boolean = WWStorage.isAdVisible(id);
     const isPhoneHidden: boolean = phone ? WWStorage.isPhoneHidden(phone) : false;
 
     return isItemVisible && !isPhoneHidden;
@@ -385,5 +391,38 @@ export const adData = {
     }
 
     return itemDataArray[0];
+  },
+
+  async loadFavoritesData(): Promise<FavoritesData> {
+    const phones = WWStorage.getFavorites();
+    const data: FavoritesData = {
+      inLocation: [],
+      notInLocation: [],
+      noAds: [],
+    };
+
+    let promises: Promise<void>[] = [];
+
+    for (let phone of phones) {
+      promises.push(adData.loadInFirstAvailableAd(WWStorage.getPhoneAds(phone), phone).then((item) => {
+        if (item) {
+          if (item.isLocationDifferent) {
+            data.notInLocation.push(item);
+          } else {
+            data.inLocation.push(item);
+          }
+        } else {
+          data.noAds.push(phone);
+        }
+      }));
+    }
+
+    await Promise.all(promises);
+
+    const sorter = (a: AdData, b: AdData): number => b.timestamp - a.timestamp;
+    data.inLocation = data.inLocation.sort(sorter);
+    data.notInLocation = data.notInLocation.sort(sorter);
+
+    return data;
   },
 };

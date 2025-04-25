@@ -27,4 +27,13 @@ export const dateLib = {
 
     return `${prefix} la ${hours}:${formattedMinutes}`;
   },
+
+  calculateTimeSince(time?: number): { daysString?: string; stale?: boolean } {
+    if (!time) return {};
+    const now = Date.now();
+    const days = Math.floor((now - time) / 8.64e+7);
+    const daysString = days === 0 ? 'recent' : days === 1 ? `de o zi` : `de ${days} zile`;
+    const stale = days > 15;
+    return { daysString, stale };
+  }
 };

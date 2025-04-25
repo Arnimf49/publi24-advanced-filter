@@ -5,13 +5,13 @@ import {ElementHandle} from "playwright-core";
 test('Should add favorites and view them.', async ({ page, context }) => {
   await utils.openPubli(context, page);
 
-  await expect(page.locator('[data-ww="temp-save"]')).toHaveText('Favorite (0)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (0)');
 
-  await page.locator('[data-wwid="temp-save"][data-wwstate="off"]').first().click();
-  await page.locator('[data-wwid="temp-save"][data-wwstate="off"]').first().click();
+  await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
+  await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
 
-  await expect(page.locator('[data-ww="temp-save"]')).toHaveText('Favorite (2)');
-  await page.locator('[data-ww="temp-save"]').click();
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (2)');
+  await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
 
   const favs = await page.$$('[data-wwid="favorites-modal"] [data-articleid]');
@@ -23,14 +23,14 @@ test('Should add favorites and view them.', async ({ page, context }) => {
 test('Should group favorites based on location.', async ({ page, context }) => {
   await utils.openPubli(context, page);
 
-  await page.locator('[data-wwid="temp-save"][data-wwstate="off"]').first().click();
+  await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
 
   await utils.openPubli(context, page, {location: 'brasov/brasov'});
 
-  await page.locator('[data-wwid="temp-save"][data-wwstate="off"]').first().click();
+  await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
 
-  await expect(page.locator('[data-ww="temp-save"]')).toHaveText('Favorite (2)');
-  await page.locator('[data-ww="temp-save"]').click();
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (2)');
+  await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
 
   expect((await page.$$('[data-wwid="favorites-modal"] [data-wwid="in-location"] [data-wwid="control-panel"]'))
@@ -38,9 +38,9 @@ test('Should group favorites based on location.', async ({ page, context }) => {
   expect((await page.$$('[data-wwid="favorites-modal"] [data-wwid="not-in-location"] [data-wwid="control-panel"]'))
     .length).toEqual(1);
 
-  const firstHeader = (await page.$$('[data-wwid="favorites-modal"] .ww-favs-header'))[0];
+  const firstHeader = (await page.$$('[data-wwid="favorites-modal"] [data-wwid="favs-header]"'))[0];
   expect(await firstHeader.innerText()).toEqual('În locație (1)');
-  const secondHeader = (await page.$$('[data-wwid="favorites-modal"] .ww-favs-header'))[1];
+  const secondHeader = (await page.$$('[data-wwid="favorites-modal"] [data-wwid="favs-header"]'))[1];
   expect(await secondHeader.innerText()).toEqual('În alte locații (1)');
 })
 
@@ -57,10 +57,10 @@ test('Should show favorites with no loading ads.', async ({ page, context }) => 
   });
   await page.reload();
 
-  await page.locator('[data-ww="temp-save"]').click();
+  await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
 
-  const firstHeader = (await page.$$('[data-wwid="favorites-modal"] .ww-favs-header'))[0];
+  const firstHeader = (await page.$$('[data-wwid="favorites-modal"] [data-wwid="favs-header"]'))[0];
   expect(await firstHeader.innerText()).toEqual('Fără anunțuri active (2)');
 
   expect(await (await page.$$('[data-wwid="favorites-modal"] [data-wwid="phone-number"]'))[0].innerText())
@@ -85,44 +85,44 @@ test('Should be able to remove favorite without available ads.', async ({ page, 
   });
   await page.reload();
 
-  await page.locator('[data-ww="temp-save"]').click();
+  await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
 
   await page.locator('[data-wwrmfav="076666654"]').click();
-  await expect(page.locator('[data-ww="temp-save"]')).toHaveText('Favorite (0)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (0)');
 })
 
 test('Should add favorites and remove one.', async ({ page, context }) => {
   await utils.openPubli(context, page);
 
-  await expect(page.locator('[data-ww="temp-save"]')).toHaveText('Favorite (0)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (0)');
 
-  await page.locator('[data-wwid="temp-save"][data-wwstate="off"]').first().click();
-  await page.locator('[data-wwid="temp-save"][data-wwstate="off"]').first().click();
+  await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
+  await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
 
-  await page.locator('[data-ww="temp-save"]').click();
-  await page.locator('[data-wwid="favorites-modal"] [data-wwid="temp-save"]').first().click();
+  await page.locator('[data-wwid="favs-button"]').click();
+  await page.locator('[data-wwid="favorites-modal"] [data-wwid="fav-toggle"]').first().click();
 
   const favs = await page.$$('[data-wwid="favorites-modal"] [data-articleid]');
   expect(favs.length).toEqual(1);
 
-  await expect(page.locator('[data-ww="temp-save"]')).toHaveText('Favorite (1)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (1)');
 })
 
 test('Should add favorites and remove all.', async ({ page, context }) => {
   await utils.openPubli(context, page);
 
-  await expect(page.locator('[data-ww="temp-save"]')).toHaveText('Favorite (0)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (0)');
 
-  await page.locator('[data-wwid="temp-save"][data-wwstate="off"]').first().click();
-  await page.locator('[data-wwid="temp-save"][data-wwstate="off"]').first().click();
-  await page.locator('[data-wwid="temp-save"][data-wwstate="off"]').first().click();
+  await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
+  await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
+  await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
 
-  await page.locator('[data-ww="temp-save"]').click();
+  await page.locator('[data-wwid="favs-button"]').click();
   await page.locator('[data-wwid="clear-favorites"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).not.toBeVisible();
 
-  await expect(page.locator('[data-ww="temp-save"]')).toHaveText('Favorite (0)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (0)');
 })
 
 test('Should optimize phone ads and display newest for favorite.', async ({ page, context }) => {
@@ -139,12 +139,12 @@ test('Should optimize phone ads and display newest for favorite.', async ({ page
 
   const article: ElementHandle = await utils.findAdWithCondition(page, getAdWithDuplicates);
   const phone = await (await article.$('[data-wwid="phone-number"]')).innerText();
-  await (await article.$('[data-wwid="temp-save"]')).click();
+  await (await article.$('[data-wwid="fav-toggle"]')).click();
 
   await page.reload();
   await page.waitForTimeout(7000);
 
-  await page.locator('[data-ww="temp-save"]').click();
+  await page.locator('[data-wwid="favs-button"]').click();
 
   const articleId = await (await page.$('[data-wwid="favorites-modal"] [data-articleid]')).getAttribute('data-articleid');
 
@@ -160,7 +160,7 @@ test('Should optimize phone ads and display newest for favorite.', async ({ page
   const adCount = +await (await page.$(`[data-articleid="${articleId}"] [data-wwid="duplicates-count"]`)).innerText();
   await page.waitForTimeout(adCount * 2500 + adCount * 600 + 10);
 
-  await page.locator('[data-ww="temp-save"]').click();
+  await page.locator('[data-wwid="favs-button"]').click();
   expect(await (await page.$('[data-wwid="favorites-modal"] [data-articleid]')).getAttribute('data-articleid'))
     .toEqual(articleId);
 })

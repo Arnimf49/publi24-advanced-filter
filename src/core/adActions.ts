@@ -1,18 +1,11 @@
 import {adData} from "./adData";
 import {misc} from "./misc";
 import {dateLib} from "./dateLib";
-import {IS_SAFARI_IOS} from "./globals";
-import {WWBrowserStorage} from "./browser_storage";
-import {WWStorage} from "./storage";
+import {IS_AD_PAGE, IS_MOBILE_VIEW, IS_SAFARI_IOS} from "./globals";
+import {WWBrowserStorage} from "./browserStorage";
+import {AutoHideCriterias, WWStorage} from "./storage";
 
 export type AdContentTuple = [string, number | boolean];
-
-export interface AutoHideCriterias {
-  maxAgeValue?: number;
-  minHeightValue?: number;
-  maxHeightValue?: number;
-  maxWeightValue?: number;
-}
 
 export interface AutoHideCriteriaProps {
   condition: (criterias: AutoHideCriterias, value: any) => boolean;
@@ -20,7 +13,7 @@ export interface AutoHideCriteriaProps {
   reason: (criterias: AutoHideCriterias) => string;
 }
 
-const AUTO_HIDE_CRITERIA: { [key: string]: AutoHideCriteriaProps } = {
+const AUTO_HIDE_CRITERIA: { [key in keyof AutoHideCriterias]: AutoHideCriteriaProps } = {
   maxAge: {
     condition: ({maxAgeValue}: AutoHideCriterias, value: number): boolean => !!maxAgeValue && maxAgeValue < value,
     value: 'age',
@@ -162,7 +155,7 @@ function applyAutoHiding(phoneNumber: string, id: string, contentData: AdContent
   const matched: string[] = [];
 
   for (let [criteria, props] of Object.entries(AUTO_HIDE_CRITERIA)) {
-    if (!WWStorage.isAutoHideCriteriaEnabled(criteria)) {
+    if (!WWStorage.isAutoHideCriteriaEnabled(criteria as keyof AutoHideCriterias)) {
       continue;
     }
 
@@ -278,5 +271,86 @@ export const adActions = {
         WWStorage.addAdDuplicateInOtherLocation(id, publi24AdLinks[index], dateDiff < 2);
       }
     });
+  },
+
+  createInvestigateImgClickHandler(id: string, item: HTMLElement): (this: GlobalEventHandlers, e: MouseEvent) => Promise<void> {
+    const imageToLensUrl = (imgLink: string): string => {
+      const encodedLink = encodeURIComponent(imgLink);
+      return `https://lens.google.com/uploadbyurl?url=${encodedLink}&hl=ro`;
+    }
+    const openImageInvestigation = (imgLink: string): void => {
+      window.open(imageToLensUrl(imgLink));
+    }
+
+    return async function (this: GlobalEventHandlers, e: MouseEvent): Promise<void> {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (!WWStorage.getAdPhone(id) && !(await adActions.investigateNumberAndSearch(item, id, false))) {
+        return;
+      }
+
+      if (this) (this as HTMLButtonElement).disabled = true;
+      await WWBrowserStorage.set(`ww:image_results:${id}`, null);
+
+      let imgs: string[] = [];
+
+      if (IS_AD_PAGE && IS_MOBILE_VIEW) {
+        const matches = document.body.innerHTML.match(/https:\/\/s3\.publi24\.ro\/[^\/]+\/large\/[^.]+\.(jpg|webp|png)/g);
+        imgs = matches ? [...new Set(matches)] : [];
+      }
+      else if (IS_AD_PAGE) {
+        // @ts-ignore
+        imgs = [...document.body.querySelectorAll<HTMLImageElement>('[id="detail-gallery"] img')]
+          .map(img => img.getAttribute('src'))
+          .filter((src): src is string => !!src); // Type guard to filter out nulls
+
+        // Maybe the post has only one picture. In that case gallery is not shown.
+        if (imgs.length === 0) {
+          // @ts-ignore
+          imgs = [...document.body.querySelectorAll<HTMLImageElement>('.detailViewImg')]
+            .map(img => img.getAttribute('src'))
+            .filter((src): src is string => !!src); // Type guard
+        }
+      }
+      else {
+        imgs = await adData.acquireSliderImages(item);
+      }
+
+      const done = (): void => {
+        WWStorage.setAdImagesInvestigatedTime(id, Date.now());
+        adActions.analyzeFoundImages(id, item);
+        if (this) (this as HTMLButtonElement).disabled = false;
+      }
+
+      await WWBrowserStorage.set(`ww:img_search_started_for`, {
+        wwid: id,
+        count: imgs.length,
+        imgs: imgs.map(url => imageToLensUrl(url)),
+      });
+
+      if (IS_MOBILE_VIEW && imgs.length > 0) {
+        openImageInvestigation(imgs[0]);
+      }
+      else {
+        imgs.forEach(img => openImageInvestigation(img));
+      }
+
+      const interval = setInterval(async() => {
+        const results = await WWBrowserStorage.get(`ww:img_search_started_for`);
+        const searchData = results[`ww:img_search_started_for`];
+        if (
+          !searchData || searchData.count === 0
+          // On safari the browser storage api breaks after returning from another tab. Reload to reset.
+          || (results as any).__from__cache
+        ) {
+          clearInterval(interval);
+          done();
+          if (IS_SAFARI_IOS) {
+            window.location.reload();
+          }
+        }
+      }, 300);
+    };
   }
 }

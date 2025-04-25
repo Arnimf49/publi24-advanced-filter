@@ -24,16 +24,16 @@ test('Should have panel functionalities on ad page.', async ({context, page}) =>
 
   // Visibility handling test.
   await page.locator('[data-wwid="toggle-hidden"]').click();
-  await page.locator('[ww-reason]').first().click();
+  await page.locator('[data-wwid="reason"]').first().click();
   await utils.assertArticleHidden(article);
-  await page.locator('[ww-show]').click();
+  await page.locator('[data-wwid="show-button"]').click();
   await utils.assertArticleHidden(article, {hidden: false});
 
   // Favorites handling test.
-  await page.locator('[data-wwid="temp-save"]').click();
-  await expect(page.locator('[data-wwid="temp-save"]')).toHaveAttribute('title', 'Șterge din favorite');
-  await page.locator('[data-wwid="temp-save"]').click();
-  await expect(page.locator('[data-wwid="temp-save"]')).toHaveAttribute('title', 'Adaugă la favorite');
+  await page.locator('[data-wwid="fav-toggle"]').click();
+  await expect(page.locator('[data-wwid="fav-toggle"]')).toHaveAttribute('title', 'Șterge din favorite');
+  await page.locator('[data-wwid="fav-toggle"]').click();
+  await expect(page.locator('[data-wwid="fav-toggle"]')).toHaveAttribute('title', 'Adaugă la favorite');
 
   // Related search test.
   await page.locator('[data-wwid="investigate"]').click();

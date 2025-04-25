@@ -1,26 +1,7 @@
-import {adRender} from "./render/ad";
-import {globalRender} from "./render/global";
-import {infoRender} from "./render/info";
 import {IS_AD_PAGE} from "./core/globals";
 import {WWStorage} from "./core/storage";
-
-declare const Handlebars: any;
-
-Handlebars.registerHelper('isUndefined', (value: unknown): boolean => {
-  return value === undefined;
-});
-
-Handlebars.registerHelper('isEmpty', (value: string | any[]): boolean => {
-  return value.length === 0;
-});
-
-Handlebars.registerHelper('inc', (value: number): number => {
-  return ++value;
-});
-
-Handlebars.registerHelper("len", (array: any[]): number => {
-  return array.length;
-});
+import {renderer} from "./core/renderer";
+import {favorites} from "./core/favorites";
 
 WWStorage.upgrade()
   .then(() => {
@@ -50,15 +31,18 @@ WWStorage.upgrade()
       item!.appendChild(container);
       item!.style.position = 'relative';
 
-      adRender.registerAdItem(item!, id.toUpperCase());
+      renderer.registerAdItem(item!, id.toUpperCase());
     } else {
-      adRender.registerAdsInContext(document.body, { applyFocusMode: true });
+      renderer.registerAdsInContext(document.body, { applyFocusMode: true });
+
       if (location.pathname.startsWith('/anunturi/matrimoniale')) {
-        globalRender.registerGlobalButtons();
+        renderer.renderGlobalButtons();
       }
-      globalRender.optimizeFavorites();
+
+      favorites.optimizeFavorites();
+
       if (!WWStorage.hasBeenShownInfo()) {
-        setTimeout(infoRender.showInfo, 100);
+        renderer.renderInfo();
         WWStorage.setHasBeenShownInfo();
       }
     }
