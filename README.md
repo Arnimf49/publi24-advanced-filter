@@ -1,6 +1,7 @@
 # Publi24 advanced filter
 
-https://chromewebstore.google.com/detail/publi24-advanced-filter/pigkjfndnpblohnmphgbmecaelefaedn?authuser=0&hl=en
+- Chrome: https://chromewebstore.google.com/detail/publi24-advanced-filter/pigkjfndnpblohnmphgbmecaelefaedn?hl=en
+- Firefox: https://addons.mozilla.org/en-US/firefox/addon/publi24-filtru-avansat/
 
 ## Development
 

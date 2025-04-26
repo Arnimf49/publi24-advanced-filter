@@ -5,8 +5,9 @@
   "description": "https://chromewebstore.google.com/detail/publi24-advanced-filter/pigkjfndnpblohnmphgbmecaelefaedn?authuser=0&hl=en",
   "main": "index.js",
   "scripts": {
-    "templates": "npx watch \"handlebars src/template -f src/template/templates.precompiled.js\" src/template",
-    "build": "web-ext build --ignore-files \"tests\" \"test-results\" \"misc\" \"package.json\" \"package-lock.json\" \"playwright.config.ts\" \"node_modules\" \"tsconfig.json\" --overwrite-dest",
+    "build": "npm run rollup-b && web-ext build --ignore-files \"tests\" \"test-results\" \"misc\" \"package.json\" \"package-lock.json\" \"playwright.config.ts\" \"node_modules\" \"tsconfig.json\" --overwrite-dest",
+    "rollup-b": "rollup -c",
+    "rollup": "rollup -c -w",
     "pw-open": "npx playwright test --ui",
     "pw-debug": "npx playwright test --debug",
     "pw-run": "npx playwright test"
@@ -15,10 +16,26 @@
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.51.0",
-    "@types/node": "^22.13.9",
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-replace": "^6.0.2",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@types/chrome": "^0.0.313",
+    "@types/firefox-webext-browser": "^120.0.4",
+    "@types/node": "^22.14.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.21",
+    "cheerio": "^1.0.0",
+    "cssnano": "^7.0.6",
     "execa": "^9.5.2",
     "fingerprint-injector": "^2.1.62",
-    "typescript": "^5.8.2",
-    "cheerio": "^1.0.0"
+    "postcss": "^8.5.3",
+    "rollup": "^4.39.0",
+    "rollup-plugin-postcss": "^4.0.2",
+    "sass": "^1.86.3",
+    "typescript": "^5.8.3",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
   }
 }

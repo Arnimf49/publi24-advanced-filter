@@ -5,16 +5,7 @@ import {utils} from "./helpers/utils";
 test('Should display duplicate ad count and list them.', async ({ page, context }) => {
   await utils.openPubli(context, page);
 
-  const getAdWithDuplicates = async () => {
-    for (let article of await page.$$('[data-articleid]')) {
-      if (await article.$('[data-wwid="duplicates-container"]')) {
-        return article;
-      }
-    }
-    return null;
-  };
-
-  const article: ElementHandle = await utils.findAdWithCondition(page, getAdWithDuplicates);
+  const article: ElementHandle = await utils.findAdWithDuplicates(page);
   const duplicatesText = await (await article.$('[data-wwid="duplicates-container"]')).innerText();
   expect(duplicatesText).toMatch(/^\d+ anunțuri cu acest telefon \(vizualizează\)$/);
 
@@ -40,16 +31,7 @@ test('Should display duplicate ad count and list them.', async ({ page, context 
 test('Should hide all duplicate ads from list.', async ({ page, context }) => {
   await utils.openPubli(context, page);
 
-  const getAdWithDuplicates = async () => {
-    for (let article of await page.$$('[data-articleid]')) {
-      if (await article.$('[data-wwid="duplicates-container"]')) {
-        return article;
-      }
-    }
-    return null;
-  };
-
-  const article: ElementHandle = await utils.findAdWithCondition(page, getAdWithDuplicates);
+  const article: ElementHandle = await utils.findAdWithDuplicates(page);
   await (await article.$('[data-wwid="duplicates"]')).click();
   await page.waitForTimeout(200);
 
@@ -58,15 +40,16 @@ test('Should hide all duplicate ads from list.', async ({ page, context }) => {
     duplicatesIds.push(await duplicate.getAttribute('data-articleid'))
   }
 
-  await (await page.$('[data-wwid="ads-modal"] [data-wwid="hide-all"]')).click();
-  await ((await page.$$('[data-wwid="ads-modal"] [ww-reason]'))[0]).click();
+  await page.locator('[data-wwid="ads-modal"] [data-wwid="hide-all"]').waitFor();
+  await page.locator('[data-wwid="ads-modal"] [data-wwid="hide-all"]').click();
+  await ((await page.$$('[data-wwid="ads-modal"] [data-wwid="reason"]'))[0]).click();
 
   expect(await page.$('[data-wwid="ads-modal"]')).toBeNull();
 
   await page.waitForTimeout(1000);
 
   for (let id of duplicatesIds) {
-    const article = await page.$(`[data-articleid="${id}"]`);
+    const article = await utils.findAdWithCondition(page, async () => await page.$(`[data-articleid="${id}"]`))
     const hideReason = await article.$('[data-wwid="hide-reason"]');
     expect(hideReason).not.toBeNull();
     expect(await hideReason.innerText()).toEqual('motiv ascundere: scump');

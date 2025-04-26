@@ -1,10 +1,9 @@
 web-ext-artifacts
 .idea
-.aider*
-
-# Playwright
 node_modules/
 /test-results/
+/tests/helpers/localStorage.json
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+dist

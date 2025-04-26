@@ -29,17 +29,15 @@
       "js": [
         "library/tesseract/tesseract.min.js",
         "library/jimp.js",
-        "library/handlebars.js",
+        "library/react/react.production.min.js",
+        "library/react/react-dom.production.min.js",
         "library/splide/splide.min.js",
         "library/qrcode.js",
-        "src/template/templates.precompiled.js",
-        "src/globals.js",
-        "src/storage.js",
-        "src/browser_storage.js",
-        "src/index.js"
+        "dist/index.js"
       ],
       "css": [
-        "library/splide/splide.min.css"
+        "library/splide/splide.min.css",
+        "dist/styles.css"
       ]
     },
     {
@@ -47,8 +45,7 @@
         "https://www.google.com/search?wwsid=*"
       ],
       "js": [
-        "src/globals.js",
-        "src/search_parser.js"
+        "dist/search_parser.js"
       ]
     },
     {
@@ -58,8 +55,7 @@
         "https://www.google.com/search?sca_esv=*"
       ],
       "js": [
-        "src/globals.js",
-        "src/image_parser_lens.js"
+        "dist/search_image_parser.js"
       ],
       "run_at": "document_idle"
     }

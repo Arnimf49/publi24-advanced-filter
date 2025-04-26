@@ -1,0 +1,151 @@
+.modalTopBorder {
+  display: block;
+  height: 2px;
+  width: 100%;
+  position: sticky;
+  background: #c59b2f;
+  top: 78px;
+  z-index: 10;
+  margin: 0 auto;
+  margin-top: -2px;
+}
+
+.contentPadding {
+  padding: 20px;
+
+  :global(.onMobile) & {
+    padding: 10px;
+  }
+}
+
+.control {
+  display: flex;
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin-bottom: 15px;
+  background: #f5f5f5;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    background: rgba(197, 155, 47, 0.11);
+    border-color: #c59b2f;
+    cursor: pointer;
+  }
+}
+
+.controlSpacer {
+  padding-bottom: 10px;
+}
+
+.controlSwitch {
+  width: 55px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.controlContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.switchContainer {
+  display: block;
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 9999px;
+  background: #b1b0b0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.switchBall {
+  position: absolute;
+  display: block;
+  width: 18px;
+  height: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 9999px;
+  left: 2px;
+  background: #ffffff;
+  transition: left 0.3s ease, right 0.3s ease;
+}
+
+.switchOn {
+  background: #1177bb;
+
+  .switchBall {
+    left: calc(100% - 18px - 2px);
+  }
+}
+
+.controlTitle {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.controlDescription {
+  margin-top: 5px;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+
+  &.isHidden {
+    display: none !important;
+  }
+}
+
+.controlInput {
+  margin-top: 8px;
+  padding: 5px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  max-width: 100px;
+
+  &:focus {
+    outline: none;
+    border-color: #1177bb;
+    box-shadow: 0 0 0 2px rgba(17, 119, 187, 0.2);
+  }
+}
+
+
+.controlInset {
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  padding-left: 10px;
+  margin-left: 5px;
+}
+
+.footerText {
+  font-size: 14px;
+  color: #555;
+  text-align: center;
+  margin-top: 20px;
+
+  b {
+    color: #333;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .modalTopBorder {
+    top: 75px;
+  }
+  .controlTitle {
+    font-size: 16px;
+  }
+  .controlDescription {
+    font-size: 13px;
+  }
+  .contentPadding {
+    padding: 10px;
+  }
+}

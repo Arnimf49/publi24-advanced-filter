@@ -1,0 +1,96 @@
+.globalButton {
+  position: fixed !important;
+  font-weight: bold;
+  border-radius: 6px;
+  padding: 8px;
+  border: 1px solid white;
+  box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  line-height: 1;
+  bottom: 80px;
+  z-index: 2000;
+
+  :global(.onMobile) & {
+    bottom: 64px;
+    padding: 7px 17px 7px 17px;
+  }
+
+  svg {
+    display: block;
+  }
+}
+
+.searchButton {
+  composes: globalButton;
+  background: #1177bb;
+  left: calc(50% - 120px);
+  transform: translateX(-50%);
+
+  &:hover {
+    background: #0b629b;
+  }
+
+  :global(.onMobile) & {
+    left: 10px;
+    transform: none;
+  }
+
+  svg {
+    stroke: #FFF;
+  }
+}
+
+.settingsButton {
+  composes: globalButton;
+  background: #c59b2f;
+  left: calc(50% + 120px);
+  transform: translateX(-50%);
+
+  &:hover {
+    background: #ab8215;
+  }
+
+  :global(.onMobile) & {
+    left: 76px;
+    transform: none;
+  }
+}
+
+.savesButton {
+  composes: globalButton;
+  background: #b34c4c;
+  padding: 13px 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 180px;
+  position: relative;
+
+  &:hover {
+    background: #a12a2a;
+  }
+
+  .savesIcon {
+    left: 12px;
+    width: 22px;
+    height: 22px;
+    fill: white;
+    vertical-align: middle;
+    position: absolute;
+  }
+
+  :global(.onMobile) & {
+    left: 140px;
+    padding: 12px 12px 12px 36px;
+    transform: none;
+    min-width: auto;
+
+    .savesIcon {
+      left: 12px;
+    }
+  }
+}

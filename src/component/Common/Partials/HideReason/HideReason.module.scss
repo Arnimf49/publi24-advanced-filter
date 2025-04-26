@@ -1,0 +1,84 @@
+.hideReason {
+  width: 100%;
+  height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(2px);
+  border-radius: 10px;
+  z-index: 3;
+}
+
+.reasonButtonsContainer {
+  width: 100%;
+  max-width: 500px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 10px;
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  transform: translate(-50%, 0);
+
+  .title {
+    grid-column: span 2;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 20px;
+    color: #ffffff;
+    background: #797978;
+    text-shadow: 1px 1px 2px #00000033;
+    border-radius: 10px;
+    padding: 5px;
+  }
+
+  .reasonButton {
+    width: 70%;
+    padding: 10px;
+    border: none;
+    margin: auto;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    background: #ffffff;
+    color: #1e1e1e;
+    box-shadow: 1px 1px 3px 2px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: #faf6f2;
+    }
+
+    &.showButton {
+      background: #c7dceb;
+      color: #2d4545;
+
+      &:hover {
+        background: #bddff8;
+      }
+    }
+
+    &.reasonSelected {
+      background: #c39a30;
+      color: white;
+
+      &:hover {
+        background: #ad882a;
+      }
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .title {
+      font-size: 16px;
+    }
+    .reasonButton {
+      width: 100%;
+    }
+  }
+}
