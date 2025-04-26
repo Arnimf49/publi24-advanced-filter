@@ -19,8 +19,8 @@ To install dependencies run in order:
 
 ### Commands
 
-- `npm run templates` - starts a watcher on the template files under `src/templates` and compiles on changes
 - `npm run build` - builds the extension, only needed for releases
+- `npm run rollup` - run rollup in development mode
 - `npm run pw-open` - open playwright, for running tests visually
 - `npm run pw-run` - runs all playwright tests
 - `npm run pw-debug -- tests/adPage.spec.ts` - runs playwright visually but in debug mode, for test development
@@ -43,7 +43,6 @@ Web Store.
 - When opening a terminal on the project always run first `nvm use` to use the correct node version.
 - To reflect code changes in the browser, have Extensions page always open and click the reload button on the unpacked
 extension. Also reload Publi24.
-- If changing templates ensure to have a terminal open with `npm run templates`.
 - Mobile version also needs to be tested for changes. This can be achieved from Chrome inspector.
 
 ## Technical overview
@@ -53,17 +52,15 @@ different JS files for handling functionalities. These are specified in `manifes
 
 - `index.js` -  This is the heart of the plugin, it is loaded on Publi24 domain.
 - `search_parser.js` - This is loaded on Google search page. Handles results gathering for searches.
-- `image_parser_lens.js`- This is loaded on Google Lens page. Handles image results gathering.
+- `search_image_parser.js`- This is loaded on Google Lens page. Handles image results gathering.
 
-Rendering is also based around storage. The render cycle reacts to storage changes, which are detected using
-intervals. The stored data is fragmented in two:
+Rendering is done with React and scss modules. Rendering is also based around storage. The render cycle 
+reacts to storage changes, which are detected using events. The stored data is fragmented in two:
 
 - `browser.storage.local` - This is extension specific API. It is used for data that needs to be accessed cross site,
 specifically the data the is collected from searches.
-- `browser_storage.js` - This file encapsulates the `localstorage` used for the extension. This is only used on the 
+- `storage.ts` - This file encapsulates the `localstorage` used for the extension. This is only used on the 
 Publi24 domain. Handles storing all other information and also upgrades to the storage schema.
 
 The library directory stores 3rd party packages. These are taken from CDNs and hardcoded as Chrome Web Store doesn't 
 really accept loading in JS files from the internet for security reasons.
-
-For discovery the code should be navigated from the end of `index.js` in the `WWStorage.upgrade()` promise. 
