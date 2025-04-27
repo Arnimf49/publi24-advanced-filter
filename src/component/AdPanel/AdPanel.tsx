@@ -189,7 +189,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                 Rezultate după telefon
                 {phoneInvestigatedSinceDays && (
                   <span className={`${styles.investigationStatus} ${phoneInvestigateStale ? styles.stale : styles.fresh}`}>
-                    ({phoneInvestigatedSinceDays})
+                    &nbsp;({phoneInvestigatedSinceDays})
                   </span>
                 )}
               </h5>
@@ -221,7 +221,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                 Rezultate după imagine
                 {imageInvestigatedSinceDays && (
                   <span className={`${styles.investigationStatus} ${imageInvestigateStale ? styles.stale : styles.fresh}`}>
-                      ({imageInvestigatedSinceDays})
+                    &nbsp;({imageInvestigatedSinceDays})
                   </span>
                 )}
               </h5>

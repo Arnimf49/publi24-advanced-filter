@@ -7,6 +7,7 @@ import {IS_MOBILE_VIEW} from "../../../../core/globals";
 type AdsListProps = {
   adsData: AdData[];
   emptyText?: string;
+  showDuplicates?: boolean;
 };
 
 const CalendarIcon = ({ isHighlighted }: { isHighlighted?: boolean }) => (
@@ -35,6 +36,7 @@ const LocationIcon = ({isHighlighted}: { isHighlighted?: boolean }) => (
 const AdsList: React.FC<AdsListProps> = ({
   adsData,
   emptyText = 'Niciun anunț găsit pentru acest număr.',
+  showDuplicates = false,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -44,9 +46,9 @@ const AdsList: React.FC<AdsListProps> = ({
 
   useEffect(() => {
     if (ref.current) {
-      renderer.registerAdsInContext(ref.current, {renderOptions: {showDuplicates: false}});
+      renderer.registerAdsInContext(ref.current, {renderOptions: {showDuplicates}});
     }
-  }, []);
+  }, [showDuplicates]);
 
   if (!adsData || adsData.length === 0) {
     return <p className={styles.emptyMessage}>{emptyText}</p>;

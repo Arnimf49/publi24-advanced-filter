@@ -1,4 +1,4 @@
-import {IS_SAFARI_IOS} from "./globals";
+import {htmlLog, IS_SAFARI_IOS} from "./globals";
 import StorageChange = chrome.storage.StorageChange;
 
 // @ts-ignore

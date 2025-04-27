@@ -56,7 +56,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
                 <h4 className={styles.favoritesSectionHeader} data-wwid="favs-header">
                   În locație <span className={styles.count}>({inLocationAds.length})</span>
                 </h4>
-                <AdsList adsData={inLocationAds}/>
+                <AdsList adsData={inLocationAds} showDuplicates={true}/>
               </div>
             )}
 
@@ -65,7 +65,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
                 <h4 className={styles.favoritesSectionHeader} data-wwid="favs-header">
                   În alte locații <span className={styles.count}>({notInLocationAds.length})</span>
                 </h4>
-                <AdsList adsData={notInLocationAds}/>
+                <AdsList adsData={notInLocationAds} showDuplicates={true}/>
               </div>
             )}
 

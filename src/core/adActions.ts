@@ -1,7 +1,7 @@
 import {adData} from "./adData";
 import {misc} from "./misc";
 import {dateLib} from "./dateLib";
-import {IS_AD_PAGE, IS_MOBILE_VIEW, IS_SAFARI_IOS} from "./globals";
+import {htmlLog, IS_AD_PAGE, IS_MOBILE_VIEW, IS_SAFARI_IOS} from "./globals";
 import {WWBrowserStorage} from "./browserStorage";
 import {AutoHideCriterias, WWStorage} from "./storage";
 
@@ -209,7 +209,7 @@ export const adActions = {
     }
 
     if (search && windowRef) {
-      WWBrowserStorage.set(`ww:search_results:${id}`, []).then(() => {
+      await WWBrowserStorage.set(`ww:search_results:${id}`, []).then(() => {
         const encodedId: string = encodeURIComponent(id);
         const urlMatch: RegExpMatchArray | null = adData.getItemUrl(item).match(/\/([^./]+)\.html/);
         const addUrlId: string = urlMatch ? urlMatch[1] : ''; // Handle potential null match

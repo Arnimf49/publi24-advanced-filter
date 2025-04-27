@@ -158,3 +158,20 @@ test('Should optimize phone ads and display newest for favorite.', async ({ page
   expect(await (await page.$('[data-wwid="favorites-modal"] [data-articleid]')).getAttribute('data-articleid'))
     .toEqual(articleId);
 })
+
+test('Should display all favorite information.', async ({ page, context }) => {
+  await utils.openPubli(context, page);
+  data-wwid="search-results"
+  const article: ElementHandle = await utils.findAdWithDuplicates(page);
+  const phone = await (await article.$('[data-wwid="phone-number"]')).innerText();
+  await (await article.$('[data-wwid="fav-toggle"]')).click();
+
+  await page.locator('[data-wwid="favs-button"]').click();
+
+  const modal = page.locator('[data-wwid="favorites-modal"]');
+  await expect(modal).toBeVisible();
+
+  await expect(modal.locator('[data-wwid="phone-number"]')).toHaveText(phone);
+  await expect(modal.locator('[data-wwid="duplicates-container"]')).toBeVisible();
+  await expect(modal.locator('[data-wwid="fav-toggle"][data-wwstate="on"]')).toBeVisible();
+})
