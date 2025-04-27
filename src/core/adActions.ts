@@ -1,7 +1,7 @@
 import {adData} from "./adData";
 import {misc} from "./misc";
 import {dateLib} from "./dateLib";
-import {htmlLog, IS_AD_PAGE, IS_MOBILE_VIEW, IS_SAFARI_IOS} from "./globals";
+import {IS_AD_PAGE, IS_MOBILE_VIEW, IS_SAFARI_IOS} from "./globals";
 import {WWBrowserStorage} from "./browserStorage";
 import {AutoHideCriterias, WWStorage} from "./storage";
 
@@ -209,14 +209,16 @@ export const adActions = {
     }
 
     if (search && windowRef) {
-      await WWBrowserStorage.set(`ww:search_results:${id}`, []).then(() => {
-        const encodedId: string = encodeURIComponent(id);
-        const urlMatch: RegExpMatchArray | null = adData.getItemUrl(item).match(/\/([^./]+)\.html/);
-        const addUrlId: string = urlMatch ? urlMatch[1] : ''; // Handle potential null match
-        const encodedSearch: string = encodeURIComponent(`"${phoneNumber}" OR "${addUrlId}"`);
-        windowRef!.location.href = `https://www.google.com/search?wwsid=${encodedId}&q=${encodedSearch}`;
-        WWStorage.setInvestigatedTime(id, Date.now());
-      });
+      await WWBrowserStorage.set(`ww:search_started_for`, { wwid: id });
+      await WWBrowserStorage.set(`ww:search_results:${id}`, null);
+
+      const encodedId: string = encodeURIComponent(id);
+      const urlMatch: RegExpMatchArray | null = adData.getItemUrl(item).match(/\/([^./]+)\.html/);
+      const addUrlId: string = urlMatch ? urlMatch[1] : ''; // Handle potential null match
+      const encodedSearch: string = encodeURIComponent(`"${phoneNumber}" OR "${addUrlId}"`);
+      windowRef.location = `https://www.google.com/search?wwsid=${encodedId}&q=${encodedSearch}`;
+      WWStorage.setInvestigatedTime(id, Date.now());
+
 
       if (IS_SAFARI_IOS) {
         setInterval(() => {
@@ -291,7 +293,7 @@ export const adActions = {
       }
 
       if (this) (this as HTMLButtonElement).disabled = true;
-      await WWBrowserStorage.set(`ww:image_results:${id}`, null);
+      WWBrowserStorage.set(`ww:image_results:${id}`, null);
 
       let imgs: string[] = [];
 

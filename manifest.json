@@ -42,7 +42,7 @@
     },
     {
       "matches": [
-        "https://www.google.com/search?wwsid=*"
+        "https://www.google.com/search?q=*"
       ],
       "js": [
         "dist/search_parser.js"

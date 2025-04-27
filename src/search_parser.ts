@@ -2,12 +2,11 @@ import {WWBrowserStorage} from "./core/browserStorage";
 
 let tries: number = 0;
 
-function extractResultLinks(): void {
-  const urlParams = new URLSearchParams(window.location.search);
-  const wwid: string | null = urlParams.get('wwsid');
+async function extractResultLinks() {
+  const wwid = (await WWBrowserStorage.get('ww:search_started_for'))['ww:search_started_for']?.wwid;
 
   if (!wwid) {
-    console.error("WWStorage ID (wwsid) not found in URL parameters.");
+    console.error("Item id not found");
     clearInterval(interval);
     return;
   }
