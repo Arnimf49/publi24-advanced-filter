@@ -47,6 +47,7 @@ async function extractResultLinks() {
 
       if (q.includes('site:nimfomane.com')) {
         window.close();
+        WWBrowserStorage.set('ww:search_started_for', null)
       } else {
         currentUrl.searchParams.set('q', q + ' site:nimfomane.com');
         console.log("Redirecting to:", currentUrl.toString());
@@ -55,7 +56,8 @@ async function extractResultLinks() {
     })
     .catch((error: any) => {
       console.error("Error processing search results or redirecting:", error);
-    });
+      WWBrowserStorage.set('ww:search_started_for', null)
+    })
 }
 
 const interval: number = window.setInterval(extractResultLinks, 50);

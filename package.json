@@ -5,7 +5,7 @@
   "description": "https://chromewebstore.google.com/detail/publi24-advanced-filter/pigkjfndnpblohnmphgbmecaelefaedn?authuser=0&hl=en",
   "main": "index.js",
   "scripts": {
-    "build": "npm run rollup-b && web-ext build --ignore-files \"tests\" \"test-results\" \"misc\" \"package.json\" \"package-lock.json\" \"playwright.config.ts\" \"node_modules\" \"tsconfig.json\" --overwrite-dest",
+    "build": "npm run rollup-b && web-ext build --ignore-files \"tests\" \"test-results\" \"misc\" \"src\" \"package.json\" \"package-lock.json\" \"playwright.config.ts\" \"node_modules\" \"tsconfig.json\" --overwrite-dest",
     "rollup-b": "rollup -c",
     "rollup": "rollup -c -w",
     "pw-open": "npx playwright test --ui",
