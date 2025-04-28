@@ -141,6 +141,10 @@
     border-radius: 4px;
     padding: 15px 6px 12px 6px;
     display: block;
+
+    :global(.onMobile) & {
+      padding: 14px 6px 11px 6px;
+    }
   }
 }
 

@@ -212,11 +212,10 @@ export const adActions = {
       await WWBrowserStorage.set(`ww:search_started_for`, { wwid: id });
       await WWBrowserStorage.set(`ww:search_results:${id}`, null);
 
-      const encodedId: string = encodeURIComponent(id);
       const urlMatch: RegExpMatchArray | null = adData.getItemUrl(item).match(/\/([^./]+)\.html/);
       const addUrlId: string = urlMatch ? urlMatch[1] : ''; // Handle potential null match
       const encodedSearch: string = encodeURIComponent(`"${phoneNumber}" OR "${addUrlId}"`);
-      windowRef.location = `https://www.google.com/search?wwsid=${encodedId}&q=${encodedSearch}`;
+      windowRef.location = `https://www.google.com/search?q=${encodedSearch}`;
       WWStorage.setInvestigatedTime(id, Date.now());
 
 
