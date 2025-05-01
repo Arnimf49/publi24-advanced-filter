@@ -161,7 +161,6 @@ test('Should optimize phone ads and display newest for favorite.', async ({ page
 
 test('Should display all favorite information.', async ({ page, context }) => {
   await utils.openPubli(context, page);
-  data-wwid="search-results"
   const article: ElementHandle = await utils.findAdWithDuplicates(page);
   const phone = await (await article.$('[data-wwid="phone-number"]')).innerText();
   await (await article.$('[data-wwid="fav-toggle"]')).click();
