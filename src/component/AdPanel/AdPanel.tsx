@@ -4,6 +4,8 @@ import {VisibilityIcon} from "../Common/Icons/VisibilityIcon";
 import {StarIcon} from "../Common/Icons/StarIcon";
 import {PhoneIcon} from "../Common/Icons/PhoneIcon";
 import {ImageIcon} from "../Common/Icons/ImageIcon";
+import {NimfomaneIcon} from "./NimfomaneIcon";
+import {DdcIcon} from "./DdcIcon";
 
 interface ImageLink {
   link: string;
@@ -22,6 +24,7 @@ interface AdPanelProps {
   phone?: string | null;
   isFav: boolean;
   nimfomaneLink?: string | null;
+  ddcLink?: string | null;
   automaticHideReason?: boolean;
   dueToPhoneHidden?: boolean;
   hideReason?: string | null;
@@ -52,6 +55,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     phone,
     isFav,
     nimfomaneLink,
+    ddcLink,
     automaticHideReason,
     dueToPhoneHidden,
     hideReason,
@@ -90,8 +94,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
         <button
           title={!visible ? "Ma-m razgândit" : "Ascunde"}
           type="button"
-          style={{ backgroundColor: !visible ? '#696969' : '#c59b2f' }}
-          className={`${styles.button} ${styles.mainBgRadius} ${styles.toggleButton} mainbg radius`}
+          className={`${styles.button} ${visible ? styles.visibilityButtonVisible : styles.visibilityButtonInvisible} radius`}
           data-wwid="toggle-hidden"
           onClick={onVisibilityClick}
         >
@@ -102,8 +105,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
           <>
             <button
               title={isFav ? "Șterge din favorite" : "Adaugă la favorite"}
-              style={{ backgroundColor: isFav ? '#b34c4c' : '#e0dada' }}
-              className={`${styles.button} ${styles.favButton} `}
+              className={`${styles.button} ${isFav ? styles.favButtonOn : styles.favButtonOff} `}
               data-wwstate={isFav ? "on" : "off"}
               data-wwid="fav-toggle"
               onClick={onFavClick}
@@ -137,11 +139,28 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
         )}
 
         {nimfomaneLink && (
-          <a href={nimfomaneLink} target='_blank' rel="noopener noreferrer" data-wwid="nimfomane-btn" className={styles.nimfomaneLink}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-              <polygon points="2.67 7.63 5.46 10.41 13.33 2.54 14.85 4.06 5.46 13.46 1.15 9.15 2.67 7.63"/>
-            </svg>
-            <img alt="Nimfomane Logo" src='https://nimfomane.com/forum/uploads/monthly_2024_01/logo2.png.d461ead015b3eddf20bc0a9b70668583.png'/>
+          <a
+            title='Nimfomane topic'
+            href={nimfomaneLink}
+            target='_blank'
+            rel="noopener noreferrer"
+            data-wwid="nimfomane-btn"
+            className={styles.forumLink}
+          >
+            <NimfomaneIcon/>
+          </a>
+        )}
+
+        {ddcLink && (
+          <a
+            title='Ddc forum topic'
+            href={ddcLink}
+            target='_blank'
+            rel="noopener noreferrer"
+            data-wwid="ddc-btn"
+            className={`${styles.forumLink} ${styles.ddcLink}`}
+          >
+            <DdcIcon/>
           </a>
         )}
       </div>

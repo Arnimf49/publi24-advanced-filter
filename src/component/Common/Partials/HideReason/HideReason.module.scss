@@ -24,12 +24,13 @@
   transform: translate(-50%, 0);
 
   .title {
+    font-weight: bold;
     grid-column: span 2;
     text-align: center;
     margin-bottom: 10px;
     font-size: 20px;
-    color: #ffffff;
-    background: #797978;
+    color: rgb(73 73 73);
+    background: rgb(235 235 235);
     text-shadow: 1px 1px 2px #00000033;
     border-radius: 10px;
     padding: 5px;
@@ -64,12 +65,8 @@
     }
 
     &.reasonSelected {
-      background: #c39a30;
+      background: rgb(197, 155, 47);
       color: white;
-
-      &:hover {
-        background: #ad882a;
-      }
     }
   }
 

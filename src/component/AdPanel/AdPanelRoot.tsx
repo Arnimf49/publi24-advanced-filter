@@ -32,6 +32,7 @@ interface AdPanelRootProps {
 
   const filteredSearchLinks = linksFilter.sortLinks(linksFilter.filterLinks(search || [], itemUrl));
   const nimfomaneLink = filteredSearchLinks.find(l => l.indexOf('https://nimfomane.com/forum/topic/') === 0);
+  const ddcLink = filteredSearchLinks.find(l => l.indexOf('https://ddcforum.com/index.php?/forums/topic/') === 0);
   const imageSearchDomains = images ? linksFilter.processImageLinks(id, images, itemUrl) : undefined;
 
   const phoneTime = WWStorage.getInvestigatedTime(id);
@@ -142,6 +143,7 @@ interface AdPanelRootProps {
         hideReason={hideReason}
         automaticHideReason={automaticHideReason}
         nimfomaneLink={nimfomaneLink}
+        ddcLink={ddcLink}
         imageSearchDomains={imageSearchDomains}
         searchLinks={search}
         filteredSearchLinks={filteredSearchLinks}

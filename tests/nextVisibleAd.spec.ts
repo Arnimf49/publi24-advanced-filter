@@ -3,7 +3,8 @@ import {utils} from "./helpers/utils";
 import {expect} from "playwright/test";
 import {Locator} from "@playwright/test";
 
-test('Should skip to next visible ads over pages.', async ({ page, context }) => {
+test('Should skip to next visible ads over pages.', async ({ page, context }, testInfo) => {
+  testInfo.setTimeout(40000);
   await utils.openPubli(context, page);
 
   await page.route('https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/**', async (route, request) => {

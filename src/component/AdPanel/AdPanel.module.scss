@@ -89,28 +89,39 @@
   justify-content: center;
   border-radius: 3px;
   margin-right: 5px;
-  transition: background-color 70ms ease-out;
+  transition: background 0.2s ease 0s;
 
   svg {
     display: block;
   }
 }
 
-.mainBgRadius {
-  border-radius: 3px;
-  color: #fff;
-
-  svg {
-    stroke: #fff;
+.visibilityButtonVisible {
+  background: #c59b2f;
+  &:hover {
+    background: #b48d28;
   }
 }
 
-.visibilityButton {
-  // Specific styles for toggle button handled inline via `style` prop based on `visible`
+.visibilityButtonInvisible {
+  background: #696969;
+  &:hover {
+    background: #595858;
+  }
 }
 
-.favButton {
-  // Specific styles for fav button handled inline via `style` prop based on `isFav`
+.favButtonOn {
+  background: #b34c4c;
+  &:hover {
+    background: #a24343;
+  }
+}
+
+.favButtonOff {
+  background: #e0dada;
+  &:hover {
+    background: #d3cccc;
+  }
 }
 
 .investigateButton {
@@ -121,29 +132,32 @@
   // Inherits .mainBgRadius
 }
 
-.nimfomaneLink {
+.forumLink {
+  background: #435b86;
+  transition: background 0.5s ease 0s;
   position: relative;
   display: inline-block;
   vertical-align: middle;
+  border-radius: 4px;
+  width: 42px;
+  height: 42px;
+  margin-right: 5px;
+
+  &:hover {
+    background: #3a5077;
+  }
 
   svg {
     position: absolute;
-    width: 16px;
-    height: 16px;
-    margin-top: 2px;
-    margin-left: 6px;
-    fill: #8fc38f;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 75%;
   }
 
-  img {
-    background: #2f4979;
-    width: 93px;
-    border-radius: 4px;
-    padding: 15px 6px 12px 6px;
-    display: block;
-
-    :global(.onMobile) & {
-      padding: 14px 6px 11px 6px;
+  &.ddcLink {
+    background: #e0dada;
+    &:hover {
+      background: #d3cccc;
     }
   }
 }

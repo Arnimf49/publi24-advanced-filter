@@ -145,7 +145,7 @@ export const renderer = {
     const button = document.createElement('button');
     button.classList.add('mainbg', 'radius');
     button.setAttribute('data-wwid', 'next-visible-ad');
-    button.innerHTML = 'următorul anunț vizibil';
+    button.innerHTML = 'următorul anunț vizibil / nou';
     button.style.margin = 'auto';
     button.style.display = 'block';
 
