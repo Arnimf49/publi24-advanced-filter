@@ -111,9 +111,11 @@ export const renderer = {
   },
 
   renderNextVisibleAdButton() {
-    const nextPageArrow = document.querySelectorAll<HTMLLinkElement>('.pagination .arrow a')[1];
+    const paginationArrows = document.querySelectorAll<HTMLLinkElement>('.pagination .arrow');
+    const nextPageArrow = paginationArrows[paginationArrows.length - 1].querySelector('a');
 
     if (!nextPageArrow) {
+      console.warn('Failed to register next visible ad button. Missing next page arrow.')
       return;
     }
 
@@ -139,6 +141,7 @@ export const renderer = {
     const list = document.querySelector('.article-list');
 
     if (!list) {
+      console.warn('Failed to register next visible ad button. Missing article list.')
       return;
     }
 
