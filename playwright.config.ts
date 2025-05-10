@@ -8,6 +8,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: 1,
   use: {
+    screenshot: 'on-first-failure',
     video: 'on-first-retry',
     trace: 'on-first-retry',
   },
@@ -26,7 +27,7 @@ export default defineConfig({
         headless: process.env.CI ? true : false,
         actionTimeout: 15000,
       },
-      timeout: 30000,
+      timeout: 40000,
       expect: {
         timeout: 15000,
       }

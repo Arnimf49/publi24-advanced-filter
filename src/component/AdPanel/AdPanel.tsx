@@ -87,7 +87,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
   };
 
   return (
-    <div data-wwphone={phone} data-wwid="control-panel">
+    <div data-wwphone={phone} data-wwid="control-panel" data-wwhidden={visible ? 'false' : 'true'}>
       <hr className={styles.hr} />
 
       <div className={styles.buttons}>

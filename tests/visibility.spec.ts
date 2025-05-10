@@ -11,7 +11,6 @@ test('Should hide without a reason.', async ({ page, context }) => {
   const hideButton = await firstArticle.$('[data-wwid="toggle-hidden"]');
 
   await hideButton.click();
-  await page.waitForTimeout(1000);
   await utils.assertArticleHidden(firstArticle);
 
   await page.reload();
@@ -26,18 +25,15 @@ test('Should hide and then show.', async ({ page, context }) => {
   const articleId = await firstArticle.getAttribute('data-articleid');
 
   await (await firstArticle.$('[data-wwid="toggle-hidden"]')).click();
-  await page.waitForTimeout(1000);
   await utils.assertArticleHidden(firstArticle);
 
   await (await firstArticle.$('[data-wwid="show-button"]')).click();
-  await page.waitForTimeout(1000);
   await utils.assertArticleHidden(firstArticle, {hidden: false});
 
   await (await firstArticle.$('[data-wwid="toggle-hidden"]')).click();
   await page.reload();
   const article = await page.$(`[data-articleid="${articleId}"]`);
   await (await article.$('[data-wwid="toggle-hidden"]')).click();
-  await page.waitForTimeout(1000);
   await utils.assertArticleHidden(article, {hidden: false});
 })
 

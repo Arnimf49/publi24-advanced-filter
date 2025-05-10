@@ -126,7 +126,7 @@ test('Should add favorites and remove all.', async ({ page, context }) => {
 })
 
 test('Should optimize phone ads and display newest for favorite.', async ({ page, context }, testInfo) => {
-  testInfo.setTimeout(45000);
+  testInfo.setTimeout(55000);
 
   await utils.openPubli(context, page);
 

@@ -3,8 +3,7 @@ import {utils} from "./helpers/utils";
 import {expect} from "playwright/test";
 import {Locator} from "@playwright/test";
 
-test('Should skip to next visible ads over pages.', async ({ page, context }, testInfo) => {
-  testInfo.setTimeout(40000);
+test('Should skip to next visible ads over pages.', async ({ page, context }) => {
   await utils.openPubli(context, page);
 
   await page.route('https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/**', async (route, request) => {
@@ -23,8 +22,9 @@ test('Should skip to next visible ads over pages.', async ({ page, context }, te
       if (count && count === hidden) {
         return article;
       }
-      await article.locator('[data-wwid="toggle-hidden"]').click();
-      await page.waitForTimeout(100);
+      if (await article.locator('[data-wwhidden="false"]').isVisible()) {
+        await article.locator('[data-wwid="toggle-hidden"]').click();
+      }
       ++hidden;
     }
   }

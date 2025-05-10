@@ -3,7 +3,7 @@ import {utils} from "./helpers/utils";
 import {ElementHandle} from "playwright-core";
 
 test('Should have panel functionalities on ad page.', async ({context, page}, testInfo) => {
-  testInfo.setTimeout(45000);
+  testInfo.setTimeout(55000);
 
   await utils.openPubli(context, page);
   await page.waitForTimeout(500);

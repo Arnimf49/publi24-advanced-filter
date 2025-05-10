@@ -67,10 +67,15 @@ const utils = {
       : {};
     await context.addCookies(JSON.parse(fs.readFileSync('tests/helpers/cookies.json').toString()));
     await context.addInitScript(({config, localStorageData}: any) => {
+      if (window.localStorage.getItem('_pw_init') === 'true') {
+        return;
+      }
+
       for (const [key, value] of Object.entries(localStorageData)) {
         window.localStorage.setItem(key, value as string);
       }
       window.localStorage.setItem('ww:info-shown', config.infoShown || 'true');
+      window.localStorage.setItem('_pw_init', 'true');
     }, {config, localStorageData})
 
     await page.goto(`https://www.publi24.ro/anunturi/matrimoniale/escorte/${config.location || 'cluj/cluj-napoca/'}`);
@@ -131,6 +136,8 @@ const utils = {
   },
 
   async assertArticleHidden(element: ElementHandle, options: {hidden: boolean, reason?: string} = {hidden: true}) {
+    await new Promise(r => setTimeout(r, 300));
+
     const inner = await element.$('.article-txt-wrap, .ww-inset') || element;
     const opacity = await inner.evaluate(el => getComputedStyle(el as Element).getPropertyValue('opacity'))
     const blendMode = await inner.evaluate(el => getComputedStyle(el as Element).getPropertyValue('mix-blend-mode'))
