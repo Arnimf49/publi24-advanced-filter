@@ -373,13 +373,19 @@ export const adData = {
   },
 
 
-  async loadInFirstAvailableAd(uuids: string[], phone: string): Promise<AdData | null> {
+  async loadInFirstAvailableAd(uuids: string[], phone: string, requirePhone: boolean = false): Promise<AdData | null> {
     if (!uuids || uuids.length === 0) {
       return null;
     }
 
     const currentUuid = uuids.shift();
     if (!currentUuid) return null;
+
+    // This is to prevent showing in case of favorites ads without phone number.
+    // As in this case it cannot be removed from favorites.
+    if (requirePhone && WWStorage.hasAdNoPhone(adData.uuidParts(currentUuid)[0])) {
+      return adData.loadInFirstAvailableAd(uuids, phone);
+    }
 
     const itemDataArray = await adData.loadInAdsData(
       [currentUuid],
@@ -404,7 +410,7 @@ export const adData = {
     let promises: Promise<void>[] = [];
 
     for (let phone of phones) {
-      promises.push(adData.loadInFirstAvailableAd(WWStorage.getPhoneAds(phone), phone).then((item) => {
+      promises.push(adData.loadInFirstAvailableAd(WWStorage.getPhoneAds(phone), phone, true).then((item) => {
         if (item) {
           if (item.isLocationDifferent) {
             data.notInLocation.push(item);

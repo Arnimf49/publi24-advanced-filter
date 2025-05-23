@@ -101,7 +101,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
           <VisibilityIcon visible={visible}/>
         </button>
 
-        {phone && (
+        {!hasNoPhone && phone && (
           <>
             <button
               title={isFav ? "Șterge din favorite" : "Adaugă la favorite"}

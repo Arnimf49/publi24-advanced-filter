@@ -1,8 +1,8 @@
 export const NimfomaneIcon = () => {
   return (
     <svg
-      width="41.420799mm"
-      height="33.851044mm"
+      width="23px"
+      height="23px"
       viewBox="0 0 41.420799 33.851044"
       version="1.1"
       id="svg5"

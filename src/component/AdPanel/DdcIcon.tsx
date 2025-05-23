@@ -1,8 +1,8 @@
 export const DdcIcon = () => {
   return (
     <svg
-      width="14.011548mm"
-      height="14.74277mm"
+      width="26px"
+      height="26px"
       viewBox="0 0 14.011548 14.74277"
       version="1.1"
       id="svg5"
