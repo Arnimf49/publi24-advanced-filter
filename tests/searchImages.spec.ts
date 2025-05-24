@@ -1,6 +1,7 @@
 import {expect, test} from "./helpers/fixture";
 import {utils} from "./helpers/utils";
 import {ElementHandle, errors} from "playwright-core";
+import * as cheerio from "cheerio";
 
 test('Should search for images and show relevant results.', async ({ page, context }, testInfo) => {
   testInfo.setTimeout(60000 * 4);
@@ -129,5 +130,45 @@ test('Should search for images and show relevant results.', async ({ page, conte
   }
 
   expect(Object.keys(caseChecks).length, `Cases not met: ${Object.keys(caseChecks).join(', ')}`).toEqual(0)
+});
+
+test('Should be able to search images on ads without phone.', async ({ page, context }) => {
+  await utils.openPubli(context, page, {loadStorage: false});
+
+  const articles = await page.$$('[data-articleid]');
+  const article = articles[2];
+  const id = await article.getAttribute('data-articleid');
+  const url = await(await article.$('[class="article-title"] a')).getAttribute('href');
+
+  await page.route(url, async (route) => {
+    const response = await route.fetch();
+    let body = await response.text();
+
+    const $ = cheerio.load(body);
+    $('[id="EncryptedPhone"]').remove()
+    const modifiedBody = $.html();
+
+    await route.fulfill({
+      response,
+      body: modifiedBody,
+    });
+  });
+
+  await page.waitForResponse(response => response.url() === url);
+  await page.waitForTimeout(100);
+
+  await (await article.$(`[data-wwid="no-phone-message"]`)).isVisible();
+  expect(await article.$(`[data-wwid="search-results"]`)).toBeNull();
+
+  await (await article.$('[data-wwid="investigate_img"]')).click();
+  await page.waitForTimeout(2000);
+  await (await article.$('[data-wwid="investigate_img"]')).click();
+
+  await utils.waitForInnerTextNot(
+    page,
+    `[data-articleid="${id}"] [data-wwid="image-results"]`,
+    'nerulat',
+    5000,
+  );
 });
 

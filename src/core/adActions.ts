@@ -287,10 +287,6 @@ export const adActions = {
       e.preventDefault();
       e.stopPropagation();
 
-      if (!WWStorage.getAdPhone(id) && !(await adActions.investigateNumberAndSearch(item, id, false))) {
-        return;
-      }
-
       if (this) (this as HTMLButtonElement).disabled = true;
       WWBrowserStorage.set(`ww:image_results:${id}`, null);
 
