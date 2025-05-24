@@ -125,7 +125,7 @@ function readImageLinksMobile(_: string, done: (results: string[]) => void): voi
           .filter((href): href is string => href !== null);
         done(resultUrls);
       }, 100);
-    }, 800);
+    }, 1750);
   }).catch(error => {
     console.error("Error finding or clicking mobile exact link:", error);
     done([]);
