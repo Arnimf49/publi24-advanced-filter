@@ -1,5 +1,6 @@
 import {STORAGE_PAGE, utils} from "./utils";
 import fs from "node:fs";
+import {utilsPubli} from "./utilsPubli";
 
 const MAX_AGE_MS = 20 * 60 * 1000; // 20 min
 
@@ -18,8 +19,8 @@ export default async () => {
   const context = await utils.makeContext();
   const page = await context.newPage();
 
-  await utils.openPubli(context, page, {loadStorage: false});
-  await utils.findAdWithDuplicates(page);
+  await utilsPubli.open(context, page, {loadStorage: false});
+  await utilsPubli.findAdWithDuplicates(page);
 
   const localStorageData = await page.evaluate(() => {
     const data: any = {};

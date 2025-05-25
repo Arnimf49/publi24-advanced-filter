@@ -9,93 +9,75 @@ import path from 'path';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-export default [
-  {
-    input: 'src/index.ts',
-    output: {
-      file: 'dist/index.js',
-      format: 'iife',
-      sourcemap: !isProduction,
-      globals: {
-        'react': 'React',
-        'react-dom/client': 'ReactDOM',
-        'react-dom': 'ReactDOM'
-      }
-    },
-    external: ['react', 'react-dom/client', 'react-dom'],
-    plugins: [
-      resolve({ browser: true }),
-      commonjs(),
-      typescript({
-        tsconfig: './tsconfig.json',
-        sourceMap: !isProduction,
-        inlineSources: !isProduction,
-      }),
-      postcss({
-        extract: path.resolve('dist/styles.css'),
-        modules: {
-          generateScopedName: isProduction
-            ? '[hash:base64:5]'
-            : '[name]__[local]___[hash:base64:5]',
-        },
-        use: ['sass'],
-        plugins: [
-          autoprefixer(),
-          isProduction ? cssnano() : null,
-        ].filter(Boolean),
-        sourceMap: !isProduction,
-      }),
-      replace({
-        preventAssignment: true,
-        'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
-      }),
-    ],
-    watch: {
-      // Optional: Add watch options if needed, e.g., clearScreen: false
+const makeStyledSource = (root, file) => ({
+  input: `src/${root}/${file}`,
+  output: {
+    file: `dist/${root}/${file.replace(/\.ts$/, '.js')}`,
+    format: 'iife',
+    sourcemap: !isProduction,
+    globals: {
+      'react': 'React',
+      'react-dom/client': 'ReactDOM',
+      'react-dom': 'ReactDOM'
     }
   },
+  external: ['react', 'react-dom/client', 'react-dom'],
+  plugins: [
+    resolve({ browser: true }),
+    commonjs(),
+    typescript({
+      tsconfig: './tsconfig.json',
+      sourceMap: !isProduction,
+      inlineSources: !isProduction,
+    }),
+    postcss({
+      extract: path.resolve(`dist/${root}/styles.css`),
+      modules: {
+        generateScopedName: isProduction
+          ? '[hash:base64:5]'
+          : '[name]__[local]___[hash:base64:5]',
+      },
+      use: ['sass'],
+      plugins: [
+        autoprefixer(),
+        isProduction ? cssnano() : null,
+      ].filter(Boolean),
+      sourceMap: !isProduction,
+    }),
+    replace({
+      preventAssignment: true,
+      'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
+    }),
+  ],
+  watch: {}
+})
 
-  {
-    input: 'src/search_parser.ts',
-    output: {
-      file: 'dist/search_parser.js',
-      format: 'iife',
-      sourcemap: !isProduction,
-    },
-    plugins: [
-      resolve({ browser: true }),
-      commonjs(),
-      typescript({
-        tsconfig: './tsconfig.json',
-        sourceMap: !isProduction,
-        inlineSources: !isProduction,
-      }),
-      replace({
-        preventAssignment: true,
-        'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
-      }),
-    ]
+const makeSimpleSource = (root, file) => ({
+  input: `src/${root}/${file}`,
+  output: {
+    file: `dist/${root}/${file.replace(/\.ts$/, '.js')}`,
+    format: 'iife',
+    sourcemap: !isProduction,
   },
+  plugins: [
+    resolve({ browser: true }),
+    commonjs(),
+    typescript({
+      tsconfig: './tsconfig.json',
+      sourceMap: !isProduction,
+      inlineSources: !isProduction,
+    }),
+    replace({
+      preventAssignment: true,
+      'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
+    }),
+  ]
+})
 
-  {
-    input: 'src/search_image_parser.ts',
-    output: {
-      file: 'dist/search_image_parser.js',
-      format: 'iife',
-      sourcemap: !isProduction,
-    },
-    plugins: [
-      resolve({ browser: true }),
-      commonjs(),
-      typescript({
-        tsconfig: './tsconfig.json',
-        sourceMap: !isProduction,
-        inlineSources: !isProduction,
-      }),
-      replace({
-        preventAssignment: true,
-        'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
-      }),
-    ]
-  }
+export default [
+  makeStyledSource('publi24', 'index.ts'),
+  makeSimpleSource('publi24', 'search_parser.ts'),
+  makeSimpleSource('publi24', 'search_image_parser.ts'),
+
+  makeStyledSource('nimfomane', 'index.ts'),
 ];

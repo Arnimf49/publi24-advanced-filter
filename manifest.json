@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Publi24 filtru avansat",
-  "version": "2.28",
+  "version": "2.29",
   "description": "Publi24 filtru avansat",
   "icons": {
     "128": "icon.png"
@@ -21,6 +21,12 @@
         "library/tesseract/*.traineddata"
       ],
       "matches": ["*://www.publi24.ro/*"]
+    },
+    {
+      "resources": [
+        "icon.png"
+      ],
+      "matches": ["*://nimfomane.com/*"]
     }
   ],
   "content_scripts": [
@@ -33,11 +39,11 @@
         "library/react/react-dom.production.min.js",
         "library/splide/splide.min.js",
         "library/qrcode.js",
-        "dist/index.js"
+        "dist/publi24/index.js"
       ],
       "css": [
         "library/splide/splide.min.css",
-        "dist/styles.css"
+        "dist/publi24/styles.css"
       ]
     },
     {
@@ -45,7 +51,7 @@
         "https://www.google.com/search?q=*"
       ],
       "js": [
-        "dist/search_parser.js"
+        "dist/publi24/search_parser.js"
       ]
     },
     {
@@ -55,9 +61,19 @@
         "https://www.google.com/search?sca_esv=*"
       ],
       "js": [
-        "dist/search_image_parser.js"
+        "dist/publi24/search_image_parser.js"
+      ]
+    },
+    {
+      "matches": ["https://nimfomane.com/forum/*"],
+      "js": [
+        "library/react/react.production.min.js",
+        "library/react/react-dom.production.min.js",
+        "dist/nimfomane/index.js"
       ],
-      "run_at": "document_idle"
+      "css": [
+        "dist/nimfomane/styles.css"
+      ]
     }
   ],
   "browser_specific_settings": {

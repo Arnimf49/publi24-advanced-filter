@@ -1,0 +1,55 @@
+.container {
+  background: #e5e2e2;
+  border-radius: 5px;
+  width: 100px;
+  height: 100px;
+  margin: 5px;
+  position: relative;
+  overflow: hidden;
+
+  svg {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  :global(.onMobile) & {
+    width: 70px;
+    height: 85px;
+    margin: 0;
+    margin-right: 5px;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+  }
+}
+
+:global(.onMobile [data-rowid] .ipsDataItem_main), :global(.onMobile [data-rowid] .ipsDataItem_stats) {
+  margin-left: 80px !important;
+}
+:global(.onMobile [data-rowid] .ipsPagination_page:nth-child(3)),
+:global(.onMobile [data-rowid] .ipsPagination_page:nth-child(4)) {
+  display: none;
+}
+:global(.onMobile [data-rowid] > .ipsDataItem_icon) {
+  position: absolute;
+  right: 8px;
+  top: 65px;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.image {
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.loader {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
