@@ -24,14 +24,14 @@
   }
 }
 
-:global(.onMobile [data-rowid] .ipsDataItem_main), :global(.onMobile [data-rowid] .ipsDataItem_stats) {
+:global(.onMobile .ww_topic_image_registered .ipsDataItem_main), :global(.onMobile .ww_topic_image_registered .ipsDataItem_stats) {
   margin-left: 80px !important;
 }
-:global(.onMobile [data-rowid] .ipsPagination_page:nth-child(3)),
-:global(.onMobile [data-rowid] .ipsPagination_page:nth-child(4)) {
+:global(.onMobile .ww_topic_image_registered .ipsPagination_page:nth-child(3)),
+:global(.onMobile .ww_topic_image_registered .ipsPagination_page:nth-child(4)) {
   display: none;
 }
-:global(.onMobile [data-rowid] > .ipsDataItem_icon) {
+:global(.onMobile .ww_topic_image_registered > .ipsDataItem_icon) {
   position: absolute;
   right: 8px;
   top: 65px;

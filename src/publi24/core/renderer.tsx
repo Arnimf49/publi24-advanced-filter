@@ -152,6 +152,9 @@ export const renderer = {
     button.innerHTML = 'următorul anunț vizibil / nou';
     button.style.margin = 'auto';
     button.style.display = 'block';
+    if (IS_MOBILE_VIEW) {
+      button.style.marginTop = '-15px';
+    }
 
     list.appendChild(button);
 

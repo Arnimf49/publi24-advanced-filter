@@ -8,9 +8,11 @@ export const renderer = {
     const root = ReactDOM.createRoot(imageContainer);
     root.render(<TopicImageRoot id={id} container={container}/>);
 
+
     const mainDataContainer = container.querySelector('.ipsDataItem_main');
     if (mainDataContainer) {
       container.insertBefore(imageContainer, mainDataContainer);
+      container.classList.add('ww_topic_image_registered');
     } else {
       console.error('Main data container not found');
     }

@@ -24,8 +24,8 @@
         }
 
         .canvas-container {
-            width: 1200px;
-            height: 628px;
+            width: 1280px;
+            height: 800px;
             background-color: #f7f7fc;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -85,9 +85,12 @@
 
         .ad-card .image-box img {
             width: 100%;
-            height: 100%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
         }
         .ad-card .image-box {
+            position: relative;
             overflow: hidden;
             width: 30%;
             height: 100%;
@@ -211,7 +214,7 @@
         <div class="ad-card highlight">
             <div class="checkmark">✓</div>
             <div class="image-box">
-                <img src="woman_in_dress.png"/>
+                <img src="woman_in_dress.png" />
             </div>
             <div class="text-box">
                 <div class="text-line" style="width: 35%"></div>
