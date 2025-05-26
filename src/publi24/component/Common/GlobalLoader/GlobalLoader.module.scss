@@ -21,12 +21,14 @@
 }
 
 .loaderAnimation {
-  animation: l5 1s infinite, fadeIn 1s !important;
   position: fixed;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   z-index: 10001;
+}
+.fadeInWrapper {
+  animation: fadeIn 1s !important;
 }
 @keyframes fadeIn {
   0% { opacity: 0; }

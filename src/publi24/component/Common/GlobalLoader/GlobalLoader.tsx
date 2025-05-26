@@ -25,7 +25,9 @@ const GlobalLoader: React.FC<GlobalLoaderProps> = ({ message }) => {
         aria-busy="true"
       >
         <div className={styles.backdrop}></div>
-        <Loader classes={styles.loaderAnimation}/>
+        <div className={styles.fadeInWrapper}>
+          <Loader classes={styles.loaderAnimation}/>
+        </div>
         {message && (
           <div className={styles.loaderMessage} data-wwid="ww-loader-message">
             {message}
