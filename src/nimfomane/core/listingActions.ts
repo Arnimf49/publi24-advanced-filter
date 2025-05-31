@@ -16,7 +16,7 @@ export const listingActions = {
     const url = (container.querySelector('.ipsPagination_last a')! || topicTitle).getAttribute('href')!;
 
     const normalizedTitle = utils.normalizeDigits(topicTitle.innerText)
-    if (!normalizedTitle.match(/07\d{8}/)
+    if (!normalizedTitle.match(/07(\d ?){8}/)
       && !normalizedTitle.match(/indisponibil[aă]/i)) {
       if (!await topicActions.determineTopPosterEscort(url)) {
         NimfomaneStorage.setTopicProp(id, 'isOfEscort', false);

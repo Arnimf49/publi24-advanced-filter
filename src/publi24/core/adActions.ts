@@ -137,7 +137,7 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
     && !content.match(/(\W|^)(nu fac total|nu ofer total)(\W|$)/i)) {
     data.push(['total', true]);
   }
-  if (content.match(/(\W|^)((doar|numai) (deplasar|depalsar|deplsar)(i{1,3}|e)|nu am locatie)(\W|$)/i)
+  if (content.match(/(\W|^)((doar|numai|decat) (deplasar|depalsar|deplsar)(i{1,4}|e)|nu am locatie)(\W|$)/i)
     && !content.match(/(\W|^)(la mine|locatie proprie|si deplasar[ie]|si locatie|locatia mea|in locatie|nu fac deplasari)(\W|$)/i)) {
     data.push(['onlyTrips', true]);
   }

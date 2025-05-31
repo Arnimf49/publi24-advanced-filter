@@ -147,7 +147,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
             <input
               type="number"
               className={styles.controlInput}
-              value={settings.maxAgeValue ?? ''}
+              defaultValue={settings.maxAgeValue ?? ''}
               onChange={(e) => handleValueChange('maxAgeValue', e)}
               onKeyDown={handleInputKeyDown}
             />
@@ -164,7 +164,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
             <input
               type="number"
               className={styles.controlInput}
-              value={settings.minHeightValue ?? ''}
+              defaultValue={settings.minHeightValue ?? ''}
               onChange={(e) => handleValueChange('minHeightValue', e)}
               onKeyDown={handleInputKeyDown}
             />
@@ -181,7 +181,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
             <input
               type="number"
               className={styles.controlInput}
-              value={settings.maxHeightValue ?? ''}
+              defaultValue={settings.maxHeightValue ?? ''}
               onChange={(e) => handleValueChange('maxHeightValue', e)}
               onKeyDown={handleInputKeyDown}
             />
@@ -198,7 +198,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
             <input
               type="number"
               className={styles.controlInput}
-              value={settings.maxWeightValue ?? ''}
+              defaultValue={settings.maxWeightValue ?? ''}
               onChange={(e) => handleValueChange('maxWeightValue', e)}
               onKeyDown={handleInputKeyDown}
             />

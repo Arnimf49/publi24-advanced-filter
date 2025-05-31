@@ -45,7 +45,9 @@ const setupHideSetting = async (page: Page, criteria: string, options?: {default
     const input = await page.$(`[data-wwcriteria="${criteria}"] input`);
     expect(await input.getAttribute('value'), ''+options.defaultValue);
     await input.fill('');
+    expect(await input.getAttribute('value'), '');
     await input.fill(''+options.value);
+    expect(await input.getAttribute('value'), ''+options.value);
   }
 
   await page.locator('[data-wwid="close"]').click();

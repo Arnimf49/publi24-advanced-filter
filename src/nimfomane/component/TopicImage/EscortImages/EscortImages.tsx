@@ -110,7 +110,7 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
 
       {images.map((url, index) => (
         <div key={index} data-wwid={'escort-image'} className={classes.image_container}>
-          <img src={url} />
+          <img src={url} onClick={(e) => e.stopPropagation()} />
         </div>
       ))}
 
