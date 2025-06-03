@@ -80,13 +80,13 @@ export const adData = {
 
       if (IS_AD_PAGE || itemIsOnAdPage) {
         if (IS_MOBILE_VIEW) {
-          locationText = targetElement.querySelector<HTMLElement>('[class="location"]')?.textContent;
+          locationText = targetElement.querySelector<HTMLElement>('[class="location"]')?.innerText;
         } else {
-          locationText = targetElement.querySelector<HTMLElement>('[itemtype="https://schema.org/Place"]')?.textContent;
+          locationText = targetElement.querySelector<HTMLElement>('[itemtype="https://schema.org/Place"]')?.innerText;
         }
       } else {
         if (item instanceof Element) {
-          locationText = item.querySelector<HTMLElement>('[class="article-location"]')?.textContent;
+          locationText = item.querySelector<HTMLElement>('[class="article-location"]')?.innerText;
         }
       }
     }

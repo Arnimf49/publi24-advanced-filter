@@ -38,7 +38,7 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
       botox: criteria.botox ?? false,
       onlyTrips: criteria.onlyTrips ?? false,
       showWeb: criteria.showWeb ?? false,
-      total: criteria.total ?? false,
+      btsRisc: criteria.btsRisc ?? false,
       party: criteria.party ?? false,
     });
   }, []);

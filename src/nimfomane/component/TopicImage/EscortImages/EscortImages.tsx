@@ -108,6 +108,10 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
         <CloseIcon />
       </button>
 
+      {!images.length && !loading &&
+        <div className={classes.noImages}>Nu sunt poze</div>
+      }
+
       {images.map((url, index) => (
         <div key={index} data-wwid={'escort-image'} className={classes.image_container}>
           <img src={url} onClick={(e) => e.stopPropagation()} />

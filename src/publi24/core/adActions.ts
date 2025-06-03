@@ -55,10 +55,10 @@ const AUTO_HIDE_CRITERIA: { [key in keyof AutoHideCriterias]: AutoHideCriteriaPr
     value: 'party',
     reason: (): string => `face party`,
   },
-  total: {
+  btsRisc: {
     condition: (_: AutoHideCriterias, value: boolean): boolean => value,
-    value: 'total',
-    reason: (): string => `servicii totale`,
+    value: 'btsRisc',
+    reason: (): string => `risc bts`,
   },
   trans: {
     condition: (_: AutoHideCriterias, value: boolean): boolean => value,
@@ -133,9 +133,8 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
   if (content.match(/(\W|^)(party)(\W|$)/i)) {
     data.push(['party', true]);
   }
-  if (content.match(/(\W|^)(servtotale|servicii totale|tottal|(?<!(devii |fii ))total)(\W|$)|(\W|^)full (?!\s*(detail|of))/i)
-    && !content.match(/(\W|^)(nu fac total|nu ofer total)(\W|$)/i)) {
-    data.push(['total', true]);
+  if (content.match(/(\W|^)(cu sau fara|cum vrei tu|cum te simti mai bine)(\W|$)/i)) {
+    data.push(['btsRisc', true]);
   }
   if (content.match(/(\W|^)((doar|numai|decat) (deplasar|depalsar|deplsar)(i{1,4}|e)|nu am locatie)(\W|$)/i)
     && !content.match(/(\W|^)(la mine|locatie proprie|si deplasar[ie]|si locatie|locatia mea|in locatie|nu fac deplasari)(\W|$)/i)) {
@@ -257,7 +256,7 @@ export const adActions = {
 
     pageResults.forEach((pageResult, index: number) => {
       if (typeof pageResult === 'object' && pageResult !== null && (pageResult as any).error) {
-        if ((pageResult as any).code === 410) {
+        if ((pageResult as any).code === 410 || (pageResult as any).code === 404) {
           WWStorage.addAdDeadLink(id, publi24AdLinks[index]);
         }
         return;

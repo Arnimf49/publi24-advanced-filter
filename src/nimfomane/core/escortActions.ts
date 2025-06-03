@@ -30,17 +30,17 @@ export const escortActions = {
     NimfomaneStorage.setEscortProp(user, 'optimizedProfileImageTime', Date.now());
   },
 
-  async loadImages(user: string, pageNumber: number): Promise<string[] | null> {
+  async loadImages(user: string, pageNum: number): Promise<string[] | null> {
     let url = NimfomaneStorage.getEscort(user).profileLink + 'content';
-    if (pageNumber !== 0) {
-      url += '/page/' + (pageNumber + 1);
+    if (pageNum !== 0) {
+      url += '/page/' + (pageNum + 1);
     }
 
     try {
       const pageData = await page.load(url, 'nimfomane');
-      const pageExists = !!pageData.querySelector(`[data-page="${pageNumber + 1}"]`)
+      const pageExists = !!pageData.querySelector(`[data-page="${pageNum + 1}"]`)
 
-      if (pageNumber !== 0 && !pageExists) {
+      if (pageNum !== 0 && !pageExists) {
         return null;
       }
 

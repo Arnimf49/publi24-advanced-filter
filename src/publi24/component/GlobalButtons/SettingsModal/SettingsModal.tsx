@@ -245,12 +245,12 @@ const SettingsModal: React.FC<SettingsModalProps> =
             showDetails={settings.showWeb}
           />
           <SettingControl
-            title="Servicii totale"
-            description="Dacă zice că are servicii totale fii ascuns. Cei care zic asta tind să facă și normal neprotejat."
-            isOn={settings.total}
-            onToggle={() => onToggleCriteria('total')}
-            dataWwid="auto-hide-criteria" dataCriteria="total"
-            showDetails={settings.total}
+            title="Risc BTS"
+            description="Dacă descrierea conține formulări cu indici că ar face normal sau anal neprotejat atunci va fii ascuns."
+            isOn={settings.btsRisc}
+            onToggle={() => onToggleCriteria('btsRisc')}
+            dataWwid="auto-hide-criteria" dataCriteria="btsRisc"
+            showDetails={settings.btsRisc}
           />
           <SettingControl
             title="Party"

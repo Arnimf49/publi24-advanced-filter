@@ -1,6 +1,7 @@
 import * as ReactDOM from "react-dom/client";
 import {TopicImageRoot} from "../component/TopicImage/TopicImageRoot";
 import {ProfileImages} from "../component/ProfileImages/ProfileImages";
+import {profileActions} from "./profileActions";
 
 export const renderer = {
   registerTopicItem(container: HTMLDivElement, id: string) {
@@ -26,6 +27,8 @@ export const renderer = {
   },
 
   registerProfileImages(container: HTMLDivElement, user: string) {
+    profileActions.determineEscort();
+
     const buttonContainer = document.createElement('div');
     const root = ReactDOM.createRoot(buttonContainer);
     root.render(<ProfileImages user={user}/>);

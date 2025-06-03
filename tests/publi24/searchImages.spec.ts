@@ -50,7 +50,7 @@ test('Should search for images and show relevant results.', async ({ page, conte
         return false;
       }
 
-      expect(await warning.innerText()).toEqual('anunțuri active găsite in alte locații !');
+      expect(await warning.innerText()).toEqual('anunțuri active găsite în alte locații !');
       return true;
     },
     'safe links': async (article) => {

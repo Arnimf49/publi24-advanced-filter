@@ -43,7 +43,7 @@ export interface AutoHideCriterias {
   botox?: boolean;
   onlyTrips?: boolean;
   showWeb?: boolean;
-  total?: boolean;
+  btsRisc?: boolean;
   party?: boolean;
 }
 

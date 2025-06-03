@@ -267,7 +267,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                         <>
                           {hasImagesInOtherLocation && (
                             <p className={styles.imagesWarning} data-wwid="images-warning">
-                              anunțuri active găsite in alte locații !
+                              anunțuri active găsite în alte locații !
                             </p>
                           )}
                           <div className={styles.imageResultsContainer}>

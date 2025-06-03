@@ -122,7 +122,7 @@ export const linksFilter = {
     links
       .filter((link: string): boolean => {
         return !(link.startsWith("https://www.publi24.ro/") && !link.includes("/anunt/")) &&
-          link !== itemUrl;
+          link.replace(/.+\/([^.\/]+)\.html.*/, '$1') !== itemUrl.replace(/.+\/([^.\/]+)\.html.*/, '$1');
       })
       .forEach((link: string) => {
         try {

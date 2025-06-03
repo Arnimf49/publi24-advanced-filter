@@ -1,9 +1,12 @@
 import {NimfomaneStorage} from "./core/storage";
 import {IS_MOBILE_VIEW} from "../common/globals";
 import {renderer} from "./core/renderer";
+import {elementHelpers} from "./core/elementHelpers";
 
 const IS_TOPIC_PAGE = window.location.pathname.match(/^\/forum\/topic\//);
 const IS_PROFILE_PAGE = window.location.pathname.match(/^\/forum\/profile\//);
+const IS_PROFILE_PAGE_ESCORT = IS_PROFILE_PAGE
+  && elementHelpers.isProfilePageEscort(document);
 const IS_LISTING_PAGE = !!document.querySelector('.ipsDataList.cForumTopicTable');
 const IS_ESCORT_LISTING =
   document.querySelector<HTMLElement>('[data-role="breadcrumbList"] li:last-child')?.innerText.match(/escorte|masaj/i) &&
@@ -53,7 +56,7 @@ NimfomaneStorage.upgrade()
       runWithObserver(registerItems, '.cForumTopicTable');
     }
 
-    if (IS_PROFILE_PAGE) {
+    if (IS_PROFILE_PAGE_ESCORT) {
       const user = document.querySelector<HTMLElement>('.cProfileHeader_name h1')!.innerText.trim();
       const container = document.querySelector<HTMLDivElement>('[data-role="profileHeader"]')!;
 

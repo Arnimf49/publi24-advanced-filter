@@ -117,12 +117,12 @@ test('Should automatically hide if show web.', async ({ page, context }) => {
   await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'oferă show web'});
 });
 
-test('Should automatically hide if total service.', async ({ page, context }) => {
+test('Should automatically hide if btw risk.', async ({ page, context }) => {
   await utilsPubli.open(context, page, {loadStorage: false});
 
-  await setupHideSetting(page, 'total');
-  const article = await setupArticle(page, 'Buna', 'Servicii totale');
-  await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'servicii totale'});
+  await setupHideSetting(page, 'btsRisc');
+  const article = await setupArticle(page, 'Buna', 'cum vrei tu');
+  await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'risc bts'});
 });
 
 test('Should automatically hide if party.', async ({ page, context }) => {

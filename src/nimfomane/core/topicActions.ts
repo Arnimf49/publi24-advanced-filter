@@ -53,7 +53,7 @@ export const topicActions = {
     }
 
     const userPage = await page.load(url, 'nimfomane');
-    if (elementHelpers.isUsePageEscort(userPage)) {
+    if (elementHelpers.isProfilePageEscort(userPage)) {
       NimfomaneStorage.setEscortProp(user, 'profileLink', url.replace(/\?.*$/, ''));
       return true;
     }
