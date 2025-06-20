@@ -133,7 +133,7 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
   if (content.match(/(\W|^)(party)(\W|$)/i)) {
     data.push(['party', true]);
   }
-  if (content.match(/(\W|^)(cu sau fara|cum vrei tu|cum te simti mai bine)(\W|$)/i)) {
+  if (content.match(/(\W|^)(cu sau fara(?!\s+jucarii)|cum vrei tu|cum te simti mai bine)(\W|$)/i)) {
     data.push(['btsRisc', true]);
   }
   if (content.match(/(\W|^)((doar|numai|decat) (deplasar|depalsar|deplsar)(i{1,4}|e)|nu am locatie)(\W|$)/i)

@@ -248,8 +248,19 @@ export const adData = {
     }
 
     const trimmedPhone = phone.trim();
+    const previousPhone = WWStorage.getAdPhone(id);
+
     WWStorage.setAdPhone(id, trimmedPhone);
     WWStorage.addPhoneAd(trimmedPhone, id, adData.getItemUrl(item));
+
+    if (previousPhone) {
+      WWStorage.removePhoneAd(previousPhone, id);
+      // @TODO: Grave side effect.
+      if (WWStorage.getFavorites().includes(previousPhone)) {
+        WWStorage.toggleFavorite(previousPhone);
+        WWStorage.toggleFavorite(trimmedPhone, true);
+      }
+    }
 
     if (WWStorage.hasAdNoPhone(id)) {
       WWStorage.setAdNoPhone(id, false);

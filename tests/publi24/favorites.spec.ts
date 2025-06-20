@@ -174,3 +174,29 @@ test('Should display all favorite information.', async ({ page, context }) => {
   await expect(modal.locator('[data-wwid="duplicates-container"]')).toBeVisible();
   await expect(modal.locator('[data-wwid="fav-toggle"][data-wwstate="on"]')).toBeVisible();
 })
+
+test.only('Should switch phone number of favorite if phone number changes.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  const firstArticle = (await page.$$('[data-articleid]'))[0];
+  const phone = await (await firstArticle.$('[data-wwid="phone-number"]')).innerText();
+  await (await firstArticle.$('[data-wwid="fav-toggle"]')).click();
+
+  await page.locator('[data-wwid="favs-button"]').click();
+
+  const modal = page.locator('[data-wwid="favorites-modal"]');
+  await expect(modal).toBeVisible();
+  await expect(modal.locator('[data-wwid="phone-number"]')).toHaveText(phone);
+
+  await page.route('https://www.publi24.ro/DetailAd/PhoneNumberImages?Length=8', (route) => {
+    return route.fulfill({
+      status: 200,
+      body: 'iVBORw0KGgoAAAANSUhEUgAAANwAAABkCAYAAADtw16ZAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAALGSURBVHhe7dfbkeowDABQyqMgyqEXWqGTXNgFLL+CzQ0zC3POJyiJ7Ei2swMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC+wH45npfM6bBbbn/+Opxu/6w4HfJr9seluG0dE+zLJM7HZb8r8rgZjh3JYWZsb5+Hw1I+oXoXfLL6Bd9lL3q20Nbiq+aoG/7hf2JHc3hnw83MQ6sxb87HfYrjc6Wd4rwc978vP9XIaTlkxV5Lsen6vCnCPULxxWZu5RB3sNdi53JoaY+tbYt5qO/RuZ5PFV5oXJXDSrtalKFwshU4XJ+vzGE3fTyvk0PTROxUDg29sbVsMg/ht7DzpcVEw32B9JJ7BdEvtlD81bGvZ73QzsdDWNFbz56J7WnlUJoZ21bz0BLihu/N39XdyQYKonMsWhOPfo8GCTk0xefPxHY0cyjNjG2reSjEGM32LV5uuBdW9VCYl4vSd07RRPc8UviLsS29HDJv3t2GcijCLkabmb/s1YYL1w0d5Yrqya6JTRSLtvWMmdjSWg7RzNhmYq9GcwjSTvdkMeEDhIKZabhUBAMf8vVSncfHJsr+a+QwExs9yyGYGdum89D17LTB5+iu0Okl16vwxDEqNshVs2B6BdX6fSb2ZiiHuzcdJ6dyKK2MjU8Tiia+zFAg1bdDt0lLoVCuusUScrhckXaKdH16zkzs1WgON8Nju9h6Hrr3642Nj9T6Rkinn8ZRKRyN1j7ksxPUkx0g5ZCKqpXX1UzsTA4/Bsf2Y/N5iI2Z5j1d7xvuSxQrcNAspEcFrBRAWK27spU+7ly5elUfjJ3O4WJkbHfvmIesO3N2t69SF3Fv1e7tJlHchboaR6uy3oZ3josy9pUcRsZ29755qBfAtXkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/rDd7h+SFljmIP9RbgAAAABJRU5ErkJggg=='
+    })
+  });
+
+  await modal.locator('[data-wwid="investigate"]').click();
+  await expect(modal.locator('[data-wwid="phone-number"]')).not.toHaveText(phone);
+  await expect(modal.locator('[data-wwid="phone-number"]')).toHaveText('0726627723');
+  await expect(modal.locator('[data-wwid="fav-toggle"][data-wwstate="on"]')).toBeVisible();
+})

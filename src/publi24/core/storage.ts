@@ -259,14 +259,16 @@ export const WWStorage = {
     }
   },
 
-  removePhoneAd(phone: string, uuid: string): void {
-    if (!phone || !uuid) {
+  removePhoneAd(phone: string, uuidOrId: string): void {
+    if (!phone || !uuidOrId) {
       return;
     }
 
+    const id = uuidOrId.split('|').shift();
+
     let ads = WWStorage.getPhoneAds(phone);
     const initialLength = ads.length;
-    ads = ads.filter(adEntry => adEntry !== uuid);
+    ads = ads.filter(uuid => uuid.split('|').shift() !== id);
 
     if (ads.length < initialLength) {
       WWStorage.setPhoneProp(phone, 'ads', ads);
@@ -479,7 +481,7 @@ export const WWStorage = {
 
   async upgrade(): Promise<void> {
     const version = WWStorage.getVersion();
-    const currentVersion = 4;
+    const currentVersion = 5;
     const parsedVersion = version ? parseInt(version, 10) : currentVersion;
 
     type MigrationFunction = () => void;
@@ -561,6 +563,25 @@ export const WWStorage = {
           });
           localStorage.removeItem('ww:temp_save');
         }
+      },
+
+      // --- MIGRATION from v4 to v5 ---
+      4: () => {
+        console.log("Running migration v4 -> v5");
+        const favs = WWStorage.getFavorites();
+        favs.forEach(fav => {
+          const ads = WWStorage.getPhoneAds(fav);
+          const first = ads[0];
+          if (first) {
+            const firstPhone = WWStorage.getAdPhone(first.split('|').shift() as string);
+            if (!firstPhone) {
+              WWStorage.toggleFavorite(fav);
+            } else if (firstPhone !== fav) {
+              WWStorage.toggleFavorite(fav);
+              WWStorage.toggleFavorite(firstPhone, true);
+            }
+          }
+        })
       }
     };
 
