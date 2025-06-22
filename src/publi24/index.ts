@@ -40,7 +40,7 @@ WWStorage.upgrade()
 
       renderer.registerAdItem(item!, id.toUpperCase());
     } else {
-      renderer.registerAdsInContext(document.body, { applyFocusMode: true });
+      renderer.registerAdsInContext(document.body, { applyFocusMode: true, isFromListing: true });
       renderer.renderNextVisibleAdButton();
 
       if (location.pathname.startsWith('/anunturi/matrimoniale')) {

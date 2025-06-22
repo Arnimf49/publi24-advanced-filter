@@ -114,3 +114,48 @@ test('Should toggle focus mode and not see hidden ads.', async ({ page, context 
   await expect(page.locator(`[data-articleid="${firstArticleId}"]`)).toBeVisible();
   await expect(page.locator(`[data-articleid="${secondArticleId}"]`)).toBeVisible();
 })
+
+test('Should toggle ad deduplication and see only newest ad.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  const firstArticle = await utilsPubli.findAdWithDuplicates(page);
+  const firstArticleUrl = page.url();
+  const firstArticleId = await firstArticle.getAttribute('data-articleid');
+  const phone = await (await firstArticle.$('[data-wwid="phone-number"]')).innerText();
+
+  let duplicateArticleIds: string[] = [];
+
+  do {
+    const articles = await page.locator(`[data-wwphone="${phone}"]`).all();
+
+    if (articles.length) {
+      for (let i = 1; i < articles.length; i++) {
+        const parent = await articles[i].evaluateHandle(el => el.closest('[data-articleid]'));
+        const articleId = await parent.getAttribute('data-articleid');
+
+        if (articleId !== firstArticleId) {
+          duplicateArticleIds.push(articleId);
+        }
+      }
+    }
+
+    if (!duplicateArticleIds.length) {
+      await (await page.$$('.pagination .arrow'))[1].click();
+    }
+  } while (!duplicateArticleIds.length);
+
+
+  await page.waitForTimeout(1000);
+
+  await (await page.$('[data-wwid="settings-button"]')).click();
+  await (await page.$('[data-wwid="ad-deduplication-switch"]')).click();
+  await page.waitForTimeout(1500);
+
+  for (let articleId of duplicateArticleIds) {
+    await expect(page.locator(`[data-articleid="${articleId}"]`)).toBeHidden();
+  }
+
+  await page.goto(firstArticleUrl);
+  await page.waitForTimeout(1500);
+  await expect(page.locator(`[data-articleid="${firstArticleId}"]`)).toBeVisible();
+})

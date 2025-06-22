@@ -19,11 +19,13 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
 
   useEffect(() => {
     const focusMode = WWStorage.isFocusMode();
+    const adDeduplication = WWStorage.isAdDeduplicationEnabled();
     const autoHide = WWStorage.isAutoHideEnabled();
     const criteria = WWStorage.getAutoHideCriterias();
 
     setSettings({
       focusMode,
+      adDeduplication,
       autoHide,
       maxAge: criteria.maxAge ?? false,
       maxAgeValue: criteria.maxAgeValue ?? DEFAULT_CRITERIA_VALUES.maxAgeValue,
@@ -41,6 +43,16 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
       btsRisc: criteria.btsRisc ?? false,
       party: criteria.party ?? false,
     });
+  }, []);
+
+  const handleToggleAdDeduplication = useCallback(() => {
+    const current = WWStorage.isAdDeduplicationEnabled();
+    WWStorage.setAdDeduplication(!current);
+    setSettings(prev => prev ? { ...prev, adDeduplication: !current } : null);
+    setTimeout(() => {
+      window.scrollTo({ left: 0, top: 0 });
+      window.location.reload();
+    }, 400);
   }, []);
 
   const handleToggleFocusMode = useCallback(() => {
@@ -93,6 +105,7 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
         onClose={onClose}
         settings={settings}
         onToggleFocusMode={handleToggleFocusMode}
+        onToggleAdDeduplication={handleToggleAdDeduplication}
         onToggleAutoHide={handleToggleAutoHide}
         onToggleCriteria={handleToggleCriteria}
         onCriteriaValueChange={handleCriteriaValueChange}

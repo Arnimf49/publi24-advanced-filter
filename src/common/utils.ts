@@ -55,5 +55,48 @@ export const utils = {
     });
 
     return str;
+  },
+
+  parseRomanianDate(input: string) {
+    const now = new Date();
+    const months: Record<string, number> = {
+      ianuarie: 0, februarie: 1, martie: 2, aprilie: 3,
+      mai: 4, iunie: 5, iulie: 6, august: 7,
+      septembrie: 8, octombrie: 9, noiembrie: 10, decembrie: 11
+    };
+
+    const lower = input.toLowerCase().trim();
+
+    if (lower.startsWith('azi')) {
+      const [, time] = lower.split(' ');
+      const [h, m] = time.split(':').map(Number);
+      const date = new Date(now);
+      date.setHours(h, m, 0, 0);
+      return date;
+    }
+
+    if (lower.startsWith('ieri')) {
+      const [, time] = lower.split(' ');
+      const [h, m] = time.split(':').map(Number);
+      const date = new Date(now);
+      date.setDate(date.getDate() - 1);
+      date.setHours(h, m, 0, 0);
+      return date;
+    }
+
+    const match = lower.match(/^([a-zăîâșț]+)\s+(\d{1,2})$/);
+    if (match) {
+      const [, monthStr, dayStr] = match;
+      if (!monthStr || !months[monthStr]) {
+        return null;
+      }
+      const month = months[monthStr] as number;
+      const day = parseInt(dayStr, 10);
+      if (month !== undefined) {
+        return new Date(now.getFullYear(), month, day);
+      }
+    }
+
+    return null;
   }
 }

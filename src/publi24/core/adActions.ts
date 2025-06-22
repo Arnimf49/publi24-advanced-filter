@@ -183,6 +183,13 @@ export const adActions = {
     }
   },
 
+  adSeen(item: HTMLElement, id: string) {
+    const date = adData.getItemDate(item);
+    if (date) {
+      WWStorage.setSeenTime(id, date.getTime())
+    }
+  },
+
   async investigateNumberAndSearch(item: HTMLElement, id: string, search: boolean = true): Promise<boolean> {
     let windowRef: Window | null = null;
     if (search) {

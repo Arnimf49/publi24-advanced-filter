@@ -4,6 +4,7 @@ import {IS_AD_PAGE} from "./globals";
 import {WWStorage} from "./storage";
 import {IS_MOBILE_VIEW} from "../../common/globals";
 import {BrowserError, page} from "../../common/page";
+import {utils} from "../../common/utils";
 
 export interface AdData {
   IS_MOBILE_VIEW: boolean;
@@ -56,6 +57,15 @@ export const adData = {
   getPageTitle(itemPage: DocumentFragment | HTMLElement): string {
     const titleElement = itemPage.querySelector<HTMLHeadingElement>('[itemscope] h1[itemprop="name"]');
     return titleElement ? titleElement.innerHTML : '';
+  },
+
+  getItemDate(item: Element) {
+    if (IS_AD_PAGE) {
+      throw new Error('Not implemented: getItemDate for ad page');
+    } else {
+      const dateStr = item.querySelector<HTMLElement>('[class="article-date"]')!.innerText;
+      return utils.parseRomanianDate(dateStr);
+    }
   },
 
   getItemUrl(itemOrUrl: Element | string): string {
@@ -112,6 +122,42 @@ export const adData = {
     const isPhoneHidden: boolean = phone ? WWStorage.isPhoneHidden(phone) : false;
 
     return isItemVisible && !isPhoneHidden;
+  },
+
+  hasAdNewerDuplicate(id: string) {
+    const phone = WWStorage.getAdPhone(id);
+
+    if (!phone) {
+      return false;
+    }
+
+    const adIds = WWStorage.getPhoneAds(phone)
+      .map(uuid => adData.uuidParts(uuid)[0])
+      .filter(adId => id !== adId);
+    const thisSeenTime = WWStorage.getSeenTime(id) || 0;
+
+    if (!adIds.length) {
+      return false;
+    }
+
+    let newestTime = 0;
+    adIds.forEach(adId => {
+      const time = WWStorage.getSeenTime(adId) || 0;
+      if (time > newestTime) {
+        newestTime = time;
+      }
+    });
+
+    if (thisSeenTime === newestTime) {
+      const firstWithTime = adIds.reverse().find((id) => {
+        const time = WWStorage.getSeenTime(id) || 0;
+        return time === thisSeenTime;
+      })
+
+      return firstWithTime !== id;
+    }
+
+    return thisSeenTime < newestTime;
   },
 
   async loadInAdPage(itemOrUrl: Element | string | null, _url?: string): Promise<HTMLElement> {

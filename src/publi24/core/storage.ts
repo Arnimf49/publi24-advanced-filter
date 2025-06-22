@@ -9,6 +9,7 @@ interface AdItem {
   deadLinks?: string[] | null;
   phoneTime?: number;
   imagesTime?: number;
+  lastSeen?: number;
   [key: string]: any;
 }
 
@@ -185,6 +186,14 @@ export const WWStorage = {
 
   setInvestigatedTime(id: string, timestamp: number): void {
     WWStorage.setAdProp(id, 'phoneTime', timestamp);
+  },
+
+  setSeenTime(id: string, timestamp: number): void {
+    WWStorage.setAdProp(id, 'lastSeen', timestamp);
+  },
+
+  getSeenTime(id: string): number | undefined {
+    return WWStorage.getAdProp(id, 'lastSeen');
   },
 
   getInvestigatedTime(id: string): number | undefined {
@@ -373,6 +382,14 @@ export const WWStorage = {
 
   isFocusMode(): boolean {
     return localStorage.getItem('ww:focus_mode') === 'true';
+  },
+
+  setAdDeduplication(enabled: boolean): void {
+    localStorage.setItem('ww:ad_deduplication', enabled ? 'true' : 'false');
+  },
+
+  isAdDeduplicationEnabled(): boolean {
+    return localStorage.getItem('ww:ad_deduplication') === 'true';
   },
 
   setAutoHideEnabled(enabled: boolean): void {

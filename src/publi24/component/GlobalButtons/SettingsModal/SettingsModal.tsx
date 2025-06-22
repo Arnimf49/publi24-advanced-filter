@@ -72,6 +72,7 @@ const SettingControl: React.FC<SettingControlProps> =
 
 export type SettingsData = {
   focusMode: boolean;
+  adDeduplication: boolean;
   autoHide: boolean;
 } & AutoHideCriterias;
 
@@ -79,6 +80,7 @@ type SettingsModalProps = {
   onClose: () => void;
   settings: SettingsData;
   onToggleFocusMode: () => void;
+  onToggleAdDeduplication: () => void;
   onToggleAutoHide: () => void;
   onToggleCriteria: (criteriaKey: keyof AutoHideCriterias) => void;
   onCriteriaValueChange: (criteriaKey: keyof AutoHideCriterias, value: number) => void;
@@ -89,6 +91,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
   onClose,
   settings,
   onToggleFocusMode,
+  onToggleAdDeduplication,
   onToggleAutoHide,
   onToggleCriteria,
   onCriteriaValueChange,
@@ -118,10 +121,17 @@ const SettingsModal: React.FC<SettingsModalProps> =
     >
       <SettingControl
         title="Mod focus"
-        description="Cănd activat anunțurile ascunse anterior nu se vor mai afișa deloc. Util pentru a vedea numai cea ce ii nou sau încă ne-ascuns."
+        description="Cănd activat anunțurile ascunse anterior nu se vor mai afișa deloc pe pagina de listare. Util pentru a vedea numai cea ce ii nou sau încă ne-ascuns."
         isOn={settings.focusMode}
         onToggle={onToggleFocusMode}
         dataWwid="focus-mode-switch"
+      />
+      <SettingControl
+        title="Singur anunț"
+        description="Cănd activat numai cel mai nou anunț de la aceeași telefon va fii vizibil pe pagina de listare."
+        isOn={settings.adDeduplication}
+        onToggle={onToggleAdDeduplication}
+        dataWwid="ad-deduplication-switch"
       />
 
       <div className={styles.controlSpacer}></div>

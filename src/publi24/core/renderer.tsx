@@ -49,6 +49,7 @@ let INVESTIGATE_TIMEOUT: number = 500;
 
 interface RegisterAdsOptions {
   applyFocusMode?: boolean;
+  isFromListing?: boolean;
   renderOptions?: RenderOptions;
 }
 
@@ -66,6 +67,7 @@ export const renderer = {
 
   registerAdsInContext(context: HTMLElement | Document, {
     applyFocusMode = false,
+    isFromListing = false,
     renderOptions
   }: RegisterAdsOptions = {}): Array<() => void> {
     let itemsNodeList = context.querySelectorAll<HTMLElement>('[data-articleid]');
@@ -84,11 +86,25 @@ export const renderer = {
 
     return items.map((item) => {
       const articleId = item.getAttribute('data-articleid');
+
       if (!articleId) {
         console.error("Item missing data-articleid", item);
         return () => {
         };
       }
+
+      if (isFromListing) {
+        try {
+          adActions.adSeen(item, articleId);
+        } catch (error) {
+          console.error(error);
+        }
+
+        if (WWStorage.isAdDeduplicationEnabled() && adData.hasAdNewerDuplicate(articleId)) {
+          item.style.display = 'none';
+        }
+      }
+
       return renderer.registerAdItem(item, articleId, renderOptions);
     });
   },

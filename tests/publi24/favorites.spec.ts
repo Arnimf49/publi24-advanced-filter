@@ -175,7 +175,7 @@ test('Should display all favorite information.', async ({ page, context }) => {
   await expect(modal.locator('[data-wwid="fav-toggle"][data-wwstate="on"]')).toBeVisible();
 })
 
-test.only('Should switch phone number of favorite if phone number changes.', async ({ page, context }) => {
+test('Should switch phone number of favorite if phone number changes.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   const firstArticle = (await page.$$('[data-articleid]'))[0];
