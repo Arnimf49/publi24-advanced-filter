@@ -101,7 +101,7 @@ function readImageLinksMobile(_: string, done: (results: string[]) => void): voi
         clearInterval(intervalId);
         resolve();
       }
-    }, 700);
+    }, IS_MOBILE_VIEW ? 700 : 100);
   }).then(() => {
     setTimeout(() => {
       let attempt = 0;
@@ -125,7 +125,7 @@ function readImageLinksMobile(_: string, done: (results: string[]) => void): voi
           .filter((href): href is string => href !== null);
         done(resultUrls);
       }, 100);
-    }, 1750);
+    }, IS_MOBILE_VIEW ? 1750 : 300);
   }).catch(error => {
     console.error("Error finding or clicking mobile exact link:", error);
     done([]);

@@ -98,5 +98,12 @@ export const utils = {
     }
 
     return null;
+  },
+
+  countryCodeToFlagEmoji(countryCode: string) {
+    const codePoints = [...countryCode.toUpperCase()].map(
+      char => 0x1F1E6 + char.charCodeAt(0) - 65
+    );
+    return String.fromCodePoint(...codePoints);
   }
 }
