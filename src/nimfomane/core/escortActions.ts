@@ -1,6 +1,11 @@
 import {NimfomaneStorage} from "./storage";
 import {BrowserError, page} from "../../common/page";
 
+export interface Image {
+  url: string;
+  date: string;
+}
+
 export const escortActions = {
   async determineMainProfileImage(user: string) {
     let profileContentUrl = NimfomaneStorage.getEscort(user).profileLink + 'content';
@@ -30,7 +35,7 @@ export const escortActions = {
     NimfomaneStorage.setEscortProp(user, 'optimizedProfileImageTime', Date.now());
   },
 
-  async loadImages(user: string, pageNum: number): Promise<string[] | null> {
+  async loadImages(user: string, pageNum: number): Promise<Image[] | null> {
     let url = NimfomaneStorage.getEscort(user).profileLink + 'content';
     if (pageNum !== 0) {
       url += '/page/' + (pageNum + 1);
@@ -47,7 +52,12 @@ export const escortActions = {
       const imageElements = pageData.querySelectorAll('.ipsStreamItem_snippet [data-background-src]');
 
       // @ts-ignore
-      return [...imageElements].map(el => el.getAttribute('data-background-src'));
+      return [...imageElements].map(el => {
+        return {
+          url: el.getAttribute('data-background-src'),
+          date: el.closest('.ipsStreamItem_container').querySelector('time').innerText,
+        }
+      });
     } catch (e: any | BrowserError) {
       if (e.code === 404) {
         return null;

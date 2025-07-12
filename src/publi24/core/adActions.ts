@@ -133,10 +133,10 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
   if (content.match(/(\W|^)(party)(\W|$)/i)) {
     data.push(['party', true]);
   }
-  if (content.match(/(\W|^)(cu sau fara(?!\s+jucarii)|cum vrei tu|cum te simti mai bine)(\W|$)/i)) {
+  if (content.match(/(\W|^)(cu sau fara(?!\s+jucarii)|cum vrei tu|cum te simti mai bine|totale fara[,.;])(\W|$)/i)) {
     data.push(['btsRisc', true]);
   }
-  if (content.match(/(\W|^)((doar|numai|decat) (deplasar|depalsar|deplsar)(i{1,4}|e)|nu am locatie)(\W|$)/i)
+  if (content.match(/(\W|^)((doa?r|numai|decat) (deplasar|depalsar|deplsar)(i{1,4}|e)|nu am locatie)(\W|$)/i)
     && !content.match(/(\W|^)(la mine|locatie proprie|si deplasar[ie]|si locatie|locatia mea|in locatie|nu fac deplasari)(\W|$)/i)) {
     data.push(['onlyTrips', true]);
   }

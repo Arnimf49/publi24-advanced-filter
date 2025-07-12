@@ -3,6 +3,7 @@
 }
 
 .image_container {
+  position: relative;
   background: rgba(20,20,20,0.95);
   border-radius: 15px;
   overflow: hidden;
@@ -16,12 +17,27 @@
   }
 }
 
+.image_date {
+  padding: 2px 5px;
+  color: #b9b9b9;
+  background: rgba(34, 34, 34, 0.6);
+  backdrop-filter: blur(2px);
+  border-radius: 5px;
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  display: inline-block;
+  text-align: center;
+}
+
 .logo {
   position: sticky;
   width: 60px;
   top: 20px;
   margin-bottom: 20px;
   cursor: pointer;
+  z-index: 10;
 
   :global(.onMobile) & {
     width: 42px;
@@ -39,6 +55,7 @@
   top: 20px;
   float: right;
   margin-bottom: 20px;
+  z-index: 10;
 
   svg {
     stroke: #ffffff;

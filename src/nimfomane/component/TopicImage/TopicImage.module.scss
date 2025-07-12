@@ -27,8 +27,8 @@
 :global(.onMobile .ww_topic_image_registered .ipsDataItem_main), :global(.onMobile .ww_topic_image_registered .ipsDataItem_stats) {
   margin-left: 80px !important;
 }
-:global(.onMobile .ww_topic_image_registered .ipsPagination_page:nth-child(3)),
-:global(.onMobile .ww_topic_image_registered .ipsPagination_page:nth-child(4)) {
+:global(.onMobile .ww_topic_image_registered span:not(:last-child).ipsPagination_page:nth-child(3)),
+:global(.onMobile .ww_topic_image_registered span:not(:last-child).ipsPagination_page:nth-child(4)) {
   display: none;
 }
 :global(.onMobile .ww_topic_image_registered > .ipsDataItem_icon) {

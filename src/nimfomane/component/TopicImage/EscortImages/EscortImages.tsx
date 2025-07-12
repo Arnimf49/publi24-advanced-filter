@@ -8,7 +8,7 @@ import {
   useRef,
   useState
 } from "react";
-import {escortActions} from "../../../core/escortActions";
+import {escortActions, Image} from "../../../core/escortActions";
 import classes from './EscortImages.module.scss';
 import {CloseIcon} from "../../../../publi24/component/Common/Icons/CloseIcon";
 import {utils} from "../../../../common/utils";
@@ -26,7 +26,7 @@ interface EscortImagesProps {
 }
 
 export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<Image[]>([]);
   const [loadedPages, setLoadedPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [ended, setEnded] = useState(false);
@@ -112,9 +112,10 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
         <div className={classes.noImages}>Nu sunt poze</div>
       }
 
-      {images.map((url, index) => (
+      {images.map((image, index) => (
         <div key={index} data-wwid={'escort-image'} className={classes.image_container}>
-          <img src={url} onClick={(e) => e.stopPropagation()} />
+          <img src={image.url} onClick={(e) => e.stopPropagation()} />
+          <div className={classes.image_date}>{image.date}</div>
         </div>
       ))}
 
