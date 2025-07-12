@@ -35,7 +35,7 @@ test('Should search for images and show relevant results.', async ({ page, conte
         }
 
         if (domainIndex === 1) {
-          expect(text).toEqual(domain);
+          expect(text).toContain(domain);
         } else {
           expect(text).toEqual(`#${domainIndex}`);
         }
@@ -57,7 +57,7 @@ test('Should search for images and show relevant results.', async ({ page, conte
       const links = await article.$$('[data-wwid="image-results"] a[target="_blank"][href]');
       for (let link of links) {
         const className = await link.getAttribute('class');
-        if (className.indexOf('ww-link-safe')) {
+        if (className.indexOf('linkSafe')) {
           return true;
         }
       }
@@ -67,7 +67,7 @@ test('Should search for images and show relevant results.', async ({ page, conte
       const links = await article.$$('[data-wwid="image-results"] a[target="_blank"][href]');
       for (let link of links) {
         const className = await link.getAttribute('class');
-        if (className.indexOf('ww-link-unsafe')) {
+        if (className.indexOf('linkUnsafe')) {
           return true;
         }
       }

@@ -96,12 +96,12 @@ export const renderer = {
       if (isFromListing) {
         try {
           adActions.adSeen(item, articleId);
+
+          if (WWStorage.isAdDeduplicationEnabled() && adData.hasAdNewerDuplicate(articleId)) {
+            item.style.display = 'none';
+          }
         } catch (error) {
           console.error(error);
-        }
-
-        if (WWStorage.isAdDeduplicationEnabled() && adData.hasAdNewerDuplicate(articleId)) {
-          item.style.display = 'none';
         }
       }
 

@@ -131,17 +131,17 @@ export const adData = {
       return false;
     }
 
-    const adIds = WWStorage.getPhoneAds(phone)
-      .map(uuid => adData.uuidParts(uuid)[0])
-      .filter(adId => id !== adId);
+    const allAdIds = WWStorage.getPhoneAds(phone)
+      .map(uuid => adData.uuidParts(uuid)[0]);
+    const otherAdIds = allAdIds.filter(adId => id !== adId);
     const thisSeenTime = WWStorage.getSeenTime(id) || 0;
 
-    if (!adIds.length) {
+    if (!otherAdIds.length) {
       return false;
     }
 
     let newestTime = 0;
-    adIds.forEach(adId => {
+    otherAdIds.forEach(adId => {
       const time = WWStorage.getSeenTime(adId) || 0;
       if (time > newestTime) {
         newestTime = time;
@@ -149,10 +149,10 @@ export const adData = {
     });
 
     if (thisSeenTime === newestTime) {
-      const firstWithTime = adIds.reverse().find((id) => {
+      const firstWithTime = allAdIds.filter((id) => {
         const time = WWStorage.getSeenTime(id) || 0;
         return time === thisSeenTime;
-      })
+      })[0];
 
       return firstWithTime !== id;
     }
@@ -299,7 +299,7 @@ export const adData = {
     WWStorage.setAdPhone(id, trimmedPhone);
     WWStorage.addPhoneAd(trimmedPhone, id, adData.getItemUrl(item));
 
-    if (previousPhone) {
+    if (previousPhone && previousPhone !== phone) {
       WWStorage.removePhoneAd(previousPhone, id);
       // @TODO: Grave side effect.
       if (WWStorage.getFavorites().includes(previousPhone)) {
