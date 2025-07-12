@@ -8,6 +8,7 @@ import cssnano from 'cssnano';
 import path from 'path';
 
 const isProduction = process.env.NODE_ENV === 'production';
+const isPromoter = process.env.PROMOTER === 'true';
 
 const makeStyledSource = (root, file) => ({
   input: `src/${root}/${file}`,
@@ -47,6 +48,7 @@ const makeStyledSource = (root, file) => ({
     replace({
       preventAssignment: true,
       'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
+      'process.env.PROMOTER': JSON.stringify(isPromoter ? 'true' : 'false'),
     }),
   ],
   watch: {}

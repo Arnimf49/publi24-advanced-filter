@@ -32,6 +32,10 @@ const runWithObserver = (callback: () => any, changingContainerSelector: string)
 
 NimfomaneStorage.upgrade()
   .then(() => {
+    if (process.env.PROMOTER === 'true') {
+      return;
+    }
+
     console.log('Booting publi24-advanced-filter');
 
     if (IS_MOBILE_VIEW) {
