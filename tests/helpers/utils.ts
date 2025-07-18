@@ -40,6 +40,11 @@ const utils = {
       extraHTTPHeaders: {
         'accept-language': headers['accept-language'],
       },
+      ...(process.env.PLAYWRIGHT_LAUNCH_OPTIONS_EXECUTABLE_PATH
+        ? {
+            executablePath: process.env.PLAYWRIGHT_LAUNCH_OPTIONS_EXECUTABLE_PATH,
+          }
+        : {}),
     });
     await new FingerprintInjector().attachFingerprintToPlaywright(context, { fingerprint, headers });
 

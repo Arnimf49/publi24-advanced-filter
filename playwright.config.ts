@@ -26,6 +26,13 @@ export default defineConfig({
         permissions: ['geolocation'],
         headless: process.env.CI ? true : false,
         actionTimeout: 15000,
+        launchOptions: {
+          ...(process.env.PLAYWRIGHT_LAUNCH_OPTIONS_EXECUTABLE_PATH
+            ? {
+                executablePath: process.env.PLAYWRIGHT_LAUNCH_OPTIONS_EXECUTABLE_PATH,
+              }
+            : {}),
+        }
       },
       timeout: 40000,
       expect: {
