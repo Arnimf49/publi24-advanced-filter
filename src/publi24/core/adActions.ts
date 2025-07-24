@@ -184,10 +184,12 @@ export const adActions = {
   },
 
   adSeen(item: HTMLElement, id: string) {
+    const currentSeen = WWStorage.getSeenTime(id);
     const date = adData.getItemDate(item);
     if (date) {
       WWStorage.setSeenTime(id, date.getTime())
     }
+    return currentSeen
   },
 
   async investigateNumberAndSearch(item: HTMLElement, id: string, search: boolean = true): Promise<boolean> {
@@ -273,7 +275,7 @@ export const adActions = {
 
       const location: string = adData.getItemLocation(page, true);
 
-      if (location !== currentAdLocation) {
+      if (location !== currentAdLocation && (!location.includes('Sector') && !currentAdLocation.includes('Sector'))) {
         const pageDate: Date = adData.getPageDate(page);
         const dateDiff: number = dateLib.dayDiff(pageDate, currentAdDate);
         WWStorage.addAdDuplicateInOtherLocation(id, publi24AdLinks[index], dateDiff < 2);

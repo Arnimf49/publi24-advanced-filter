@@ -95,9 +95,13 @@ export const renderer = {
 
       if (isFromListing) {
         try {
-          adActions.adSeen(item, articleId);
+          const lastSeen = adActions.adSeen(item, articleId);
 
-          if (WWStorage.isAdDeduplicationEnabled() && adData.hasAdNewerDuplicate(articleId)) {
+          if (
+            WWStorage.isAdDeduplicationEnabled()
+            && adData.hasAdNewerDuplicate(articleId)
+            && lastSeen !== undefined
+          ) {
             item.style.display = 'none';
           }
         } catch (error) {
@@ -141,14 +145,17 @@ export const renderer = {
         // @ts-ignore
         let ads: HTMLDivElement[] = [...document.querySelectorAll<HTMLDivElement>('[data-articleid]')];
         for (let ad of ads) {
-          if (adData.getItemVisibility(ad.getAttribute('data-articleid') as string)) {
+          if (
+            adData.getItemVisibility(ad.getAttribute('data-articleid') as string)
+            && getComputedStyle(ad).display !== 'none'
+          ) {
             adActions.scrollIntoView(ad);
             WWStorage.setFindNextVisibleAd(false);
             return;
           }
         }
         nextPageArrow.click();
-      }, 200);
+      }, 350);
     };
 
     if (WWStorage.isFindNextVisibleAd()) {

@@ -62,7 +62,7 @@ const AdsModal: React.FC<AdsModalProps> = ({
           </strong>
           {removed && removed > 0 && (
             <span className={styles.removedInfo}>
-              ({removed} nu s-a mai încărcat)
+              ({removed} {removed > 1 ? 'anunțuri' : 'anunț'} nu mai există)
             </span>
           )}
           <span className={styles.infoText}>

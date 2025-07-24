@@ -15,6 +15,7 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
   phone,
 }) => {
   const [adsData, setAdsData] = useState<null | AdData[]>(null);
+  const [removedNow, setRemovedNow] = useState(0);
   const [showHideReason, setShowHideReason] = useState(false);
 
   const onHideAll: MouseEventHandler = useCallback((e) => {
@@ -36,7 +37,10 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
     const duplicateUuids = WWStorage.getPhoneAds(phone);
     adData.loadInAdsData(
       duplicateUuids,
-      (uuid: string) => WWStorage.removePhoneAd(phone, uuid)
+      (uuid: string) => {
+        WWStorage.removePhoneAd(phone, uuid);
+        setRemovedNow((n) => n + 1);
+      }
     ).then(setAdsData);
   }, []);
 
@@ -48,6 +52,7 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
     <AdsModal
       phone={phone}
       adsData={adsData}
+      removed={removedNow}
       close={close}
       onHideAll={onHideAll}
       hideReasonSelector={showHideReason
