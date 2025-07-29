@@ -60,11 +60,11 @@ const AdsModal: React.FC<AdsModalProps> = ({
           <strong className={styles.resultsCount} data-wwid="results-count">
             Rezultate: <span data-wwid="count">{adsData ? adsData.length : '...'}</span>
           </strong>
-          {removed && removed > 0 && (
+          {(removed && removed > 0) ? (
             <span className={styles.removedInfo}>
               ({removed} {removed > 1 ? 'anunțuri' : 'anunț'} nu mai există)
             </span>
-          )}
+          ) : null}
           <span className={styles.infoText}>
             Pot sa fie mai multe care încă nu au fost analizate.
           </span>
