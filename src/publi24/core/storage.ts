@@ -10,6 +10,7 @@ interface AdItem {
   phoneTime?: number;
   imagesTime?: number;
   lastSeen?: number;
+  analyzedAt?: number;
   [key: string]: any;
 }
 
@@ -194,6 +195,14 @@ export const WWStorage = {
 
   getSeenTime(id: string): number | undefined {
     return WWStorage.getAdProp(id, 'lastSeen');
+  },
+
+  setAnalyzedTime(id: string, timestamp: number): void {
+    WWStorage.setAdProp(id, 'analyzedAt', timestamp);
+  },
+
+  getAnalyzedAt(id: string): number | undefined {
+    return WWStorage.getAdProp(id, 'analyzedAt');
   },
 
   getInvestigatedTime(id: string): number | undefined {

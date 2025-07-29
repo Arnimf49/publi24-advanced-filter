@@ -217,6 +217,8 @@ export const adActions = {
       applyAutoHiding(phoneNumber, id, contentData);
     }
 
+    WWStorage.setAnalyzedTime(id, Date.now());
+
     if (search && windowRef) {
       await WWBrowserStorage.set(`ww:search_started_for`, { wwid: id });
       await WWBrowserStorage.set(`ww:search_results:${id}`, null);

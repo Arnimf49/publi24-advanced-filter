@@ -55,7 +55,11 @@ interface RegisterAdsOptions {
 
 export const renderer = {
   registerAdItem(item: HTMLElement, id: string, renderOptions?: RenderOptions): () => void {
-    if (!WWStorage.getAdPhone(id) || WWStorage.hasAdNoPhone(id)) {
+    if (
+      !WWStorage.getAdPhone(id)
+      || WWStorage.hasAdNoPhone(id)
+      || Date.now() - (WWStorage.getAnalyzedAt(id) || 0) > 1.296e+9 // 15 days
+    ) {
       CURRENT_INVESTIGATE_PROMISE = CURRENT_INVESTIGATE_PROMISE
         .then(() => adActions.investigateNumberAndSearch(item, id, false))
         // Wait a bit to avoid triggering rate limits.
@@ -89,8 +93,7 @@ export const renderer = {
 
       if (!articleId) {
         console.error("Item missing data-articleid", item);
-        return () => {
-        };
+        return () => {};
       }
 
       if (isFromListing) {
