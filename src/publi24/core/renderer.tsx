@@ -55,8 +55,10 @@ interface RegisterAdsOptions {
 
 export const renderer = {
   registerAdItem(item: HTMLElement, id: string, renderOptions?: RenderOptions): () => void {
+    const phone = WWStorage.getAdPhone(id);
+
     if (
-      !WWStorage.getAdPhone(id)
+      !phone
       || WWStorage.hasAdNoPhone(id)
       || Date.now() - (WWStorage.getAnalyzedAt(id) || 0) > 1.296e+9 // 15 days
     ) {
@@ -64,6 +66,10 @@ export const renderer = {
         .then(() => adActions.investigateNumberAndSearch(item, id, false))
         // Wait a bit to avoid triggering rate limits.
         .then(() => new Promise(r => setTimeout(r, Math.min(2500, INVESTIGATE_TIMEOUT *= 1.3))));
+    }
+
+    if (phone) {
+      WWStorage.addPhoneAd(phone, id, adData.getItemUrl(item));
     }
 
     return renderAdElement(item, id, renderOptions);

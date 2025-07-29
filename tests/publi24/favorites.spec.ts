@@ -200,3 +200,28 @@ test('Should switch phone number of favorite if phone number changes.', async ({
   await expect(modal.locator('[data-wwid="phone-number"]')).toHaveText('0726627723');
   await expect(modal.locator('[data-wwid="fav-toggle"][data-wwstate="on"]')).toBeVisible();
 })
+
+test('Should show new ad when previous was inactive but new appeared.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+  const url = page.url();
+
+  const firstArticle = (await page.$$('[data-articleid]'))[0];
+  const phone = await (await firstArticle.$('[data-wwid="phone-number"]')).innerText();
+  await (await firstArticle.$('[data-wwid="fav-toggle"]')).click();
+
+  await page.evaluate((innerPhone) => {
+    window.localStorage.setItem(`ww2:phone:${innerPhone}`, JSON.stringify({}));
+  }, phone);
+  await page.goto(url + '?pag=10');
+  await page.locator('[data-wwid="favs-button"]').click();
+  await page.waitForTimeout(100);
+  expect(await (await page.$$('[data-wwid="favorites-modal"] [data-wwid="no-ads"] [data-wwid="phone-number"]'))[0].innerText())
+    .toEqual(phone)
+
+  await page.goto(url);
+  await page.waitForTimeout(1000);
+  await page.locator('[data-wwid="favs-button"]').click();
+  await page.waitForTimeout(500);
+  expect(await (await page.$('[data-wwid="favorites-modal"] [data-wwid="in-location"] [data-wwid="phone-number"]')).innerText())
+    .toEqual(phone)
+})
