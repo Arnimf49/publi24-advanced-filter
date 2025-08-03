@@ -277,7 +277,7 @@ export const adActions = {
 
       const location: string = adData.getItemLocation(page, true);
 
-      if (location !== currentAdLocation && (!location.includes('Sector') && !currentAdLocation.includes('Sector'))) {
+      if (location !== currentAdLocation && !(location.includes('Sector') && currentAdLocation.includes('Sector'))) {
         const pageDate: Date = adData.getPageDate(page);
         const dateDiff: number = dateLib.dayDiff(pageDate, currentAdDate);
         WWStorage.addAdDuplicateInOtherLocation(id, publi24AdLinks[index], dateDiff < 2);
