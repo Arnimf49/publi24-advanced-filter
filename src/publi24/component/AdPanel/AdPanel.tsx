@@ -305,7 +305,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
 
       {loading && (
         <div className={styles.results}>
-          <Loader classes={styles.loader} color={misc.getPubliTheme() === 'dark' ? '#8ab4f8' : '#17b'}/>
+          <Loader classes={styles.loader} color={misc.getPubliTheme() === 'dark' ? '#9fc2fa' : '#17b'}/>
         </div>
       )}
     </div>

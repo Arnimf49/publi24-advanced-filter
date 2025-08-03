@@ -52,10 +52,10 @@
   :global(.dark) & {
     background-color: rgb(60, 84, 123);
     svg {
-      stroke: #8ab4f8;
+      stroke: #9fc2fa;
     }
     &:hover svg {
-       stroke: #b9d1f8;
+       stroke: #c7d9f6;
     }
   }
 }
@@ -121,14 +121,14 @@
 
   :global(.dark) &{
     background-color: rgb(85, 47, 64);
-    color: #da6161;
+    color: #e57373;
     .savesIcon {
-      fill: #da6161;
+      fill: #e57373;
     }
     &:hover {
-      color: #ef9090;
+      color: #f6a5a5;
       .savesIcon {
-        fill: #ef9090;
+        fill: #f6a5a5 ;
       }
     }
   }

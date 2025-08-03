@@ -190,7 +190,7 @@ export const renderer = {
     button.style.margin = 'auto';
     button.style.display = 'block';
     if (misc.getPubliTheme() === 'dark') {
-      button.style.background = '#8ab4f8';
+      button.style.background = '#9fc2fa';
       button.style.setProperty('color', '#111', 'important');
     }
     if (IS_MOBILE_VIEW) {
