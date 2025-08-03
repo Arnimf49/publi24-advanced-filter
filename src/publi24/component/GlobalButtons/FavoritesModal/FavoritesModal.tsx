@@ -44,7 +44,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
           <b>șterge lista</b>
         </button>}
         onClose={onClose}
-        color={'#b34c4c'}
+        color={misc.getPubliTheme() === 'dark' ? 'rgb(85 47 64)' : '#b34c4c'}
       >
         {isEmpty ? (
           <p className={styles.emptyMessage}>

@@ -177,6 +177,13 @@
   b {
     color: #333;
   }
+
+  :global(.dark) & {
+    color: #bfbfbf;
+    b {
+      color: #b0b0b0;
+    }
+  }
 }
 
 @media screen and (max-width: 640px) {

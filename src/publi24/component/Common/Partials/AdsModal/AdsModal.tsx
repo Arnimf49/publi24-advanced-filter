@@ -4,6 +4,7 @@ import ContentModal from '../../Modal/ContentModal';
 import AdsList from '../AdList/AdsList';
 import styles from './AdsModal.module.scss';
 import {AdData} from "../../../../core/adData";
+import {misc} from "../../../../core/misc";
 
 type AdsModalProps = {
   close: () => void;
@@ -44,7 +45,7 @@ const AdsModal: React.FC<AdsModalProps> = ({
             <b>ascunde toate</b>
           </button>
         }
-        color={'#1177bb'}
+        color={misc.getPubliTheme() === 'dark' ? 'rgb(60 84 123)' : '#1177bb'}
       >
         <input
           type="text"

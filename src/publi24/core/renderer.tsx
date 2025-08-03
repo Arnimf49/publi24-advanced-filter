@@ -139,6 +139,10 @@ export const renderer = {
     if (siteGlobalButtons && siteGlobalButtons.parentNode) {
       siteGlobalButtons.parentNode.removeChild(siteGlobalButtons);
     }
+    const siteSaveSearch = document.querySelector('.save-search-wrap');
+    if (siteSaveSearch && siteSaveSearch.parentNode) {
+      siteSaveSearch.parentNode.removeChild(siteSaveSearch);
+    }
   },
 
   renderNextVisibleAdButton() {

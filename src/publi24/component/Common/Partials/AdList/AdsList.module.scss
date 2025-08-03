@@ -9,6 +9,12 @@
   margin-bottom: 30px;
   position: relative;
   width: 100% !important;
+
+  :global(.dark) & {
+    box-shadow: none;
+    background: #28292a;
+    border: 1px solid #363636;
+  }
 }
 
 .articleIndex {
@@ -52,6 +58,10 @@
   border-radius: 8px;
   overflow: hidden;
   box-sizing: border-box;
+
+  :global(.dark) & {
+    border-color: #28292a;
+  }
 }
 
 .articleContentWrap {
@@ -117,10 +127,14 @@
   overflow: hidden;
   margin: 4px 0 8px;
   font-family: var(--secondary-font-family);
-  font-size: 13px;
+  font-size: 14px !important;
   font-weight: 400;
   line-height: 1.4;
   color: #444;
+
+  :global(.dark) & {
+    color: #bfbfbf;
+  }
 }
 
 .articleMeta {
@@ -147,12 +161,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
+  width: 12px !important;
   height: 16px;
   margin-right: 4px;
 
   svg {
-    width: 12px;
+    width: 12px !important;
     height: 12px;
     fill: #999;
     vertical-align: middle;
