@@ -7,13 +7,16 @@ import {IS_MOBILE_VIEW} from "../../../common/globals";
 
 type GlobalButtonsProps = {
   favsCount: number;
+  favsWithNoAdsCount: number;
   onSearchClick: MouseEventHandler;
   onSettingsClick: MouseEventHandler;
   onFavsClick: MouseEventHandler;
 };
 
-const GlobalButtons: React.FC<GlobalButtonsProps> = ({
+const GlobalButtons: React.FC<GlobalButtonsProps> =
+({
   favsCount,
+  favsWithNoAdsCount,
   onSearchClick,
   onSettingsClick,
   onFavsClick,
@@ -51,7 +54,10 @@ const GlobalButtons: React.FC<GlobalButtonsProps> = ({
         aria-label={`View ${favsCount} saved items`}
       >
         <StarIcon className={styles.savesIcon}/>
-        {IS_MOBILE_VIEW ? favsCount : `Favorite (${favsCount})`}
+        {IS_MOBILE_VIEW
+          ? `${favsCount}${favsWithNoAdsCount ? ' - ' + favsWithNoAdsCount : ''}`
+          : `Favorite (${favsCount}${favsWithNoAdsCount ? ' - ' + favsWithNoAdsCount : ''})`
+        }
       </button>
     </>
   );

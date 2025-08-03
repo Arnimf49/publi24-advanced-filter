@@ -169,7 +169,7 @@ export const renderer = {
           }
         }
         nextPageArrow.click();
-      }, 350);
+      }, 150);
     };
 
     if (WWStorage.isFindNextVisibleAd()) {

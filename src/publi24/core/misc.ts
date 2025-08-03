@@ -80,7 +80,7 @@ export const misc = {
   },
 
   getPubliTheme(): 'dark' | 'light' {
-    const theme = localStorage.getItem('theme') || 'light';
+    const theme = localStorage.getItem('theme') as 'dark' | 'light' | 'system' | null || 'system';
     return theme === 'system'
       ? (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
       : theme;

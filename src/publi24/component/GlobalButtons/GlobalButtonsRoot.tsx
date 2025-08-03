@@ -13,10 +13,16 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
   const [isFavsOpen, setFavsOpen] = useState(false);
   const [isPhoneSearchOpen, setPhoneSearchOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
-  const [savesCount, setSavesCount] = useState<number>(0);
+  const [favsCount, setFavsCount] = useState<number>(0);
+  const [favsWithNoAdsCount, setFavsWithNoAdsCount] = useState<number>(0);
 
   useEffect(() => {
-    const onFavsChanged = () => setSavesCount(WWStorage.getFavorites().length);
+    const onFavsChanged = () => {
+      const total = WWStorage.getFavorites().length;
+      const noAds = WWStorage.getFavorites().filter(p => !WWStorage.getPhoneAds(p).length).length;
+      setFavsCount(total - noAds);
+      setFavsWithNoAdsCount(noAds);
+    }
     onFavsChanged();
     WWStorage.onFavsChanged(onFavsChanged);
     return () => WWStorage.removeOnFavsChanged(onFavsChanged);
@@ -29,7 +35,8 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
   return (
     <>
       <GlobalButtons
-        favsCount={savesCount}
+        favsCount={favsCount}
+        favsWithNoAdsCount={favsWithNoAdsCount}
         onFavsClick={onFavsClick}
         onSearchClick={onSearchClick}
         onSettingsClick={onSettingsClick}

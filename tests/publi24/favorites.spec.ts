@@ -72,6 +72,10 @@ test('Should show favorites with no loading ads.', async ({ page, context }) => 
     .toHaveLength(2);
   expect(await page.$$('[data-wwid="favorites-modal"] [data-wwid="height"]'))
     .toHaveLength(2);
+
+  await page.reload();
+  await page.waitForTimeout(200);
+  expect(await page.locator('[data-wwid="favs-button"]').innerText()).toEqual('Favorite (0 - 2)');
 })
 
 test('Should be able to remove favorite without available ads.', async ({ page, context }) => {
