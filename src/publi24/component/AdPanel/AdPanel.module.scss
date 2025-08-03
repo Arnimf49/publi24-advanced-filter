@@ -12,6 +12,10 @@
   padding-top: 12px;
   margin-bottom: 0;
 
+  :global(.dark) & {
+    color: #bfbfbf;
+  }
+
   :global(.onAdPage #content) & {
     @media screen and (max-width: 640px) {
       padding-left: 16px;
@@ -53,15 +57,42 @@
 
 .linkSafe {
   background-color: #d1e1d1;
+  :global(.dark) & {
+    background: rgb(58 75 51);
+    color: #89d789;
+    :hover & {
+      color: #89d789;
+    }
+  }
 }
 .linkDead {
   background-color: #d6d8dd;
+  :global(.dark) & {
+    background: #4d4d4d;
+    :hover & {
+      color: #efefef;
+    }
+  }
 }
 .linkSuspicious {
   background-color: #e5e38e;
+  :global(.dark) & {
+    background: #54471e;
+    color: #f5d04b;
+    :hover & {
+      color: #f5d04b;
+    }
+  }
 }
 .linkUnsafe {
   background-color: #efe2e2;
+  :global(.dark) & {
+    background: rgb(73 40 43);
+    color: #e18a8a;
+    :hover & {
+      color: #e18a8a;
+    }
+  }
 }
 
 .duplicatesContainer {
@@ -77,6 +108,10 @@
   a {
     cursor: pointer;
   }
+
+  :global(.dark) & {
+    color: rgb(191 183 92);
+  }
 }
 
 .button {
@@ -91,6 +126,19 @@
   margin-right: 5px;
   transition: background 0.2s ease 0s;
 
+  :global(.dark) & {
+    background: rgb(60 84 123);
+    &:hover {
+      background: rgb(60 84 123);
+      svg {
+        stroke: #b9d1f8;
+      }
+    }
+    svg {
+      stroke: #8ab4f8;
+    }
+  }
+
   svg {
     display: block;
   }
@@ -100,6 +148,19 @@
   background: #c59b2f;
   &:hover {
     background: #b48d28;
+  }
+
+  :global(.dark) & {
+    background: #54471e;
+    &:hover {
+      background: #54471e;
+      svg {
+        stroke: #f6e9bd;
+      }
+    }
+    svg {
+      stroke: #f5d04b;
+    }
   }
 }
 
@@ -115,12 +176,39 @@
   &:hover {
     background: #a24343;
   }
+
+  :global(.dark) & {
+    background: rgb(85 47 64);
+    &:hover {
+      background: rgb(85 47 64);
+      svg {
+        fill: #ef9090;
+        stroke: #ef9090;
+      }
+    }
+    svg {
+      fill: #da6161;
+      stroke: #da6161;
+    }
+  }
 }
 
 .favButtonOff {
   background: #e0dada;
   &:hover {
     background: #d3cccc;
+  }
+  :global(.dark) & {
+    background: #575656;
+    &:hover {
+      background: #575656;
+      svg {
+        stroke: #eaeaea;
+      }
+    }
+    svg {
+      stroke: #bfbfbf;
+    }
   }
 }
 
@@ -159,6 +247,19 @@
     &:hover {
       background: #d3cccc;
     }
+    :global(.dark) & {
+      background: #6c6b6b;
+      &:hover {
+        background: #807f7f;
+      }
+    }
+  }
+
+  :global(.dark) & {
+    background: rgb(38 62 105);
+    &:hover {
+      background: rgb(43, 71, 121);
+    }
   }
 }
 
@@ -166,6 +267,10 @@
   margin-top: 5px;
   margin-bottom: 3px;
   font-size: 1.125rem;
+
+  :global(.dark) & {
+    color: #bfbfbf;
+  }
 }
 
 .investigationStatus {
@@ -174,10 +279,18 @@
 
 .stale {
   color: #8b5454;
+
+  :global(.dark) & {
+    color: rgb(207 161 161);
+  }
 }
 
 .fresh {
   color: #69875c;
+
+  :global(.dark) & {
+    color: rgb(138 181 120);
+  }
 }
 
 .noResults {
@@ -186,10 +299,18 @@
 
 .noResultsYet {
   color: #8b5454;
+
+  :global(.dark) & {
+    color: rgb(207 161 161);
+  }
 }
 
 .noResultsFound {
   color: #69875c;
+
+  :global(.dark) & {
+    color: rgb(138 181 120);
+  }
 }
 
 .searchResultLinkContainer {
@@ -219,6 +340,10 @@
   color: #8b5454;
   font-size: .8125rem;
   margin-bottom: 5px;
+
+  :global(.dark) & {
+    color: rgb(207 161 161);
+  }
 }
 
 .imageResultLink {

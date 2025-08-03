@@ -1,3 +1,5 @@
+import {misc} from "../../core/misc";
+
 export const NimfomaneIcon = () => {
   return (
     <svg
@@ -35,7 +37,7 @@ export const NimfomaneIcon = () => {
             fontVariationSettings: 'normal',
             opacity: 1,
             vectorEffect: 'none',
-            fill: '#435b86',
+            fill: 'transparent',
             fillOpacity: 1,
             strokeWidth: 0.112215,
             strokeLinecap: 'butt',
@@ -58,7 +60,7 @@ export const NimfomaneIcon = () => {
           <path
             id="rect285"
             style={{
-              fill: '#ffffff',
+              fill: misc.getPubliTheme() === 'dark' ? '#bfbfbf' : '#ffffff',
               fillOpacity: 1,
               strokeWidth: 0.264583,
             }}
@@ -69,7 +71,7 @@ export const NimfomaneIcon = () => {
               fontVariationSettings: 'normal',
               opacity: 1,
               vectorEffect: 'none',
-              fill: '#fefefe',
+              fill: misc.getPubliTheme() === 'dark' ? '#bfbfbf' : '#ffffff',
               fillOpacity: 1,
               strokeWidth: 0.263499,
               strokeLinecap: 'butt',

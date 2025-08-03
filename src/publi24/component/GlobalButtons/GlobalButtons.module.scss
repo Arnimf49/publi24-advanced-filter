@@ -20,6 +20,11 @@
     padding: 7px 17px 7px 17px;
   }
 
+  :global(.dark) & {
+    border-color: #3c3f41;
+    color: #bfbfbf;
+  }
+
   svg {
     display: block;
   }
@@ -35,13 +40,23 @@
     background: #0b629b;
   }
 
+  svg {
+    stroke: #FFF;
+  }
+
   :global(.onMobile) & {
     left: 10px;
     transform: none;
   }
 
-  svg {
-    stroke: #FFF;
+  :global(.dark) & {
+    background-color: rgb(60, 84, 123);
+    svg {
+      stroke: #8ab4f8;
+    }
+    &:hover svg {
+       stroke: #b9d1f8;
+    }
   }
 }
 
@@ -58,6 +73,16 @@
   :global(.onMobile) & {
     left: 76px;
     transform: none;
+  }
+
+  :global(.dark) & {
+    background-color: rgb(84, 71, 30);
+    svg {
+      fill: #f5d04b;
+    }
+    &:hover svg {
+      fill: #f6e9bd;
+    }
   }
 }
 
@@ -91,6 +116,20 @@
 
     .savesIcon {
       left: 12px;
+    }
+  }
+
+  :global(.dark) &{
+    background-color: rgb(85, 47, 64);
+    color: #da6161;
+    .savesIcon {
+      fill: #da6161;
+    }
+    &:hover {
+      color: #ef9090;
+      .savesIcon {
+        fill: #ef9090;
+      }
     }
   }
 }

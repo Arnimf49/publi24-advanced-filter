@@ -4,6 +4,7 @@ import HideReasonRoot from '../../Common/Partials/HideReason/HideReasonRoot';
 import { WWStorage } from '../../../core/storage';
 import {AdData, adData} from '../../../core/adData';
 import {PhoneIcon} from "../../Common/Icons/PhoneIcon";
+import {misc} from "../../../core/misc";
 
 type PhoneSearchRootProps = {
   onClose: () => void;
@@ -83,7 +84,7 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
     <AdsModal
       close={onClose}
       adsData={resultsData}
-      title={<><PhoneIcon/> Anunțuri</>}
+      title={<><PhoneIcon fill={misc.getPubliTheme() === 'dark' ? '#bfbfbf' : '#fff'}/> Anunțuri</>}
       onHideAll={resultsData?.length ? triggerHideActions : undefined}
       onInputChange={handleInputChange}
       hideReasonSelector={showHideReason && searchedPhone

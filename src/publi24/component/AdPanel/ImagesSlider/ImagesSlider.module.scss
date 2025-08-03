@@ -39,11 +39,37 @@
 
   &.isVisible {
     background-color: #c59b2f !important;
+
+    :global(.dark) & {
+      background-color: #54471e !important;
+      &:hover {
+        background-color: #54471e !important;;
+        svg {
+          stroke: #f6e9bd;
+        }
+      }
+      svg {
+        stroke: #f5d04b;
+      }
+    }
   }
 }
 
 .analyzeButton {
   composes: actionButton;
+
+  :global(.dark) & {
+    background: rgb(60 84 123);
+    &:hover {
+      background: rgb(60 84 123);
+      svg {
+        stroke: #b9d1f8;
+      }
+    }
+    svg {
+      stroke: #8ab4f8;
+    }
+  }
 }
 
 .closeButton {

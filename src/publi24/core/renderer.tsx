@@ -7,6 +7,7 @@ import AdPanelRoot from "../component/AdPanel/AdPanelRoot";
 import GlobalButtonsRoot from "../component/GlobalButtons/GlobalButtonsRoot";
 import InfoOverlay, {CutoutRect} from "../component/InfoOverlay/InfoOverlay";
 import {IS_MOBILE_VIEW} from "../../common/globals";
+import {misc} from "./misc";
 
 interface RenderOptions {
   showDuplicates?: boolean;
@@ -184,6 +185,10 @@ export const renderer = {
     button.innerHTML = 'următorul anunț vizibil / nou';
     button.style.margin = 'auto';
     button.style.display = 'block';
+    if (misc.getPubliTheme() === 'dark') {
+      button.style.background = '#8ab4f8';
+      button.style.setProperty('color', '#111', 'important');
+    }
     if (IS_MOBILE_VIEW) {
       button.style.marginTop = '-15px';
     }

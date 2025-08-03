@@ -3,10 +3,20 @@ import {WWStorage} from "./core/storage";
 import {renderer} from "./core/renderer";
 import {favorites} from "./core/favorites";
 import {IS_MOBILE_VIEW} from "../common/globals";
+import {misc} from "./core/misc";
 
 WWStorage.upgrade()
   .then(() => {
     console.log('Booting publi24-advanced-filter');
+
+    try {
+      document.body.classList.add(misc.getPubliTheme());
+      Array.from(document.getElementsByClassName('theme-button')).forEach(child => {
+        child.addEventListener('click', () => window.location.reload());
+      });
+    } catch (error) {
+      console.error(error);
+    }
 
     if (IS_MOBILE_VIEW) {
       document.body.classList.add('onMobile');

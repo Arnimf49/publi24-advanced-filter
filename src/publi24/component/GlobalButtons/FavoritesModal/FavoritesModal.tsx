@@ -7,6 +7,7 @@ import {AdData} from "../../../core/adData";
 import PhoneAndTagsRoot from "../../Common/Partials/PhoneAndTags/PhoneAndTagsRoot";
 import {StarIcon} from "../../Common/Icons/StarIcon";
 import {RemoveIcon} from "../../Common/Icons/RemoveIcon";
+import {misc} from "../../../core/misc";
 
 type FavoritesModalProps = {
   onClose: () => void;
@@ -33,7 +34,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
       dataWwid="favorites-modal"
     >
       <ContentModal
-        title={<><StarIcon/> Favorite</>}
+        title={<><StarIcon fill={misc.getPubliTheme() === 'dark' ? '#bfbfbf' : '#fff'}/> Favorite</>}
         headerActions={<button
           type="button"
           className={styles.clearFavoritesButton}

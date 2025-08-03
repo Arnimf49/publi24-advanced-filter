@@ -24,6 +24,21 @@ input[type="text"].phoneInput {
   &:disabled {
     background-color: #f0f0f0;
   }
+
+  :global(.dark) & {
+    color: #bfbfbf;
+    border-color: #494949;
+    background-color: #4d5156;
+    ::placeholder {
+      color: #bfbfbf;
+    }
+    &:focus {
+      border-color: #52b1fa;
+    }
+    &:disabled {
+      background-color: #434343;
+    }
+  }
 }
 
 .resultsInfo {
@@ -36,6 +51,10 @@ input[type="text"].phoneInput {
   align-items: baseline;
   gap: 5px 15px;
   width: 100%;
+
+  :global(.dark) & {
+    color: #bfbfbf;
+  }
 }
 
 .resultsCount {
@@ -50,6 +69,10 @@ input[type="text"].phoneInput {
   opacity: 0.8;
   color: #8b5454;
   white-space: nowrap;
+
+  :global(.dark) & {
+    color: rgb(207 161 161);
+  }
 }
 
 .infoText {

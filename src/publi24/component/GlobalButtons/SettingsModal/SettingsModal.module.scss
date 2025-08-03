@@ -8,6 +8,10 @@
   z-index: 10;
   margin: 0 auto;
   margin-top: -2px;
+
+  :global(.dark) & {
+    background: rgb(127 105 24);
+  }
 }
 
 .contentPadding {
@@ -32,6 +36,13 @@
     background: rgba(197, 155, 47, 0.11);
     border-color: #c59b2f;
     cursor: pointer;
+  }
+
+  :global(.dark) & {
+    background: #28292a;
+    &:hover {
+      background: #2a2a2d;
+    }
   }
 }
 
@@ -62,6 +73,10 @@
   background: #b1b0b0;
   cursor: pointer;
   transition: background-color 0.3s ease;
+
+  :global(.dark) & {
+    background: #42444b;
+  }
 }
 
 .switchBall {
@@ -75,6 +90,10 @@
   left: 2px;
   background: #ffffff;
   transition: left 0.3s ease, right 0.3s ease;
+
+  :global(.dark) & {
+    background: #bfbfbf;
+  }
 }
 
 .switchOn {
@@ -83,12 +102,20 @@
   .switchBall {
     left: calc(100% - 18px - 2px);
   }
+
+  :global(.dark) & {
+    background: #1177bb;
+  }
 }
 
 .controlTitle {
   font-size: 18px;
   font-weight: bold;
   color: #333;
+
+  :global(.dark) & {
+    color: #bfbfbf;
+  }
 }
 
 .controlDescription {
@@ -96,6 +123,10 @@
   font-size: 14px;
   color: #555;
   line-height: 1.4;
+
+  :global(.dark) & {
+    color: #b9b9b9;
+  }
 
   &.isHidden {
     display: none !important;
@@ -114,6 +145,19 @@
     outline: none;
     border-color: #1177bb;
     box-shadow: 0 0 0 2px rgba(17, 119, 187, 0.2);
+  }
+
+  :global(.dark) & {
+    color: #bfbfbf;
+    border-color: #494949;
+    background-color: #4d5156;
+    ::placeholder {
+      color: #bfbfbf;
+    }
+    &:focus {
+      border-color: #52b1fa;
+      background-color: #4d5156;
+    }
   }
 }
 

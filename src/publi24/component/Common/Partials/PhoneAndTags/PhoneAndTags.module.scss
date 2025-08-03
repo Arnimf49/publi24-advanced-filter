@@ -1,3 +1,9 @@
+.phone {
+    :global(.dark) & {
+        color: #bfbfbf;
+    }
+}
+
 .whatsapp {
     margin-left: 5px;
 
@@ -21,9 +27,19 @@
     b {
         font-size: 13px;
     }
+
+    :global(.dark) & {
+        background: #404040;
+        color: #c8c8c8;
+    }
 }
 
 .chipWarn {
     color: rgb(55 55 55);
     background-color: #e5e38e;
+
+    :global(.dark) & {
+        background: rgb(87 77 41);
+        color: #c8c8c8;
+    }
 }

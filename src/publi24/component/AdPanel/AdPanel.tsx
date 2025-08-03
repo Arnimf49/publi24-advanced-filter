@@ -7,6 +7,7 @@ import {ImageIcon} from "../Common/Icons/ImageIcon";
 import {NimfomaneIcon} from "./NimfomaneIcon";
 import {DdcIcon} from "./DdcIcon";
 import {Loader} from "../../../common/components/Loader/Loader";
+import {misc} from "../../core/misc";
 
 interface ImageLink {
   link: string;
@@ -190,7 +191,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
       )}
 
       {hasNoPhone && (
-        <p className={styles.message} style={{ color: 'rgb(34, 34, 34)' }} data-wwid="no-phone-message">
+        <p className={styles.message} data-wwid="no-phone-message">
           anunțul nu are nr telefon
         </p>
       )}
@@ -304,7 +305,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
 
       {loading && (
         <div className={styles.results}>
-          <Loader classes={styles.loader} color={'#17b'}/>
+          <Loader classes={styles.loader} color={misc.getPubliTheme() === 'dark' ? '#8ab4f8' : '#17b'}/>
         </div>
       )}
     </div>

@@ -59,18 +59,30 @@ export const misc = {
   async getPhoneQrCode(phone: string): Promise<string> {
     return new Promise<string>((res, rej) => {
       try {
-        QRCode.toDataURL(`tel:${phone}`, (err: Error | null | undefined, url: string | undefined) => {
-          if (err) {
-            rej(err);
-          } else if (url) {
-            res(url);
-          } else {
-            rej(new Error('QR Code generation returned undefined URL without error.'));
+        QRCode.toDataURL(`tel:${phone}`, {
+          color: misc.getPubliTheme() === 'dark' ? {
+            dark: '#bfbfbf',
+            light: '#28292a',
+          } : null},  (err: Error | null | undefined, url: string | undefined) => {
+            if (err) {
+              rej(err);
+            } else if (url) {
+              res(url);
+            } else {
+              rej(new Error('QR Code generation returned undefined URL without error.'));
+            }
           }
-        });
+        );
       } catch (error) {
         rej(error);
       }
     });
   },
+
+  getPubliTheme(): 'dark' | 'light' {
+    const theme = localStorage.getItem('theme') || 'light';
+    return theme === 'system'
+      ? (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : theme;
+  }
 };

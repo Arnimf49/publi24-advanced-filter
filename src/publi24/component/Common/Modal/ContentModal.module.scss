@@ -40,6 +40,10 @@
     }
   }
 
+  :global(.dark) & {
+    color: #bfbfbf;
+  }
+
   @media screen and (min-width: 1000px) {
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
@@ -86,6 +90,10 @@
 
   :global(.onMobile) & {
     margin-top: 105px;
+  }
+  :global(.dark) & {
+    color: #bfbfbf;
+    background: #1f1f1f;
   }
 }
 

@@ -3,6 +3,7 @@ import ContentModal from '../../Common/Modal/ContentModal';
 import styles from './SettingsModal.module.scss';
 import {AutoHideCriterias} from "../../../core/storage";
 import {SettingsIcon} from "../../Common/Icons/SettingsIcon";
+import {misc} from "../../../core/misc";
 
 type SwitchProps = {
   isOn?: boolean;
@@ -114,10 +115,10 @@ const SettingsModal: React.FC<SettingsModalProps> =
 
   return (
     <ContentModal
-      title={<><SettingsIcon /> Setări</>}
+      title={<><SettingsIcon fill={misc.getPubliTheme() === 'dark' ? '#bfbfbf' : '#fff'}/> Setări</>}
       onClose={onClose}
       maxWidth={600}
-      color={'#c59b2f'}
+      color={misc.getPubliTheme() === 'dark' ? 'rgb(127 105 24)' : '#c59b2f'}
     >
       <SettingControl
         title="Mod focus"

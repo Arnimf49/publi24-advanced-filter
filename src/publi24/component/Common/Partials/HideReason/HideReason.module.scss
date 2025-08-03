@@ -33,6 +33,11 @@
     background: rgb(235 235 235);
     border-radius: 10px;
     padding: 5px;
+
+    :global(.dark) & {
+      background: #3d4145;
+      color: #bfbfbf;
+    }
   }
 
   .reasonButton {
@@ -54,6 +59,13 @@
       background: #faf6f2;
     }
 
+    :global(.dark) & {
+      background: #bfbfbf;
+      &:hover {
+        background: #d3d3d3;
+      }
+    }
+
     &.showButton {
       background: #c7dceb;
       color: #2d4545;
@@ -61,11 +73,25 @@
       &:hover {
         background: #bddff8;
       }
+
+      :global(.dark) & {
+        background: rgb(135 172 199);
+        color: #2b3838;
+
+        &:hover {
+          background: rgb(154, 192, 220);
+        }
+      }
     }
 
     &.reasonSelected {
       background: rgb(197, 155, 47);
       color: white;
+
+      :global(.dark) & {
+        background-color: #f5d04b;
+        color: #222;
+      }
     }
   }
 
