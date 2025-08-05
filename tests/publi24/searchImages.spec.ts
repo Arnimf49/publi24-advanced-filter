@@ -1,7 +1,6 @@
 import {expect, test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
 import {ElementHandle, errors} from "playwright-core";
-import * as cheerio from "cheerio";
 import {utils} from "../helpers/utils";
 
 test('Should search for images and show relevant results.', async ({ page, context }, testInfo) => {
@@ -141,18 +140,8 @@ test('Should be able to search images on ads without phone.', async ({ page, con
   const id = await article.getAttribute('data-articleid');
   const url = await(await article.$('[class="article-title"] a')).getAttribute('href');
 
-  await page.route(url, async (route) => {
-    const response = await route.fetch();
-    let body = await response.text();
-
-    const $ = cheerio.load(body);
+  await utils.modifyRouteBody(page, url, ($) => {
     $('[id="EncryptedPhone"]').remove()
-    const modifiedBody = $.html();
-
-    await route.fulfill({
-      response,
-      body: modifiedBody,
-    });
   });
 
   await page.waitForResponse(response => response.url() === url);

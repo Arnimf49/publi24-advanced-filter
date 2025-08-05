@@ -124,6 +124,11 @@ export const adData = {
     return isItemVisible && !isPhoneHidden;
   },
 
+  isStaleAnalyze(id: string) {
+    return WWStorage.getAnalyzedAt(id) === undefined
+      || Date.now() - (WWStorage.getAnalyzedAt(id) || 0) > 1.296e+9 // 15 days;
+  },
+
   hasAdNewerDuplicate(id: string) {
     const phone = WWStorage.getAdPhone(id);
 

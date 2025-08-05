@@ -61,7 +61,7 @@ export const renderer = {
     if (
       !phone
       || WWStorage.hasAdNoPhone(id)
-      || Date.now() - (WWStorage.getAnalyzedAt(id) || 0) > 1.296e+9 // 15 days
+      || adData.isStaleAnalyze(id)
     ) {
       CURRENT_INVESTIGATE_PROMISE = CURRENT_INVESTIGATE_PROMISE
         .then(() => adActions.investigateNumberAndSearch(item, id, false))
@@ -154,26 +154,8 @@ export const renderer = {
       return;
     }
 
-    const findVisibleAd = () => {
-      setTimeout(() => {
-        // @ts-ignore
-        let ads: HTMLDivElement[] = [...document.querySelectorAll<HTMLDivElement>('[data-articleid]')];
-        for (let ad of ads) {
-          if (
-            adData.getItemVisibility(ad.getAttribute('data-articleid') as string)
-            && getComputedStyle(ad).display !== 'none'
-          ) {
-            adActions.scrollIntoView(ad);
-            WWStorage.setFindNextVisibleAd(false);
-            return;
-          }
-        }
-        nextPageArrow.click();
-      }, 150);
-    };
-
     if (WWStorage.isFindNextVisibleAd()) {
-      findVisibleAd();
+      adActions.findVisibleAd().catch(console.error);
     }
 
     const list = document.querySelector('.article-list');

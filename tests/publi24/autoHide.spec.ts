@@ -1,29 +1,14 @@
 import {expect, test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
-import * as cheerio from "cheerio";
 import {Page} from "playwright-core";
+import {utils} from "../helpers/utils";
 
 const setupArticle = async (page: Page, title: string, description: string) => {
   const articles = await page.$$('[data-articleid]');
   const article = articles[2];
   const url = await(await article.$('[class="article-title"] a')).getAttribute('href');
 
-  await page.route(url, async (route) => {
-    const response = await route.fetch();
-    let body = await response.text();
-
-    const $ = cheerio.load(body);
-
-    $('.detail-title h1').text(title);
-    $('.article-description').text(description);
-
-    const modifiedBody = $.html();
-
-    await route.fulfill({
-      response,
-      body: modifiedBody,
-    });
-  });
+  await utils.modifyAdContent(page, url, {title, description});
 
   await page.waitForResponse(response => response.url() === url);
   await page.waitForTimeout(1200);

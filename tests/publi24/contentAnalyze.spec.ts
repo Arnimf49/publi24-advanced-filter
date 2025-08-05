@@ -1,6 +1,7 @@
 import {expect, test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
 import * as cheerio from "cheerio";
+import {utils} from "../helpers/utils";
 
 test('Should show age, height, weight and bmi from description.', async ({ page, context }) => {
   await utilsPubli.open(context, page, {loadStorage: false});
@@ -9,22 +10,10 @@ test('Should show age, height, weight and bmi from description.', async ({ page,
   const lastArticle = articles[3];
   const url = await(await lastArticle.$('[class="article-title"] a')).getAttribute('href');
 
-  await page.route(url, async (route) => {
-    const response = await route.fetch();
-    let body = await response.text();
-
-    const $ = cheerio.load(body);
-
-    $('.detail-title h1').text('Hai sa ne vedem, 23 de ani');
-    $('.article-description').text('Buna. Sunt Ana, poze 100% reale, 155 si 58 de kg.');
-
-    const modifiedBody = $.html();
-
-    await route.fulfill({
-      response,
-      body: modifiedBody,
-    });
-  });
+  await utils.modifyAdContent(page, url, {
+    title: 'Hai sa ne vedem, 23 de ani',
+    description: 'Buna. Sunt Ana, poze 100% reale, 155 si 58 de kg.',
+  })
 
   await page.waitForResponse(response => response.url() === url);
   await page.waitForTimeout(1200);

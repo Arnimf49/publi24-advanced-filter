@@ -21,12 +21,14 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
     const focusMode = WWStorage.isFocusMode();
     const adDeduplication = WWStorage.isAdDeduplicationEnabled();
     const autoHide = WWStorage.isAutoHideEnabled();
+    const nextOnlyVisible = WWStorage.isNextOnlyVisibleEnabled();
     const criteria = WWStorage.getAutoHideCriterias();
 
     setSettings({
       focusMode,
       adDeduplication,
       autoHide,
+      nextOnlyVisible,
       maxAge: criteria.maxAge ?? false,
       maxAgeValue: criteria.maxAgeValue ?? DEFAULT_CRITERIA_VALUES.maxAgeValue,
       minHeight: criteria.minHeight ?? false,
@@ -71,6 +73,12 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
     setSettings(prev => prev ? { ...prev, autoHide: !currentAutoHide } : null);
   }, []);
 
+  const handleToggleNextOnlyVisible = useCallback(() => {
+    const currentValue = WWStorage.isNextOnlyVisibleEnabled();
+    WWStorage.setNextOnlyVisibleEnabled(!currentValue);
+    setSettings(prev => prev ? { ...prev, nextOnlyVisible: !currentValue } : null);
+  }, []);
+
   const handleToggleCriteria = useCallback((criteriaKey: keyof AutoHideCriterias) => {
     if (criteriaKey.endsWith('Value')) return;
 
@@ -107,6 +115,7 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
         onToggleFocusMode={handleToggleFocusMode}
         onToggleAdDeduplication={handleToggleAdDeduplication}
         onToggleAutoHide={handleToggleAutoHide}
+        onToggleNextOnlyVisible={handleToggleNextOnlyVisible}
         onToggleCriteria={handleToggleCriteria}
         onCriteriaValueChange={handleCriteriaValueChange}
       />

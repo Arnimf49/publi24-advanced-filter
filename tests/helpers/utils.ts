@@ -1,7 +1,5 @@
-import fs from "node:fs";
-import {ElementHandle, Page} from "playwright-core";
-import {BrowserContext, chromium} from "@playwright/test";
-import {expect} from "playwright/test";
+import {Page} from "playwright-core";
+import {chromium} from "@playwright/test";
 import {FingerprintGenerator} from "fingerprint-generator";
 import {FingerprintInjector} from "fingerprint-injector";
 import {dirname} from "node:path";
@@ -59,7 +57,7 @@ const utils = {
     );
   },
 
-  async modifyRouteBody(page: Page, url: string, modifier: ($: CheerioAPI) => any) {
+  async modifyRouteBody(page: Page, url: string, modifier: ($: CheerioAPI) => any, delay?: number) {
     await page.route(url, async (route) => {
       const response = await route.fetch();
       let body = await response.text();
@@ -68,11 +66,22 @@ const utils = {
       modifier($);
       const modifiedBody = $.html();
 
+      if (delay) {
+        await new Promise(r => setTimeout(r, delay));
+      }
+
       await route.fulfill({
         response,
         body: modifiedBody,
       });
     });
+  },
+
+  async modifyAdContent(page: Page, url: string, {title, description, delay}: {title: string, description: string, delay?: number}) {
+    await utils.modifyRouteBody(page, url, ($) => {
+      $('.detail-title h1').text(title);
+      $('.article-description').text(description);
+    }, delay)
   }
 }
 

@@ -21,25 +21,33 @@ export const utilsPubli = {
   async open(
     context: BrowserContext,
     page: Page,
-    config: {infoShow?: boolean, location?: string, loadStorage?: boolean} = {}
+    config: {infoShow?: boolean, location?: string, page?: number, loadStorage?: boolean, clearStorage?: boolean} = {}
   ) {
     const localStorageData = config.loadStorage === undefined || config.loadStorage === true
       ? JSON.parse(fs.readFileSync(STORAGE_PAGE, 'utf-8'))
-      : {};
+      : null;
     await context.addCookies(JSON.parse(fs.readFileSync('tests/helpers/cookies.json').toString()));
     await context.addInitScript(({config, localStorageData}: any) => {
       if (window.localStorage.getItem('_pw_init') === 'true') {
         return;
       }
 
-      for (const [key, value] of Object.entries(localStorageData)) {
-        window.localStorage.setItem(key, value as string);
+      if (localStorageData) {
+        for (const [key, value] of Object.entries(localStorageData)) {
+          window.localStorage.setItem(key, value as string);
+        }
       }
+
       window.localStorage.setItem('ww:info-shown', config.infoShown || 'true');
       window.localStorage.setItem('_pw_init', 'true');
     }, {config, localStorageData})
 
-    await page.goto(`https://www.publi24.ro/anunturi/matrimoniale/escorte/${config.location || 'cluj/cluj-napoca/'}`);
+    if (config.clearStorage) {
+      await page.goto('https://www.publi24.ro/');
+      await page.evaluate(() => localStorage.clear());
+    }
+
+    await page.goto(`https://www.publi24.ro/anunturi/matrimoniale/escorte/${config.location || 'cluj/cluj-napoca/'}${config.page ? '/?pag=' + config.page : ''}`);
     await page.waitForTimeout(600);
 
     const consent = await page.$('[class="qc-cmp2-summary-buttons"] [mode="primary"]');

@@ -204,6 +204,7 @@ export const adActions = {
     ]);
 
     if (!phoneNumberResult) {
+      WWStorage.setAnalyzedTime(id, Date.now());
       return false;
     }
     const phoneNumber: string = phoneNumberResult;
@@ -361,12 +362,76 @@ export const adActions = {
       }, 300);
     };
   },
+  async findVisibleAd () {
+    const paginationArrows = document.querySelectorAll<HTMLLinkElement>('.pagination .arrow');
+    const nextPageArrow = paginationArrows[paginationArrows.length - 1].querySelector('a') as HTMLElement;
+    const isVisible = (ad: HTMLDivElement) =>
+      adData.getItemVisibility(ad.getAttribute('data-articleid') as string)
+      && getComputedStyle(ad).display !== 'none';
+
+    // @ts-ignore
+    const ads: HTMLDivElement[] = [...document.querySelectorAll<HTMLDivElement>('[data-articleid]')];
+    const adsOrder = ads.filter((ad) => isVisible(ad));
+    const staleAds = ads.filter((ad) => adData.isStaleAnalyze(ad.getAttribute('data-articleid') as string));
+
+    if (!adsOrder.length) {
+      nextPageArrow.click();
+    } else if (!WWStorage.isNextOnlyVisibleEnabled()) {
+      adActions.scrollIntoView(adsOrder[0]);
+      WWStorage.setFindNextVisibleAd(false);
+    } else {
+      let found = false;
+
+      for (const ad of adsOrder) {
+        const articleId = ad.getAttribute('data-articleid') as string;
+
+        if (isVisible(ad)) {
+          adActions.scrollIntoView(ad);
+        } else {
+          continue;
+        }
+
+        if (!staleAds.includes(ad)) {
+          setTimeout(() => adActions.scrollIntoView(ad), 50);
+          found = true;
+          break;
+        }
+
+        const remainedVisible = await new Promise<boolean>((resolve) => {
+          const maxChecks = 280; // 10.5s
+          let checks = 0;
+
+          const interval = setInterval(() => {
+            if (WWStorage.getAnalyzedAt(articleId) || ++checks >= maxChecks) {
+              clearInterval(interval);
+              resolve(isVisible(ad));
+            }
+          }, 50);
+        });
+
+        if (remainedVisible) {
+          found = true;
+          adActions.scrollIntoView(ad);
+          break;
+        }
+      }
+
+      if (found) {
+        WWStorage.setFindNextVisibleAd(false);
+      } else {
+        nextPageArrow.click();
+      }
+    }
+  },
 
   scrollIntoView(element: HTMLDivElement) {
     const panel = element.querySelector<HTMLElement>('[data-wwid="control-panel"]');
     if (panel) {
       panel.scrollIntoView({behavior: 'instant', block: 'start'});
+      window.scrollBy({top: IS_MOBILE_VIEW ? -320 : -350, behavior: "instant"});
+    } else {
+      element.scrollIntoView({behavior: 'instant', block: 'start'});
+      window.scrollBy({top: IS_MOBILE_VIEW ? -100 : -130, behavior: "instant"});
     }
-    window.scrollBy({top: IS_MOBILE_VIEW ? -320 : -350, behavior: "instant"});
   }
 }

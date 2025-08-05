@@ -409,6 +409,14 @@ export const WWStorage = {
     return localStorage.getItem('ww:auto-hide') === 'true';
   },
 
+  setNextOnlyVisibleEnabled(enabled: boolean): void {
+    localStorage.setItem('ww:next-only-visible', enabled ? 'true' : 'false');
+  },
+
+  isNextOnlyVisibleEnabled(): boolean {
+    return localStorage.getItem('ww:next-only-visible') === 'true';
+  },
+
   setAutoHideCriteria(criteria: keyof AutoHideCriterias, enabled?: boolean, value?: number | string): void {
     const current = WWStorage.getAutoHideCriterias();
     if (enabled !== undefined) {

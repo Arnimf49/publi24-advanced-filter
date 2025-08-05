@@ -75,6 +75,7 @@ export type SettingsData = {
   focusMode: boolean;
   adDeduplication: boolean;
   autoHide: boolean;
+  nextOnlyVisible: boolean;
 } & AutoHideCriterias;
 
 type SettingsModalProps = {
@@ -83,6 +84,7 @@ type SettingsModalProps = {
   onToggleFocusMode: () => void;
   onToggleAdDeduplication: () => void;
   onToggleAutoHide: () => void;
+  onToggleNextOnlyVisible: () => void;
   onToggleCriteria: (criteriaKey: keyof AutoHideCriterias) => void;
   onCriteriaValueChange: (criteriaKey: keyof AutoHideCriterias, value: number) => void;
 };
@@ -94,6 +96,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
   onToggleFocusMode,
   onToggleAdDeduplication,
   onToggleAutoHide,
+  onToggleNextOnlyVisible,
   onToggleCriteria,
   onCriteriaValueChange,
 }) => {
@@ -147,6 +150,15 @@ const SettingsModal: React.FC<SettingsModalProps> =
 
       {settings.autoHide && (
         <div className={styles.controlInset}>
+          <SettingControl
+            title="Următorul numai vizibil"
+            description="La căutarea anunțului următor se va sări peste cele noi care sunt ascunse după analiză."
+            isOn={settings.nextOnlyVisible}
+            onToggle={onToggleNextOnlyVisible}
+            dataWwid="next-only-visible"
+            showDetails={settings.nextOnlyVisible}
+          />
+
           <SettingControl
             title="Maximum ani"
             description="Dacă specifică ani mai mare decăt cea setată va fii ascuns."
