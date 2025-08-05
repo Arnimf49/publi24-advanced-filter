@@ -3,17 +3,19 @@ import {WWStorage} from "../../../../core/storage";
 import PhoneAndTags from "./PhoneAndTags";
 
 type PhoneAndTagsRoot = {
+  adId?: string,
   phone: string;
   noPadding?: boolean;
 };
 
 const PhoneAndTagsRoot: React.FC<PhoneAndTagsRoot> = ({
+ adId,
  phone,
  noPadding = false,
 }) => {
-  const age = WWStorage.getPhoneAge(phone);
-  const height = WWStorage.getPhoneHeight(phone);
-  const weight = WWStorage.getPhoneWeight(phone);
+  const age = (adId && WWStorage.getAdAge(adId)) || WWStorage.getPhoneAge(phone);
+  const height = (adId && WWStorage.getAdHeight(adId)) || WWStorage.getPhoneHeight(phone);
+  const weight = (adId && WWStorage.getAdWeight(adId)) || WWStorage.getPhoneWeight(phone);
   const bmi = height && weight
     ? Math.round(weight / Math.pow(height / 100, 2) * 10) / 10
     : undefined;

@@ -198,19 +198,23 @@ export const adActions = {
       windowRef = window.open();
     }
 
-    const [phoneNumberResult, contentData] = await Promise.all([
+    const [phoneNumber, contentData] = await Promise.all([
       adData.acquirePhoneNumber(item, id),
       investigateAdContent(item)
     ]);
 
-    if (!phoneNumberResult) {
+    contentData
+      .filter(([key]) => ['age', 'weight', 'height'].includes(key))
+      .forEach(([key, value]: AdContentTuple) =>
+        WWStorage.setAdProp(id, key, value))
+
+    if (!phoneNumber) {
       WWStorage.setAnalyzedTime(id, Date.now());
       return false;
     }
-    const phoneNumber: string = phoneNumberResult;
 
     contentData.forEach(([key, value]: AdContentTuple) =>
-      WWStorage.setPhoneProp(phoneNumber, key, value));
+      WWStorage.setPhoneProp(phoneNumber, key, value))
 
     if (WWStorage.isPhoneHidden(phoneNumber)) {
       adActions.setItemVisible(item, false);

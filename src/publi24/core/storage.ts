@@ -11,6 +11,9 @@ interface AdItem {
   imagesTime?: number;
   lastSeen?: number;
   analyzedAt?: number;
+  height?: any;
+  weight?: any;
+  age?: any;
   [key: string]: any;
 }
 
@@ -215,6 +218,18 @@ export const WWStorage = {
 
   getAdImagesInvestigatedTime(id: string): number | undefined {
     return WWStorage.getAdProp<number>(id, 'imagesTime');
+  },
+
+  getAdHeight(id: string): any {
+    return WWStorage.getAdProp(id, 'height');
+  },
+
+  getAdWeight(id: string): any {
+    return WWStorage.getAdProp(id, 'weight');
+  },
+
+  getAdAge(id: string): any {
+    return WWStorage.getAdProp(id, 'age');
   },
 
   async getAdSearchResults(id: string): Promise<{search?: string[], images?: []}> {

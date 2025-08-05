@@ -48,7 +48,7 @@ export const utilsPubli = {
     }
 
     await page.goto(`https://www.publi24.ro/anunturi/matrimoniale/escorte/${config.location || 'cluj/cluj-napoca/'}${config.page ? '/?pag=' + config.page : ''}`);
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(700);
 
     const consent = await page.$('[class="qc-cmp2-summary-buttons"] [mode="primary"]');
     if (consent) {
@@ -56,8 +56,6 @@ export const utilsPubli = {
     }
 
     utilsPubli.clearPopups(page);
-
-    await page.waitForTimeout(600);
   },
 
   async findAdWithCondition(page: Page, conditionFn: (...args: any) => Promise<any>) {
@@ -94,6 +92,37 @@ export const utilsPubli = {
 
     const firstArticle: ElementHandle = await utilsPubli.findAdWithCondition(page, getAdWithDuplicates);
     return firstArticle;
+  },
+
+  async findDuplicateAds(page: Page, firstArticle: ElementHandle) {
+    const phone = await (await firstArticle.$('[data-wwid="phone-number"]')).innerText();
+    const firstArticleId = await firstArticle.getAttribute('data-articleid');
+    const duplicateArticleIds: string[] = [];
+    let atNav = 0;
+
+    do {
+      const articles = await page.locator(`[data-wwphone="${phone}"]`).all();
+
+      if (articles.length) {
+        for (let i = 1; i < articles.length; i++) {
+          const parent = await articles[i].evaluateHandle(el => el.closest('[data-articleid]'));
+          const articleId = await parent.getAttribute('data-articleid');
+
+          if (articleId !== firstArticleId) {
+            duplicateArticleIds.push(articleId);
+          }
+        }
+      }
+
+      if (!duplicateArticleIds.length) {
+        if (atNav > 2) {
+          throw new Error('Something is wrong. The duplicate is too far.')
+        }
+        await page.locator('.pagination .arrow').nth(1).click();
+        ++atNav;
+      }
+    } while (!duplicateArticleIds.length);
+    return duplicateArticleIds;
   },
 
   async assertAdHidden(element: ElementHandle, options: {hidden: boolean, reason?: string} = {hidden: true}) {

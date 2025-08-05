@@ -157,7 +157,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         onInvestigateImgClick={onInvestigateImgClick}
         onViewDuplicatesClick={onViewDuplicatesClick}
         phoneAndTags={
-          <PhoneAndTagsRoot phone={phone}/>
+          <PhoneAndTagsRoot adId={id} phone={phone}/>
         }
       />
 

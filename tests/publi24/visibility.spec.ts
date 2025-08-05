@@ -121,29 +121,8 @@ test('Should toggle ad deduplication and see only newest ad.', async ({ page, co
   const firstArticle = await utilsPubli.findAdWithDuplicates(page);
   const firstArticleUrl = page.url();
   const firstArticleId = await firstArticle.getAttribute('data-articleid');
-  const phone = await (await firstArticle.$('[data-wwid="phone-number"]')).innerText();
 
-  let duplicateArticleIds: string[] = [];
-
-  do {
-    const articles = await page.locator(`[data-wwphone="${phone}"]`).all();
-
-    if (articles.length) {
-      for (let i = 1; i < articles.length; i++) {
-        const parent = await articles[i].evaluateHandle(el => el.closest('[data-articleid]'));
-        const articleId = await parent.getAttribute('data-articleid');
-
-        if (articleId !== firstArticleId) {
-          duplicateArticleIds.push(articleId);
-        }
-      }
-    }
-
-    if (!duplicateArticleIds.length) {
-      await (await page.$$('.pagination .arrow'))[1].click();
-    }
-  } while (!duplicateArticleIds.length);
-
+  let duplicateArticleIds: string[] = await utilsPubli.findDuplicateAds(page, firstArticle);
 
   await page.waitForTimeout(1000);
 
