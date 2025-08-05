@@ -55,8 +55,8 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
       >
         <StarIcon className={styles.savesIcon}/>
         {IS_MOBILE_VIEW
-          ? `${favsCount}${favsWithNoAdsCount ? ' - ' + favsWithNoAdsCount : ''}`
-          : `Favorite (${favsCount}${favsWithNoAdsCount ? ' - ' + favsWithNoAdsCount : ''})`
+          ? `${favsCount}${favsWithNoAdsCount ? '+' + favsWithNoAdsCount : ''}`
+          : `Favorite (${favsCount}${favsWithNoAdsCount ? '+' + favsWithNoAdsCount : ''})`
         }
       </button>
     </>
