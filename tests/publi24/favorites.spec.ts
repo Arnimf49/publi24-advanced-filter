@@ -205,7 +205,7 @@ test('Should switch phone number of favorite if phone number changes.', async ({
   await expect(modal.locator('[data-wwid="fav-toggle"][data-wwstate="on"]')).toBeVisible();
 })
 
-test.only('Should show new ad when previous was inactive but new appeared.', async ({ page, context }) => {
+test('Should show new ad when previous was inactive but new appeared.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
   const url = page.url();
 
