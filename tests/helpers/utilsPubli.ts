@@ -12,6 +12,10 @@ export const utilsPubli = {
         if (await element?.isVisible()) {
           await element?.click();
         }
+        const campaign = await page.$('[class="js-campaign-modal-close-button"]');
+        if (await campaign?.isVisible()) {
+          await campaign.click();
+        }
       } catch (e) {
         // noop
       }
