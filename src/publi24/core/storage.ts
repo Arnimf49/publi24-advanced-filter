@@ -527,6 +527,24 @@ export const WWStorage = {
     (_WW_CALLBACKS.phoneChanged[phone] || []).forEach(callback => callback());
   },
 
+  exportData(): Record<string, string> {
+    const allItems: Record<string, string> = { ...localStorage };
+    Object.keys(allItems).forEach(key => {
+      if (!key.match(/^ww2?:/)) {
+        delete allItems[key];
+      }
+    });
+    return allItems;
+  },
+
+  async importData(data: Record<string, string>) {
+    Object.entries(data).forEach(([key, data]) => {
+      if (key.match(/^ww2?:/)) {
+        localStorage.setItem(key, data);
+      }
+    });
+    await WWStorage.upgrade();
+  },
 
   async upgrade(): Promise<void> {
     const version = WWStorage.getVersion();

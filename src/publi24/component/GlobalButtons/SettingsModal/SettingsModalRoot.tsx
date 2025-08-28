@@ -103,6 +103,35 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
     });
   }, []);
 
+  const handleExport = useCallback(() => {
+    const blob = new Blob([JSON.stringify(WWStorage.exportData())], {type:"application/json"});
+    const a = Object.assign(document.createElement("a"), {
+      href: URL.createObjectURL(blob),
+      download: `p24fa-${Date.now()}.json`
+    });
+    a.click();
+  }, []);
+
+  const handleImport = useCallback(() => {
+    return new Promise<void>((r, err) => {
+      const inp = Object.assign(document.createElement("input"), {
+        type: "file", accept: ".json"
+      });
+      inp.onchange = async (e: Event) => {
+        try {
+          const txt = await (e.target as any)?.files[0].text();
+          const data = JSON.parse(txt);
+          await WWStorage.importData(data)
+        } catch (e) {
+          err(e);
+          return;
+        }
+        r();
+      };
+      inp.click();
+    })
+  }, []);
+
   if (!settings) {
     return null;
   }
@@ -118,6 +147,8 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
         onToggleNextOnlyVisible={handleToggleNextOnlyVisible}
         onToggleCriteria={handleToggleCriteria}
         onCriteriaValueChange={handleCriteriaValueChange}
+        handleExport={handleExport}
+        handleImport={handleImport}
       />
     </Modal>
   );

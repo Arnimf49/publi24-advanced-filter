@@ -104,7 +104,11 @@
   }
 
   :global(.dark) & {
-    background: #1177bb;
+    background: #8ab4f8;
+
+    .switchBall {
+      background: #333;
+    }
   }
 }
 
@@ -183,6 +187,58 @@
     b {
       color: #b0b0b0;
     }
+  }
+}
+
+.header {
+  font-size: 21px;
+  color: #333;
+  margin-bottom: 14px;
+
+  :global(.dark) & {
+    color: rgb(185, 185, 185);
+  }
+}
+
+.button {
+  border-radius: 3px;
+  margin-right: 10px;
+  padding: 10px 15px;
+  color: white;
+  background: #1177bb;
+
+  &:hover {
+    background: #1881c7;
+  }
+
+  :global(.dark) & {
+    color: #111;
+    background: #8ab4f8;
+
+    &:hover {
+      background: #9abffc;
+    }
+  }
+}
+
+.importMessage {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.errorMessage {
+  color: #b34c4c;
+
+  :global(.dark) & {
+    color: rgb(246, 165, 165);
+  }
+}
+
+.successMessage {
+  color: #69875c;
+
+  :global(.dark) & {
+    color: #89d789;
   }
 }
 

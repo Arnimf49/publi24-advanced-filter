@@ -1,4 +1,4 @@
-import React, { ChangeEvent, KeyboardEvent } from 'react';
+import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
 import ContentModal from '../../Common/Modal/ContentModal';
 import styles from './SettingsModal.module.scss';
 import {AutoHideCriterias} from "../../../core/storage";
@@ -87,6 +87,8 @@ type SettingsModalProps = {
   onToggleNextOnlyVisible: () => void;
   onToggleCriteria: (criteriaKey: keyof AutoHideCriterias) => void;
   onCriteriaValueChange: (criteriaKey: keyof AutoHideCriterias, value: number) => void;
+  handleExport: () => void;
+  handleImport: () => Promise<void>;
 };
 
 const SettingsModal: React.FC<SettingsModalProps> =
@@ -99,7 +101,11 @@ const SettingsModal: React.FC<SettingsModalProps> =
   onToggleNextOnlyVisible,
   onToggleCriteria,
   onCriteriaValueChange,
+  handleExport,
+  handleImport,
 }) => {
+  const [importMessage, setImportMessage] = useState<[string, string]|null>(null);
+
   const handleValueChange = (
     criteriaKey: keyof AutoHideCriterias,
     event: ChangeEvent<HTMLInputElement>
@@ -115,6 +121,21 @@ const SettingsModal: React.FC<SettingsModalProps> =
       (event.target as HTMLInputElement).blur();
     }
   };
+
+  const configureImportMessage = (style: string, message: string, time: number = 6000) => {
+    setImportMessage([style, message]);
+    setTimeout(() => setImportMessage(null), time);
+  }
+
+  const onImport = () => {
+    setImportMessage(null);
+    handleImport()
+      .then(() => {
+        configureImportMessage(styles.successMessage, 'Datele au fost importate cu succes. Reîncărcarea paginii imediat ..');
+        setTimeout(() => window.location.reload(), 4000);
+      })
+      .catch(err => configureImportMessage(styles.errorMessage, 'Probleme cu import-ul: ' + err.message, 12000));
+  }
 
   return (
     <ContentModal
@@ -285,6 +306,11 @@ const SettingsModal: React.FC<SettingsModalProps> =
           />
         </div>
       )}
+
+      <h2 className={styles.header}>Transfer date</h2>
+      {importMessage && <p className={misc.cx(importMessage[0], styles.importMessage)}>{importMessage[1]}</p>}
+      <button onClick={handleExport} className={styles.button}>↑ export</button>
+      <button onClick={onImport} className={styles.button}>↓ import</button>
 
       <hr style={{ opacity: 0.2, marginTop: '25px', marginBottom: '15px' }} />
       <p className={styles.footerText}>
