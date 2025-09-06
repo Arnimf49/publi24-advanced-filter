@@ -4,7 +4,7 @@ import {ElementHandle, errors} from "playwright-core";
 import {utils} from "../helpers/utils";
 
 test('Should search for phone number and article id and show relevant results.', async ({ page, context }, testInfo) => {
-  testInfo.setTimeout(60000 * 6);
+  testInfo.setTimeout(60000 * 5);
 
   await utilsPubli.open(context, page);
 
@@ -72,6 +72,7 @@ test('Should search for phone number and article id and show relevant results.',
     ++atArticle;
 
     const articleId = await article.getAttribute('data-articleid')
+    await article.scrollIntoViewIfNeeded();
 
     const articleSearchButton = await article.$('[data-wwid="investigate"]');
     await articleSearchButton.isVisible();
