@@ -20,6 +20,7 @@ export default async () => {
   const page = await context.newPage();
 
   await utilsPubli.open(context, page, {loadStorage: false});
+  utilsPubli.clearPopups(page);
   await utilsPubli.findAdWithDuplicates(page);
 
   const localStorageData = await page.evaluate(() => {

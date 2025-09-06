@@ -5,16 +5,15 @@ import {utils} from "../helpers/utils";
 
 const setupArticle = async (page: Page, title: string, description: string) => {
   const articles = await page.$$('[data-articleid]');
-  const article = articles[2];
+  const article = articles.pop();
   const url = await(await article.$('[class="article-title"] a')).getAttribute('href');
 
   await utils.modifyAdContent(page, url, {title, description});
 
-  await page.waitForResponse(response => response.url() === url);
-  await page.waitForTimeout(1200);
-
   await (await article.$('[data-wwid="investigate"]')).click();
-  await page.waitForTimeout(100);
+  await page.waitForResponse(response => response.url() === url);
+  await article.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(500);
 
   return article;
 }
@@ -39,7 +38,7 @@ const setupHideSetting = async (page: Page, criteria: string, options?: {default
 }
 
 test('Should automatically hide based on max age.', async ({ page, context }) => {
-  await utilsPubli.open(context, page, {loadStorage: false});
+  await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'maxAge', {defaultValue: 35, value: 26});
   const article = await setupArticle(page, 'Am 27 de ani', 'Buna');
@@ -47,7 +46,7 @@ test('Should automatically hide based on max age.', async ({ page, context }) =>
 });
 
 test('Should automatically hide based on min height.', async ({ page, context }) => {
-  await utilsPubli.open(context, page, {loadStorage: false});
+  await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'minHeight', {defaultValue: 160, value: 165});
   const article = await setupArticle(page, 'Buna', 'Am 1.64');
@@ -55,7 +54,7 @@ test('Should automatically hide based on min height.', async ({ page, context })
 });
 
 test('Should automatically hide based on max height.', async ({ page, context }) => {
-  await utilsPubli.open(context, page, {loadStorage: false});
+  await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'maxHeight', {defaultValue: 175, value: 170});
   const article = await setupArticle(page, 'Buna', 'Inaltime 171cm');
@@ -63,7 +62,7 @@ test('Should automatically hide based on max height.', async ({ page, context })
 });
 
 test('Should automatically hide based on max weight.', async ({ page, context }) => {
-  await utilsPubli.open(context, page, {loadStorage: false});
+  await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'maxWeight', {defaultValue: 65, value: 55});
   const article = await setupArticle(page, 'Buna', '56KG');
@@ -71,7 +70,7 @@ test('Should automatically hide based on max weight.', async ({ page, context })
 });
 
 test('Should automatically hide if trans mentioned.', async ({ page, context }) => {
-  await utilsPubli.open(context, page, {loadStorage: false});
+  await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'trans');
   const article = await setupArticle(page, 'Buna sunt transsexuala', '');
@@ -79,7 +78,7 @@ test('Should automatically hide if trans mentioned.', async ({ page, context }) 
 });
 
 test('Should automatically hide if botoxed.', async ({ page, context }) => {
-  await utilsPubli.open(context, page, {loadStorage: false});
+  await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'botox');
   const article = await setupArticle(page, 'Buna', 'Siliconata');
@@ -87,7 +86,7 @@ test('Should automatically hide if botoxed.', async ({ page, context }) => {
 });
 
 test('Should automatically hide if only trips.', async ({ page, context }) => {
-  await utilsPubli.open(context, page, {loadStorage: false});
+  await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'onlyTrips');
   const article = await setupArticle(page, 'Buna', 'Numai deplasari');
@@ -95,7 +94,7 @@ test('Should automatically hide if only trips.', async ({ page, context }) => {
 });
 
 test('Should automatically hide if show web.', async ({ page, context }) => {
-  await utilsPubli.open(context, page, {loadStorage: false});
+  await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'showWeb');
   const article = await setupArticle(page, 'Buna', 'Ofer show web');
@@ -103,7 +102,7 @@ test('Should automatically hide if show web.', async ({ page, context }) => {
 });
 
 test('Should automatically hide if btw risk.', async ({ page, context }) => {
-  await utilsPubli.open(context, page, {loadStorage: false});
+  await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'btsRisc');
   const article = await setupArticle(page, 'Buna', 'cum vrei tu');
@@ -111,7 +110,7 @@ test('Should automatically hide if btw risk.', async ({ page, context }) => {
 });
 
 test('Should automatically hide if party.', async ({ page, context }) => {
-  await utilsPubli.open(context, page, {loadStorage: false});
+  await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'party');
   const article = await setupArticle(page, 'Buna', 'Fac party si deplasari');
@@ -119,7 +118,7 @@ test('Should automatically hide if party.', async ({ page, context }) => {
 });
 
 test('Should automatically hide if mature.', async ({ page, context }) => {
-  await utilsPubli.open(context, page, {loadStorage: false});
+  await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'mature');
   const article = await setupArticle(page, 'Buna matură 40 ani', '');
@@ -127,7 +126,7 @@ test('Should automatically hide if mature.', async ({ page, context }) => {
 });
 
 test('Should automatically hide for multiple.', async ({ page, context }) => {
-  await utilsPubli.open(context, page, {loadStorage: false});
+  await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'onlyTrips');
   await setupHideSetting(page, 'party', {noOpen: true});

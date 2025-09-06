@@ -16,6 +16,10 @@ export const utilsPubli = {
         if (await campaign?.isVisible()) {
           await campaign.click();
         }
+        const consent = await page.$('[class="qc-cmp2-summary-buttons"] [mode="primary"]');
+        if (consent) {
+          await consent.click();
+        }
       } catch (e) {
         // noop
       }
@@ -53,11 +57,6 @@ export const utilsPubli = {
 
     await page.goto(`https://www.publi24.ro/anunturi/matrimoniale/escorte/${config.location || 'cluj/cluj-napoca/'}${config.page ? '/?pag=' + config.page : ''}`);
     await page.waitForTimeout(700);
-
-    const consent = await page.$('[class="qc-cmp2-summary-buttons"] [mode="primary"]');
-    if (consent) {
-      await consent.click();
-    }
 
     utilsPubli.clearPopups(page);
   },
@@ -119,9 +118,10 @@ export const utilsPubli = {
       }
 
       if (!duplicateArticleIds.length) {
-        if (atNav > 2) {
+        if (atNav > 10) {
           throw new Error('Something is wrong. The duplicate is too far.')
         }
+        await page.waitForTimeout(1000);
         await page.locator('.pagination .arrow').nth(1).click();
         ++atNav;
       }

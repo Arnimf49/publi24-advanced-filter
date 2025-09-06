@@ -7,7 +7,7 @@ export const utilsNimfomane = {
   },
 
   async waitForFirstImage(page: Page) {
-    const firstImage = page.locator('[data-wwid="topic-image"] img').first();
+    const firstImage = page.locator('[data-wwid="topic-image"] img').nth(Math.floor(Math.random() * 3));
     await firstImage.waitFor();
     const src = await firstImage.getAttribute('src');
     const parentHandle = await firstImage.evaluateHandle(el => el.parentElement);
