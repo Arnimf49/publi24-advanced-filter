@@ -57,11 +57,12 @@ test('Should search images from slider.', async ({ page, context }) => {
   const firstArticle = (await page.$$('[data-articleid]'))[0];
   await (await firstArticle.$('[class="art-img"]')).click();
 
-  await page.locator('[data-wwid="images-slider"] [data-wwid="analyze-images"]').click();
-  await expect(page.locator('[data-wwid="images-slider"]')).not.toBeVisible();
-
-  await (await firstArticle.$('[class="art-img"]')).click();
-  await page.locator('[data-wwid="images-slider"] [data-wwid="analyze-images"]').click();
+  for (let i = 0; i < 3; i++) {
+    await (await firstArticle.$('[class="art-img"]')).click();
+    await page.locator('[data-wwid="images-slider"] [data-wwid="analyze-images"]').click();
+    await expect(page.locator('[data-wwid="images-slider"]')).not.toBeVisible();
+    await page.waitForTimeout(5000);
+  }
 
   await utils.waitForInnerTextNot(page,
     `[data-articleid="${await firstArticle.getAttribute('data-articleid')}"] [data-wwid="image-results"]`,
