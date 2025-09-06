@@ -4,14 +4,19 @@ import {Page} from "playwright-core";
 import {utils} from "../helpers/utils";
 
 const setupArticle = async (page: Page, title: string, description: string) => {
-  const articles = await page.$$('[data-articleid]');
-  const article = articles.pop();
-  const url = await(await article.$('[class="article-title"] a')).getAttribute('href');
+  const button = (await page.$$('[data-wwid="investigate"]')).pop();
+  if (!button) {
+    throw new Error("No investigate button found");
+  }
 
-  await utils.modifyAdContent(page, url, {title, description});
+  const article = await button.evaluateHandle(el => el.closest('[data-articleid]'));
+  const url = await (await article.$('.article-title a')).getAttribute('href');
 
-  await (await article.$('[data-wwid="investigate"]')).click();
-  await page.waitForResponse(response => response.url() === url);
+  await utils.modifyAdContent(page, url, { title, description });
+  await Promise.all([
+    page.waitForResponse(response => response.url() === url),
+    button.click(),
+  ])
   await article.scrollIntoViewIfNeeded();
   await page.waitForTimeout(500);
 
