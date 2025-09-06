@@ -44,6 +44,8 @@ test('Should have panel functionalities on ad page.', async ({context, page}, te
   await page.locator('[data-wwid="investigate_img"]').click();
   await page.waitForTimeout(5000);
   await page.locator('[data-wwid="investigate_img"]').click();
+  await page.waitForTimeout(5000);
+  await page.locator('[data-wwid="investigate_img"]').click();
   await utils.waitForInnerTextNot(page,
     `[data-articleid] [data-wwid="image-results"]`,
     'nerulat'
