@@ -1,0 +1,57 @@
+.container {
+  display: flex;
+  background: #2E303B;
+  border-radius: 15px;
+  padding: 8px;
+  border: 2px solid #00bafc;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+
+  &:hover {
+    background: #353748;
+  }
+}
+
+.text {
+  flex: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mainText {
+  font-size: 22px;
+  flex: 1;
+  color: #00bafc;
+  font-family: system-ui;
+  font-weight: bold;
+
+  @media screen and (max-width: 600px) {
+    font-size: 18px;
+    padding-bottom: 7px;
+  }
+}
+
+.adNotify {
+  position: absolute;
+  right: 10px;
+  bottom: 3px;
+  font-weight: bold;
+  color: #67718f;
+  font-size: 13px;
+  text-align: right;
+
+  @media screen and (max-width: 600px) {
+    font-size: 11px;
+  }
+}
+
+.icon {
+  flex: 0;
+
+  svg {
+    width: 55px;
+    height: 55px;
+  }
+}

@@ -8,6 +8,7 @@ import PhoneAndTagsRoot from "../../Common/Partials/PhoneAndTags/PhoneAndTagsRoo
 import {StarIcon} from "../../Common/Icons/StarIcon";
 import {RemoveIcon} from "../../Common/Icons/RemoveIcon";
 import {misc} from "../../../core/misc";
+import {Ad} from "./Ad";
 
 type FavoritesModalProps = {
   onClose: () => void;
@@ -46,6 +47,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
         onClose={onClose}
         color={misc.getPubliTheme() === 'dark' ? 'rgb(85 47 64)' : '#b34c4c'}
       >
+        <Ad/>
         {isEmpty ? (
           <p className={styles.emptyMessage}>
             Nu ai încă anunțuri favorite. Apasă pe butonul cu steluța pe anunț ca să le adaugi aici.
