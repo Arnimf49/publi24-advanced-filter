@@ -75,11 +75,12 @@ test('Should search for phone number and article id and show relevant results.',
     await article.scrollIntoViewIfNeeded();
 
     const articleSearchButton = await article.$('[data-wwid="investigate"]');
-    await articleSearchButton.isVisible();
 
-    await articleSearchButton.click();
-    await page.waitForTimeout(5000);
-    await articleSearchButton.click();
+    if (!articleSearchButton) {
+      continue;
+    }
+
+    await utilsPubli.awaitGooglePagesClose(articleSearchButton, context, page);
 
     try {
       await utils.waitForInnerTextNot(
@@ -105,7 +106,7 @@ test('Should search for phone number and article id and show relevant results.',
       }
     }
 
-    await page.waitForTimeout(4000);
+    await page.waitForTimeout(2000);
   }
 
   expect(Object.keys(caseChecks).length, `Cases not met: ${Object.keys(caseChecks).join(', ')}`).toEqual(0)

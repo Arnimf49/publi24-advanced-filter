@@ -15,30 +15,34 @@ test('Should skip to next visible or new ads over pages.', async ({ page, contex
     }
   });
 
-  const hideAds = async (count?: number): Promise<Locator | void> => {
-    const articles = await page.locator('[data-articleid]').all();
+  const hideAds = async (count?: number): Promise<Locator> => {
     let hidden = 0;
+    let article;
+    const elCount = await page.locator('[data-articleid]').count();
 
-    for (const article of articles) {
+    for (let i = 0; i < elCount; i++) {
+      article = page.locator('[data-articleid]').nth(i);
       if (count && count === hidden) {
-        return article;
+        break;
       }
       if (await article.locator('[data-wwhidden="false"]').isVisible()) {
         await article.locator('[data-wwid="toggle-hidden"]').click();
       }
       ++hidden;
     }
+
+    return article;
   }
 
   await hideAds();
   await ((await page.$$('.pagination .arrow'))[1]).click();
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(1500);
 
   await hideAds();
   await ((await page.$$('.pagination .arrow'))[1]).click();
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(1500);
 
-  const article = await hideAds(4) as Locator;
+  const article = await hideAds(4);
   const articleId = await article.getAttribute('data-articleid');
 
   await (await page.$('.pagination div:nth-child(2) li:first-child')).click();

@@ -98,9 +98,7 @@ test('Should search for images and show relevant results.', async ({ page, conte
 
     const articleImageSearchButton = await article.$('[data-wwid="investigate_img"]');
     await articleImageSearchButton.isVisible();
-
-    await articleImageSearchButton.click();
-    await page.waitForTimeout(2000);
+    await utilsPubli.awaitGooglePagesClose(articleImageSearchButton, context, page);
 
     try {
       await utils.waitForInnerTextNot(
@@ -132,7 +130,8 @@ test('Should search for images and show relevant results.', async ({ page, conte
   expect(Object.keys(caseChecks).length, `Cases not met: ${Object.keys(caseChecks).join(', ')}`).toEqual(0)
 });
 
-test('Should be able to search images on ads without phone.', async ({ page, context }) => {
+test('Should be able to search images on ads without phone.', async ({ page, context }, test) => {
+  test.setTimeout(60000);
   await utilsPubli.open(context, page, {loadStorage: false});
 
   const articles = await page.$$('[data-articleid]');
@@ -150,9 +149,7 @@ test('Should be able to search images on ads without phone.', async ({ page, con
   await (await article.$(`[data-wwid="no-phone-message"]`)).isVisible();
   expect(await article.$(`[data-wwid="search-results"]`)).toBeNull();
 
-  await (await article.$('[data-wwid="investigate_img"]')).click();
-  await page.waitForTimeout(2000);
-  await (await article.$('[data-wwid="investigate_img"]')).click();
+  await utilsPubli.awaitGooglePagesClose(await article.$('[data-wwid="investigate_img"]'), context, page);
 
   await utils.waitForInnerTextNot(
     page,

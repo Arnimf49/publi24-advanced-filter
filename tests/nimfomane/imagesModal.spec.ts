@@ -24,9 +24,7 @@ test('Should load more images when scrolling.', async ({page}) => {
   const imagesCount = await page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').count();
 
   if (imagesCount > 3) {
-    await page.locator('[data-wwid="escort-image-modal"]').evaluate(el => {
-      el.scrollTop = el.scrollHeight;
-    });
+    await page.locator('[data-wwid="escort-image-modal"]').locator('[data-wwid="escort-image"]:last-child').scrollIntoViewIfNeeded();
 
     await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toBeVisible();
     await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toHaveCount(0);

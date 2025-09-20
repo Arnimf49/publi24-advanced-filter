@@ -10,7 +10,8 @@
     "rollup": "rollup -c -w",
     "pw-open": "npx playwright test --ui",
     "pw-debug": "npx playwright test --debug",
-    "pw-run": "npx playwright test"
+    "pw-run": "npx playwright test",
+    "postinstall": "sed -i 's/:visible//g' node_modules/recaptcha-solver/lib/index.js node_modules/recaptcha-solver/lib/index.mjs || true"
   },
   "author": "",
   "license": "MIT",
@@ -29,13 +30,13 @@
     "cheerio": "^1.0.0",
     "cssnano": "^7.0.6",
     "execa": "^9.5.2",
-    "fingerprint-injector": "^2.1.62",
     "postcss": "^8.5.3",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "recaptcha-solver": "^0.3.0",
     "rollup": "^4.39.0",
     "rollup-plugin-postcss": "^4.0.2",
     "sass": "^1.86.3",
-    "typescript": "^5.8.3",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0"
+    "typescript": "^5.8.3"
   }
 }

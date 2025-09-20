@@ -3,6 +3,7 @@ import {BrowserContext} from "@playwright/test";
 import fs from "node:fs";
 import {expect} from "playwright/test";
 import {STORAGE_PAGE} from "./utils";
+import {solve} from "recaptcha-solver";
 
 export const utilsPubli = {
   clearPopups(page: Page) {
@@ -59,6 +60,27 @@ export const utilsPubli = {
     await page.waitForTimeout(700);
 
     utilsPubli.clearPopups(page);
+  },
+
+  async awaitGooglePagesClose(triggerButton: ElementHandle, context: BrowserContext, page: Page) {
+    const secondaryPages: Page[] = [];
+
+    context.on('page', page => {
+      secondaryPages.push(page);
+    });
+
+    await triggerButton.click();
+    await page.waitForTimeout(4000);
+
+    for (let altPage of secondaryPages) {
+      if (altPage.isClosed()) {
+        continue;
+      }
+      if (altPage.url().startsWith("https://www.google.com/sorry/index")) {
+        solve(altPage).catch(console.error);
+      }
+      await altPage.waitForEvent('close')
+    }
   },
 
   async findAdWithCondition(page: Page, conditionFn: (...args: any) => Promise<any>) {

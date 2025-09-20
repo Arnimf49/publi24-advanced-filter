@@ -1,7 +1,5 @@
 import {Page} from "playwright-core";
-import {chromium} from "@playwright/test";
-import {FingerprintGenerator} from "fingerprint-generator";
-import {FingerprintInjector} from "fingerprint-injector";
+import { chromium } from 'playwright';
 import {dirname} from "node:path";
 import path from "path";
 import {fileURLToPath} from "node:url";
@@ -13,38 +11,22 @@ export const STORAGE_PAGE = 'tests/helpers/localStorage.json';
 
 const utils = {
   async makeContext() {
-    const { fingerprint, headers } = new FingerprintGenerator().getFingerprint({
-      devices: ['desktop'],
-      operatingSystems: ['linux'],
-      browsers: ['chrome']
-    });
-
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',
       headless: !!process.env.CI,
+      viewport: null,
       args: [
         `--disable-extensions-except=${EXTENSION_PATH}`,
         `--load-extension=${EXTENSION_PATH}`,
-        '--disable-blink-features=AutomationControlled',
-        '--no-sandbox',
         '--start-maximized',
       ],
-      userAgent: fingerprint.navigator.userAgent,
       colorScheme: 'dark',
-      viewport: {
-        width: Math.min(fingerprint.screen.width, 1800),
-        height: Math.min(fingerprint.screen.height, 900),
-      },
-      extraHTTPHeaders: {
-        'accept-language': headers['accept-language'],
-      },
       ...(process.env.PLAYWRIGHT_LAUNCH_OPTIONS_EXECUTABLE_PATH
         ? {
             executablePath: process.env.PLAYWRIGHT_LAUNCH_OPTIONS_EXECUTABLE_PATH,
           }
         : {}),
     });
-    await new FingerprintInjector().attachFingerprintToPlaywright(context, { fingerprint, headers });
 
     return context;
   },

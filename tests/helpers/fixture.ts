@@ -7,7 +7,7 @@ export const test = base.extend<{
   context: BrowserContext;
   extensionId: string;
 }>({
-  context: async ({ }, use) => {
+  context: async ({}, use, testInfo) => {
     const context = await utils.makeContext();
 
     if (process.env.CI && process.env.DISPLAY) {
@@ -18,10 +18,14 @@ export const test = base.extend<{
     await use(context);
     await context.close();
 
-    // Prevent too many requests.
-    if (!process.env.DEBUG && !process.env.PWDEBUG) {
+    // Prevent too many requests, except for nimfomane tests
+    if (
+      !process.env.DEBUG &&
+      !process.env.PWDEBUG &&
+      !testInfo.file.includes("/nimfomane/")
+    ) {
       const duration = (Date.now() - start) / 1000;
-      const delay = Math.max(0, (10 - duration) * 1000);
+      const delay = Math.max(0, (8 - duration) * 1000);
       await new Promise(r => setTimeout(r, delay));
     }
   },

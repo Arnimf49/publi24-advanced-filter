@@ -7,14 +7,25 @@ export const utilsNimfomane = {
   },
 
   async waitForFirstImage(page: Page) {
-    const firstImage = page.locator('[data-wwid="topic-image"] img').nth(Math.floor(Math.random() * 3));
-    await firstImage.waitFor();
-    const src = await firstImage.getAttribute('src');
-    const parentHandle = await firstImage.evaluateHandle(el => el.parentElement);
-    const user = await parentHandle.getAttribute('data-wwuser');
-    const id = await parentHandle.getAttribute('data-wwtopic');
+    let index = 0;
 
-    return {firstImage, src, user, id};
+    while (index < 10) {
+      const parentHandle = page.locator('[data-wwid="topic-image"]').nth(index)
+      const firstImage = parentHandle.locator('img');
+      try {
+        await firstImage.waitFor();
+      } catch (error) {
+        console.warn(error);
+        continue;
+      }
+      const src = await firstImage.getAttribute('src');
+      const user = await parentHandle.getAttribute('data-wwuser');
+      const id = await parentHandle.getAttribute('data-wwtopic');
+
+      return {firstImage, src, user, id};
+    }
+
+    throw new Error('Failed to find first image');
   },
 
   async getUserProfileLink(page: Page, user: string) {

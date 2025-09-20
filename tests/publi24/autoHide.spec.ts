@@ -15,6 +15,8 @@ const setupArticle = async (page: Page, title: string, description: string) => {
   article = await page.$(`[data-articleid="${id}"]`);
   button = await article.$('[data-wwid="investigate"]');
 
+  await page.waitForTimeout(1000);
+
   await Promise.all([
     page.waitForResponse(response => response.url() === url),
     button.click(),
@@ -108,7 +110,7 @@ test('Should automatically hide if show web.', async ({ page, context }) => {
   await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'oferă show web'});
 });
 
-test('Should automatically hide if btw risk.', async ({ page, context }) => {
+test('Should automatically hide if bts risk.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'btsRisc');
