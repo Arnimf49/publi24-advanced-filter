@@ -10,10 +10,6 @@ export const test = base.extend<{
   context: async ({}, use, testInfo) => {
     const context = await utils.makeContext();
 
-    if (process.env.CI && process.env.DISPLAY) {
-      setTimeout(() => $`xdotool key Escape`, 1100);
-    }
-
     const start = Date.now();
     await use(context);
     await context.close();

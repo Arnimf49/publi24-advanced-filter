@@ -13,7 +13,7 @@ const utils = {
   async makeContext() {
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',
-      headless: !!process.env.CI,
+      headless: false,
       viewport: null,
       args: [
         `--disable-extensions-except=${EXTENSION_PATH}`,
