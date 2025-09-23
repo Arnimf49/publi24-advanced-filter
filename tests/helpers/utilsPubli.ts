@@ -77,7 +77,7 @@ export const utilsPubli = {
         continue;
       }
       if (altPage.url().startsWith("https://www.google.com/sorry/index")) {
-        solve(altPage).catch(console.error);
+        await solve(altPage);
       }
       await altPage.waitForEvent('close')
     }
