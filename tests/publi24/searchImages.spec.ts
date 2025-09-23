@@ -4,7 +4,7 @@ import {ElementHandle, errors} from "playwright-core";
 import {utils} from "../helpers/utils";
 
 test('Should search for images and show relevant results.', async ({ page, context }, testInfo) => {
-  testInfo.setTimeout(60000 * 4);
+  testInfo.setTimeout(60000 * 5);
 
   await utilsPubli.open(context, page);
 
@@ -124,7 +124,7 @@ test('Should search for images and show relevant results.', async ({ page, conte
       }
     }
 
-    await page.waitForTimeout(4000);
+    await page.waitForTimeout(process.env.CI == 'true' ? 10000 : 4000);
   }
 
   expect(Object.keys(caseChecks).length, `Cases not met: ${Object.keys(caseChecks).join(', ')}`).toEqual(0)
