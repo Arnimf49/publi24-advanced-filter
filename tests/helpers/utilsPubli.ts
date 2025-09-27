@@ -21,6 +21,10 @@ export const utilsPubli = {
         if (consent) {
           await consent.click();
         }
+        const years = await page.$('.overlay-18 .cta-btn-secondary');
+        if (years) {
+          await years.click();
+        }
       } catch (e) {
         // noop
       }
