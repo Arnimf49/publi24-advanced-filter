@@ -35,7 +35,9 @@ export const utilsPubli = {
     const localStorageData = config.loadStorage === undefined || config.loadStorage === true
       ? JSON.parse(fs.readFileSync(STORAGE_JSON, 'utf-8'))
       : null;
-    await context.addCookies(JSON.parse(fs.readFileSync(COOKIES_JSON).toString()));
+    if (fs.existsSync(COOKIES_JSON)) {
+      await context.addCookies(JSON.parse(fs.readFileSync(COOKIES_JSON).toString()));
+    }
     await context.addInitScript(({config, localStorageData}: any) => {
       if (window.localStorage.getItem('_pw_init') === 'true') {
         return;
