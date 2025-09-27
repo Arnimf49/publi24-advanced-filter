@@ -3,6 +3,7 @@ web-ext-artifacts
 node_modules/
 /test-results/
 /tests/helpers/localStorage.json
+/tests/helpers/cookies.json
 /playwright-report/
 /blob-report/
 /playwright/.cache/

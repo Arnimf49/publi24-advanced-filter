@@ -2,7 +2,7 @@ import {ElementHandle, Page} from "playwright-core";
 import {BrowserContext} from "@playwright/test";
 import fs from "node:fs";
 import {expect} from "playwright/test";
-import {STORAGE_PAGE} from "./utils";
+import {COOKIES_JSON, STORAGE_JSON} from "./utils";
 import {solve} from "recaptcha-solver";
 
 export const utilsPubli = {
@@ -33,9 +33,9 @@ export const utilsPubli = {
     config: {infoShow?: boolean, location?: string, page?: number, loadStorage?: boolean, clearStorage?: boolean} = {}
   ) {
     const localStorageData = config.loadStorage === undefined || config.loadStorage === true
-      ? JSON.parse(fs.readFileSync(STORAGE_PAGE, 'utf-8'))
+      ? JSON.parse(fs.readFileSync(STORAGE_JSON, 'utf-8'))
       : null;
-    await context.addCookies(JSON.parse(fs.readFileSync('tests/helpers/cookies.json').toString()));
+    await context.addCookies(JSON.parse(fs.readFileSync(COOKIES_JSON).toString()));
     await context.addInitScript(({config, localStorageData}: any) => {
       if (window.localStorage.getItem('_pw_init') === 'true') {
         return;

@@ -7,7 +7,8 @@ import * as cheerio from "cheerio";
 import {CheerioAPI} from "cheerio";
 
 const EXTENSION_PATH = dirname(path.join(fileURLToPath(import.meta.url), '../..'));
-export const STORAGE_PAGE = 'tests/helpers/localStorage.json';
+export const STORAGE_JSON = 'tests/helpers/localStorage.json';
+export const COOKIES_JSON = 'tests/helpers/cookies.json';
 
 const utils = {
   async makeContext() {

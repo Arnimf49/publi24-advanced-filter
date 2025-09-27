@@ -1,12 +1,12 @@
-import {STORAGE_PAGE, utils} from "./utils";
+import {COOKIES_JSON, STORAGE_JSON, utils} from "./utils";
 import fs from "node:fs";
 import {utilsPubli} from "./utilsPubli";
 
 const MAX_AGE_MS = 5 * 60 * 1000; // 5 min
 
 export default async () => {
-  const shouldSkip = fs.existsSync(STORAGE_PAGE) && (() => {
-    const stats = fs.statSync(STORAGE_PAGE);
+  const shouldSkip = fs.existsSync(STORAGE_JSON) && fs.existsSync(COOKIES_JSON) && (() => {
+    const stats = fs.statSync(STORAGE_JSON);
     const age = Date.now() - stats.mtimeMs;
     return age < MAX_AGE_MS;
   })();
@@ -33,6 +33,7 @@ export default async () => {
   });
 
   fs.writeFileSync('tests/helpers/localStorage.json', JSON.stringify(localStorageData, null, 2));
+  fs.writeFileSync('tests/helpers/cookies.json', JSON.stringify(await context.cookies(), null, 2));
 
   await context.close();
 };
