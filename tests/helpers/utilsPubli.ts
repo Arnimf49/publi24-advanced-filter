@@ -83,7 +83,10 @@ export const utilsPubli = {
         continue;
       }
       if (altPage.url().startsWith("https://www.google.com/sorry/index")) {
-        await solve(altPage);
+        await solve(altPage, {
+          delay: process.env.CI ? 200 : 64,
+          wait: process.env.CI ? 7000 : 5000,
+        });
       }
       await altPage.waitForEvent('close')
     }
@@ -149,8 +152,8 @@ export const utilsPubli = {
         if (atNav > 10) {
           throw new Error('Something is wrong. The duplicate is too far.')
         }
-        await page.waitForTimeout(1000);
         await page.locator('.pagination .arrow').nth(1).click();
+        await page.waitForTimeout(3000);
         ++atNav;
       }
     } while (!duplicateArticleIds.length);
