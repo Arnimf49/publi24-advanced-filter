@@ -69,26 +69,43 @@ export const utilsPubli = {
   },
 
   async awaitGooglePagesClose(triggerButton: ElementHandle, context: BrowserContext, page: Page) {
-    const secondaryPages: Page[] = [];
+    const attemptGoogleCaptchaSolve = async () => {
+      const secondaryPages: Page[] = [];
 
-    context.on('page', page => {
-      secondaryPages.push(page);
-    });
+      context.on('page', page => {
+        secondaryPages.push(page);
+      });
 
-    await triggerButton.click();
-    await page.waitForTimeout(4000);
+      await triggerButton.click();
+      await page.waitForTimeout(4000);
 
-    for (let altPage of secondaryPages) {
-      if (altPage.isClosed()) {
-        continue;
+      for (let altPage of secondaryPages) {
+        if (altPage.isClosed()) {
+          continue;
+        }
+        if (altPage.url().startsWith("https://www.google.com/sorry/index")) {
+          await solve(altPage, {
+            delay: process.env.CI ? 200 : 64,
+            wait: process.env.CI ? 7000 : 5000,
+          });
+        }
+        await altPage.waitForEvent('close')
       }
-      if (altPage.url().startsWith("https://www.google.com/sorry/index")) {
-        await solve(altPage, {
-          delay: process.env.CI ? 200 : 64,
-          wait: process.env.CI ? 7000 : 5000,
-        });
+    }
+
+    const attemptGoogleSearchReplication = async () => {
+      await triggerButton.click();
+      await page.waitForTimeout(4000);
+    }
+
+    try {
+      await attemptGoogleCaptchaSolve();
+    } catch (error: any) {
+      if (error?.message?.includes('No Audio Found')) {
+        await attemptGoogleSearchReplication();
+      } else {
+        throw error;
       }
-      await altPage.waitForEvent('close')
     }
   },
 
