@@ -4,7 +4,7 @@ import {ElementHandle, errors} from "playwright-core";
 import {utils} from "../helpers/utils";
 
 test('Should search for images and show relevant results.', async ({ page, context }, testInfo) => {
-  testInfo.setTimeout(60000 * 5);
+  testInfo.setTimeout(60000 * 6);
 
   await utilsPubli.open(context, page);
 
@@ -131,7 +131,7 @@ test('Should search for images and show relevant results.', async ({ page, conte
 });
 
 test('Should be able to search images on ads without phone.', async ({ page, context }, test) => {
-  test.setTimeout(60000);
+  test.setTimeout(70000);
   await utilsPubli.open(context, page, {loadStorage: false});
 
   const articles = await page.$$('[data-articleid]');

@@ -9,14 +9,6 @@ export const utilsPubli = {
   clearPopups(page: Page) {
     setInterval(async () => {
       try {
-        const element = await page.$('.voucher-modal .close-reveal-modal');
-        if (await element?.isVisible()) {
-          await element?.click();
-        }
-        const campaign = await page.$('[class="js-campaign-modal-close-button"]');
-        if (await campaign?.isVisible()) {
-          await campaign.click();
-        }
         const consent = await page.$('[class="qc-cmp2-summary-buttons"] [mode="primary"]');
         if (consent) {
           await consent.click();
@@ -24,6 +16,14 @@ export const utilsPubli = {
         const years = await page.$('.overlay-18 .cta-btn-secondary');
         if (years) {
           await years.click();
+        }
+        const element = await page.$('.voucher-modal .close-reveal-modal');
+        if (await element?.isVisible()) {
+          await element?.click();
+        }
+        const campaign = await page.$('[class="js-campaign-modal-close-button"]');
+        if (await campaign?.isVisible()) {
+          await campaign.click();
         }
       } catch (e) {
         // noop

@@ -183,6 +183,7 @@ test('Should switch phone number of favorite if phone number changes.', async ({
   await utilsPubli.open(context, page);
 
   const firstArticle = (await page.$$('[data-articleid]'))[0];
+  await firstArticle.waitForSelector('[data-wwid="phone-number"]')
   const phone = await (await firstArticle.$('[data-wwid="phone-number"]')).innerText();
   await (await firstArticle.$('[data-wwid="fav-toggle"]')).click();
 
