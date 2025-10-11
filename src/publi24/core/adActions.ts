@@ -124,7 +124,7 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
     }
   }
 
-  if (content.match(/(\W|^)(show web|web show|show la web|show erotic web|si webb?)(\W|$)/i)) {
+  if (content.match(/(\W|^)(show\s+web|web\s+show|show\s+la\s+web|show\s+erotic\s+web|si\s+webb?)(\W|$)/i)) {
     data.push(['showWeb', true]);
   }
   if (content.match(/(\W|^)(botox|siliconata|silicoane)(\W|$)/i)) {
@@ -133,14 +133,14 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
   if (content.match(/(\W|^)(party)(\W|$)/i)) {
     data.push(['party', true]);
   }
-  if (content.match(/(\W|^)(cu sau fara(?!\s+jucarii)|cum vrei tu|cum te simti mai bine|totale fara[,.;])(\W|$)/i)) {
+  if (content.match(/(\W|^)(cu sau fara(?!\s+jucarii)|cum\s+vrei\s+tu|cum\s+te\s+simti\s+mai\s+bine|totale\s+fara[,.;]|cu\s+tot\s+ce\s+vrei)(\W|$)/i)) {
     data.push(['btsRisc', true]);
   }
-  if (content.match(/(\W|^)((doa?r|numai|decat) (deplasar|depalsar|deplsar)(i{1,4}|e)|nu am locatie)(\W|$)/i)
-    && !content.match(/(\W|^)(la mine|locatie proprie|si deplasar[ie]|si locatie|locatia mea|in locatie|nu fac deplasari)(\W|$)/i)) {
+  if (content.match(/(\W|^)((doa?r|numai|decat)\s+(deplasar|depalsar|deplsar)(i{1,4}|e)|nu am locatie)(\W|$)/i)
+    && !content.match(/(\W|^)(la\s+mine|locatie\s+proprie|si\s+deplasar[ie]|si\s+locatie|locatia\s+mea|in\s+locatie|nu\s+fac\s+deplasari)(\W|$)/i)) {
     data.push(['onlyTrips', true]);
   }
-  if (content.match(/(\W|^)(trans|transsexuala?)(\W|$)/i)) {
+  if (content.match(/(\W|^)(ts|trans|transs?exuala?)(\W|$)/i)) {
     data.push(['trans', true]);
   }
   if (content.match(/(\W|^)(matura)(\W|$)/i)) {
