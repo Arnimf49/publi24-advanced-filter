@@ -19,6 +19,7 @@ interface AdItem {
 
 interface PhoneItem {
   hidden?: boolean;
+  hideResetAt?: number;
   ads?: string[]; // Format: "id|url"
   adsOptimized?: string;
   hideReason?: string;
@@ -265,10 +266,22 @@ export const WWStorage = {
 
   setPhoneHidden(phone: string, h: boolean = true): void {
     WWStorage.setPhoneProp(phone, 'hidden', h);
+    if (!h) {
+      WWStorage.setPhoneProp(phone, 'hideResetAt', null);
+      WWStorage.setPhoneProp(phone, 'hideReason', null);
+    }
   },
 
   isPhoneHidden(phone: string): boolean {
     return WWStorage.getPhoneProp<boolean>(phone, 'hidden') === true;
+  },
+
+  getPhoneHideResetAt(phone: string): number | undefined {
+    return WWStorage.getPhoneProp<number>(phone, 'hideResetAt');
+  },
+
+  setPhoneHideResetAt(phone: string, timestamp: number | null): void {
+    WWStorage.setPhoneProp(phone, 'hideResetAt', timestamp);
   },
 
   getPhoneAds(phone: string): string[] {

@@ -2,7 +2,7 @@ import {COOKIES_JSON, STORAGE_JSON, utils} from "./utils";
 import fs from "node:fs";
 import {utilsPubli} from "./utilsPubli";
 
-const MAX_AGE_MS = 5 * 60 * 1000; // 5 min
+const MAX_AGE_MS = 15 * 60 * 1000; // 15 min
 
 export default async () => {
   const shouldSkip = fs.existsSync(STORAGE_JSON) && fs.existsSync(COOKIES_JSON) && (() => {

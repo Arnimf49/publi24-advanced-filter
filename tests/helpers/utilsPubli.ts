@@ -109,7 +109,7 @@ export const utilsPubli = {
     }
   },
 
-  async findAdWithCondition(page: Page, conditionFn: (...args: any) => Promise<any>) {
+  async findAdWithCondition<T>(page: Page, conditionFn: (...args: any) => Promise<T>): Promise<T> {
     let results;
 
     while (true) {
@@ -190,5 +190,62 @@ export const utilsPubli = {
     if (options?.reason) {
       expect(await (await element.$('[data-wwid="hide-reason"]')).innerText()).toEqual(`motiv ascundere: ${options.reason}`);
     }
+  },
+
+  async findFirstArticleWithPhone(page: Page) {
+    return await utilsPubli.findAdWithCondition(page, async () => {
+      for (let article of await page.$$('[data-articleid]')) {
+        while (await article.$('[data-wwid="loader"]')) {
+          await page.waitForTimeout(1000);
+        }
+
+        const phone = await article.$('[data-wwid="phone-number"]');
+        if (phone && await phone.isVisible()) {
+          return article;
+        }
+      }
+      return null;
+    });
+  },
+
+  async selectArticle(articleId: string, page: Page) {
+    const article = await utilsPubli.findAdWithCondition(page, async () => {
+      return await page.$(`[data-articleid="${articleId}"]`);
+    });
+
+    if (article) {
+      await article.scrollIntoViewIfNeeded();
+    }
+
+    return article;
+  },
+
+  async getPhoneByArticleId(page: Page, articleId: string): Promise<string> {
+    return await page.evaluate((id) => {
+      const item = JSON.parse(localStorage.getItem(`ww2:${id.toUpperCase()}`) || '{}');
+      return item.phone || '';
+    }, articleId);
+  },
+
+  async getPhoneStorageData(page: Page, phone: string): Promise<any> {
+    return await page.evaluate((phone) => {
+      return JSON.parse(localStorage.getItem(`ww2:phone:${phone}`) || '{}');
+    }, phone);
+  },
+
+  async setPhoneStorageProp(page: Page, phone: string, key: string, value: any): Promise<void> {
+    await page.evaluate(({phone, key, value}) => {
+      const phoneItem = JSON.parse(localStorage.getItem(`ww2:phone:${phone}`) || '{}');
+      phoneItem[key] = value;
+      localStorage.setItem(`ww2:phone:${phone}`, JSON.stringify(phoneItem));
+    }, {phone, key, value});
+  },
+
+  async forceNewAnalyzeOnArticle(page: Page, id: string): Promise<void> {
+    await page.evaluate((innerId) => {
+      const data = JSON.parse(window.localStorage.getItem(`ww2:${innerId.toUpperCase()}`));
+      data.analyzedAt = Date.now() - (1.296e+9 + 1000 * 60);
+      window.localStorage.setItem(`ww2:${innerId.toUpperCase()}`, JSON.stringify(data));
+    }, id);
   },
 };

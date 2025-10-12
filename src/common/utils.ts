@@ -1,4 +1,9 @@
 export const utils = {
+  debugLog(message: string | number, data?: any) {
+    if (process.env.WATCH_MODE) {
+      console.log(`[WW-DEBUG] ${message}`, data || '');
+    }
+  },
   mostRepeated<T>(arr: T[], transformer: ((v: T) => string) = ((v) => v + '')): T {
     const counts = arr.reduce((acc, val) => {
       acc[transformer(val)] = acc[transformer(val)] ? {

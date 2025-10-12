@@ -9,6 +9,7 @@ import path from 'path';
 
 const isProduction = process.env.NODE_ENV === 'production';
 const isPromoter = process.env.PROMOTER === 'true';
+const isWatchMode = !!process.env.ROLLUP_WATCH;
 
 const makeStyledSource = (root, file) => ({
   input: `src/${root}/${file}`,
@@ -24,6 +25,12 @@ const makeStyledSource = (root, file) => ({
   },
   external: ['react', 'react-dom/client', 'react-dom'],
   plugins: [
+    replace({
+      preventAssignment: true,
+      'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
+      'process.env.PROMOTER': JSON.stringify(isPromoter ? 'true' : 'false'),
+      'process.env.WATCH_MODE': JSON.stringify(isWatchMode),
+    }),
     resolve({ browser: true }),
     commonjs(),
     typescript({
@@ -45,11 +52,6 @@ const makeStyledSource = (root, file) => ({
       ].filter(Boolean),
       sourceMap: !isProduction,
     }),
-    replace({
-      preventAssignment: true,
-      'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
-      'process.env.PROMOTER': JSON.stringify(isPromoter ? 'true' : 'false'),
-    }),
   ],
   watch: {}
 })
@@ -62,16 +64,17 @@ const makeSimpleSource = (root, file) => ({
     sourcemap: !isProduction,
   },
   plugins: [
+    replace({
+      preventAssignment: true,
+      'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
+      'process.env.WATCH_MODE': JSON.stringify(isWatchMode),
+    }),
     resolve({ browser: true }),
     commonjs(),
     typescript({
       tsconfig: './tsconfig.json',
       sourceMap: !isProduction,
       inlineSources: !isProduction,
-    }),
-    replace({
-      preventAssignment: true,
-      'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
     }),
   ]
 })

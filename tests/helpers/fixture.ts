@@ -10,6 +10,18 @@ export const test = base.extend<{
   context: async ({}, use, testInfo) => {
     const context = await utils.makeContext();
 
+    const setupDebugLogListener = (page) => {
+      page.on('console', (msg) => {
+        const text = msg.text();
+        if (text.startsWith('[WW-DEBUG]')) {
+          console.log(`\x1b[36m${text}\x1b[0m`);
+        }
+      });
+    };
+
+    context.pages().forEach(setupDebugLogListener);
+    context.on('page', setupDebugLogListener);
+
     const start = Date.now();
     await use(context);
     await context.close();

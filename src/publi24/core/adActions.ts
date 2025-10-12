@@ -5,72 +5,11 @@ import {IS_AD_PAGE} from "./globals";
 import {WWBrowserStorage} from "./browserStorage";
 import {AutoHideCriterias, WWStorage} from "./storage";
 import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../../common/globals";
+import {AUTO_HIDE_CRITERIA} from "./hideReasons";
+import {utils} from "../../common/utils";
 
 export type AdContentTuple = [string, number | boolean];
 
-export interface AutoHideCriteriaProps {
-  condition: (criterias: AutoHideCriterias, value: any) => boolean;
-  value: string;
-  reason: (criterias: AutoHideCriterias) => string;
-}
-
-const AUTO_HIDE_CRITERIA: { [key in keyof AutoHideCriterias]: AutoHideCriteriaProps } = {
-  maxAge: {
-    condition: ({maxAgeValue}: AutoHideCriterias, value: number): boolean => !!maxAgeValue && maxAgeValue < value,
-    value: 'age',
-    reason: ({maxAgeValue}: AutoHideCriterias): string => `peste ${maxAgeValue} de ani`,
-  },
-  minHeight: {
-    condition: ({minHeightValue}: AutoHideCriterias, value: number): boolean => !!minHeightValue && minHeightValue > value,
-    value: 'height',
-    reason: ({minHeightValue}: AutoHideCriterias): string => `sub ${minHeightValue}cm`,
-  },
-  maxHeight: {
-    condition: ({maxHeightValue}: AutoHideCriterias, value: number): boolean => !!maxHeightValue && maxHeightValue < value,
-    value: 'height',
-    reason: ({maxHeightValue}: AutoHideCriterias): string => `peste ${maxHeightValue}cm`,
-  },
-  maxWeight: {
-    condition: ({maxWeightValue}: AutoHideCriterias, value: number): boolean => !!maxWeightValue && maxWeightValue < value,
-    value: 'weight',
-    reason: ({maxWeightValue}: AutoHideCriterias): string => `peste ${maxWeightValue}kg`,
-  },
-  onlyTrips: {
-    condition: (_: AutoHideCriterias, value: boolean): boolean => value,
-    value: 'onlyTrips',
-    reason: (): string => `numai deplasări`,
-  },
-  showWeb: {
-    condition: (_: AutoHideCriterias, value: boolean): boolean => value,
-    value: 'showWeb',
-    reason: (): string => `oferă show web`,
-  },
-  botox: {
-    condition: (_: AutoHideCriterias, value: boolean): boolean => value,
-    value: 'botox',
-    reason: (): string => `siliconată`,
-  },
-  party: {
-    condition: (_: AutoHideCriterias, value: boolean): boolean => value,
-    value: 'party',
-    reason: (): string => `face party`,
-  },
-  btsRisc: {
-    condition: (_: AutoHideCriterias, value: boolean): boolean => value,
-    value: 'btsRisc',
-    reason: (): string => `risc bts`,
-  },
-  trans: {
-    condition: (_: AutoHideCriterias, value: boolean): boolean => value,
-    value: 'trans',
-    reason: (): string => `transsexual`,
-  },
-  mature: {
-    condition: (_: AutoHideCriterias, value: boolean): boolean => value,
-    value: 'mature',
-    reason: (): string => `matură`,
-  },
-};
 
 async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
   const pageResult = await adData.loadInAdPage(item);
@@ -81,6 +20,8 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
   }
   const page = pageResult as DocumentFragment | HTMLElement; // Type assertion after check
   const content: string = misc.removeDiacritics(adData.getPageTitle(page) + ' ' + adData.getPageDescription(page));
+
+  utils.debugLog('Analyzing content', {content: content.trim().substring(0, 200) + '...'});
 
   const data: AdContentTuple[] = [];
   let match: RegExpMatchArray | null;
@@ -151,8 +92,11 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
 }
 
 function applyAutoHiding(phoneNumber: string, id: string, contentData: AdContentTuple[]): void {
+  utils.debugLog('applyAutoHiding called', {phoneNumber, id, contentDataKeys: contentData.map(([k]) => k)});
+
   const criterias: AutoHideCriterias = WWStorage.getAutoHideCriterias();
   const matched: string[] = [];
+  const matchedCriteria: any[] = [];
 
   for (let [criteria, props] of Object.entries(AUTO_HIDE_CRITERIA)) {
     if (!WWStorage.isAutoHideCriteriaEnabled(criteria as keyof AutoHideCriterias)) {
@@ -160,20 +104,56 @@ function applyAutoHiding(phoneNumber: string, id: string, contentData: AdContent
     }
 
     const dataItem = contentData.find(([key]) => key === props.value);
+    utils.debugLog(`Checking ${criteria}`, {dataItem, condition: !!dataItem && props.condition(criterias, dataItem[1])});
 
     if (dataItem && props.condition(criterias, dataItem[1])) {
       matched.push(props.reason(criterias));
+      matchedCriteria.push(props);
+      utils.debugLog(`Matched criteria: ${criteria}`, props.reason(criterias));
     }
   }
 
   if (matched.length) {
+    utils.debugLog('Auto-hiding ad', {matched, phoneNumber});
     WWStorage.setAdVisibility(id, false);
     WWStorage.setPhoneHidden(phoneNumber, true);
     WWStorage.setPhoneHiddenReason(phoneNumber, 'automat: ' + matched.join(' / '));
+
+    const expirableCriteria = matchedCriteria.find(props => props.expireDays);
+    if (expirableCriteria) {
+      const resetTimestamp = Date.now() + (expirableCriteria.expireDays * 24 * 60 * 60 * 1000);
+      WWStorage.setPhoneHideResetAt(phoneNumber, resetTimestamp);
+      utils.debugLog('Set hideResetAt', {phoneNumber, resetTimestamp, expireDays: expirableCriteria.expireDays});
+    }
+  } else {
+    utils.debugLog('No auto-hide criteria matched', {phoneNumber, availableData: contentData});
   }
 }
 
 export const adActions = {
+  resetExpiredHides(phone: string, id: string): boolean {
+    utils.debugLog('checkExpiredHide called', {phone});
+
+    const hideResetAt = WWStorage.getPhoneHideResetAt(phone);
+    const hideReason = WWStorage.getPhoneHiddenReason(phone);
+    utils.debugLog('Hide reset check', {phone, hideResetAt, hideReason, now: Date.now()});
+
+    if (!hideResetAt) {
+      utils.debugLog('No hideResetAt timestamp, hide will not expire', {phone});
+      return false;
+    }
+
+    if (Date.now() >= hideResetAt) {
+      utils.debugLog('Resetting expired hide', {phone, hideResetAt, hideReason});
+      WWStorage.setPhoneHidden(phone, false);
+      WWStorage.setAdVisibility(id, true);
+      return true;
+    }
+
+    utils.debugLog('Hide not yet expired', {phone, timeLeft: hideResetAt - Date.now()});
+    return false;
+  },
+
   setItemVisible(item: HTMLElement, v: boolean): void {
     const target = item.querySelector<HTMLElement>('.article-txt-wrap, .ww-inset');
 

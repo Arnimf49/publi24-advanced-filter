@@ -58,6 +58,10 @@ export const renderer = {
   registerAdItem(item: HTMLElement, id: string, renderOptions?: RenderOptions): () => void {
     const phone = WWStorage.getAdPhone(id);
 
+    if (phone && WWStorage.isPhoneHidden(phone)) {
+      adActions.resetExpiredHides(phone, id);
+    }
+
     if (
       !phone
       || WWStorage.hasAdNoPhone(id)

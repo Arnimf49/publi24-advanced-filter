@@ -4,23 +4,15 @@ import {misc} from "../../../../core/misc";
 import {IS_AD_PAGE} from "../../../../core/globals";
 import {IS_MOBILE_VIEW} from "../../../../../common/globals";
 import {utils} from "../../../../../common/utils";
+import {MANUAL_HIDE_REASONS} from "../../../../core/hideReasons";
+import {ManualHideReasonWithKey} from "./HideReasonRoot";
 
-const REASONS = [
-  "scump",
-  "etnie",
-  "țeapă",
-  "înălțime",
-  "comunicare",
-  "formă",
-  "servicii slabe",
-  "poze false",
-  "alta",
-];
+const REASONS = Object.keys(MANUAL_HIDE_REASONS);
 
 type HideReasonProps = {
   reasons?: string[];
   selectedReason?: string | null;
-  onReasonSelect: (reason: string) => void;
+  onReasonSelect: (reason: ManualHideReasonWithKey) => void;
   onShowClick?: () => void;
 };
 
@@ -61,7 +53,10 @@ const HideReason: React.FC<HideReasonProps> = ({
             )}
             onClick={() => {
               setSelected(reason)
-              onReasonSelect(reason)
+              onReasonSelect({
+                key: reason,
+                config: MANUAL_HIDE_REASONS[reason]
+              })
             }}
             data-wwselected={selected === reason ? "true" : ""}
             data-wwid="reason"
