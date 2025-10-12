@@ -11,6 +11,7 @@
     "pw-open": "npx playwright test --ui",
     "pw-debug": "npx playwright test --debug",
     "pw-run": "npx playwright test",
+    "show-domains": "node misc/show-unknown-domains.js",
     "postinstall": "sed -i 's/:visible//g' node_modules/recaptcha-solver/lib/index.js node_modules/recaptcha-solver/lib/index.mjs || true"
   },
   "author": "",

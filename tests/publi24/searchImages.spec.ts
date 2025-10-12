@@ -2,8 +2,9 @@ import {expect, test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
 import {ElementHandle, errors} from "playwright-core";
 import {utils} from "../helpers/utils";
+import {collectUnknownDomains} from "../helpers/domainCollector";
 
-test('Should search for images and show relevant results.', async ({ page, context }, testInfo) => {
+test.only('Should search for images and show relevant results.', async ({ page, context }, testInfo) => {
   testInfo.setTimeout(60000 * 6);
 
   await utilsPubli.open(context, page);
@@ -117,6 +118,9 @@ test('Should search for images and show relevant results.', async ({ page, conte
     }
     // Wait for images post-processing.
     await page.waitForTimeout(2000);
+
+    // Collect any unknown domains from the image results
+    await collectUnknownDomains(ad);
 
     const cases = Object.entries(caseChecks);
     for (let [name, check] of cases) {
