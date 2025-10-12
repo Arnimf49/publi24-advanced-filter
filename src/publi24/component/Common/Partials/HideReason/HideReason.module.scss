@@ -84,6 +84,81 @@
       }
     }
 
+    &.temporarButton {
+      background: rgb(225, 215, 225);
+      color: #333;
+      font-weight: bold;
+      position: relative;
+      
+      &:hover {
+        background: rgb(235, 225, 235);
+      }
+      
+      :global(.dark) & {
+        background: rgb(181, 158, 181);
+        color: #333;
+        
+        &:hover {
+          background: rgb(195, 172, 195);
+        }
+      }
+      
+      &.reasonSelected {
+        background: rgb(197, 155, 47);
+        color: white;
+        
+        .temporarSubtext {
+          color: white;
+        }
+        
+        :global(.dark) & {
+          background-color: #f5d04b;
+          color: #222;
+          
+          .temporarSubtext {
+            color: #222;
+          }
+        }
+      }
+    }
+    
+    &.backButton {
+      background: #9e9e9e;
+      color: white;
+      
+      &:hover {
+        background: #8e8e8e;
+      }
+      
+      :global(.dark) & {
+        background: #616161;
+        
+        &:hover {
+          background: #515151;
+        }
+      }
+    }
+    
+    &.skipSubcategoryButton {
+      background: #e3f2fd;
+      color: #1976d2;
+      border: 2px solid #1976d2;
+      
+      &:hover {
+        background: #bbdefb;
+      }
+      
+      :global(.dark) & {
+        background: #1e3a5f;
+        color: #64b5f6;
+        border-color: #64b5f6;
+        
+        &:hover {
+          background: #2c5282;
+        }
+      }
+    }
+
     &.reasonSelected {
       background: rgb(197, 155, 47);
       color: white;
@@ -93,6 +168,16 @@
         color: #222;
       }
     }
+  }
+
+  .temporarSubtext {
+    font-size: 11px;
+    font-weight: normal;
+    color: black;
+    opacity: 0.6;
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
   }
 
   @media screen and (max-width: 600px) {

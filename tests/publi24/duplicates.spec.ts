@@ -42,7 +42,17 @@ test('Should hide all duplicate ads from list.', async ({ page, context }) => {
 
   await page.locator('[data-wwid="ads-modal"] [data-wwid="hide-all"]').waitFor();
   await page.locator('[data-wwid="ads-modal"] [data-wwid="hide-all"]').click();
-  await ((await page.$$('[data-wwid="ads-modal"] [data-wwid="reason"]'))[0]).click();
+  
+  const altaButton = await page.$('[data-wwid="ads-modal"] :text("alta")');
+  await altaButton.click();
+  await page.waitForTimeout(500);
+  
+  expect(await page.$('[data-wwid="ads-modal"]')).toBeTruthy();
+  const subcategories = await page.$$('[data-wwid="ads-modal"] [data-wwid="subcategory"]');
+  expect(subcategories.length).toBeGreaterThan(0);
+  
+  const selectedCategoryButton = await page.$('[data-wwid="ads-modal"] [data-wwid="selected-category"]');
+  await selectedCategoryButton.click();
 
   expect(await page.$('[data-wwid="ads-modal"]')).toBeNull();
 
@@ -52,7 +62,31 @@ test('Should hide all duplicate ads from list.', async ({ page, context }) => {
     const ad =  await utilsPubli.selectAd(page, id);
     const hideReason = await ad.$('[data-wwid="hide-reason"]');
     expect(hideReason).not.toBeNull();
-    expect(await hideReason.innerText()).toEqual('motiv ascundere: scump');
+    expect(await hideReason.innerText()).toEqual('motiv ascundere: alta');
   }
 })
 
+test('Should not close hide reason window when clicking category with subcategories in AdPanel context.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
+  await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
+  await page.waitForTimeout(800);
+
+  const aspectButton = await firstAd.$(':text("aspect")');
+  await aspectButton.click();
+  await page.waitForTimeout(500);
+
+  const hideReasonSelection = await firstAd.$('[data-wwid="hide-reason-selection"]');
+  expect(hideReasonSelection).toBeTruthy();
+  
+  const subcategories = await firstAd.$$('[data-wwid="subcategory"]');
+  expect(subcategories.length).toBeGreaterThan(0);
+  
+  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: aspect');
+  
+  await subcategories[0].click();
+  await page.waitForTimeout(500);
+  
+  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toContain('motiv ascundere: aspect: ');
+})

@@ -21,15 +21,20 @@ const HideReasonRoot: React.FC<HideReasonRootProps> = ({
   onCancel,
   onReason,
 }) => {
-  const onReasonSelect = useCallback((reasonWithKey: ManualHideReasonWithKey) => {
-    WWStorage.setPhoneHiddenReason(phone, reasonWithKey.key);
+  const onReasonSelect = useCallback((reasonWithKey: ManualHideReasonWithKey, subcategory?: string) => {
+    const reasonKey = (subcategory && subcategory !== '') ? `${reasonWithKey.key}: ${subcategory}` : reasonWithKey.key;
+    WWStorage.setPhoneHiddenReason(phone, reasonKey);
     
     if (reasonWithKey.config.expireDays) {
       const resetTimestamp = Date.now() + (reasonWithKey.config.expireDays * 24 * 60 * 60 * 1000);
       WWStorage.setPhoneHideResetAt(phone, resetTimestamp);
     }
     
-    onReason && onReason();
+    const shouldClose = !reasonWithKey.config.subcategories?.length || subcategory !== undefined;
+    
+    if (shouldClose && onReason) {
+      onReason();
+    }
   }, [phone, onReason]);
 
   useEffect(() => {

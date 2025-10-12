@@ -45,17 +45,90 @@ test('Should hide with a reason and be able to change reason.', async ({ page, c
   await page.waitForTimeout(800);
 
   const hideReasons = await firstAd.$$('[data-wwid="reason"]');
-  expect(hideReasons).toHaveLength(9);
+  expect(hideReasons).toHaveLength(5);
 
-  await hideReasons[0].click();
+  const temporarButton = await firstAd.$(':text("temporar")');
+  await temporarButton.click();
   await page.waitForTimeout(1000);
-  expect(await hideReasons[0].getAttribute('data-wwselected')).toEqual('true');
-  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: scump');
+  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: temporar');
 
-  await hideReasons[1].click();
+  const pozeFalseButton = await firstAd.$(':text("poze false")');
+  await pozeFalseButton.click();
   await page.waitForTimeout(1000);
-  expect(await hideReasons[1].getAttribute('data-wwselected')).toEqual('true');
-  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: etnie');
+  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: poze false');
+})
+
+test('Should show subcategories when clicking category with subcategories.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
+  await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
+  await page.waitForTimeout(800);
+
+  const aspectButton = await firstAd.$(':text("aspect")');
+  await aspectButton.click();
+  await page.waitForTimeout(500);
+
+  const subcategories = await firstAd.$$('[data-wwid="subcategory"]');
+  expect(subcategories).toHaveLength(6);
+
+  const backButton = await firstAd.$('[data-wwid="back-button"]');
+  expect(backButton).toBeTruthy();
+
+  const selectedButton = await firstAd.$('[data-wwid="selected-category"]');
+  expect(selectedButton).toBeTruthy();
+  expect(await selectedButton.innerText()).toEqual('aspect');
+
+  await subcategories[0].click();
+  await page.waitForTimeout(1000);
+  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: aspect: înălțime');
+})
+
+test('Should handle temporar hide with 15 days expiration.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
+  const adId = await firstAd.getAttribute('data-articleid');
+
+  await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
+  await page.waitForTimeout(800);
+
+  const temporarButton = await firstAd.$(':text("temporar")');
+  expect(temporarButton).toBeTruthy();
+
+  await temporarButton.click();
+  await page.waitForTimeout(1000);
+
+  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: temporar');
+
+  await page.reload();
+  const hiddenAd = await page.$(`[data-articleid="${adId}"]`);
+  await utilsPubli.assertAdHidden(hiddenAd);
+})
+
+test('Should allow going back from subcategories to main categories.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
+  await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
+  await page.waitForTimeout(800);
+
+  const comportamentButton = await firstAd.$(':text("comportament")');
+  await comportamentButton.click();
+  await page.waitForTimeout(500);
+
+  const subcategories = await firstAd.$$('[data-wwid="subcategory"]');
+  expect(subcategories).toHaveLength(4);
+
+  const backButton = await firstAd.$('[data-wwid="back-button"]');
+  await backButton.click();
+  await page.waitForTimeout(500);
+
+  const mainReasons = await firstAd.$$('[data-wwid="reason"]');
+  expect(mainReasons).toHaveLength(5);
+
+  const title = await firstAd.$('[data-wwid="hide-reason-selection"] span');
+  expect(await title.innerText()).toEqual('motivul ascunderii?');
 })
 
 test('Should hide phone number and thus hide duplicate ads.', async ({ page, context }) => {

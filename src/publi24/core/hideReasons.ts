@@ -2,18 +2,24 @@ import {AutoHideCriterias} from "./storage";
 
 export interface ManualHideReason {
   expireDays: number | null;
+  subcategories?: string[];
 }
 
 export const MANUAL_HIDE_REASONS: Record<string, ManualHideReason> = {
-  scump: { expireDays: null },
-  etnie: { expireDays: null },
-  țeapă: { expireDays: null },
-  înălțime: { expireDays: null },
-  comunicare: { expireDays: null },
-  formă: { expireDays: null },
-  'servicii slabe': { expireDays: null },
+  alta: { 
+    expireDays: null,
+    subcategories: ['neprotejat', 'servicii slabe', 'sex', 'boală', 'substanțe', 'țeapă']
+  },
+  aspect: { 
+    expireDays: null,
+    subcategories: ['înălțime', 'greutate', 'vârstă', 'chip', 'etnie', 'silicoane']
+  },
+  comportament: { 
+    expireDays: null,
+    subcategories: ['nu răspunde', 'igienă', 'needucată', 'fast fuck']
+  },
   'poze false': { expireDays: 90 },
-  alta: { expireDays: null },
+  temporar: { expireDays: 15 },
 };
 
 export interface AutoHideCriteriaProps {
