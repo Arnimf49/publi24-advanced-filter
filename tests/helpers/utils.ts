@@ -5,6 +5,8 @@ import path from "path";
 import {fileURLToPath} from "node:url";
 import * as cheerio from "cheerio";
 import {CheerioAPI} from "cheerio";
+import {FingerprintGenerator} from "fingerprint-generator";
+import {FingerprintInjector} from "fingerprint-injector";
 
 const EXTENSION_PATH = dirname(path.join(fileURLToPath(import.meta.url), '../..'));
 export const STORAGE_JSON = 'tests/helpers/localStorage.json';
@@ -12,15 +14,30 @@ export const COOKIES_JSON = 'tests/helpers/cookies.json';
 
 const utils = {
   async makeContext() {
+    const { fingerprint, headers } = new FingerprintGenerator().getFingerprint({
+      devices: ['desktop'],
+      operatingSystems: ['linux'],
+      browsers: ['chrome']
+    });
+
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',
       headless: false,
-      viewport: null,
+      viewport: {
+        width: Math.max(1550, Math.min(fingerprint.screen.width, 1920)),
+        height: Math.max(700, Math.min(fingerprint.screen.height, 1000)),
+      },
+      extraHTTPHeaders: {
+        'accept-language': headers['accept-language'],
+      },
       args: [
+        '--disable-blink-features=AutomationControlled',
+        '--no-sandbox',
         `--disable-extensions-except=${EXTENSION_PATH}`,
         `--load-extension=${EXTENSION_PATH}`,
         '--start-maximized',
       ],
+      userAgent: fingerprint.navigator.userAgent,
       colorScheme: 'dark',
       ...(process.env.PLAYWRIGHT_LAUNCH_OPTIONS_EXECUTABLE_PATH
         ? {
@@ -28,6 +45,7 @@ const utils = {
           }
         : {}),
     });
+    await new FingerprintInjector().attachFingerprintToPlaywright(context, { fingerprint, headers });
 
     return context;
   },
@@ -58,13 +76,6 @@ const utils = {
         body: modifiedBody,
       });
     });
-  },
-
-  async modifyAdContent(page: Page, url: string, {title, description, delay}: {title: string, description: string, delay?: number}) {
-    await utils.modifyRouteBody(page, url, ($) => {
-      $('.detail-title h1').text(title);
-      $('.article-description').text(description);
-    }, delay)
   }
 }
 

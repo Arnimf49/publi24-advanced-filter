@@ -5,14 +5,14 @@ import {utilsPubli} from "../helpers/utilsPubli";
 test('Should display duplicate ad count and list them.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  const article: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
-  const duplicatesText = await (await article.$('[data-wwid="duplicates-container"]')).innerText();
+  const ad: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
+  const duplicatesText = await (await ad.$('[data-wwid="duplicates-container"]')).innerText();
   expect(duplicatesText).toMatch(/^\d+ anunțuri cu acest telefon \(vizualizează\)$/);
 
   const count = +(duplicatesText.match(/(\d+)/)[1]);
-  const phone = await (await article.$('[data-wwid="phone-number"]')).innerText();
+  const phone = await (await ad.$('[data-wwid="phone-number"]')).innerText();
 
-  await (await article.$('[data-wwid="duplicates"]')).click();
+  await (await ad.$('[data-wwid="duplicates"]')).click();
   await page.waitForTimeout(200);
 
   await expect(page.locator('[data-wwid="ads-modal"]')).toBeVisible();
@@ -31,8 +31,8 @@ test('Should display duplicate ad count and list them.', async ({ page, context 
 test('Should hide all duplicate ads from list.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  const article: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
-  await (await article.$('[data-wwid="duplicates"]')).click();
+  const ad: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
+  await (await ad.$('[data-wwid="duplicates"]')).click();
   await page.waitForTimeout(200);
 
   const duplicatesIds = [];
@@ -49,8 +49,8 @@ test('Should hide all duplicate ads from list.', async ({ page, context }) => {
   await page.waitForTimeout(1000);
 
   for (let id of duplicatesIds) {
-    const article = await utilsPubli.findAdWithCondition(page, async () => await page.$(`[data-articleid="${id}"]`))
-    const hideReason = await article.$('[data-wwid="hide-reason"]');
+    const ad =  await utilsPubli.selectAd(page, id);
+    const hideReason = await ad.$('[data-wwid="hide-reason"]');
     expect(hideReason).not.toBeNull();
     expect(await hideReason.innerText()).toEqual('motiv ascundere: scump');
   }

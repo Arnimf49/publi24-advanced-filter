@@ -6,56 +6,56 @@ import {expect} from "playwright/test";
 test('Should hide without a reason.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  const firstArticle = (await page.$$('[data-articleid]'))[0];
-  const articleId = await firstArticle.getAttribute('data-articleid');
-  const hideButton = await firstArticle.$('[data-wwid="toggle-hidden"]');
+  const firstAd =  await utilsPubli.selectAd(page);
+  const adId = await firstAd.getAttribute('data-articleid');
+  const hideButton = await firstAd.$('[data-wwid="toggle-hidden"]');
 
   await hideButton.click();
-  await utilsPubli.assertAdHidden(firstArticle);
+  await utilsPubli.assertAdHidden(firstAd);
 
   await page.reload();
-  const article = await page.$(`[data-articleid="${articleId}"]`);
-  await utilsPubli.assertAdHidden(article);
+  const ad =  await page.$(`[data-articleid="${adId}"]`);
+  await utilsPubli.assertAdHidden(ad);
 })
 
 test('Should hide and then show.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  const firstArticle = (await page.$$('[data-articleid]'))[0];
-  const articleId = await firstArticle.getAttribute('data-articleid');
+  const firstAd =  await utilsPubli.selectAd(page);
+  const adId = await firstAd.getAttribute('data-articleid');
 
-  await (await firstArticle.$('[data-wwid="toggle-hidden"]')).click();
-  await utilsPubli.assertAdHidden(firstArticle);
+  await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
+  await utilsPubli.assertAdHidden(firstAd);
 
-  await (await firstArticle.$('[data-wwid="show-button"]')).click();
-  await utilsPubli.assertAdHidden(firstArticle, {hidden: false});
+  await (await firstAd.$('[data-wwid="show-button"]')).click();
+  await utilsPubli.assertAdHidden(firstAd, {hidden: false});
 
-  await (await firstArticle.$('[data-wwid="toggle-hidden"]')).click();
+  await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
   await page.reload();
-  const article = await page.$(`[data-articleid="${articleId}"]`);
-  await (await article.$('[data-wwid="toggle-hidden"]')).click();
-  await utilsPubli.assertAdHidden(article, {hidden: false});
+  const ad =  await page.$(`[data-articleid="${adId}"]`);
+  await (await ad.$('[data-wwid="toggle-hidden"]')).click();
+  await utilsPubli.assertAdHidden(ad, {hidden: false});
 })
 
 test('Should hide with a reason and be able to change reason.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  const firstArticle = (await page.$$('[data-articleid]'))[0];
-  await (await firstArticle.$('[data-wwid="toggle-hidden"]')).click();
+  const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
+  await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
   await page.waitForTimeout(800);
 
-  const hideReasons = await firstArticle.$$('[data-wwid="reason"]');
+  const hideReasons = await firstAd.$$('[data-wwid="reason"]');
   expect(hideReasons).toHaveLength(9);
 
   await hideReasons[0].click();
   await page.waitForTimeout(1000);
   expect(await hideReasons[0].getAttribute('data-wwselected')).toEqual('true');
-  expect(await (await firstArticle.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: scump');
+  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: scump');
 
   await hideReasons[1].click();
   await page.waitForTimeout(1000);
   expect(await hideReasons[1].getAttribute('data-wwselected')).toEqual('true');
-  expect(await (await firstArticle.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: etnie');
+  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: etnie');
 })
 
 test('Should hide phone number and thus hide duplicate ads.', async ({ page, context }) => {
@@ -65,8 +65,8 @@ test('Should hide phone number and thus hide duplicate ads.', async ({ page, con
     const articles = await page.$$('[data-articleid]');
     let articlesWithPhone: Array<ElementHandle>;
 
-    for (let article of articles) {
-      const phone = await article.$('[data-wwid="phone-number"]');
+    for (let ad of articles) {
+      const phone = await ad.$('[data-wwid="phone-number"]');
       if (phone) {
         articlesWithPhone = await page.$$(`[data-wwphone="${await phone.innerText()}"]`);
 
@@ -91,12 +91,12 @@ test('Should hide phone number and thus hide duplicate ads.', async ({ page, con
 test('Should toggle focus mode and not see hidden ads.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  const firstArticle = (await page.$$('[data-articleid]'))[0];
-  const secondArticle = (await page.$$('[data-articleid]'))[1];
-  await (await firstArticle.$('[data-wwid="toggle-hidden"]')).click();
-  await (await secondArticle.$('[data-wwid="toggle-hidden"]')).click();
-  const firstArticleId = await firstArticle.getAttribute('data-articleid');
-  const secondArticleId = await secondArticle.getAttribute('data-articleid');
+  const firstAd =  (await page.$$('[data-articleid]'))[0];
+  const secondad =  (await page.$$('[data-articleid]'))[1];
+  await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
+  await (await secondad.$('[data-wwid="toggle-hidden"]')).click();
+  const firstArticleId = await firstAd.getAttribute('data-articleid');
+  const secondArticleId = await secondad.getAttribute('data-articleid');
 
   await page.waitForTimeout(1000);
 
@@ -118,11 +118,11 @@ test('Should toggle focus mode and not see hidden ads.', async ({ page, context 
 test('Should toggle ad deduplication and see only newest ad.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  const firstArticle = await utilsPubli.findAdWithDuplicates(page);
+  const firstAd =  await utilsPubli.findAdWithDuplicates(page);
   const firstArticleUrl = page.url();
-  const firstArticleId = await firstArticle.getAttribute('data-articleid');
+  const firstArticleId = await firstAd.getAttribute('data-articleid');
 
-  let duplicateArticleIds: string[] = await utilsPubli.findDuplicateAds(page, firstArticle);
+  let duplicateArticleIds: string[] = await utilsPubli.findDuplicateAds(page, firstAd);
 
   await page.waitForTimeout(1000);
 
@@ -130,8 +130,8 @@ test('Should toggle ad deduplication and see only newest ad.', async ({ page, co
   await (await page.$('[data-wwid="ad-deduplication-switch"]')).click();
   await page.waitForTimeout(1500);
 
-  for (let articleId of duplicateArticleIds) {
-    await expect(page.locator(`[data-articleid="${articleId}"]`)).toBeHidden();
+  for (let adId of duplicateArticleIds) {
+    await expect(page.locator(`[data-articleid="${adId}"]`)).toBeHidden();
   }
 
   await page.goto(firstArticleUrl);

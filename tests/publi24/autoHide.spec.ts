@@ -1,25 +1,6 @@
 import {expect, test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
 import {Page} from "playwright-core";
-import {utils} from "../helpers/utils";
-
-const setupArticle = async (page: Page, title: string, description: string) => {
-  let article = await utilsPubli.findFirstArticleWithPhone(page);
-  const id = await article.getAttribute('data-articleid');
-  const url = await (await article.$('.article-title a')).getAttribute('href');
-
-  await utils.modifyAdContent(page, url, { title, description });
-  await utilsPubli.forceNewAnalyzeOnArticle(page, id);
-
-  await Promise.all([
-    page.reload(),
-    page.waitForResponse(response => response.url() === url),
-  ]);
-  article = await utilsPubli.selectArticle(id, page);
-  await page.waitForTimeout(500);
-
-  return article;
-}
 
 const setupHideSetting = async (page: Page, criteria: string, options?: {defaultValue?: string | number, value?: string | number, noOpen?: boolean}) => {
   await (await page.$('[data-wwid="settings-button"]')).click();
@@ -44,88 +25,99 @@ test('Should automatically hide based on max age.', async ({ page, context }) =>
   await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'maxAge', {defaultValue: 35, value: 26});
-  const article = await setupArticle(page, 'Am 27 de ani', 'Buna');
-  await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'peste 26 de ani'});
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
+  ad =  await utilsPubli.mockAdContent(page, ad, 'Am 27 de ani', 'Buna');
+  await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'peste 26 de ani'});
 });
 
 test('Should automatically hide based on min height.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'minHeight', {defaultValue: 160, value: 165});
-  const article = await setupArticle(page, 'Buna', 'Am 1.64');
-  await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'sub 165cm'});
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
+  ad =  await utilsPubli.mockAdContent(page, ad, 'Buna', 'Am 1.64');
+  await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'sub 165cm'});
 });
 
 test('Should automatically hide based on max height.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'maxHeight', {defaultValue: 175, value: 170});
-  const article = await setupArticle(page, 'Buna', 'Inaltime 171cm');
-  await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'peste 170cm'});
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
+  ad =  await utilsPubli.mockAdContent(page, ad, 'Buna', 'Inaltime 171cm');
+  await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'peste 170cm'});
 });
 
 test('Should automatically hide based on max weight.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'maxWeight', {defaultValue: 65, value: 55});
-  const article = await setupArticle(page, 'Buna', '56KG');
-  await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'peste 55kg'});
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
+  ad =  await utilsPubli.mockAdContent(page, ad, 'Buna', '56KG');
+  await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'peste 55kg'});
 });
 
 test('Should automatically hide if trans mentioned.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'trans');
-  const article = await setupArticle(page, 'Buna sunt transsexuala', '');
-  await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'transsexual'});
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
+  ad =  await utilsPubli.mockAdContent(page, ad, 'Buna sunt transsexuala', '');
+  await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'transsexual'});
 });
 
 test('Should automatically hide if botoxed.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'botox');
-  const article = await setupArticle(page, 'Buna', 'Siliconata');
-  await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'siliconată'});
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
+  ad =  await utilsPubli.mockAdContent(page, ad, 'Buna', 'Siliconata');
+  await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'siliconată'});
 });
 
 test('Should automatically hide if only trips.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'onlyTrips');
-  const article = await setupArticle(page, 'Buna', 'Numai deplasari');
-  await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'numai deplasări'});
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
+  ad =  await utilsPubli.mockAdContent(page, ad, 'Buna', 'Numai deplasari');
+  await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'numai deplasări'});
 });
 
 test('Should automatically hide if show web.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'showWeb');
-  const article = await setupArticle(page, 'Buna', 'Ofer show web');
-  await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'oferă show web'});
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
+  ad =  await utilsPubli.mockAdContent(page, ad, 'Buna', 'Ofer show web');
+  await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'oferă show web'});
 });
 
 test('Should automatically hide if bts risk.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'btsRisc');
-  const article = await setupArticle(page, 'Buna', 'cum vrei tu');
-  await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'risc bts'});
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
+  ad =  await utilsPubli.mockAdContent(page, ad, 'Buna', 'cum vrei tu');
+  await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'risc bts'});
 });
 
 test('Should automatically hide if party.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'party');
-  const article = await setupArticle(page, 'Buna', 'Fac party si deplasari');
-  await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'face party'});
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
+  ad =  await utilsPubli.mockAdContent(page, ad, 'Buna', 'Fac party si deplasari');
+  await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'face party'});
 });
 
 test('Should automatically hide if mature.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   await setupHideSetting(page, 'mature');
-  const article = await setupArticle(page, 'Buna matură 40 ani', '');
-  await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'matură'});
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
+  ad =  await utilsPubli.mockAdContent(page, ad, 'Buna matură 40 ani', '');
+  await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'matură'});
 });
 
 test('Should automatically hide for multiple.', async ({ page, context }) => {
@@ -133,7 +125,8 @@ test('Should automatically hide for multiple.', async ({ page, context }) => {
 
   await setupHideSetting(page, 'onlyTrips');
   await setupHideSetting(page, 'party', {noOpen: true});
-  const article = await setupArticle(page, 'Numai depalsari', 'Fac party');
-  await utilsPubli.assertAdHidden(article, {hidden: true, reason: 'numai deplasări / face party'});
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
+  ad =  await utilsPubli.mockAdContent(page, ad, 'Numai depalsari', 'Fac party');
+  await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'numai deplasări / face party'});
 });
 

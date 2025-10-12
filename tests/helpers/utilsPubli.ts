@@ -2,7 +2,7 @@ import {ElementHandle, Page} from "playwright-core";
 import {BrowserContext} from "@playwright/test";
 import fs from "node:fs";
 import {expect} from "playwright/test";
-import {COOKIES_JSON, STORAGE_JSON} from "./utils";
+import {COOKIES_JSON, STORAGE_JSON, utils} from "./utils";
 import {solve} from "recaptcha-solver";
 
 export const utilsPubli = {
@@ -34,7 +34,7 @@ export const utilsPubli = {
   async open(
     context: BrowserContext,
     page: Page,
-    config: {infoShow?: boolean, location?: string, page?: number, loadStorage?: boolean, clearStorage?: boolean} = {}
+    config: {infoShown?: string, location?: string, page?: number, loadStorage?: boolean, clearStorage?: boolean} = {}
   ) {
     const localStorageData = config.loadStorage === undefined || config.loadStorage === true
       ? JSON.parse(fs.readFileSync(STORAGE_JSON, 'utf-8'))
@@ -68,7 +68,7 @@ export const utilsPubli = {
     utilsPubli.clearPopups(page);
   },
 
-  async awaitGooglePagesClose(triggerButton: ElementHandle, context: BrowserContext, page: Page) {
+  async awaitGooglePagesClose(triggerButton: (ElementHandle | (() => Promise<ElementHandle>)), context: BrowserContext, page: Page) {
     const attemptGoogleCaptchaSolve = async () => {
       const secondaryPages: Page[] = [];
 
@@ -76,7 +76,7 @@ export const utilsPubli = {
         secondaryPages.push(page);
       });
 
-      await triggerButton.click();
+      await (typeof triggerButton === 'function' ? await triggerButton() : triggerButton).click();
       await page.waitForTimeout(4000);
 
       for (let altPage of secondaryPages) {
@@ -94,14 +94,14 @@ export const utilsPubli = {
     }
 
     const attemptGoogleSearchReplication = async () => {
-      await triggerButton.click();
+      await (typeof triggerButton === 'function' ? await triggerButton() : triggerButton).click();
       await page.waitForTimeout(4000);
     }
 
     try {
       await attemptGoogleCaptchaSolve();
     } catch (error: any) {
-      if (error?.message?.includes('No Audio Found')) {
+      if (error?.message?.includes('No Audio Found') || error?.message?.includes('No reCAPTCHA detected')) {
         await attemptGoogleSearchReplication();
       } else {
         throw error;
@@ -192,7 +192,7 @@ export const utilsPubli = {
     }
   },
 
-  async findFirstArticleWithPhone(page: Page) {
+  async findFirstAdWithPhone(page: Page) {
     return await utilsPubli.findAdWithCondition(page, async () => {
       for (let article of await page.$$('[data-articleid]')) {
         while (await article.$('[data-wwid="loader"]')) {
@@ -208,10 +208,17 @@ export const utilsPubli = {
     });
   },
 
-  async selectArticle(articleId: string, page: Page) {
-    const article = await utilsPubli.findAdWithCondition(page, async () => {
-      return await page.$(`[data-articleid="${articleId}"]`);
-    });
+  async selectAd(page: Page, articleId?: string) {
+    let article;
+
+    if (articleId) {
+      article = await utilsPubli.findAdWithCondition(page, async () => {
+        return await page.$(`[data-articleid="${articleId}"]`);
+      });
+    } else {
+      const articles = await page.$$('[data-articleid]');
+      article = articles[0];
+    }
 
     if (article) {
       await article.scrollIntoViewIfNeeded();
@@ -241,11 +248,35 @@ export const utilsPubli = {
     }, {phone, key, value});
   },
 
-  async forceNewAnalyzeOnArticle(page: Page, id: string): Promise<void> {
+  async forceAdNewAnalyze(page: Page, id: string): Promise<void> {
     await page.evaluate((innerId) => {
       const data = JSON.parse(window.localStorage.getItem(`ww2:${innerId.toUpperCase()}`));
       data.analyzedAt = Date.now() - (1.296e+9 + 1000 * 60);
       window.localStorage.setItem(`ww2:${innerId.toUpperCase()}`, JSON.stringify(data));
     }, id);
   },
+
+  async mockAdContentResponse(page: Page, url: string, {title, description, delay}: {title: string, description: string, delay?: number}) {
+    await utils.modifyRouteBody(page, url, ($) => {
+      $('.detail-title h1').text(title);
+      $('.article-description').text(description);
+    }, delay)
+  },
+
+  async mockAdContent(page: Page, article: ElementHandle, title: string, description: string) {
+    const id = await article.getAttribute('data-articleid');
+    const url = await (await article.$('.article-title a')).getAttribute('href');
+
+    await utilsPubli.mockAdContentResponse(page, url, { title, description });
+    await utilsPubli.forceAdNewAnalyze(page, id);
+
+    await Promise.all([
+      page.reload(),
+      page.waitForResponse(response => response.url() === url),
+    ]);
+    const newArticle = await utilsPubli.selectAd(page, id);
+    await page.waitForTimeout(500);
+
+    return newArticle;
+  }
 };

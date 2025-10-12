@@ -8,17 +8,17 @@ test('Should search for phone number and article id and show relevant results.',
 
   await utilsPubli.open(context, page);
 
-  let caseChecks: Record<string, ((article: ElementHandle) => Promise<boolean>)> = {
-    'no relevant results': async (article) => {
-      const innerText = await (await article.$('[data-wwid="search-results"]')).innerText();
+  let caseChecks: Record<string, ((ad: ElementHandle) => Promise<boolean>)> = {
+    'no relevant results': async (ad) => {
+      const innerText = await (await ad.$('[data-wwid="search-results"]')).innerText();
       return innerText === 'nu au fost găsite linkuri relevante';
     },
-    'some results': async (article) => {
-      const links = await article.$$('[data-wwid="search-results"] a[target="_blank"][href]');
+    'some results': async (ad) => {
+      const links = await ad.$$('[data-wwid="search-results"] a[target="_blank"][href]');
       return links.length > 0;
     },
-    'nimfomane results': async (article) => {
-      const links = await article.$$('[data-wwid="search-results"] a[target="_blank"][href]');
+    'nimfomane results': async (ad) => {
+      const links = await ad.$$('[data-wwid="search-results"] a[target="_blank"][href]');
       const nimfomaneLinks = [];
 
       for (let link of links) {
@@ -29,8 +29,8 @@ test('Should search for phone number and article id and show relevant results.',
 
       return nimfomaneLinks.length > 0;
     },
-    'nimfomane button': async (article) => {
-      const links = await article.$$('[data-wwid="search-results"] a[target="_blank"][href]');
+    'nimfomane button': async (ad) => {
+      const links = await ad.$$('[data-wwid="search-results"] a[target="_blank"][href]');
       const nimfomaneLinks = [];
 
       for (let link of links) {
@@ -43,7 +43,7 @@ test('Should search for phone number and article id and show relevant results.',
         return false;
       }
 
-      const nimfomaneButton = await article.$('[data-wwid="nimfomane-btn"]');
+      const nimfomaneButton = await ad.$('[data-wwid="nimfomane-btn"]');
       expect(await nimfomaneButton.isVisible()).toBe(true);
       expect(await nimfomaneButton.getAttribute('href')).toEqual(await nimfomaneLinks[0].getAttribute('href'));
 
@@ -51,30 +51,30 @@ test('Should search for phone number and article id and show relevant results.',
     },
   }
 
-  let atArticle = 0;
+  let atAd =  0;
   let pages = 0;
 
   while (Object.keys(caseChecks).length) {
-    const article = (await page.$$('[data-articleid]'))[atArticle];
+    const ad =  (await page.$$('[data-articleid]'))[atAd];
 
-    if (!article) {
+    if (!ad) {
       if (pages === 1) {
         break;
       }
 
       await ((await page.$$('.pagination .arrow'))[1]).click();
       await page.waitForTimeout(3000);
-      atArticle = 0;
+      atAd =  0;
       ++pages;
       continue;
     }
 
-    ++atArticle;
+    ++atAd;
 
-    const articleId = await article.getAttribute('data-articleid')
-    await article.scrollIntoViewIfNeeded();
+    const adId = await ad.getAttribute('data-articleid')
+    await ad.scrollIntoViewIfNeeded();
 
-    const articleSearchButton = await article.$('[data-wwid="investigate"]');
+    const articleSearchButton = await ad.$('[data-wwid="investigate"]');
 
     if (!articleSearchButton) {
       continue;
@@ -85,7 +85,7 @@ test('Should search for phone number and article id and show relevant results.',
     try {
       await utils.waitForInnerTextNot(
         page,
-        `[data-articleid="${articleId}"] [data-wwid="search-results"]`,
+        `[data-articleid="${adId}"] [data-wwid="search-results"]`,
         'nerulat',
         4000,
       );
@@ -101,7 +101,7 @@ test('Should search for phone number and article id and show relevant results.',
 
     const cases = Object.entries(caseChecks);
     for (let [name, check] of cases) {
-      if (await check(article)) {
+      if (await check(ad)) {
         delete caseChecks[name];
       }
     }

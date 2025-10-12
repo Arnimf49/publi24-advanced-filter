@@ -5,17 +5,17 @@ import {utils} from "../helpers/utils";
 test('Should open images slider and display all images.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  let articleWithMultiple;
-  for (let article of await page.$$('[data-articleid]')) {
-    const imageCount = +(await (await article.$('[class="article-img-count-number"]')).innerText());
+  let adWithMultiple;
+  for (let ad of await page.$$('[data-articleid]')) {
+    const imageCount = +(await (await ad.$('[class="article-img-count-number"]')).innerText());
     if (imageCount > 1) {
-      articleWithMultiple = article;
+      adWithMultiple = ad;
       break;
     }
   }
 
-  await (await articleWithMultiple.$('[class="art-img"]')).click();
-  const imageCount = +(await (await articleWithMultiple.$('[class="article-img-count-number"]')).innerText());
+  await (await adWithMultiple.$('[class="art-img"]')).click();
+  const imageCount = +(await (await adWithMultiple.$('[class="article-img-count-number"]')).innerText());
 
   await expect(page.locator('[data-wwid="images-slider"]')).toBeVisible();
   await expect(page.locator('[data-wwid="images-slider"] .splide__slide:not(.splide__slide--clone)'))
@@ -32,38 +32,38 @@ test('Should open images slider and display all images.', async ({ page, context
 
 test('Should toggle visibility from slider.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
-  let firstArticle = (await page.$$('[data-articleid]'))[0];
-  const firstArticleId = await firstArticle.getAttribute('data-articleid');
-  await (await firstArticle.$('[class="art-img"]')).click();
+  let firstAd =  await utilsPubli.selectAd(page);
+  const firstArticleId = await firstAd.getAttribute('data-articleid');
+  await (await firstAd.$('[class="art-img"]')).click();
 
   await page.locator('[data-wwid="images-slider"] [data-wwid="toggle-hidden"]').click();
   await expect(page.locator('[data-wwid="images-slider"]')).not.toBeVisible();
-  await ((await firstArticle.$$('[data-wwid="reason"]'))[0]).click();
-  await utilsPubli.assertAdHidden(firstArticle);
+  await ((await firstAd.$$('[data-wwid="reason"]'))[0]).click();
+  await utilsPubli.assertAdHidden(firstAd);
 
   await page.reload();
   await page.waitForTimeout(1000);
 
-  firstArticle = await page.$(`[data-articleid="${firstArticleId}"]`);
+  firstAd =  await page.$(`[data-articleid="${firstArticleId}"]`);
 
-  await (await firstArticle.$('[class="art-img"]')).click();
+  await (await firstAd.$('[class="art-img"]')).click();
   await page.locator('[data-wwid="images-slider"] [data-wwid="toggle-hidden"]').click();
   await expect(page.locator('[data-wwid="images-slider"]')).not.toBeVisible();
-  await utilsPubli.assertAdHidden(firstArticle, {hidden: false});
+  await utilsPubli.assertAdHidden(firstAd, {hidden: false});
 })
 
 test('Should search images from slider.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
-  const firstArticle = (await page.$$('[data-articleid]'))[0];
-  await (await firstArticle.$('[class="art-img"]')).click();
+  const firstAd =  await utilsPubli.selectAd(page);
 
-  const searchButton = await page.$('[data-wwid="images-slider"] [data-wwid="analyze-images"]');
-  await searchButton.isVisible();
-  await utilsPubli.awaitGooglePagesClose(searchButton, context, page);
+  await utilsPubli.awaitGooglePagesClose(async () => {
+    await (await firstAd.$('[class="art-img"]')).click()
+    return page.$('[data-wwid="images-slider"] [data-wwid="analyze-images"]')
+  }, context , page);
   await expect(page.locator('[data-wwid="images-slider"]')).not.toBeVisible();
 
   await utils.waitForInnerTextNot(page,
-    `[data-articleid="${await firstArticle.getAttribute('data-articleid')}"] [data-wwid="image-results"]`,
+    `[data-articleid="${await firstAd.getAttribute('data-articleid')}"] [data-wwid="image-results"]`,
     'nerulat'
   );
 })

@@ -9,19 +9,19 @@ test('Should have panel functionalities on ad page.', async ({context, page}, te
   await utilsPubli.open(context, page);
   await page.waitForTimeout(500);
 
-  const firstArticle: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
-  await (await firstArticle.$('.article-title a')).click();
+  const firstAd: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
+  await (await firstAd.$('.article-title a')).click();
   await page.waitForTimeout(2000);
 
-  const article = await page.$('[data-articleid]');
+  const ad =  await page.$('[data-articleid]');
   await page.locator('[data-wwid="control-panel"]').waitFor();
 
   // Visibility handling test.
   await page.locator('[data-wwid="toggle-hidden"]').click();
   await page.locator('[data-wwid="reason"]').first().click();
-  await utilsPubli.assertAdHidden(article);
+  await utilsPubli.assertAdHidden(ad);
   await page.locator('[data-wwid="show-button"]').click();
-  await utilsPubli.assertAdHidden(article, {hidden: false});
+  await utilsPubli.assertAdHidden(ad, {hidden: false});
 
   // Favorites handling test.
   await page.locator('[data-wwid="fav-toggle"]').click();

@@ -2,7 +2,6 @@ import {test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
 import {expect} from "playwright/test";
 import {Locator} from "@playwright/test";
-import {utils} from "../helpers/utils";
 
 test('Should skip to next visible or new ads over pages.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
@@ -17,21 +16,21 @@ test('Should skip to next visible or new ads over pages.', async ({ page, contex
 
   const hideAds = async (count?: number): Promise<Locator> => {
     let hidden = 0;
-    let article;
+    let ad;
     const elCount = await page.locator('[data-articleid]').count();
 
     for (let i = 0; i < elCount; i++) {
-      article = page.locator('[data-articleid]').nth(i);
+      ad =  page.locator('[data-articleid]').nth(i);
       if (count && count === hidden) {
         break;
       }
-      if (await article.locator('[data-wwhidden="false"]').isVisible()) {
-        await article.locator('[data-wwid="toggle-hidden"]').click();
+      if (await ad.locator('[data-wwhidden="false"]').isVisible()) {
+        await ad.locator('[data-wwid="toggle-hidden"]').click();
       }
       ++hidden;
     }
 
-    return article;
+    return ad;
   }
 
   await hideAds();
@@ -42,8 +41,8 @@ test('Should skip to next visible or new ads over pages.', async ({ page, contex
   await ((await page.$$('.pagination .arrow'))[1]).click();
   await page.waitForTimeout(1500);
 
-  const article = await hideAds(4);
-  const articleId = await article.getAttribute('data-articleid');
+  const ad =  await hideAds(4);
+  const adId = await ad.getAttribute('data-articleid');
 
   await (await page.$('.pagination div:nth-child(2) li:first-child')).click();
   await page.waitForTimeout(1000);
@@ -51,7 +50,7 @@ test('Should skip to next visible or new ads over pages.', async ({ page, contex
   await page.locator('[data-wwid="next-visible-ad"]').click();
 
   await page.waitForTimeout(3000);
-  await expect(page.locator(`[data-articleid="${articleId}"]`)).toBeInViewport();
+  await expect(page.locator(`[data-articleid="${adId}"]`)).toBeInViewport();
 })
 
 test('Should skip to next visible over a page and ignore new one.', async ({ page, context }) => {
@@ -72,7 +71,7 @@ test('Should skip to next visible over a page and ignore new one.', async ({ pag
   await page.locator('[data-wwid="close"]').click();
 
   for (const url of [adOneUrl, adTwoUrl]) {
-    await utils.modifyAdContent(page, url, {
+    await utilsPubli.mockAdContentResponse(page, url, {
       title: 'matură',
       description: 'matură',
       delay: 1000

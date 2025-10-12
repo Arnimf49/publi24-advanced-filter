@@ -8,13 +8,13 @@ test('Should search for images and show relevant results.', async ({ page, conte
 
   await utilsPubli.open(context, page);
 
-  let caseChecks: Record<string, ((article: ElementHandle) => Promise<boolean>)> = {
-    'no relevant results': async (article) => {
-      const innerText = await (await article.$('[data-wwid="image-results"]')).innerText();
+  let caseChecks: Record<string, ((ad: ElementHandle) => Promise<boolean>)> = {
+    'no relevant results': async (ad) => {
+      const innerText = await (await ad.$('[data-wwid="image-results"]')).innerText();
       return innerText === 'nu au fost găsite linkuri relevante';
     },
-    'some results': async (article) => {
-      const links = await article.$$('[data-wwid="image-results"] a[target="_blank"][href]');
+    'some results': async (ad) => {
+      const links = await ad.$$('[data-wwid="image-results"] a[target="_blank"][href]');
 
       if (!links.length) {
         return false;
@@ -42,8 +42,8 @@ test('Should search for images and show relevant results.', async ({ page, conte
 
       return true;
     },
-    'active ad from other location': async (article) => {
-      const warning = await article.$('[data-wwid="images-warning"]');
+    'active ad from other location': async (ad) => {
+      const warning = await ad.$('[data-wwid="images-warning"]');
 
       if (warning == null) {
         return false;
@@ -52,8 +52,8 @@ test('Should search for images and show relevant results.', async ({ page, conte
       expect(await warning.innerText()).toEqual('anunțuri active găsite în alte locații !');
       return true;
     },
-    'safe links': async (article) => {
-      const links = await article.$$('[data-wwid="image-results"] a[target="_blank"][href]');
+    'safe links': async (ad) => {
+      const links = await ad.$$('[data-wwid="image-results"] a[target="_blank"][href]');
       for (let link of links) {
         const className = await link.getAttribute('class');
         if (className.indexOf('linkSafe')) {
@@ -62,8 +62,8 @@ test('Should search for images and show relevant results.', async ({ page, conte
       }
       return false;
     },
-    'unsafe links': async (article) => {
-      const links = await article.$$('[data-wwid="image-results"] a[target="_blank"][href]');
+    'unsafe links': async (ad) => {
+      const links = await ad.$$('[data-wwid="image-results"] a[target="_blank"][href]');
       for (let link of links) {
         const className = await link.getAttribute('class');
         if (className.indexOf('linkUnsafe')) {
@@ -74,36 +74,37 @@ test('Should search for images and show relevant results.', async ({ page, conte
     },
   }
 
-  let atArticle = 0;
+  let atAd =  0;
   let pages = 0;
 
   while (Object.keys(caseChecks).length) {
-    const article = (await page.$$('[data-articleid]'))[atArticle];
+    const articles = await page.$$('[data-articleid]');
+    const ad =  articles[atAd];
 
-    if (!article) {
+    if (!ad) {
       if (pages === 1) {
         break;
       }
 
       await ((await page.$$('.pagination .arrow'))[1]).click();
       await page.waitForTimeout(3000);
-      atArticle = 0;
+      atAd =  0;
       ++pages;
       continue;
     }
 
-    ++atArticle;
+    ++atAd;
 
-    const articleId = await article.getAttribute('data-articleid')
+    const adId = await ad.getAttribute('data-articleid')
 
-    const articleImageSearchButton = await article.$('[data-wwid="investigate_img"]');
+    const articleImageSearchButton = await ad.$('[data-wwid="investigate_img"]');
     await articleImageSearchButton.isVisible();
     await utilsPubli.awaitGooglePagesClose(articleImageSearchButton, context, page);
 
     try {
       await utils.waitForInnerTextNot(
         page,
-        `[data-articleid="${articleId}"] [data-wwid="image-results"]`,
+        `[data-articleid="${adId}"] [data-wwid="image-results"]`,
         'nerulat',
         4000,
       );
@@ -119,7 +120,7 @@ test('Should search for images and show relevant results.', async ({ page, conte
 
     const cases = Object.entries(caseChecks);
     for (let [name, check] of cases) {
-      if (await check(article)) {
+      if (await check(ad)) {
         delete caseChecks[name];
       }
     }
@@ -135,9 +136,9 @@ test('Should be able to search images on ads without phone.', async ({ page, con
   await utilsPubli.open(context, page, {loadStorage: false});
 
   const articles = await page.$$('[data-articleid]');
-  const article = articles[2];
-  const id = await article.getAttribute('data-articleid');
-  const url = await(await article.$('[class="article-title"] a')).getAttribute('href');
+  const ad =  articles[2];
+  const id = await ad.getAttribute('data-articleid');
+  const url = await(await ad.$('[class="article-title"] a')).getAttribute('href');
 
   await utils.modifyRouteBody(page, url, ($) => {
     $('[id="EncryptedPhone"]').remove()
@@ -146,10 +147,10 @@ test('Should be able to search images on ads without phone.', async ({ page, con
   await page.waitForResponse(response => response.url() === url);
   await page.waitForTimeout(100);
 
-  await (await article.$(`[data-wwid="no-phone-message"]`)).isVisible();
-  expect(await article.$(`[data-wwid="search-results"]`)).toBeNull();
+  await (await ad.$(`[data-wwid="no-phone-message"]`)).isVisible();
+  expect(await ad.$(`[data-wwid="search-results"]`)).toBeNull();
 
-  await utilsPubli.awaitGooglePagesClose(await article.$('[data-wwid="investigate_img"]'), context, page);
+  await utilsPubli.awaitGooglePagesClose(await ad.$('[data-wwid="investigate_img"]'), context, page);
 
   await utils.waitForInnerTextNot(
     page,

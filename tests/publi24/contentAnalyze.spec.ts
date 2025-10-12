@@ -1,50 +1,42 @@
 import {expect, test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
-import * as cheerio from "cheerio";
-import {utils} from "../helpers/utils";
 
 test('Should show age, height, weight and bmi from description.', async ({ page, context }) => {
   await utilsPubli.open(context, page, {loadStorage: false});
 
-  const articles = await page.$$('[data-articleid]');
-  const lastArticle = articles[3];
-  const url = await(await lastArticle.$('[class="article-title"] a')).getAttribute('href');
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
 
-  await utils.modifyAdContent(page, url, {
-    title: 'Hai sa ne vedem, 23 de ani',
-    description: 'Buna. Sunt Ana, poze 100% reale, 155 si 58 de kg.',
-  })
+  ad = await utilsPubli.mockAdContent(
+    page,
+    ad,
+    'Buna. Sunt Ana, poze 100% reale, 155 si 58 de kg.',
+    'Hai sa ne vedem, 23 de ani'
+  )
 
-  await page.waitForResponse(response => response.url() === url);
-  await page.waitForTimeout(1200);
-
-  await (await lastArticle.$('[data-wwid="investigate"]')).click();
-  await page.waitForTimeout(100);
-
-  expect(await (await lastArticle.$('[data-wwid="age"]')).innerText()).toEqual('23ani');
-  expect(await (await lastArticle.$('[data-wwid="height"]')).innerText()).toEqual('155cm');
-  expect(await (await lastArticle.$('[data-wwid="weight"]')).innerText()).toEqual('58kg');
-  expect(await (await lastArticle.$('[data-wwid="bmi"]')).innerText()).toEqual('24.1bmi');
-  expect(await (await lastArticle.$('[data-wwid="bmi"]')).getAttribute('data-wwstatus')).toEqual('warn');
+  expect(await (await ad.$('[data-wwid="age"]')).innerText()).toEqual('23ani');
+  expect(await (await ad.$('[data-wwid="height"]')).innerText()).toEqual('155cm');
+  expect(await (await ad.$('[data-wwid="weight"]')).innerText()).toEqual('58kg');
+  expect(await (await ad.$('[data-wwid="bmi"]')).innerText()).toEqual('24.1bmi');
+  expect(await (await ad.$('[data-wwid="bmi"]')).getAttribute('data-wwstatus')).toEqual('warn');
 });
 
 test('Should show age, height, weight variation between ads of same phone number.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  const firstArticle = await utilsPubli.findAdWithDuplicates(page);
-  const firstArticleId = await firstArticle.getAttribute('data-articleid');
-  const firstArticleUrl = await (await firstArticle.$('[class="article-title"] a')).getAttribute('href');
+  const firstAd =  await utilsPubli.findAdWithDuplicates(page);
+  const firstArticleId = await firstAd.getAttribute('data-articleid');
+  const firstArticleUrl = await (await firstAd.$('[class="article-title"] a')).getAttribute('href');
   const firstArticleOnPage = page.url();
 
-  const secondArticleId = (await utilsPubli.findDuplicateAds(page, firstArticle))[0];
+  const secondArticleId = (await utilsPubli.findDuplicateAds(page, firstAd))[0];
   const secondArticleUrl = await page.locator(`[data-articleid="${secondArticleId}"] [class="article-title"] a`).getAttribute('href');
   const secondArticleOnPage = page.url();
 
-  await utils.modifyAdContent(page, firstArticleUrl, {
+  await utilsPubli.mockAdContentResponse(page, firstArticleUrl, {
     title: 'Hai sa ne vedem, 23 de ani',
     description: 'Buna. Sunt Ana, poze 100% reale, 155 si 58 de kg.',
   })
-  await utils.modifyAdContent(page, secondArticleUrl, {
+  await utilsPubli.mockAdContentResponse(page, secondArticleUrl, {
     title: 'Hai sa ne vedem, 24 de ani',
     description: 'Buna. Sunt Ana, poze 100% reale, 157 si 52 de kg.',
   })
@@ -55,7 +47,7 @@ test('Should show age, height, weight variation between ads of same phone number
   }, {firstArticleId, secondArticleId});
 
   await page.goto(firstArticleOnPage);
-  await page.locator(`[data-articleid="${firstArticleId}"]`).scrollIntoViewIfNeeded();
+  await utilsPubli.selectAd(page, firstArticleId);
   await page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="phone-number"]`).waitFor({timeout: 25000});
   await expect(page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="age"]`)).toHaveText('23ani');
   await expect(page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="height"]`)).toHaveText('155cm');
@@ -64,7 +56,7 @@ test('Should show age, height, weight variation between ads of same phone number
   if (firstArticleOnPage !== secondArticleOnPage) {
     await page.goto(secondArticleOnPage);
   }
-  await page.locator(`[data-articleid="${secondArticleId}"]`).scrollIntoViewIfNeeded();
+  await utilsPubli.selectAd(page, firstArticleId);
   await page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="phone-number"]`).waitFor({timeout: 15000});
   await expect(page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="age"]`)).toHaveText('24ani', {timeout: 25000});
   await expect(page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="height"]`)).toHaveText('157cm', {timeout: 25000});
@@ -74,20 +66,20 @@ test('Should show age, height, weight variation between ads of same phone number
 test('Should fallback on age, height and weight from phone.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  const firstArticle = await utilsPubli.findAdWithDuplicates(page);
-  const firstArticleId = await firstArticle.getAttribute('data-articleid');
-  const firstArticleUrl = await (await firstArticle.$('[class="article-title"] a')).getAttribute('href');
+  const firstAd =  await utilsPubli.findAdWithDuplicates(page);
+  const firstArticleId = await firstAd.getAttribute('data-articleid');
+  const firstArticleUrl = await (await firstAd.$('[class="article-title"] a')).getAttribute('href');
   const firstArticleOnPage = page.url();
 
-  const secondArticleId = (await utilsPubli.findDuplicateAds(page, firstArticle))[0];
+  const secondArticleId = (await utilsPubli.findDuplicateAds(page, firstAd))[0];
   const secondArticleUrl = await page.locator(`[data-articleid="${secondArticleId}"] [class="article-title"] a`).getAttribute('href');
   const secondArticleOnPage = page.url();
 
-  await utils.modifyAdContent(page, firstArticleUrl, {
+  await utilsPubli.mockAdContentResponse(page, firstArticleUrl, {
     title: 'Hai sa ne vedem, 23 de ani',
     description: 'Buna. Sunt Ana, poze 100% reale, 155 si 58 de kg.',
   })
-  await utils.modifyAdContent(page, secondArticleUrl, {
+  await utilsPubli.mockAdContentResponse(page, secondArticleUrl, {
     title: 'none',
     description: 'none',
   })
@@ -98,7 +90,7 @@ test('Should fallback on age, height and weight from phone.', async ({ page, con
   }, {firstArticleId, secondArticleId});
 
   await page.goto(firstArticleOnPage);
-  await page.locator(`[data-articleid="${firstArticleId}"]`).scrollIntoViewIfNeeded();
+  await utilsPubli.selectAd(page, firstArticleId);
   await page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="phone-number"]`).waitFor({timeout: 25000});
   await expect(page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="age"]`)).toHaveText('23ani');
   await expect(page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="height"]`)).toHaveText('155cm');
@@ -107,7 +99,7 @@ test('Should fallback on age, height and weight from phone.', async ({ page, con
   if (firstArticleOnPage !== secondArticleOnPage) {
     await page.goto(secondArticleOnPage);
   }
-  await page.locator(`[data-articleid="${secondArticleId}"]`).scrollIntoViewIfNeeded();
+  await utilsPubli.selectAd(page, secondArticleId);
   await page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="phone-number"]`).waitFor({timeout: 15000});
   await expect(page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="age"]`)).toHaveText('23ani', {timeout: 25000});
   await expect(page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="height"]`)).toHaveText('155cm', {timeout: 25000});
@@ -117,54 +109,28 @@ test('Should fallback on age, height and weight from phone.', async ({ page, con
 test('Should re-analyze after 15 days.', async ({ page, context }) => {
   await utilsPubli.open(context, page, {loadStorage: false});
 
-  const articles = await page.$$('[data-articleid]');
-  const lastArticle = articles[4];
-  const url = await(await lastArticle.$('[class="article-title"] a')).getAttribute('href');
-  const id = await lastArticle.getAttribute('data-articleid');
+  let ad =  await utilsPubli.selectAd(page);
+  const id = await ad.getAttribute('data-articleid');
+  const url = await (await ad.$('[class="article-title"] a')).getAttribute('href');
 
-  const mockAge = (age: string) =>
-    page.route(url, async (route) => {
-      const response = await route.fetch();
-      let body = await response.text();
-
-      const $ = cheerio.load(body);
-
-      $('.detail-title h1').text(`Hai sa ne vedem, ${age} de ani`);
-      $('.article-description').text('Matter not.');
-
-      const modifiedBody = $.html();
-
-      await route.fulfill({
-        response,
-        body: modifiedBody,
-      });
-    });
-
-  await mockAge('23');
-  await page.waitForResponse(response => response.url() === url, {timeout: 10000});
-  await page.waitForTimeout(2000);
-  expect(await (await page.$(`[data-articleid="${id}"] [data-wwid="age"]`)).innerText()).toEqual('23ani');
+  ad = await utilsPubli.mockAdContent(page, ad, 'Hai sa ne vedem, 23 de ani', 'Matter not.');
+  expect(await (await ad.$('[data-wwid="age"]')).innerText()).toEqual('23ani');
 
   await page.evaluate((innerId) => {
     const data = JSON.parse(window.localStorage.getItem(`ww2:${innerId.toUpperCase()}`));
-    data.analyzedAt = Date.now() - 1.296e+9 + 1000 * 60;
+    data.analyzedAt = Date.now() - (1.296e+9 - 1000 * 60);
     window.localStorage.setItem(`ww2:${innerId.toUpperCase()}`, JSON.stringify(data));
   }, id);
 
-  await mockAge('44');
+  await utilsPubli.mockAdContentResponse(page, url, {title: 'Hai sa ne vedem, 44 de ani', description: 'Matter not.'});
   await page.reload();
   await page.waitForTimeout(2000);
-  expect(await (await page.$(`[data-articleid="${id}"] [data-wwid="age"]`)).innerText()).toEqual('23ani');
+  ad =  await utilsPubli.selectAd(page, id);
+  expect(await (await ad.$('[data-wwid="age"]')).innerText()).toEqual('23ani');
 
-  await page.evaluate((innerId) => {
-    const data = JSON.parse(window.localStorage.getItem(`ww2:${innerId.toUpperCase()}`));
-    data.analyzedAt = Date.now() - 1.296e+9 - 1000 * 60;
-    window.localStorage.setItem(`ww2:${innerId.toUpperCase()}`, JSON.stringify(data));
-  }, id);
+  await utilsPubli.forceAdNewAnalyze(page, id);
 
-  await mockAge('50');
-  await page.reload();
-  await page.waitForTimeout(1000);
-  expect(await (await page.$(`[data-articleid="${id}"] [data-wwid="age"]`)).innerText()).toEqual('50ani');
+  ad =  await utilsPubli.mockAdContent(page, ad, 'Hai sa ne vedem, 50 de ani', 'Matter not.');
+  expect(await (await ad.$('[data-wwid="age"]')).innerText()).toEqual('50ani');
 });
 

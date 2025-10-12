@@ -134,9 +134,9 @@ test('Should optimize phone ads and display newest for favorite.', async ({ page
 
   await utilsPubli.open(context, page);
 
-  const article: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
-  const phone = await (await article.$('[data-wwid="phone-number"]')).innerText();
-  await (await article.$('[data-wwid="fav-toggle"]')).click();
+  const ad: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
+  const phone = await (await ad.$('[data-wwid="phone-number"]')).innerText();
+  await (await ad.$('[data-wwid="fav-toggle"]')).click();
 
   await page.reload();
   await page.waitForTimeout(7000);
@@ -144,7 +144,7 @@ test('Should optimize phone ads and display newest for favorite.', async ({ page
   await page.locator('[data-wwid="favs-button"]').click();
   await page.waitForTimeout(500);
 
-  const articleId = await (await page.$('[data-wwid="favorites-modal"] [data-articleid]')).getAttribute('data-articleid');
+  const adId = await (await page.$('[data-wwid="favorites-modal"] [data-articleid]')).getAttribute('data-articleid');
 
   await page.evaluate((phone) => {
     const data = JSON.parse(window.localStorage.getItem(`ww2:phone:${phone}`));
@@ -155,19 +155,19 @@ test('Should optimize phone ads and display newest for favorite.', async ({ page
 
   await page.reload();
 
-  const adCount = +await (await page.$(`[data-articleid="${articleId}"] [data-wwid="duplicates-count"]`)).innerText();
+  const adCount = +await (await page.$(`[data-articleid="${adId}"] [data-wwid="duplicates-count"]`)).innerText();
   await page.waitForTimeout(adCount * 2500 + adCount * 600 + 10);
 
   await page.locator('[data-wwid="favs-button"]').click();
   expect(await (await page.$('[data-wwid="favorites-modal"] [data-articleid]')).getAttribute('data-articleid'))
-    .toEqual(articleId);
+    .toEqual(adId);
 })
 
 test('Should display all favorite information.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
-  const article: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
-  const phone = await (await article.$('[data-wwid="phone-number"]')).innerText();
-  await (await article.$('[data-wwid="fav-toggle"]')).click();
+  const ad: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
+  const phone = await (await ad.$('[data-wwid="phone-number"]')).innerText();
+  await (await ad.$('[data-wwid="fav-toggle"]')).click();
 
   await page.locator('[data-wwid="favs-button"]').click();
 
@@ -182,10 +182,10 @@ test('Should display all favorite information.', async ({ page, context }) => {
 test('Should switch phone number of favorite if phone number changes.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  const firstArticle = (await page.$$('[data-articleid]'))[0];
-  await firstArticle.waitForSelector('[data-wwid="phone-number"]')
-  const phone = await (await firstArticle.$('[data-wwid="phone-number"]')).innerText();
-  await (await firstArticle.$('[data-wwid="fav-toggle"]')).click();
+  const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
+  await firstAd.waitForSelector('[data-wwid="phone-number"]')
+  const phone = await (await firstAd.$('[data-wwid="phone-number"]')).innerText();
+  await (await firstAd.$('[data-wwid="fav-toggle"]')).click();
 
   await page.locator('[data-wwid="favs-button"]').click();
 
@@ -210,9 +210,9 @@ test('Should show new ad when previous was inactive but new appeared.', async ({
   await utilsPubli.open(context, page);
   const url = page.url();
 
-  const firstArticle = (await page.$$('[data-articleid]'))[0];
-  const phone = await (await firstArticle.$('[data-wwid="phone-number"]')).innerText();
-  await (await firstArticle.$('[data-wwid="fav-toggle"]')).click();
+  const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
+  const phone = await (await firstAd.$('[data-wwid="phone-number"]')).innerText();
+  await (await firstAd.$('[data-wwid="fav-toggle"]')).click();
 
   await page.evaluate((innerPhone) => {
     window.localStorage.setItem(`ww2:phone:${innerPhone}`, JSON.stringify({}));
