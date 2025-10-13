@@ -6,12 +6,14 @@ type PhoneAndTagsRoot = {
   adId?: string,
   phone: string;
   noPadding?: boolean;
+  children?: React.ReactNode;
 };
 
 const PhoneAndTagsRoot: React.FC<PhoneAndTagsRoot> = ({
  adId,
  phone,
  noPadding = false,
+ children,
 }) => {
   const age = (adId && WWStorage.getAdAge(adId)) || WWStorage.getPhoneAge(phone);
   const height = (adId && WWStorage.getAdHeight(adId)) || WWStorage.getPhoneHeight(phone);
@@ -32,7 +34,9 @@ const PhoneAndTagsRoot: React.FC<PhoneAndTagsRoot> = ({
       bmiWarn={bmiWarn}
       height={height}
       weight={weight}
-    />
+    >
+      {children}
+    </PhoneAndTags>
   );
 };
 

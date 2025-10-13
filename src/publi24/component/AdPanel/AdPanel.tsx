@@ -1,4 +1,4 @@
-import React, {MouseEventHandler, ReactElement} from 'react';
+import React, {MouseEventHandler} from 'react';
 import styles from './AdPanel.module.scss';
 import {VisibilityIcon} from "../Common/Icons/VisibilityIcon";
 import {StarIcon} from "../Common/Icons/StarIcon";
@@ -8,6 +8,7 @@ import {NimfomaneIcon} from "./NimfomaneIcon";
 import {DdcIcon} from "./DdcIcon";
 import {Loader} from "../../../common/components/Loader/Loader";
 import {misc} from "../../core/misc";
+import PhoneAndTagsRoot from "../Common/Partials/PhoneAndTags/PhoneAndTagsRoot";
 
 interface ImageLink {
   link: string;
@@ -22,6 +23,7 @@ interface ImageSearchDomain {
 }
 
 interface AdPanelProps {
+  adId: string;
   visible: boolean;
   phone?: string | null;
   isFav: boolean;
@@ -31,7 +33,6 @@ interface AdPanelProps {
   dueToPhoneHidden?: boolean;
   hideReason?: string | null;
   hasNoPhone: boolean;
-  phoneAndTags: ReactElement;
   showDuplicates: boolean;
   hasDuplicateAdsWithSamePhone: boolean;
   numberOfAdsWithSamePhone?: number | string;
@@ -42,6 +43,7 @@ interface AdPanelProps {
   imageInvestigatedSinceDays?: string | null;
   imageInvestigateStale?: boolean;
   imageSearchDomains?: ImageSearchDomain[];
+  imageResultsStatus?: 'green' | 'yellow' | 'red' | null;
   hasImagesInOtherLocation?: boolean;
 
   onVisibilityClick?: MouseEventHandler;
@@ -53,6 +55,7 @@ interface AdPanelProps {
 
 const AdPanel: React.FC<AdPanelProps> = (props) => {
   const {
+    adId,
     visible,
     phone,
     isFav,
@@ -62,7 +65,6 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     dueToPhoneHidden,
     hideReason,
     hasNoPhone,
-    phoneAndTags,
     showDuplicates,
     hasDuplicateAdsWithSamePhone,
     numberOfAdsWithSamePhone,
@@ -73,6 +75,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     imageInvestigatedSinceDays,
     imageInvestigateStale,
     imageSearchDomains,
+    imageResultsStatus,
     hasImagesInOtherLocation,
     onVisibilityClick,
     onFavClick,
@@ -168,6 +171,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
             <DdcIcon/>
           </a>
         )}
+
       </div>
 
       {!visible && (
@@ -197,12 +201,19 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
       )}
 
       <div className={styles.results}>
-        {hasPhone && phoneAndTags}
-
-        {hasPhone && showDuplicates && hasDuplicateAdsWithSamePhone && (
-          <p data-wwid="duplicates-container" className={styles.duplicatesContainer}>
-            <strong data-wwid="duplicates-count">{numberOfAdsWithSamePhone}</strong> anunțuri cu acest telefon <a data-wwid="duplicates" onClick={onViewDuplicatesClick}>(vizualizează)</a>
-          </p>
+        {hasPhone && (
+          <PhoneAndTagsRoot adId={adId} phone={phone}>
+            {showDuplicates && hasDuplicateAdsWithSamePhone && (
+              <button
+                title={`${numberOfAdsWithSamePhone} anunțuri cu acest telefon`}
+                className={`${styles.duplicatesButton} ${Number(numberOfAdsWithSamePhone) > 6 ? styles.highCount : ''}`}
+                data-wwid="duplicates-container"
+                onClick={onViewDuplicatesClick}
+              >
+                <span data-wwid="duplicates-count">{numberOfAdsWithSamePhone}</span>&nbsp;<span data-wwid="duplicates" onClick={onViewDuplicatesClick}>anunțuri</span>
+              </button>
+            )}
+          </PhoneAndTagsRoot>
         )}
 
         {visible && (
@@ -210,11 +221,11 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
             {hasPhone && (
               <>
                 <h5 className={styles.resultsHeader}>
-                  Rezultate după telefon
+                  <span>Rezultate după telefon</span>
                   {phoneInvestigatedSinceDays && (
                     <span
                       className={`${styles.investigationStatus} ${phoneInvestigateStale ? styles.stale : styles.fresh}`}>
-                  &nbsp;({phoneInvestigatedSinceDays})
+                  ({phoneInvestigatedSinceDays})
                 </span>
                   )}
                 </h5>
@@ -252,11 +263,14 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
             {!loading && (
               <>
                 <h5 className={styles.resultsHeader}>
-                  Rezultate după imagine
+                  <span>Rezultate după imagine</span>
+                  {imageResultsStatus && (
+                    <div className={`${styles.statusCircle} ${styles[`status${imageResultsStatus.charAt(0).toUpperCase() + imageResultsStatus.slice(1)}`]}`} />
+                  )}
                   {imageInvestigatedSinceDays && (
                     <span
                       className={`${styles.investigationStatus} ${imageInvestigateStale ? styles.stale : styles.fresh}`}>
-                  &nbsp;({imageInvestigatedSinceDays})
+                  ({imageInvestigatedSinceDays})
                 </span>
                   )}
                 </h5>

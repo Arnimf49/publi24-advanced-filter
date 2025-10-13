@@ -12,6 +12,7 @@ type ContactInfoProps = {
   weight?: number;
   bmi?: number;
   bmiWarn?: boolean;
+  children?: React.ReactNode;
 };
 
 const PhoneAndTags: React.FC<ContactInfoProps> = ({
@@ -23,6 +24,7 @@ const PhoneAndTags: React.FC<ContactInfoProps> = ({
    weight,
    bmi,
    bmiWarn = false,
+   children,
  }) => {
   const headingStyle: CSSProperties = {
     fontWeight: 'bold',
@@ -90,6 +92,7 @@ const PhoneAndTags: React.FC<ContactInfoProps> = ({
             </g>
           </svg>
         </a>
+        {children}
       </h4>
       <div>
         {age != null && (

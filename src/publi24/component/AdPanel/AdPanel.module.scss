@@ -95,22 +95,68 @@
   }
 }
 
-.duplicatesContainer {
-  color: #9d9103;
+.duplicatesButton {
+  background: rgb(175 141 185 / 17%);
+  color: rgb(149 87 167);
   font-size: 0.8125rem;
-  margin-top: 6px;
-  margin-bottom: 0;
+  font-weight: bold;
+  padding: 3px 10px;
+  border: 2px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-left: 8px;
+  vertical-align: middle;
+  margin-bottom: 4px;
+  height: 24px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  * {
+    vertical-align: baseline;
+  }
+  transition: all 0.2s ease 0s;
 
-  strong {
+  [data-wwid="duplicates-count"] {
     font-weight: bold;
+    vertical-align: baseline;
+    line-height: inherit;
   }
 
-  a {
-    cursor: pointer;
+  &:hover {
+    background: rgb(175 141 185 / 25%);
+    color: rgb(149 87 167);
   }
 
   :global(.dark) & {
-    color: rgb(191 183 92);
+    background: rgb(175 141 185 / 25%);
+    color: rgb(193 148 203);
+    
+    &:hover {
+      background: rgb(175 141 185 / 35%);
+      color: rgb(193 148 203);
+    }
+  }
+
+  &.highCount {
+    background: #efe2e2;
+    color: #b34c4c;
+
+    &:hover {
+      background: #ecd4d4;
+      color: #a24343;
+    }
+
+    :global(.dark) & {
+      background: rgb(73 40 43);
+      color: #e18a8a;
+      
+      &:hover {
+        background: rgb(83 50 53);
+        color: #e57373;
+      }
+    }
   }
 }
 
@@ -264,33 +310,68 @@
 }
 
 .resultsHeader {
-  margin-top: 5px;
+  margin-top: 7px;
   margin-bottom: 3px;
   font-size: 1.125rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  @media screen and (max-width: 640px) {
+    gap: 6px;
+  }
 
   :global(.dark) & {
     color: #bfbfbf;
   }
 }
 
+.statusCircle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.statusGreen {
+  background-color: #69875c;
+  :global(.dark) & {
+    background-color: #89d789;
+  }
+}
+
+.statusYellow {
+  background-color: #c59b2f;
+  :global(.dark) & {
+    background-color: rgb(191 183 92);
+  }
+}
+
+.statusRed {
+  background-color: #b34c4c;
+  :global(.dark) & {
+    background-color: #d67373;
+  }
+}
+
 .investigationStatus {
   font-size: 0.825rem;
+
+  @media screen and (max-width: 640px) {
+    font-size: 0.7rem;
+  }
 }
 
 .stale {
-  color: #8b5454;
-
+  color: #9d9103;
+  font-weight: bold;
   :global(.dark) & {
-    color: rgb(207 161 161);
+    color: rgb(191 183 92);
   }
 }
 
 .fresh {
-  color: #69875c;
-
-  :global(.dark) & {
-    color: rgb(138 181 120);
-  }
+  opacity: 0.7;
 }
 
 .noResults {

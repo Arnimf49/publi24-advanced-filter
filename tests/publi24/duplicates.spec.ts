@@ -7,7 +7,7 @@ test('Should display duplicate ad count and list them.', async ({ page, context 
 
   const ad: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
   const duplicatesText = await (await ad.$('[data-wwid="duplicates-container"]')).innerText();
-  expect(duplicatesText).toMatch(/^\d+ anunțuri cu acest telefon \(vizualizează\)$/);
+  expect(duplicatesText).toMatch(/^\d+\s+anunțuri$/);
 
   const count = +(duplicatesText.match(/(\d+)/)[1]);
   const phone = await (await ad.$('[data-wwid="phone-number"]')).innerText();

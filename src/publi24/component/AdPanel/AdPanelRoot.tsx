@@ -4,7 +4,6 @@ import {WWStorage} from "../../core/storage";
 import {linksFilter} from "../../core/linksFilter";
 import {dateLib} from "../../core/dateLib";
 import AdPanel from "./AdPanel";
-import PhoneAndTagsRoot from "../Common/Partials/PhoneAndTags/PhoneAndTagsRoot";
 import {adActions} from "../../core/adActions";
 import * as ReactDOM from "react-dom";
 import HideReasonRoot from "../Common/Partials/HideReason/HideReasonRoot";
@@ -39,6 +38,8 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const imageTime = WWStorage.getAdImagesInvestigatedTime(id);
   const {daysString: phoneInvestigatedSinceDays, stale: phoneInvestigateStale} = dateLib.calculateTimeSince(phoneTime);
   const {daysString: imageInvestigatedSinceDays, stale: imageInvestigateStale} = dateLib.calculateTimeSince(imageTime);
+  
+  const imageResultsStatus = linksFilter.getImageResultsStatus(imageSearchDomains, imageInvestigateStale);
 
   const visible = adData.getItemVisibility(id);
   let hideReason = WWStorage.getPhoneHiddenReason(phone);
@@ -131,6 +132,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   return (
     <div>
       <AdPanel
+        adId={id}
         phone={phone}
         hasNoPhone={WWStorage.hasAdNoPhone(id)}
         numberOfAdsWithSamePhone={WWStorage.getPhoneAds(phone).length}
@@ -145,6 +147,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         nimfomaneLink={nimfomaneLink}
         ddcLink={ddcLink}
         imageSearchDomains={imageSearchDomains}
+        imageResultsStatus={imageResultsStatus}
         searchLinks={search}
         filteredSearchLinks={filteredSearchLinks}
         phoneInvestigatedSinceDays={phoneInvestigatedSinceDays}
@@ -156,9 +159,6 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         onInvestigateClick={onInvestigateClick}
         onInvestigateImgClick={onInvestigateImgClick}
         onViewDuplicatesClick={onViewDuplicatesClick}
-        phoneAndTags={
-          <PhoneAndTagsRoot adId={id} phone={phone}/>
-        }
       />
 
       {showImagesSlider

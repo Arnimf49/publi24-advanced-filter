@@ -493,12 +493,16 @@ interface ProcessedLink {
 interface DomainInfo {
   links: ProcessedLink[];
   isSafe: boolean;
+  isEscortListing: boolean;
+  flag: string | null;
 }
 
 interface ImageLinkDomainGroup {
   domain: string;
   links: ProcessedLink[];
   isSafe: boolean;
+  isEscortListing: boolean;
+  flag: string | null;
 }
 
 function getFlagForDomain(domain: string): string | null {
@@ -516,6 +520,45 @@ function getFlagForDomain(domain: string): string | null {
 export const linksFilter = {
   filterLinks(links: string[], itemUrl: string): string[] {
     return links.filter((l: string) => !BLACKLISTED_LINKS.some((b: string) => l.indexOf(b) === 0) && itemUrl !== l);
+  },
+
+  getImageResultsStatus(imageSearchDomains: ImageLinkDomainGroup[] | undefined, isStale?: boolean): 'green' | 'yellow' | 'red' | null {
+    if (imageSearchDomains === undefined) {
+      return null;
+    }
+
+    if (imageSearchDomains.length === 0) {
+      return isStale ? 'yellow' : 'green';
+    }
+
+    let countryEscortSources = 0;
+    let hasRedLinks = false;
+    let hasYellowLinks = false;
+
+    imageSearchDomains.forEach(domainData => {
+      if (domainData.isEscortListing) {
+        countryEscortSources++;
+      }
+
+      domainData.links.forEach(linkData => {
+        if (!linkData.isSafe && !linkData.isSuspicious && !linkData.isDead) {
+          hasRedLinks = true;
+        }
+        if (linkData.isSuspicious && !linkData.isDead) {
+          hasYellowLinks = true;
+        }
+      });
+    });
+
+    if (hasRedLinks || countryEscortSources > 3) {
+      return 'red';
+    }
+
+    if (hasYellowLinks || isStale) {
+      return 'yellow';
+    }
+
+    return 'green';
   },
 
   sortLinks(links: string[]): string[] {
@@ -551,26 +594,31 @@ export const linksFilter = {
       .forEach((link: string) => {
         try {
           const urlObj = new URL(link);
-          let domain = urlObj.hostname.replace(/^www\./, '');
+          const originalDomain = urlObj.hostname.replace(/^www\./, '');
 
           const isSafeLastDomain = SAFE_LAST_DOMAIN_PARTS.some(part =>
-            domain.endsWith(part)
+            originalDomain.endsWith(part)
           );
-
 
           let isDomainSafe = false;
           let isDomainSuspicious = false;
+          let isEscortListing = false;
+          let flag = null;
+          let displayDomain = originalDomain;
 
           if (isSafeLastDomain) {
             isDomainSafe = !duplicatesInOtherLoc.includes(link);
             isDomainSuspicious = duplicatesNotOldInOtherLoc.includes(link);
-            domain = `🇷🇴  ${domain}`;
+            flag = '🇷🇴';
+            displayDomain = `🇷🇴  ${originalDomain}`;
           } else {
-            const externalEscortListingFlag = getFlagForDomain(domain);
+            const externalEscortListingFlag = getFlagForDomain(originalDomain);
             if (externalEscortListingFlag) {
               isDomainSafe = false;
               isDomainSuspicious = true;
-              domain = `${externalEscortListingFlag} ${domain}`;
+              isEscortListing = true;
+              flag = externalEscortListingFlag;
+              displayDomain = `${externalEscortListingFlag} ${originalDomain}`;
             }
           }
 
@@ -581,8 +629,13 @@ export const linksFilter = {
             isSuspicious: isDomainSuspicious,
           };
 
-          if (!domainMap[domain]) {
-            domainMap[domain] = { links: [linkObj], isSafe: isSafeLastDomain };
+          if (!domainMap[displayDomain]) {
+            domainMap[displayDomain] = { 
+              links: [linkObj], 
+              isSafe: isSafeLastDomain, 
+              isEscortListing, 
+              flag 
+            };
           } else {
             function getPriority(link: ProcessedLink) {
               if (link.isDead) return 4;
@@ -592,15 +645,15 @@ export const linksFilter = {
               return 4;
             }
             const newPriority = getPriority(linkObj);
-            const insertIndex = domainMap[domain].links.findIndex(existing => {
+            const insertIndex = domainMap[displayDomain].links.findIndex(existing => {
               const existingPriority = getPriority(existing);
               return newPriority < existingPriority;
             });
 
             if (insertIndex === -1) {
-              domainMap[domain].links.push(linkObj);
+              domainMap[displayDomain].links.push(linkObj);
             } else {
-              domainMap[domain].links.splice(insertIndex, 0, linkObj);
+              domainMap[displayDomain].links.splice(insertIndex, 0, linkObj);
             }
           }
         } catch (error: any) {
@@ -609,10 +662,12 @@ export const linksFilter = {
       });
 
     return Object.entries(domainMap)
-      .map(([domain, {links: domainLinks, isSafe}]: [string, DomainInfo]): ImageLinkDomainGroup => ({
+      .map(([domain, {links: domainLinks, isSafe, isEscortListing, flag}]: [string, DomainInfo]): ImageLinkDomainGroup => ({
         domain,
         links: domainLinks,
-        isSafe
+        isSafe,
+        isEscortListing,
+        flag
       }))
       .sort((groupA: ImageLinkDomainGroup, groupB: ImageLinkDomainGroup): number => {
         const isPrioA = PRIO_DOMAINS.includes(groupA.domain);
