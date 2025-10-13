@@ -1,6 +1,5 @@
-import {FC, useEffect, useState} from "react";
+import {FC} from "react";
 import styles from "./Ad.module.scss";
-import {Loader} from "../../../../common/components/Loader/Loader";
 
 const Icon: FC = () => {
   return (
@@ -15,58 +14,19 @@ const Icon: FC = () => {
   )
 }
 
-// @ts-ignore
-function getLink(){return("undefined"!=typeof window?atob:n=>Buffer.from(n,"base64").toString("utf-8"))("aHR0cHM6Ly9zaG9ydHVybC5hdC9wUkJWVg==")}
-
 const Ad: FC = () => {
-  const [loading, setLoading] = useState(false);
-  const [textIndex, setTextIndex] = useState(0);
-
-  const handleClick = () => {
-    setLoading(true);
-
-    const iframe = document.createElement("iframe");
-    iframe.src = getLink();
-    iframe.style.visibility = "collapse";
-
-    document.body.appendChild(iframe);
-
-    const minDelay = new Promise(resolve => setTimeout(resolve, 3000));
-    Promise.all([minDelay, new Promise<void>(res => {
-      iframe.onload = () => {
-        res();
-      };
-    })]).then(() => {
-      setLoading(false);
-      window.open("https://www.trading212.com/ro", "_blank");
-    });
-  };
-
-  const texts = [
-    "Puneți bani la muncă, nu numai la păsărică. Investește cu Trading 212.",
-    "Plăcerile trec, investițiile rămân. Pune banii să muncească cu Trading 212.",
-    "Dacă ești bogat îți permiți orice piersică. Hai pe Trading 212.",
-  ];
-
-  useEffect(() => {
-    setInterval(() => {
-      setTextIndex(val => val === texts.length - 1 ? 0 : val + 1);
-    }, 5000);
-  }, []);
-
   const today = new Date();
   const cutoff = new Date("2025-10-03");
 
   if (today > cutoff) return null;
 
   return (
-    <div className={styles.container} onClick={handleClick}>
+    <div className={styles.container}>
       <div className={styles.icon}>
         <Icon />
       </div>
       <div className={styles.text}>
         <div className={styles.mainText}>
-          {loading ? <Loader color={'#00bafc'} /> : texts[textIndex]}
         </div>
       </div>
       <div className={styles.adNotify}>
