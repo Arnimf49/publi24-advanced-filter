@@ -21,7 +21,7 @@ export default async () => {
 
   await utilsPubli.open(context, page, {loadStorage: false});
   utilsPubli.clearPopups(page);
-  const article = await utilsPubli.findAdWithDuplicates(page);
+  const article = await utilsPubli.findAdWithDuplicates(page, true);
   // Attempt a click to ensure all popups closed properly.
   await article.click();
 

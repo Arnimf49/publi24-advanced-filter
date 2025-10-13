@@ -131,7 +131,7 @@ export const utilsPubli = {
     }
   },
 
-  async findAdWithDuplicates(page: Page) {
+  async findAdWithDuplicates(page: Page, forceFind: boolean = false) {
     const getAdWithDuplicates = async () => {
       for (let article of await page.$$('[data-articleid]')) {
         if (await article.$('[data-wwid="duplicates-container"]')) {
@@ -141,8 +141,23 @@ export const utilsPubli = {
       return null;
     };
 
-    const firstArticle: ElementHandle = await utilsPubli.findAdWithCondition(page, getAdWithDuplicates);
-    return firstArticle;
+    if (forceFind) {
+      return await utilsPubli.findAdWithCondition(page, getAdWithDuplicates);
+    }
+
+    let result = await getAdWithDuplicates();
+    if (result) return result;
+
+    for (let i = 0; i < 5; i++) {
+      const nextButton = (await page.$$('.pagination .arrow'))[1];
+      if (!nextButton) break;
+      await nextButton.click();
+      result = await getAdWithDuplicates();
+      if (result) return result;
+      await page.waitForTimeout(2000);
+    }
+
+    return await utilsPubli.findAdWithCondition(page, getAdWithDuplicates);
   },
 
   async findDuplicateAds(page: Page, firstArticle: ElementHandle) {

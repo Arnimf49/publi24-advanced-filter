@@ -109,7 +109,7 @@ test('Should fallback on age, height and weight from phone.', async ({ page, con
 test('Should re-analyze after 15 days.', async ({ page, context }) => {
   await utilsPubli.open(context, page, {loadStorage: false});
 
-  let ad =  await utilsPubli.selectAd(page);
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
   const id = await ad.getAttribute('data-articleid');
   const url = await (await ad.$('[class="article-title"] a')).getAttribute('href');
 

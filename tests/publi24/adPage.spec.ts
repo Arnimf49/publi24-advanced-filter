@@ -18,7 +18,7 @@ test('Should have panel functionalities on ad page.', async ({context, page}, te
 
   // Visibility handling test.
   await page.locator('[data-wwid="toggle-hidden"]').click();
-  await page.locator('[data-wwid="reason"]').first().click();
+  await page.locator(':text("temporar")').click();
   await utilsPubli.assertAdHidden(ad);
   await page.locator('[data-wwid="show-button"]').click();
   await utilsPubli.assertAdHidden(ad, {hidden: false});

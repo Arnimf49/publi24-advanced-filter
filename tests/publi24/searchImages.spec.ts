@@ -4,7 +4,7 @@ import {ElementHandle, errors} from "playwright-core";
 import {utils} from "../helpers/utils";
 import {collectUnknownDomains} from "../helpers/domainCollector";
 
-test.only('Should search for images and show relevant results.', async ({ page, context }, testInfo) => {
+test('Should search for images and show relevant results.', async ({ page, context }, testInfo) => {
   testInfo.setTimeout(60000 * 6);
 
   await utilsPubli.open(context, page);
@@ -166,26 +166,26 @@ test('Should be able to search images on ads without phone.', async ({ page, con
 
 test('Should show "date șterse, caută din nou" when image search results are cleared but analysis time exists', async ({ page, context }) => {
   await utilsPubli.open(context, page);
-  
+
   const firstAd = await utilsPubli.findFirstAdWithPhone(page);
   const adId = await firstAd.getAttribute('data-articleid');
-  
+
   await page.evaluate((id) => {
     localStorage.setItem(`ww2:${id}`, JSON.stringify({
       imagesTime: Date.now() - 60000,
       phone: '0123456789'
     }));
   }, adId);
-  
+
   await page.reload();
   await page.waitForTimeout(500);
-  
+
   const adAfterReload = await page.$(`[data-articleid="${adId}"]`);
   const imageResultsContainer = await adAfterReload.$('[data-wwid="image-results"]');
   const messageText = await imageResultsContainer.innerText();
-  
+
   expect(messageText.trim()).toEqual('date șterse, caută din nou');
-  
+
   const messageElement = await imageResultsContainer.$('p');
   const className = await messageElement.getAttribute('class');
   expect(className).toContain('noResultsFound');

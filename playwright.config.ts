@@ -17,7 +17,27 @@ export default defineConfig({
 
   projects: [
     {
-      name: 'chromium',
+      name: 'publi24',
+      testDir: './tests/publi24',
+      use: {
+        headless: false,
+        actionTimeout: 15000,
+        launchOptions: {
+          ...(process.env.PLAYWRIGHT_LAUNCH_OPTIONS_EXECUTABLE_PATH
+            ? {
+                executablePath: process.env.PLAYWRIGHT_LAUNCH_OPTIONS_EXECUTABLE_PATH,
+              }
+            : {}),
+        }
+      },
+      timeout: 40000,
+      expect: {
+        timeout: 15000,
+      }
+    },
+    {
+      name: 'nimfomane',
+      testDir: './tests/nimfomane',
       use: {
         headless: false,
         actionTimeout: 15000,

@@ -21,10 +21,11 @@ test('Should hide without a reason.', async ({ page, context }) => {
 test('Should hide and then show.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  const firstAd =  await utilsPubli.selectAd(page);
+  const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
   const adId = await firstAd.getAttribute('data-articleid');
 
   await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
+  await (await firstAd.$(':text("temporar")')).click();
   await utilsPubli.assertAdHidden(firstAd);
 
   await (await firstAd.$('[data-wwid="show-button"]')).click();
