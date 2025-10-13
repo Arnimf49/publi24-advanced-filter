@@ -92,3 +92,33 @@ test('Should reset but reapply auto-hide after expiry when content still matches
   await assertResetTimeIsSet(page, phone, 15);
 });
 
+test('Should handle temporar hide with reset verification.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  const firstAd = await utilsPubli.findFirstAdWithPhone(page);
+  const adId = await firstAd.getAttribute('data-articleid');
+
+  await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
+
+  const temporarButton = await firstAd.$(':text("temporar")');
+  expect(temporarButton).toBeTruthy();
+
+  await temporarButton.click();
+
+  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: temporar');
+
+  const phone = await utilsPubli.getPhoneByArticleId(page, adId);
+  await assertResetTimeIsSet(page, phone, 15);
+
+  await page.reload();
+  let hiddenAd = await page.$(`[data-articleid="${adId}"]`);
+  await utilsPubli.assertAdHidden(hiddenAd);
+
+  await utilsPubli.setPhoneStorageProp(page, phone, 'hideResetAt', Date.now() - 5000);
+  await page.reload();
+  
+  hiddenAd = await page.$(`[data-articleid="${adId}"]`);
+  await utilsPubli.assertAdHidden(hiddenAd, {hidden: false});
+});
+
+

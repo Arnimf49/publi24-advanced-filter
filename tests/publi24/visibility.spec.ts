@@ -84,27 +84,6 @@ test('Should show subcategories when clicking category with subcategories.', asy
   expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: aspect: înălțime');
 })
 
-test('Should handle temporar hide with 15 days expiration.', async ({ page, context }) => {
-  await utilsPubli.open(context, page);
-
-  const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
-  const adId = await firstAd.getAttribute('data-articleid');
-
-  await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
-  await page.waitForTimeout(800);
-
-  const temporarButton = await firstAd.$(':text("temporar")');
-  expect(temporarButton).toBeTruthy();
-
-  await temporarButton.click();
-  await page.waitForTimeout(1000);
-
-  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: temporar');
-
-  await page.reload();
-  const hiddenAd = await page.$(`[data-articleid="${adId}"]`);
-  await utilsPubli.assertAdHidden(hiddenAd);
-})
 
 test('Should allow going back from subcategories to main categories.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
