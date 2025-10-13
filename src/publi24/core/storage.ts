@@ -489,6 +489,22 @@ export const WWStorage = {
     return localStorage.getItem('ww:find-next') == 'true';
   },
 
+  setDefaultManualHideReasonEnabled(enabled: boolean): void {
+    localStorage.setItem('ww:default-manual-hide-reason-enabled', enabled ? 'true' : 'false');
+  },
+
+  isDefaultManualHideReasonEnabled(): boolean {
+    return localStorage.getItem('ww:default-manual-hide-reason-enabled') === 'true';
+  },
+
+  setDefaultManualHideReason(reason: string): void {
+    localStorage.setItem('ww:default-manual-hide-reason', reason);
+  },
+
+  getDefaultManualHideReason(): string {
+    return localStorage.getItem('ww:default-manual-hide-reason') || 'aspect';
+  },
+
   getVersion(): string | null {
     return localStorage.getItem('ww:storage:version');
   },

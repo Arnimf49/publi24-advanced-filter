@@ -76,6 +76,8 @@ export type SettingsData = {
   adDeduplication: boolean;
   autoHide: boolean;
   nextOnlyVisible: boolean;
+  defaultManualHideReasonEnabled: boolean;
+  defaultManualHideReason: string;
 } & AutoHideCriterias;
 
 type SettingsModalProps = {
@@ -85,6 +87,8 @@ type SettingsModalProps = {
   onToggleAdDeduplication: () => void;
   onToggleAutoHide: () => void;
   onToggleNextOnlyVisible: () => void;
+  onToggleDefaultManualHideReason: () => void;
+  onDefaultManualHideReasonChange: (reason: string) => void;
   onToggleCriteria: (criteriaKey: keyof AutoHideCriterias) => void;
   onCriteriaValueChange: (criteriaKey: keyof AutoHideCriterias, value: number) => void;
   handleExport: () => void;
@@ -99,6 +103,8 @@ const SettingsModal: React.FC<SettingsModalProps> =
   onToggleAdDeduplication,
   onToggleAutoHide,
   onToggleNextOnlyVisible,
+  onToggleDefaultManualHideReason,
+  onDefaultManualHideReasonChange,
   onToggleCriteria,
   onCriteriaValueChange,
   handleExport,
@@ -158,6 +164,27 @@ const SettingsModal: React.FC<SettingsModalProps> =
         onToggle={onToggleAdDeduplication}
         dataWwid="ad-deduplication-switch"
       />
+
+      <SettingControl
+        title="Motiv implicit ascundere"
+        description="Când este activat, motivul selectat va fi ales implicit la ascunderea manuală (dacă 'poze false' nu este deja selectat)."
+        isOn={settings.defaultManualHideReasonEnabled}
+        onToggle={onToggleDefaultManualHideReason}
+        dataWwid="default-manual-hide-reason-switch"
+        showDetails={settings.defaultManualHideReasonEnabled}
+      >
+        <select
+          className={styles.controlSelect}
+          value={settings.defaultManualHideReason}
+          onChange={(e) => onDefaultManualHideReasonChange(e.target.value)}
+          onClick={(e) => e.stopPropagation()}
+          data-wwid="default-manual-hide-reason-select"
+        >
+          <option value="aspect">aspect</option>
+          <option value="comportament">comportament</option>
+          <option value="alta">alta</option>
+        </select>
+      </SettingControl>
 
       <div className={styles.controlSpacer}></div>
 

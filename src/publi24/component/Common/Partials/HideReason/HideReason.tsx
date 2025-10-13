@@ -12,17 +12,21 @@ const REASONS = Object.keys(MANUAL_HIDE_REASONS);
 type HideReasonProps = {
   reasons?: string[];
   selectedReason?: string | null;
+  defaultReason?: string | null;
   onReasonSelect: (reason: ManualHideReasonWithKey, subcategory?: string) => void;
   onShowClick?: () => void;
 };
 
 const HideReason: React.FC<HideReasonProps> = ({
  selectedReason = null,
+ defaultReason = null,
  onReasonSelect,
  onShowClick,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [selected, setSelected] = useState<null | string>(selectedReason);
+
+  const initialSelection = selectedReason || defaultReason;
+  const [selected, setSelected] = useState<null | string>(initialSelection);
   const [selectedCategory, setSelectedCategory] = useState<null | string>(null);
   const [showSubcategories, setShowSubcategories] = useState<boolean>(false);
 
@@ -36,24 +40,41 @@ const HideReason: React.FC<HideReasonProps> = ({
     }
   }, []);
 
+  useLayoutEffect(() => {
+    if (initialSelection) {
+      const reasonConfig = MANUAL_HIDE_REASONS[initialSelection];
+      if (reasonConfig) {
+        onReasonSelect({
+          key: initialSelection,
+          config: reasonConfig
+        });
+
+        if (reasonConfig.subcategories && reasonConfig.subcategories.length > 0) {
+          setSelectedCategory(initialSelection);
+          setShowSubcategories(true);
+        }
+      }
+    }
+  }, [initialSelection, onReasonSelect]);
+
   const handleCategoryClick = (reason: string) => {
     const reasonConfig = MANUAL_HIDE_REASONS[reason];
-    
+
     setSelected(reason);
     onReasonSelect({
       key: reason,
       config: reasonConfig
     });
-    
+
     if (reasonConfig.subcategories && reasonConfig.subcategories.length > 0) {
       setSelectedCategory(reason);
       setShowSubcategories(true);
     }
   };
-  
+
   const handleSubcategoryClick = (subcategory: string) => {
     if (!selectedCategory) return;
-    
+
     const reasonKey = `${selectedCategory}: ${subcategory}`;
     setSelected(reasonKey);
     onReasonSelect({
@@ -61,7 +82,7 @@ const HideReason: React.FC<HideReasonProps> = ({
       config: MANUAL_HIDE_REASONS[selectedCategory]
     }, subcategory);
   };
-  
+
   const handleBackClick = () => {
     setShowSubcategories(false);
     setSelectedCategory(null);
@@ -77,7 +98,7 @@ const HideReason: React.FC<HideReasonProps> = ({
         <span className={styles.title}>
           motivul ascunderii?
         </span>
-        
+
         {showSubcategories && selectedCategory ? (
           <>
             <button
@@ -86,9 +107,9 @@ const HideReason: React.FC<HideReasonProps> = ({
               onClick={handleBackClick}
               data-wwid="back-button"
             >
-              înapoi
+              ← înapoi
             </button>
-            
+
             <button
               type="button"
               className={misc.cx(styles.reasonButton, styles.reasonSelected)}
@@ -104,7 +125,7 @@ const HideReason: React.FC<HideReasonProps> = ({
             >
               {selectedCategory}
             </button>
-            
+
             {MANUAL_HIDE_REASONS[selectedCategory].subcategories?.map((subcategory) => (
               <button
                 key={subcategory}
@@ -149,7 +170,7 @@ const HideReason: React.FC<HideReasonProps> = ({
                 </button>
               );
             })}
-            
+
             {onShowClick && (
               <button
                 type="button"

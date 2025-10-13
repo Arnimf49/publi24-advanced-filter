@@ -22,6 +22,8 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
     const adDeduplication = WWStorage.isAdDeduplicationEnabled();
     const autoHide = WWStorage.isAutoHideEnabled();
     const nextOnlyVisible = WWStorage.isNextOnlyVisibleEnabled();
+    const defaultManualHideReasonEnabled = WWStorage.isDefaultManualHideReasonEnabled();
+    const defaultManualHideReason = WWStorage.getDefaultManualHideReason();
     const criteria = WWStorage.getAutoHideCriterias();
 
     setSettings({
@@ -29,6 +31,8 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
       adDeduplication,
       autoHide,
       nextOnlyVisible,
+      defaultManualHideReasonEnabled,
+      defaultManualHideReason,
       maxAge: criteria.maxAge ?? false,
       maxAgeValue: criteria.maxAgeValue ?? DEFAULT_CRITERIA_VALUES.maxAgeValue,
       minHeight: criteria.minHeight ?? false,
@@ -77,6 +81,17 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
     const currentValue = WWStorage.isNextOnlyVisibleEnabled();
     WWStorage.setNextOnlyVisibleEnabled(!currentValue);
     setSettings(prev => prev ? { ...prev, nextOnlyVisible: !currentValue } : null);
+  }, []);
+
+  const handleToggleDefaultManualHideReason = useCallback(() => {
+    const currentValue = WWStorage.isDefaultManualHideReasonEnabled();
+    WWStorage.setDefaultManualHideReasonEnabled(!currentValue);
+    setSettings(prev => prev ? { ...prev, defaultManualHideReasonEnabled: !currentValue } : null);
+  }, []);
+
+  const handleDefaultManualHideReasonChange = useCallback((reason: string) => {
+    WWStorage.setDefaultManualHideReason(reason);
+    setSettings(prev => prev ? { ...prev, defaultManualHideReason: reason } : null);
   }, []);
 
   const handleToggleCriteria = useCallback((criteriaKey: keyof AutoHideCriterias) => {
@@ -145,6 +160,8 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
         onToggleAdDeduplication={handleToggleAdDeduplication}
         onToggleAutoHide={handleToggleAutoHide}
         onToggleNextOnlyVisible={handleToggleNextOnlyVisible}
+        onToggleDefaultManualHideReason={handleToggleDefaultManualHideReason}
+        onDefaultManualHideReasonChange={handleDefaultManualHideReasonChange}
         onToggleCriteria={handleToggleCriteria}
         onCriteriaValueChange={handleCriteriaValueChange}
         handleExport={handleExport}

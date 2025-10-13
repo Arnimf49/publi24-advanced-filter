@@ -201,6 +201,7 @@ export const utilsPubli = {
 
         const phone = await article.$('[data-wwid="phone-number"]');
         if (phone && await phone.isVisible()) {
+          await article.scrollIntoViewIfNeeded();
           return article;
         }
       }

@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 import HideReason from "./HideReason";
 import {WWStorage} from "../../../../core/storage";
 import {ManualHideReason} from "../../../../core/hideReasons";
@@ -21,6 +21,15 @@ const HideReasonRoot: React.FC<HideReasonRootProps> = ({
   onCancel,
   onReason,
 }) => {
+  const defaultReason = useMemo(() => {
+    if (selectedReason) return null;
+    
+    const isDefaultEnabled = WWStorage.isDefaultManualHideReasonEnabled();
+    if (isDefaultEnabled) {
+      return WWStorage.getDefaultManualHideReason();
+    }
+    return null;
+  }, [selectedReason]);
   const onReasonSelect = useCallback((reasonWithKey: ManualHideReasonWithKey, subcategory?: string) => {
     const reasonKey = (subcategory && subcategory !== '') ? `${reasonWithKey.key}: ${subcategory}` : reasonWithKey.key;
     WWStorage.setPhoneHiddenReason(phone, reasonKey);
@@ -46,6 +55,7 @@ const HideReasonRoot: React.FC<HideReasonRootProps> = ({
   return (
     <HideReason
       selectedReason={selectedReason}
+      defaultReason={defaultReason}
       onReasonSelect={onReasonSelect}
       onShowClick={onCancel}
     />
