@@ -326,8 +326,14 @@
     &:hover {
       text-decoration: underline;
     }
-    &:visited {
-      color: #660099;
+    &:visited, &:active {
+      color: #8b4db8;
+    }
+
+    :global(.dark) & {
+      &:visited, &:active {
+        color: #b888d9;
+      }
     }
   }
 }

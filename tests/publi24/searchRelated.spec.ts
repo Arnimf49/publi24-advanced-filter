@@ -112,3 +112,30 @@ test('Should search for phone number and article id and show relevant results.',
   expect(Object.keys(caseChecks).length, `Cases not met: ${Object.keys(caseChecks).join(', ')}`).toEqual(0)
 });
 
+test('Should show "date șterse, caută din nou" when phone search results are cleared but analysis time exists', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+  
+  const firstAd = await utilsPubli.findFirstAdWithPhone(page);
+  const adId = await firstAd.getAttribute('data-articleid');
+  
+  await page.evaluate((id) => {
+    localStorage.setItem(`ww2:${id}`, JSON.stringify({
+      phoneTime: Date.now() - 60000,
+      phone: '0123456789'
+    }));
+  }, adId);
+  
+  await page.reload();
+  await page.waitForTimeout(500);
+  
+  const adAfterReload = await page.$(`[data-articleid="${adId}"]`);
+  const searchResultsContainer = await adAfterReload.$('[data-wwid="search-results"]');
+  const messageText = await searchResultsContainer.innerText();
+  
+  expect(messageText.trim()).toEqual('date șterse, caută din nou');
+  
+  const messageElement = await searchResultsContainer.$('p');
+  const className = await messageElement.getAttribute('class');
+  expect(className).toContain('noResultsFound');
+});
+

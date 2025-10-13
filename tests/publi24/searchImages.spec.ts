@@ -164,3 +164,30 @@ test('Should be able to search images on ads without phone.', async ({ page, con
   );
 });
 
+test('Should show "date șterse, caută din nou" when image search results are cleared but analysis time exists', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+  
+  const firstAd = await utilsPubli.findFirstAdWithPhone(page);
+  const adId = await firstAd.getAttribute('data-articleid');
+  
+  await page.evaluate((id) => {
+    localStorage.setItem(`ww2:${id}`, JSON.stringify({
+      imagesTime: Date.now() - 60000,
+      phone: '0123456789'
+    }));
+  }, adId);
+  
+  await page.reload();
+  await page.waitForTimeout(500);
+  
+  const adAfterReload = await page.$(`[data-articleid="${adId}"]`);
+  const imageResultsContainer = await adAfterReload.$('[data-wwid="image-results"]');
+  const messageText = await imageResultsContainer.innerText();
+  
+  expect(messageText.trim()).toEqual('date șterse, caută din nou');
+  
+  const messageElement = await imageResultsContainer.$('p');
+  const className = await messageElement.getAttribute('class');
+  expect(className).toContain('noResultsFound');
+});
+
