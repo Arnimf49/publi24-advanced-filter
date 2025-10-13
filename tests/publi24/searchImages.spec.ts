@@ -102,20 +102,12 @@ test('Should search for images and show relevant results.', async ({ page, conte
     await articleImageSearchButton.isVisible();
     await utilsPubli.awaitGooglePagesClose(articleImageSearchButton, context, page);
 
-    try {
-      await utils.waitForInnerTextNot(
-        page,
-        `[data-articleid="${adId}"] [data-wwid="image-results"]`,
-        'nerulat',
-        4000,
-      );
-    } catch (e: any) {
-      if (e instanceof errors.TimeoutError) {
-        await page.waitForTimeout(4000);
-        continue;
-      }
-      throw e;
-    }
+    await utils.waitForInnerTextNot(
+      page,
+      `[data-articleid="${adId}"] [data-wwid="image-results"]`,
+      'nerulat',
+      4000,
+    );
     // Wait for images post-processing.
     await page.waitForTimeout(2000);
 
