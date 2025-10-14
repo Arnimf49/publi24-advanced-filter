@@ -43,20 +43,20 @@ test('Should hide with a reason and be able to change reason.', async ({ page, c
 
   const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
   await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(100);
 
   const hideReasons = await firstAd.$$('[data-wwid="reason"]');
   expect(hideReasons).toHaveLength(5);
 
   const temporarButton = await firstAd.$(':text("temporar")');
   await temporarButton.click();
-  await page.waitForTimeout(1000);
-  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: temporar');
+  await page.waitForTimeout(100);
+  expect(await (await firstAd.waitForSelector('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: temporar');
 
   const pozeFalseButton = await firstAd.$(':text("poze false")');
   await pozeFalseButton.click();
-  await page.waitForTimeout(1000);
-  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: poze false');
+  await page.waitForTimeout(100);
+  expect(await (await firstAd.waitForSelector('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: poze false');
 })
 
 test('Should show subcategories when clicking category with subcategories.', async ({ page, context }) => {
@@ -64,11 +64,11 @@ test('Should show subcategories when clicking category with subcategories.', asy
 
   const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
   await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(100);
 
   const aspectButton = await firstAd.$(':text("aspect")');
   await aspectButton.click();
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(100);
 
   const subcategories = await firstAd.$$('[data-wwid="subcategory"]');
   expect(subcategories).toHaveLength(6);
@@ -81,8 +81,8 @@ test('Should show subcategories when clicking category with subcategories.', asy
   expect(await selectedButton.innerText()).toEqual('aspect');
 
   await subcategories[0].click();
-  await page.waitForTimeout(1000);
-  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: aspect: înălțime');
+  await page.waitForTimeout(100);
+  expect(await (await firstAd.waitForSelector('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: aspect: înălțime');
 })
 
 
@@ -91,18 +91,18 @@ test('Should allow going back from subcategories to main categories.', async ({ 
 
   const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
   await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(100);
 
   const comportamentButton = await firstAd.$(':text("comportament")');
   await comportamentButton.click();
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(100);
 
   const subcategories = await firstAd.$$('[data-wwid="subcategory"]');
   expect(subcategories).toHaveLength(4);
 
   const backButton = await firstAd.$('[data-wwid="back-button"]');
   await backButton.click();
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(100);
 
   const mainReasons = await firstAd.$$('[data-wwid="reason"]');
   expect(mainReasons).toHaveLength(5);
@@ -135,7 +135,7 @@ test('Should hide phone number and thus hide duplicate ads.', async ({ page, con
   let articlesWithPhone: Array<ElementHandle> = await utilsPubli.findAdWithCondition(page, getMultipleArticlesWithSamePhone);
 
   await (await articlesWithPhone[0].$('[data-wwid="toggle-hidden"]')).click();
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(100);
 
   const autoHideMessage = await (await articlesWithPhone[1].$('[data-wwid="message"]')).innerText();
   expect(autoHideMessage).toEqual('ai mai ascuns un anunț cu acceeași numar de telefon, ascuns automat');
@@ -146,22 +146,20 @@ test('Should toggle focus mode and not see hidden ads.', async ({ page, context 
 
   const firstAd =  (await page.$$('[data-articleid]'))[0];
   const secondad =  (await page.$$('[data-articleid]'))[1];
-  await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
-  await (await secondad.$('[data-wwid="toggle-hidden"]')).click();
+  await (await firstAd.waitForSelector('[data-wwid="toggle-hidden"]')).click();
+  await (await secondad.waitForSelector('[data-wwid="toggle-hidden"]')).click();
   const firstArticleId = await firstAd.getAttribute('data-articleid');
   const secondArticleId = await secondad.getAttribute('data-articleid');
 
-  await page.waitForTimeout(1000);
-
-  await (await page.$('[data-wwid="settings-button"]')).click();
-  await (await page.$('[data-wwid="focus-mode-switch"]')).click();
+  await page.locator('[data-wwid="settings-button"]').click();
+  await page.locator('[data-wwid="focus-mode-switch"]').click();
   await page.waitForTimeout(1500);
 
   await expect(page.locator(`[data-articleid="${firstArticleId}"]`)).toBeHidden();
   await expect(page.locator(`[data-articleid="${secondArticleId}"]`)).toBeHidden();
 
-  await (await page.$('[data-wwid="settings-button"]')).click();
-  await (await page.$('[data-wwid="focus-mode-switch"]')).click();
+  await page.locator('[data-wwid="settings-button"]').click();
+  await page.locator('[data-wwid="focus-mode-switch"]').click();
   await page.waitForTimeout(1500);
 
   await expect(page.locator(`[data-articleid="${firstArticleId}"]`)).toBeVisible();
@@ -177,10 +175,8 @@ test('Should toggle ad deduplication and see only newest ad.', async ({ page, co
 
   let duplicateArticleIds: string[] = await utilsPubli.getDuplicateAdIds(page, firstAd);
 
-  await page.waitForTimeout(1000);
-
-  await (await page.$('[data-wwid="settings-button"]')).click();
-  await (await page.$('[data-wwid="ad-deduplication-switch"]')).click();
+  await page.locator('[data-wwid="settings-button"]').click();
+  await page.locator('[data-wwid="ad-deduplication-switch"]').click();
   await page.waitForTimeout(1500);
 
   for (let adId of duplicateArticleIds) {

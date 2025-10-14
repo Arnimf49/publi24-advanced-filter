@@ -138,13 +138,18 @@ test('Should optimize phone ads and display newest for favorite.', async ({ page
   const phone = await (await ad.$('[data-wwid="phone-number"]')).innerText();
   await (await ad.$('[data-wwid="fav-toggle"]')).click();
 
+  const awaitOptimization = async (timeout = 15000) =>
+    await page.waitForEvent('console', {
+        predicate:  msg =>
+          msg.text().includes(`Optimized first ad for favorite ${phone}`),
+        timeout,
+      }
+    );
+
   await page.reload();
-  await page.waitForTimeout(7000);
-
+  await awaitOptimization();
   await page.locator('[data-wwid="favs-button"]').click();
-  await page.waitForTimeout(500);
-
-  const adId = await (await page.$('[data-wwid="favorites-modal"] [data-articleid]')).getAttribute('data-articleid');
+  const adId = await (await page.waitForSelector('[data-wwid="favorites-modal"] [data-articleid]')).getAttribute('data-articleid');
 
   await page.evaluate((phone) => {
     const data = JSON.parse(window.localStorage.getItem(`ww2:phone:${phone}`));
@@ -154,10 +159,8 @@ test('Should optimize phone ads and display newest for favorite.', async ({ page
   }, phone);
 
   await page.reload();
-
-  const adCount = +await (await page.$(`[data-articleid="${adId}"] [data-wwid="duplicates-count"]`)).innerText();
-  await page.waitForTimeout(adCount * 2500 + adCount * 600 + 10);
-
+  const adCount = +await (await page.waitForSelector(`[data-articleid="${adId}"] [data-wwid="duplicates-count"]`)).innerText();
+  await awaitOptimization(adCount * 5000);
   await page.locator('[data-wwid="favs-button"]').click();
   expect(await (await page.$('[data-wwid="favorites-modal"] [data-articleid]')).getAttribute('data-articleid'))
     .toEqual(adId);

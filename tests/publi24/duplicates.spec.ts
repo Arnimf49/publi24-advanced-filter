@@ -42,15 +42,14 @@ test('Should hide all duplicate ads from list.', async ({ page, context }) => {
 
   await page.locator('[data-wwid="ads-modal"] [data-wwid="hide-all"]').waitFor();
   await page.locator('[data-wwid="ads-modal"] [data-wwid="hide-all"]').click();
-  
+
   const altaButton = await page.$('[data-wwid="ads-modal"] :text("alta")');
   await altaButton.click();
-  await page.waitForTimeout(500);
-  
-  expect(await page.$('[data-wwid="ads-modal"]')).toBeTruthy();
+
+  expect(await page.waitForSelector('[data-wwid="ads-modal"]')).toBeTruthy();
   const subcategories = await page.$$('[data-wwid="ads-modal"] [data-wwid="subcategory"]');
   expect(subcategories.length).toBeGreaterThan(0);
-  
+
   const selectedCategoryButton = await page.$('[data-wwid="ads-modal"] [data-wwid="selected-category"]');
   await selectedCategoryButton.click();
 
@@ -79,14 +78,14 @@ test('Should not close hide reason window when clicking category with subcategor
 
   const hideReasonSelection = await firstAd.$('[data-wwid="hide-reason-selection"]');
   expect(hideReasonSelection).toBeTruthy();
-  
+
   const subcategories = await firstAd.$$('[data-wwid="subcategory"]');
   expect(subcategories.length).toBeGreaterThan(0);
-  
-  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: aspect');
-  
+
+  expect(await (await firstAd.waitForSelector('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: aspect');
+
   await subcategories[0].click();
-  await page.waitForTimeout(500);
-  
-  expect(await (await firstAd.$('[data-wwid="hide-reason"]')).innerText()).toContain('motiv ascundere: aspect: ');
+  await page.waitForTimeout(100);
+
+  expect(await (await firstAd.waitForSelector('[data-wwid="hide-reason"]')).innerText()).toContain('motiv ascundere: aspect: ');
 })

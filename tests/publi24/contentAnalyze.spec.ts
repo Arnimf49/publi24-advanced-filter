@@ -13,11 +13,11 @@ test('Should show age, height, weight and bmi from description.', async ({ page,
     'Hai sa ne vedem, 23 de ani'
   )
 
-  expect(await (await ad.$('[data-wwid="age"]')).innerText()).toEqual('23ani');
-  expect(await (await ad.$('[data-wwid="height"]')).innerText()).toEqual('155cm');
-  expect(await (await ad.$('[data-wwid="weight"]')).innerText()).toEqual('58kg');
-  expect(await (await ad.$('[data-wwid="bmi"]')).innerText()).toEqual('24.1bmi');
-  expect(await (await ad.$('[data-wwid="bmi"]')).getAttribute('data-wwstatus')).toEqual('warn');
+  expect(await (await ad.waitForSelector('[data-wwid="age"]')).innerText()).toEqual('23ani');
+  expect(await (await ad.waitForSelector('[data-wwid="height"]')).innerText()).toEqual('155cm');
+  expect(await (await ad.waitForSelector('[data-wwid="weight"]')).innerText()).toEqual('58kg');
+  expect(await (await ad.waitForSelector('[data-wwid="bmi"]')).innerText()).toEqual('24.1bmi');
+  expect(await (await ad.waitForSelector('[data-wwid="bmi"]')).getAttribute('data-wwstatus')).toEqual('warn');
 });
 
 test('Should show age, height, weight variation between ads of same phone number.', async ({ page, context }) => {
@@ -112,23 +112,21 @@ test('Should re-analyze after 15 days.', async ({ page, context }) => {
   const url = await (await ad.$('[class="article-title"] a')).getAttribute('href');
 
   ad = await utilsPubli.mockAdContent(page, ad, 'Hai sa ne vedem, 23 de ani', 'Matter not.');
-  expect(await (await ad.$('[data-wwid="age"]')).innerText()).toEqual('23ani');
+  expect(await (await ad.waitForSelector('[data-wwid="age"]')).innerText()).toEqual('23ani');
 
+  // Set not old enough and assert not yet re-analyzed.
   await page.evaluate((innerId) => {
     const data = JSON.parse(window.localStorage.getItem(`ww2:${innerId.toUpperCase()}`));
     data.analyzedAt = Date.now() - (1.296e+9 - 1000 * 60);
     window.localStorage.setItem(`ww2:${innerId.toUpperCase()}`, JSON.stringify(data));
   }, id);
-
   await utilsPubli.mockAdContentResponse(page, url, {title: 'Hai sa ne vedem, 44 de ani', description: 'Matter not.'});
   await page.reload();
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(5000);
   ad =  await utilsPubli.selectAd(page, id);
-  expect(await (await ad.$('[data-wwid="age"]')).innerText()).toEqual('23ani');
-
-  await utilsPubli.forceAdNewAnalyze(page, id);
+  expect(await (await ad.waitForSelector('[data-wwid="age"]')).innerText()).toEqual('23ani');
 
   ad =  await utilsPubli.mockAdContent(page, ad, 'Hai sa ne vedem, 50 de ani', 'Matter not.');
-  expect(await (await ad.$('[data-wwid="age"]')).innerText()).toEqual('50ani');
+  expect(await (await ad.waitForSelector('[data-wwid="age"]')).innerText()).toEqual('50ani');
 });
 

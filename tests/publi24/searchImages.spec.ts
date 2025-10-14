@@ -143,7 +143,7 @@ test('Should be able to search images on ads without phone.', async ({ page, con
   await page.waitForResponse(response => response.url() === url);
   await page.waitForTimeout(100);
 
-  await (await ad.$(`[data-wwid="no-phone-message"]`)).isVisible();
+  await (await ad.waitForSelector(`[data-wwid="no-phone-message"]`)).isVisible();
   expect(await ad.$(`[data-wwid="search-results"]`)).toBeNull();
 
   await utilsPubli.awaitGooglePagesClose(await ad.$('[data-wwid="investigate_img"]'), context, page);

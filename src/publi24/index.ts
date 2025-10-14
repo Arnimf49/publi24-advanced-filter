@@ -8,10 +8,6 @@ import {misc} from "./core/misc";
 WWStorage.upgrade()
   .then(() => {
     console.log('Booting publi24-advanced-filter');
-    
-    setTimeout(() => {
-      alert('Asd');
-    }, 1000);
 
     try {
       document.body.classList.add(misc.getPubliTheme());
@@ -61,7 +57,7 @@ WWStorage.upgrade()
         renderer.renderGlobalButtons();
       }
 
-      favorites.optimizeFavorites();
+      favorites.optimizeFavorites().catch(console.error);
 
       if (!WWStorage.hasBeenShownInfo()) {
         renderer.renderInfo();
