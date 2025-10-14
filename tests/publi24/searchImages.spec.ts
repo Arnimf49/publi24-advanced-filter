@@ -1,6 +1,6 @@
 import {expect, test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
-import {ElementHandle, errors} from "playwright-core";
+import {ElementHandle} from "playwright-core";
 import {utils} from "../helpers/utils";
 import {collectUnknownDomains} from "../helpers/domainCollector";
 

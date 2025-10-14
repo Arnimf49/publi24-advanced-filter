@@ -28,7 +28,7 @@ test('Should show age, height, weight variation between ads of same phone number
   const firstArticleUrl = await (await firstAd.$('[class="article-title"] a')).getAttribute('href');
   const firstArticleOnPage = page.url();
 
-  const secondArticleId = (await utilsPubli.findDuplicateAds(page, firstAd))[0];
+  const secondArticleId = (await utilsPubli.getDuplicateAdIds(page, firstAd))[0];
   const secondArticleUrl = await page.locator(`[data-articleid="${secondArticleId}"] [class="article-title"] a`).getAttribute('href');
   const secondArticleOnPage = page.url();
 
@@ -48,7 +48,6 @@ test('Should show age, height, weight variation between ads of same phone number
 
   await page.goto(firstArticleOnPage);
   await utilsPubli.selectAd(page, firstArticleId);
-  await page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="phone-number"]`).waitFor({timeout: 25000});
   await expect(page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="age"]`)).toHaveText('23ani');
   await expect(page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="height"]`)).toHaveText('155cm');
   await expect(page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="weight"]`)).toHaveText('58kg');
@@ -56,8 +55,7 @@ test('Should show age, height, weight variation between ads of same phone number
   if (firstArticleOnPage !== secondArticleOnPage) {
     await page.goto(secondArticleOnPage);
   }
-  await utilsPubli.selectAd(page, firstArticleId);
-  await page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="phone-number"]`).waitFor({timeout: 15000});
+  await utilsPubli.selectAd(page, secondArticleId);
   await expect(page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="age"]`)).toHaveText('24ani', {timeout: 25000});
   await expect(page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="height"]`)).toHaveText('157cm', {timeout: 25000});
   await expect(page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="weight"]`)).toHaveText('52kg', {timeout: 25000});
@@ -71,7 +69,7 @@ test('Should fallback on age, height and weight from phone.', async ({ page, con
   const firstArticleUrl = await (await firstAd.$('[class="article-title"] a')).getAttribute('href');
   const firstArticleOnPage = page.url();
 
-  const secondArticleId = (await utilsPubli.findDuplicateAds(page, firstAd))[0];
+  const secondArticleId = (await utilsPubli.getDuplicateAdIds(page, firstAd))[0];
   const secondArticleUrl = await page.locator(`[data-articleid="${secondArticleId}"] [class="article-title"] a`).getAttribute('href');
   const secondArticleOnPage = page.url();
 

@@ -22,8 +22,10 @@ export default async () => {
   await utilsPubli.open(context, page, {loadStorage: false});
   utilsPubli.clearPopups(page);
   const article = await utilsPubli.findAdWithDuplicates(page, true);
-  // Attempt a click to ensure all popups closed properly.
-  await article.click();
+
+  // Do an action to ensure all popups closed properly.
+  // Do a google search to save images solving.
+  await utilsPubli.awaitGooglePagesClose(await article.waitForSelector('[data-wwid="investigate_img"]'), context, page);
 
   const localStorageData = await page.evaluate(() => {
     const data: any = {};

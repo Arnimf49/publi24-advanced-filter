@@ -175,7 +175,7 @@ test('Should toggle ad deduplication and see only newest ad.', async ({ page, co
   const firstArticleUrl = page.url();
   const firstArticleId = await firstAd.getAttribute('data-articleid');
 
-  let duplicateArticleIds: string[] = await utilsPubli.findDuplicateAds(page, firstAd);
+  let duplicateArticleIds: string[] = await utilsPubli.getDuplicateAdIds(page, firstAd);
 
   await page.waitForTimeout(1000);
 

@@ -8,6 +8,10 @@ import {misc} from "./core/misc";
 WWStorage.upgrade()
   .then(() => {
     console.log('Booting publi24-advanced-filter');
+    
+    setTimeout(() => {
+      alert('Asd');
+    }, 1000);
 
     try {
       document.body.classList.add(misc.getPubliTheme());

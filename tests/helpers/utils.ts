@@ -25,7 +25,7 @@ const utils = {
       headless: false,
       viewport: {
         width: Math.max(1550, Math.min(fingerprint.screen.width, 1920)),
-        height: Math.max(700, Math.min(fingerprint.screen.height, 1000)),
+        height: Math.max(700, Math.min(fingerprint.screen.height, 900)),
       },
       extraHTTPHeaders: {
         'accept-language': headers['accept-language'],

@@ -58,7 +58,7 @@ test('Should search images from slider.', async ({ page, context }) => {
 
   await utilsPubli.awaitGooglePagesClose(async () => {
     await (await firstAd.$('[class="art-img"]')).click()
-    return page.$('[data-wwid="images-slider"] [data-wwid="analyze-images"]')
+    return page.waitForSelector('[data-wwid="images-slider"] [data-wwid="analyze-images"]')
   }, context , page);
   await expect(page.locator('[data-wwid="images-slider"]')).not.toBeVisible();
 

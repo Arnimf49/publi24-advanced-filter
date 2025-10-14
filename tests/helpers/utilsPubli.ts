@@ -112,7 +112,7 @@ export const utilsPubli = {
   async findAdWithCondition<T>(page: Page, conditionFn: (...args: any) => Promise<T>): Promise<T> {
     let results;
 
-    while (true) {
+    for (let i = 0; i < 10; i++) {
       while (await page.$('[data-wwid="loader"]') && !(results = await conditionFn())) {
         try {
           await (await page.$('[data-wwid="loader"]'))?.scrollIntoViewIfNeeded();
@@ -129,6 +129,8 @@ export const utilsPubli = {
       await ((await page.$$('.pagination .arrow'))[1]).click();
       await page.waitForTimeout(2000);
     }
+
+    throw new Error('Attempted to find ad with condition, but searched through too many pages.');
   },
 
   async findAdWithDuplicates(page: Page, forceFind: boolean = false) {
@@ -160,7 +162,7 @@ export const utilsPubli = {
     return await utilsPubli.findAdWithCondition(page, getAdWithDuplicates);
   },
 
-  async findDuplicateAds(page: Page, firstArticle: ElementHandle) {
+  async getDuplicateAdIds(page: Page, firstArticle: ElementHandle) {
     const phone = await (await firstArticle.$('[data-wwid="phone-number"]')).innerText();
     const firstArticleId = await firstArticle.getAttribute('data-articleid');
     const duplicateArticleIds: string[] = [];
@@ -170,7 +172,7 @@ export const utilsPubli = {
       const articles = await page.locator(`[data-wwphone="${phone}"]`).all();
 
       if (articles.length) {
-        for (let i = 1; i < articles.length; i++) {
+        for (let i = 0; i < articles.length; i++) {
           const parent = await articles[i].evaluateHandle(el => el.closest('[data-articleid]'));
           const articleId = await parent.getAttribute('data-articleid');
 
@@ -185,26 +187,11 @@ export const utilsPubli = {
           throw new Error('Something is wrong. The duplicate is too far.')
         }
         await page.locator('.pagination .arrow').nth(1).click();
-        await page.waitForTimeout(3000);
+        await page.waitForTimeout(2000);
         ++atNav;
       }
     } while (!duplicateArticleIds.length);
     return duplicateArticleIds;
-  },
-
-  async assertAdHidden(element: ElementHandle, options: {hidden: boolean, reason?: string} = {hidden: true}) {
-    await new Promise(r => setTimeout(r, 300));
-
-    const inner = await element.$('.article-txt-wrap, .ww-inset') || element;
-    const opacity = await inner.evaluate(el => getComputedStyle(el as Element).getPropertyValue('opacity'))
-    const blendMode = await inner.evaluate(el => getComputedStyle(el as Element).getPropertyValue('mix-blend-mode'))
-
-    expect(opacity).toEqual(options?.hidden ? '0.5' : '1');
-    expect(blendMode).toEqual(options?.hidden ? 'luminosity' : 'normal');
-
-    if (options?.reason) {
-      expect(await (await element.$('[data-wwid="hide-reason"]')).innerText()).toEqual(`motiv ascundere: ${options.reason}`);
-    }
   },
 
   async findFirstAdWithPhone(page: Page) {
@@ -241,6 +228,21 @@ export const utilsPubli = {
     }
 
     return article;
+  },
+
+  async assertAdHidden(element: ElementHandle, options: {hidden: boolean, reason?: string} = {hidden: true}) {
+    await new Promise(r => setTimeout(r, 300));
+
+    const inner = await element.$('.article-txt-wrap, .ww-inset') || element;
+    const opacity = await inner.evaluate(el => getComputedStyle(el as Element).getPropertyValue('opacity'))
+    const blendMode = await inner.evaluate(el => getComputedStyle(el as Element).getPropertyValue('mix-blend-mode'))
+
+    expect(opacity).toEqual(options?.hidden ? '0.5' : '1');
+    expect(blendMode).toEqual(options?.hidden ? 'luminosity' : 'normal');
+
+    if (options?.reason) {
+      expect(await (await element.$('[data-wwid="hide-reason"]')).innerText()).toEqual(`motiv ascundere: ${options.reason}`);
+    }
   },
 
   async getPhoneByArticleId(page: Page, articleId: string): Promise<string> {
