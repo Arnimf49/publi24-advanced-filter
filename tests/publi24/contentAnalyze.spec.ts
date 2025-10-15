@@ -24,84 +24,84 @@ test('Should show age, height, weight variation between ads of same phone number
   await utilsPubli.open(context, page);
 
   const firstAd =  await utilsPubli.findAdWithDuplicates(page);
-  const firstArticleId = await firstAd.getAttribute('data-articleid');
-  const firstArticleUrl = await (await firstAd.$('[class="article-title"] a')).getAttribute('href');
-  const firstArticleOnPage = page.url();
+  const firstAdId = await firstAd.getAttribute('data-articleid');
+  const firstAdUrl = await (await firstAd.$('[class="article-title"] a')).getAttribute('href');
+  const firstAdOnPage = page.url();
 
-  const secondArticleId = (await utilsPubli.getDuplicateAdIds(page, firstAd))[0];
-  const secondArticleUrl = await page.locator(`[data-articleid="${secondArticleId}"] [class="article-title"] a`).getAttribute('href');
-  const secondArticleOnPage = page.url();
+  const secondAdId = (await utilsPubli.getDuplicateAdIds(page, firstAd))[0];
+  const secondAdUrl = await page.locator(`[data-articleid="${secondAdId}"] [class="article-title"] a`).getAttribute('href');
+  const secondAdOnPage = page.url();
 
-  await utilsPubli.mockAdContentResponse(page, firstArticleUrl, {
+  await utilsPubli.mockAdContentResponse(page, firstAdUrl, {
     title: 'Hai sa ne vedem, 23 de ani',
     description: 'Buna. Sunt Ana, poze 100% reale, 155 si 58 de kg.',
   })
-  await utilsPubli.mockAdContentResponse(page, secondArticleUrl, {
+  await utilsPubli.mockAdContentResponse(page, secondAdUrl, {
     title: 'Hai sa ne vedem, 24 de ani',
     description: 'Buna. Sunt Ana, poze 100% reale, 157 si 52 de kg.',
   })
 
-  await page.evaluate(({firstArticleId, secondArticleId}) => {
-    window.localStorage.removeItem(`ww2:${firstArticleId}`)
-    window.localStorage.removeItem(`ww2:${secondArticleId}`)
-  }, {firstArticleId, secondArticleId});
+  await page.evaluate(({firstAdId, secondAdId}) => {
+    window.localStorage.removeItem(`ww2:${firstAdId}`)
+    window.localStorage.removeItem(`ww2:${secondAdId}`)
+  }, {firstAdId, secondAdId});
 
-  await page.goto(firstArticleOnPage);
-  await utilsPubli.selectAd(page, firstArticleId);
-  await expect(page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="age"]`)).toHaveText('23ani');
-  await expect(page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="height"]`)).toHaveText('155cm');
-  await expect(page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="weight"]`)).toHaveText('58kg');
+  await page.goto(firstAdOnPage);
+  await utilsPubli.selectAd(page, firstAdId);
+  await expect(page.locator(`[data-articleid="${firstAdId}"] [data-wwid="age"]`)).toHaveText('23ani');
+  await expect(page.locator(`[data-articleid="${firstAdId}"] [data-wwid="height"]`)).toHaveText('155cm');
+  await expect(page.locator(`[data-articleid="${firstAdId}"] [data-wwid="weight"]`)).toHaveText('58kg');
 
-  if (firstArticleOnPage !== secondArticleOnPage) {
-    await page.goto(secondArticleOnPage);
+  if (firstAdOnPage !== secondAdOnPage) {
+    await page.goto(secondAdOnPage);
   }
-  await utilsPubli.selectAd(page, secondArticleId);
-  await expect(page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="age"]`)).toHaveText('24ani', {timeout: 25000});
-  await expect(page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="height"]`)).toHaveText('157cm', {timeout: 25000});
-  await expect(page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="weight"]`)).toHaveText('52kg', {timeout: 25000});
+  await utilsPubli.selectAd(page, secondAdId);
+  await expect(page.locator(`[data-articleid="${secondAdId}"] [data-wwid="age"]`)).toHaveText('24ani', {timeout: 25000});
+  await expect(page.locator(`[data-articleid="${secondAdId}"] [data-wwid="height"]`)).toHaveText('157cm', {timeout: 25000});
+  await expect(page.locator(`[data-articleid="${secondAdId}"] [data-wwid="weight"]`)).toHaveText('52kg', {timeout: 25000});
 });
 
 test('Should fallback on age, height and weight from phone.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   const firstAd =  await utilsPubli.findAdWithDuplicates(page);
-  const firstArticleId = await firstAd.getAttribute('data-articleid');
-  const firstArticleUrl = await (await firstAd.$('[class="article-title"] a')).getAttribute('href');
-  const firstArticleOnPage = page.url();
+  const firstAdId = await firstAd.getAttribute('data-articleid');
+  const firstAdUrl = await (await firstAd.$('[class="article-title"] a')).getAttribute('href');
+  const firstAdOnPage = page.url();
 
-  const secondArticleId = (await utilsPubli.getDuplicateAdIds(page, firstAd))[0];
-  const secondArticleUrl = await page.locator(`[data-articleid="${secondArticleId}"] [class="article-title"] a`).getAttribute('href');
-  const secondArticleOnPage = page.url();
+  const secondAdId = (await utilsPubli.getDuplicateAdIds(page, firstAd))[0];
+  const secondAdUrl = await page.locator(`[data-articleid="${secondAdId}"] [class="article-title"] a`).getAttribute('href');
+  const secondAdOnPage = page.url();
 
-  await utilsPubli.mockAdContentResponse(page, firstArticleUrl, {
+  await utilsPubli.mockAdContentResponse(page, firstAdUrl, {
     title: 'Hai sa ne vedem, 23 de ani',
     description: 'Buna. Sunt Ana, poze 100% reale, 155 si 58 de kg.',
   })
-  await utilsPubli.mockAdContentResponse(page, secondArticleUrl, {
+  await utilsPubli.mockAdContentResponse(page, secondAdUrl, {
     title: 'none',
     description: 'none',
   })
 
-  await page.evaluate(({firstArticleId, secondArticleId}) => {
-    window.localStorage.removeItem(`ww2:${firstArticleId}`)
-    window.localStorage.removeItem(`ww2:${secondArticleId}`)
-  }, {firstArticleId, secondArticleId});
+  await page.evaluate(({firstAdId, secondAdId}) => {
+    window.localStorage.removeItem(`ww2:${firstAdId}`)
+    window.localStorage.removeItem(`ww2:${secondAdId}`)
+  }, {firstAdId, secondAdId});
 
-  await page.goto(firstArticleOnPage);
-  await utilsPubli.selectAd(page, firstArticleId);
-  await page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="phone-number"]`).waitFor({timeout: 25000});
-  await expect(page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="age"]`)).toHaveText('23ani');
-  await expect(page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="height"]`)).toHaveText('155cm');
-  await expect(page.locator(`[data-articleid="${firstArticleId}"] [data-wwid="weight"]`)).toHaveText('58kg');
+  await page.goto(firstAdOnPage);
+  await utilsPubli.selectAd(page, firstAdId);
+  await page.locator(`[data-articleid="${firstAdId}"] [data-wwid="phone-number"]`).waitFor({timeout: 25000});
+  await expect(page.locator(`[data-articleid="${firstAdId}"] [data-wwid="age"]`)).toHaveText('23ani');
+  await expect(page.locator(`[data-articleid="${firstAdId}"] [data-wwid="height"]`)).toHaveText('155cm');
+  await expect(page.locator(`[data-articleid="${firstAdId}"] [data-wwid="weight"]`)).toHaveText('58kg');
 
-  if (firstArticleOnPage !== secondArticleOnPage) {
-    await page.goto(secondArticleOnPage);
+  if (firstAdOnPage !== secondAdOnPage) {
+    await page.goto(secondAdOnPage);
   }
-  await utilsPubli.selectAd(page, secondArticleId);
-  await page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="phone-number"]`).waitFor({timeout: 15000});
-  await expect(page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="age"]`)).toHaveText('23ani', {timeout: 25000});
-  await expect(page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="height"]`)).toHaveText('155cm', {timeout: 25000});
-  await expect(page.locator(`[data-articleid="${secondArticleId}"] [data-wwid="weight"]`)).toHaveText('58kg', {timeout: 25000});
+  await utilsPubli.selectAd(page, secondAdId);
+  await page.locator(`[data-articleid="${secondAdId}"] [data-wwid="phone-number"]`).waitFor({timeout: 15000});
+  await expect(page.locator(`[data-articleid="${secondAdId}"] [data-wwid="age"]`)).toHaveText('23ani', {timeout: 25000});
+  await expect(page.locator(`[data-articleid="${secondAdId}"] [data-wwid="height"]`)).toHaveText('155cm', {timeout: 25000});
+  await expect(page.locator(`[data-articleid="${secondAdId}"] [data-wwid="weight"]`)).toHaveText('58kg', {timeout: 25000});
 });
 
 test('Should re-analyze after 15 days.', async ({ page, context }) => {

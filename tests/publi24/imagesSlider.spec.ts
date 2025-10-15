@@ -33,7 +33,7 @@ test('Should open images slider and display all images.', async ({ page, context
 test('Should toggle visibility from slider.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
   let firstAd =  await utilsPubli.selectAd(page);
-  const firstArticleId = await firstAd.getAttribute('data-articleid');
+  const firstAdId = await firstAd.getAttribute('data-articleid');
   await (await firstAd.$('[class="art-img"]')).click();
 
   await page.locator('[data-wwid="images-slider"] [data-wwid="toggle-hidden"]').click();
@@ -44,7 +44,7 @@ test('Should toggle visibility from slider.', async ({ page, context }) => {
   await page.reload();
   await page.waitForTimeout(1000);
 
-  firstAd =  await page.$(`[data-articleid="${firstArticleId}"]`);
+  firstAd =  await page.$(`[data-articleid="${firstAdId}"]`);
 
   await (await firstAd.$('[class="art-img"]')).click();
   await page.locator('[data-wwid="images-slider"] [data-wwid="toggle-hidden"]').click();

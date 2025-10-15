@@ -111,33 +111,15 @@ test('Should allow going back from subcategories to main categories.', async ({ 
   expect(await title.innerText()).toEqual('motivul ascunderii?');
 })
 
-test('Should hide phone number and thus hide duplicate ads.', async ({ page, context }) => {
+test.only('Should hide phone number and thus hide duplicate ads.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  const getMultipleArticlesWithSamePhone = async () => {
-    const articles = await page.$$('[data-articleid]');
-    let articlesWithPhone: Array<ElementHandle>;
-
-    for (let ad of articles) {
-      const phone = await ad.$('[data-wwid="phone-number"]');
-      if (phone) {
-        articlesWithPhone = await page.$$(`[data-wwphone="${await phone.innerText()}"]`);
-
-        if (articlesWithPhone.length > 1) {
-          return articlesWithPhone;
-        }
-      }
-    }
-
-    return null;
-  }
-
-  let articlesWithPhone: Array<ElementHandle> = await utilsPubli.findAdWithCondition(page, getMultipleArticlesWithSamePhone);
-
-  await (await articlesWithPhone[0].$('[data-wwid="toggle-hidden"]')).click();
+  const firstAd =  await utilsPubli.findAdWithDuplicates(page);
+  await (await firstAd.waitForSelector('[data-wwid="toggle-hidden"]')).click();
   await page.waitForTimeout(100);
 
-  const autoHideMessage = await (await articlesWithPhone[1].$('[data-wwid="message"]')).innerText();
+  const secondAd = page.locator(`[data-articleid="${(await utilsPubli.getDuplicateAdIds(page, firstAd))[0]}"]`);
+  const autoHideMessage = await secondAd.locator('[data-wwid="message"]').innerText();
   expect(autoHideMessage).toEqual('ai mai ascuns un anunț cu acceeași numar de telefon, ascuns automat');
 })
 
@@ -148,30 +130,30 @@ test('Should toggle focus mode and not see hidden ads.', async ({ page, context 
   const secondad =  (await page.$$('[data-articleid]'))[1];
   await (await firstAd.waitForSelector('[data-wwid="toggle-hidden"]')).click();
   await (await secondad.waitForSelector('[data-wwid="toggle-hidden"]')).click();
-  const firstArticleId = await firstAd.getAttribute('data-articleid');
-  const secondArticleId = await secondad.getAttribute('data-articleid');
+  const firstAdId = await firstAd.getAttribute('data-articleid');
+  const secondAdId = await secondad.getAttribute('data-articleid');
 
   await page.locator('[data-wwid="settings-button"]').click();
   await page.locator('[data-wwid="focus-mode-switch"]').click();
   await page.waitForTimeout(1500);
 
-  await expect(page.locator(`[data-articleid="${firstArticleId}"]`)).toBeHidden();
-  await expect(page.locator(`[data-articleid="${secondArticleId}"]`)).toBeHidden();
+  await expect(page.locator(`[data-articleid="${firstAdId}"]`)).toBeHidden();
+  await expect(page.locator(`[data-articleid="${secondAdId}"]`)).toBeHidden();
 
   await page.locator('[data-wwid="settings-button"]').click();
   await page.locator('[data-wwid="focus-mode-switch"]').click();
   await page.waitForTimeout(1500);
 
-  await expect(page.locator(`[data-articleid="${firstArticleId}"]`)).toBeVisible();
-  await expect(page.locator(`[data-articleid="${secondArticleId}"]`)).toBeVisible();
+  await expect(page.locator(`[data-articleid="${firstAdId}"]`)).toBeVisible();
+  await expect(page.locator(`[data-articleid="${secondAdId}"]`)).toBeVisible();
 })
 
 test('Should toggle ad deduplication and see only newest ad.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   const firstAd =  await utilsPubli.findAdWithDuplicates(page);
-  const firstArticleUrl = page.url();
-  const firstArticleId = await firstAd.getAttribute('data-articleid');
+  const firstAdUrl = page.url();
+  const firstAdId = await firstAd.getAttribute('data-articleid');
 
   let duplicateArticleIds: string[] = await utilsPubli.getDuplicateAdIds(page, firstAd);
 
@@ -183,7 +165,7 @@ test('Should toggle ad deduplication and see only newest ad.', async ({ page, co
     await expect(page.locator(`[data-articleid="${adId}"]`)).toBeHidden();
   }
 
-  await page.goto(firstArticleUrl);
+  await page.goto(firstAdUrl);
   await page.waitForTimeout(1500);
-  await expect(page.locator(`[data-articleid="${firstArticleId}"]`)).toBeVisible();
+  await expect(page.locator(`[data-articleid="${firstAdId}"]`)).toBeVisible();
 })

@@ -162,9 +162,9 @@ export const utilsPubli = {
     return await utilsPubli.findAdWithCondition(page, getAdWithDuplicates);
   },
 
-  async getDuplicateAdIds(page: Page, firstArticle: ElementHandle) {
-    const phone = await (await firstArticle.$('[data-wwid="phone-number"]')).innerText();
-    const firstArticleId = await firstArticle.getAttribute('data-articleid');
+  async getDuplicateAdIds(page: Page, firstAd: ElementHandle) {
+    const phone = await (await firstAd.$('[data-wwid="phone-number"]')).innerText();
+    const firstAdId = await firstAd.getAttribute('data-articleid');
     const duplicateArticleIds: string[] = [];
     let atNav = 0;
 
@@ -176,7 +176,7 @@ export const utilsPubli = {
           const parent = await articles[i].evaluateHandle(el => el.closest('[data-articleid]'));
           const articleId = await parent.getAttribute('data-articleid');
 
-          if (articleId !== firstArticleId) {
+          if (articleId !== firstAdId) {
             duplicateArticleIds.push(articleId);
           }
         }
