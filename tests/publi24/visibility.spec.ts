@@ -111,7 +111,7 @@ test('Should allow going back from subcategories to main categories.', async ({ 
   expect(await title.innerText()).toEqual('motivul ascunderii?');
 })
 
-test.only('Should hide phone number and thus hide duplicate ads.', async ({ page, context }) => {
+test('Should hide phone number and thus hide duplicate ads.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   const firstAd =  await utilsPubli.findAdWithDuplicates(page);
