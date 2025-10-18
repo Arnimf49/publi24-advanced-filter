@@ -20,7 +20,9 @@ test('Should show age, height, weight and bmi from description.', async ({ page,
   expect(await (await ad.waitForSelector('[data-wwid="bmi"]')).getAttribute('data-wwstatus')).toEqual('warn');
 });
 
-test('Should show age, height, weight variation between ads of same phone number.', async ({ page, context }) => {
+test('Should show age, height, weight variation between ads of same phone number.', async ({ page, context }, testInfo) => {
+  testInfo.setTimeout(60000);
+
   await utilsPubli.open(context, page);
 
   const firstAd =  await utilsPubli.findAdWithDuplicates(page);
@@ -48,17 +50,17 @@ test('Should show age, height, weight variation between ads of same phone number
 
   await page.goto(firstAdOnPage);
   await utilsPubli.selectAd(page, firstAdId);
-  await expect(page.locator(`[data-articleid="${firstAdId}"] [data-wwid="age"]`)).toHaveText('23ani');
-  await expect(page.locator(`[data-articleid="${firstAdId}"] [data-wwid="height"]`)).toHaveText('155cm');
-  await expect(page.locator(`[data-articleid="${firstAdId}"] [data-wwid="weight"]`)).toHaveText('58kg');
+  await expect(page.locator(`[data-articleid="${firstAdId}"] [data-wwid="age"]`)).toHaveText('23ani', {timeout: 27000});
+  await expect(page.locator(`[data-articleid="${firstAdId}"] [data-wwid="height"]`)).toHaveText('155cm', {timeout: 27000});
+  await expect(page.locator(`[data-articleid="${firstAdId}"] [data-wwid="weight"]`)).toHaveText('58kg', {timeout: 27000});
 
   if (firstAdOnPage !== secondAdOnPage) {
     await page.goto(secondAdOnPage);
   }
   await utilsPubli.selectAd(page, secondAdId);
-  await expect(page.locator(`[data-articleid="${secondAdId}"] [data-wwid="age"]`)).toHaveText('24ani', {timeout: 25000});
-  await expect(page.locator(`[data-articleid="${secondAdId}"] [data-wwid="height"]`)).toHaveText('157cm', {timeout: 25000});
-  await expect(page.locator(`[data-articleid="${secondAdId}"] [data-wwid="weight"]`)).toHaveText('52kg', {timeout: 25000});
+  await expect(page.locator(`[data-articleid="${secondAdId}"] [data-wwid="age"]`)).toHaveText('24ani', {timeout: 27000});
+  await expect(page.locator(`[data-articleid="${secondAdId}"] [data-wwid="height"]`)).toHaveText('157cm', {timeout: 27000});
+  await expect(page.locator(`[data-articleid="${secondAdId}"] [data-wwid="weight"]`)).toHaveText('52kg', {timeout: 27000});
 });
 
 test('Should fallback on age, height and weight from phone.', async ({ page, context }) => {

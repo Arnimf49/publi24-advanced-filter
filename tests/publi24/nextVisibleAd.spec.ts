@@ -54,7 +54,8 @@ test('Should skip to next visible or new ads over pages.', async ({ page, contex
 })
 
 test('Should skip to next visible over a page and ignore new one.', async ({ page, context }) => {
-  await utilsPubli.open(context, page, {page: 11});
+  const tryPage = Math.round(Math.random() * 5) + 9;
+  await utilsPubli.open(context, page, {page: tryPage + 1});
 
   const adOneId = await page.locator('[data-articleid]').nth(0).getAttribute('data-articleid');
   const adOneUrl = await page.locator('[data-articleid]').nth(0).locator('[class="article-title"] a').getAttribute('href');
@@ -62,7 +63,7 @@ test('Should skip to next visible over a page and ignore new one.', async ({ pag
   const adTwoUrl = await page.locator('[data-articleid]').nth(1).locator('[class="article-title"] a').getAttribute('href');
   const adThreeId = await page.locator('[data-articleid]').nth(2).getAttribute('data-articleid');
 
-  await utilsPubli.open(context, page, {page: 10, clearStorage: true});
+  await utilsPubli.open(context, page, {page: tryPage, clearStorage: true});
 
   await page.locator('[data-wwid="settings-button"]').click();
   await page.locator('[data-wwid="auto-hiding"]').click();

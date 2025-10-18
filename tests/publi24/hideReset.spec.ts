@@ -116,7 +116,7 @@ test('Should handle temporar hide with reset verification.', async ({ page, cont
 
   await utilsPubli.setPhoneStorageProp(page, phone, 'hideResetAt', Date.now() - 5000);
   await page.reload();
-  
+
   hiddenAd = await page.$(`[data-articleid="${adId}"]`);
   await utilsPubli.assertAdHidden(hiddenAd, {hidden: false});
 });

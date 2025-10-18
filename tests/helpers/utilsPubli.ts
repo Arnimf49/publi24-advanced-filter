@@ -215,6 +215,7 @@ export const utilsPubli = {
     let article;
 
     if (articleId) {
+      await page.waitForTimeout(100);
       article = await utilsPubli.findAdWithCondition(page, async () => {
         return await page.$(`[data-articleid="${articleId}"]`);
       });
