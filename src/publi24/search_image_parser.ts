@@ -109,7 +109,7 @@ function readImageLinksMobile(_: string, done: (results: string[]) => void): voi
 
       intervalId = window.setInterval(() => {
         const hasNoResultsIcon = !!document.querySelector('[alt="Failure info image"], [alt="Imagine cu informații despre eroare"], [id="OotqVd"], [data-psd-lens-error-card]');
-        const linkItems: NodeListOf<HTMLAnchorElement> = document.body.querySelectorAll<HTMLAnchorElement>('[id="rso"] [href]');
+        const linkItems: NodeListOf<HTMLAnchorElement> = document.body.querySelectorAll<HTMLAnchorElement>('[id="rso"] [href][data-hveid]');
 
         if ((!hasNoResultsIcon && attempt < 50) && linkItems.length === 0) {
           attempt++;
@@ -164,6 +164,7 @@ async function parseResults(wwid: string): Promise<void> {
                 if (IS_MOBILE_VIEW  && newCount !== 0) {
                   const nextImageIndex = imgs.length - newCount;
                   if (nextImageIndex >= 0 && nextImageIndex < imgs.length) {
+                    console.log('Next: ', imgs[nextImageIndex]);
                     window.location.href = imgs[nextImageIndex];
                   } else {
                     console.warn("Calculated next image index is out of bounds. Closing window.");
@@ -204,11 +205,13 @@ async function parseResults(wwid: string): Promise<void> {
   }
 }
 
-function addLoader(percent: number): void {
+function addLoader(count: number, length: number): void {
   const loader = document.createElement('div');
   document.body.appendChild(loader);
 
-  loader.style.background = 'rgb(87 82 82)';
+  const percent = ((length - count + 1) / length) * 100;
+
+  loader.style.background = 'rgb(59 63 71)';
   loader.style.position = 'fixed';
   loader.style.top = '60px';
   loader.style.width = 'calc(100% - 50px)';
@@ -230,7 +233,7 @@ function addLoader(percent: number): void {
   progress.style.transition = 'width 0.2s ease-in-out';
 
   const text = document.createElement('div');
-  text.innerHTML = 'căutare după poze ..';
+  text.innerHTML = `căutare după poze (${length - count + 1}/${length}) ..`;
   loader.appendChild(text);
 
   text.style.position = 'absolute';
@@ -254,10 +257,7 @@ WWBrowserStorage.get(STORAGE_KEY_IMG_SEARCH).then((data: { [key: string]: any })
       const count = searchData.count;
       const length = searchData.imgs?.length || 0;
       if (length > 0) {
-        const percent = ((length - count + 1) / length) * 100;
-        addLoader(percent);
-      } else {
-        addLoader(0);
+        addLoader(count, length);
       }
     }
   } else {
