@@ -19,6 +19,7 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
     return [];
   }
   const page = pageResult as DocumentFragment | HTMLElement; // Type assertion after check
+  const title: string = misc.removeDiacritics(adData.getPageTitle(page));
   const content: string = misc.removeDiacritics(adData.getPageTitle(page) + ' ' + adData.getPageDescription(page));
 
   utils.debugLog('Analyzing content', {content: content.trim().substring(0, 200) + '...'});
@@ -77,8 +78,12 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
   if (content.match(/(\W|^)(cu sau fara(?!\s+jucarii)|cum\s+vrei\s+tu|cum\s+te\s+simti\s+mai\s+bine|totale\s+fara[,.;]|cu\s+tot\s+ce\s+vrei)(\W|$)/i)) {
     data.push(['btsRisc', true]);
   }
-  if (content.match(/(\W|^)((doa?r|numai|decat)\s+(deplasar|depalsar|deplsar)(i{1,4}|e)|nu am locatie)(\W|$)/i)
-    && !content.match(/(\W|^)(la\s+mine|locatie\s+proprie|si\s+deplasar[ie]|si\s+locatie|locatia\s+mea|in\s+locatie|nu\s+fac\s+deplasari)(\W|$)/i)) {
+  if (
+    (
+      content.match(/(\W|^)(out\s*call|(doa?r|numai|decat)\s+(deplasar|depalsar|deplsar)(i{1,4}|e)|nu am locatie)(\W|$)/i)
+      || title.match(/(\W|^)(out\s*call|(deplasar|depalsar|deplsar)(i{1,4}|e))(\W|$)/i)
+    )
+    && !content.match(/(\W|^)(in\s*call|la\s+mine|locatie\s+proprie|si\s+deplasar[ie]|si\s+locatie|locatia\s+mea|in\s+locatie|nu\s+fac\s+deplasari)(\W|$)/i)) {
     data.push(['onlyTrips', true]);
   }
   if (content.match(/(\W|^)(ts|trans|transs?exuala?)(\W|$)/i)) {
