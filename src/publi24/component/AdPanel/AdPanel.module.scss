@@ -112,7 +112,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  
+
   * {
     vertical-align: baseline;
   }
@@ -132,7 +132,7 @@
   :global(.dark) & {
     background: rgb(175 141 185 / 25%);
     color: rgb(193 148 203);
-    
+
     &:hover {
       background: rgb(175 141 185 / 35%);
       color: rgb(193 148 203);
@@ -151,7 +151,7 @@
     :global(.dark) & {
       background: rgb(73 40 43);
       color: #e18a8a;
-      
+
       &:hover {
         background: rgb(83 50 53);
         color: #e57373;
@@ -388,9 +388,15 @@
 
 .noResultsFound {
   color: #69875c;
-
   :global(.dark) & {
     color: rgb(138 181 120);
+  }
+}
+
+.missingResults {
+  color: #9d9103;
+  :global(.dark) & {
+    color: rgb(191 183 92);
   }
 }
 

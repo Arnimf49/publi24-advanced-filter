@@ -232,7 +232,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                 <div data-wwid="search-results">
                   {searchLinks === undefined ? (
                     phoneInvestigatedSinceDays ? (
-                      <p className={`${styles.noResults} ${styles.noResultsFound}`}>date șterse, caută din nou</p>
+                      <p className={`${styles.noResults} ${styles.missingResults}`}>date șterse, caută din nou</p>
                     ) : (
                       <p className={`${styles.noResults} ${styles.noResultsYet}`}>nerulat</p>
                     )
@@ -277,7 +277,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                 <div data-wwid="image-results">
                   {imageSearchDomains === undefined ? (
                     imageInvestigatedSinceDays ? (
-                      <p className={`${styles.noResults} ${styles.noResultsFound}`}>date șterse, caută din nou</p>
+                      <p className={`${styles.noResults} ${styles.missingResults}`}>date șterse, caută din nou</p>
                     ) : (
                       <p className={`${styles.noResults} ${styles.noResultsYet}`}>nerulat</p>
                     )
