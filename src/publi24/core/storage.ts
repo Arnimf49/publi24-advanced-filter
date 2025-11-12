@@ -63,6 +63,7 @@ const _WW_CALLBACKS = {
   adChanged: {} as Record<string, Array<() => void>>,
   phoneChanged: {} as Record<string, Array<() => void>>,
   favsChanged: [] as Array<() => void>,
+  settingsChanged: [] as Array<() => void>,
 };
 
 export const WWStorage = {
@@ -505,6 +506,24 @@ export const WWStorage = {
     return localStorage.getItem('ww:default-manual-hide-reason') || 'aspect';
   },
 
+  setWhatsappMessageEnabled(enabled: boolean): void {
+    localStorage.setItem('ww:whatsapp-message-enabled', enabled ? 'true' : 'false');
+    WWStorage.triggerSettingsChanged();
+  },
+
+  isWhatsappMessageEnabled(): boolean {
+    return localStorage.getItem('ww:whatsapp-message-enabled') === 'true';
+  },
+
+  setWhatsappMessage(message: string): void {
+    localStorage.setItem('ww:whatsapp-message', message);
+    WWStorage.triggerSettingsChanged();
+  },
+
+  getWhatsappMessage(): string {
+    return localStorage.getItem('ww:whatsapp-message') || '';
+  },
+
   getVersion(): string | null {
     return localStorage.getItem('ww:storage:version');
   },
@@ -554,6 +573,18 @@ export const WWStorage = {
 
   triggerPhoneChanged(phone: string) {
     (_WW_CALLBACKS.phoneChanged[phone] || []).forEach(callback => callback());
+  },
+
+  onSettingsChanged(callback: () => void) {
+    _WW_CALLBACKS.settingsChanged.push(callback);
+  },
+
+  removeOnSettingsChanged(callback: () => void) {
+    _WW_CALLBACKS.settingsChanged = _WW_CALLBACKS.settingsChanged.filter(c => c !== callback);
+  },
+
+  triggerSettingsChanged() {
+    _WW_CALLBACKS.settingsChanged.forEach(callback => callback());
   },
 
   exportData(): Record<string, string> {

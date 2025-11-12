@@ -12,6 +12,7 @@ type ContactInfoProps = {
   weight?: number;
   bmi?: number;
   bmiWarn?: boolean;
+  whatsappMessage?: string | null;
   children?: React.ReactNode;
 };
 
@@ -24,6 +25,7 @@ const PhoneAndTags: React.FC<ContactInfoProps> = ({
    weight,
    bmi,
    bmiWarn = false,
+   whatsappMessage = null,
    children,
  }) => {
   const headingStyle: CSSProperties = {
@@ -49,6 +51,9 @@ const PhoneAndTags: React.FC<ContactInfoProps> = ({
   );
 
   const whatsappPhone = phone.replace(/\D/g, '');
+  const whatsappUrl = whatsappMessage
+    ? `https://wa.me/+4${whatsappPhone}?text=${encodeURIComponent(whatsappMessage)}`
+    : `https://wa.me/+4${whatsappPhone}`;
 
   return (
     <>
@@ -59,7 +64,7 @@ const PhoneAndTags: React.FC<ContactInfoProps> = ({
           <span className={styles.phone} data-wwid="phone-number">{phone}</span>
         )}
         <a
-          href={`https://wa.me/+4${whatsappPhone}`}
+          href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
           className={styles.whatsapp}

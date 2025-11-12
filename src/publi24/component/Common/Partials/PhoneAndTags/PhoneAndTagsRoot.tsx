@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {WWStorage} from "../../../../core/storage";
 import PhoneAndTags from "./PhoneAndTags";
 
@@ -15,6 +15,21 @@ const PhoneAndTagsRoot: React.FC<PhoneAndTagsRoot> = ({
  noPadding = false,
  children,
 }) => {
+  const [whatsappMessage, setWhatsappMessage] = useState<string | null>(
+    WWStorage.isWhatsappMessageEnabled() ? WWStorage.getWhatsappMessage() : null
+  );
+
+  useEffect(() => {
+    const handleSettingsChange = () => {
+      setWhatsappMessage(
+        WWStorage.isWhatsappMessageEnabled() ? WWStorage.getWhatsappMessage() : null
+      );
+    };
+
+    WWStorage.onSettingsChanged(handleSettingsChange);
+    return () => WWStorage.removeOnSettingsChanged(handleSettingsChange);
+  }, []);
+
   const age = (adId && WWStorage.getAdAge(adId)) || WWStorage.getPhoneAge(phone);
   const height = (adId && WWStorage.getAdHeight(adId)) || WWStorage.getPhoneHeight(phone);
   const weight = (adId && WWStorage.getAdWeight(adId)) || WWStorage.getPhoneWeight(phone);
@@ -34,6 +49,7 @@ const PhoneAndTagsRoot: React.FC<PhoneAndTagsRoot> = ({
       bmiWarn={bmiWarn}
       height={height}
       weight={weight}
+      whatsappMessage={whatsappMessage}
     >
       {children}
     </PhoneAndTags>

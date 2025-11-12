@@ -72,6 +72,8 @@ const SettingControl: React.FC<SettingControlProps> =
 };
 
 export type SettingsData = {
+  whatsappMessageEnabled: boolean;
+  whatsappMessage: string;
   focusMode: boolean;
   adDeduplication: boolean;
   autoHide: boolean;
@@ -83,6 +85,8 @@ export type SettingsData = {
 type SettingsModalProps = {
   onClose: () => void;
   settings: SettingsData;
+  onToggleWhatsappMessage: () => void;
+  onWhatsappMessageChange: (message: string) => void;
   onToggleFocusMode: () => void;
   onToggleAdDeduplication: () => void;
   onToggleAutoHide: () => void;
@@ -99,6 +103,8 @@ const SettingsModal: React.FC<SettingsModalProps> =
 ({
   onClose,
   settings,
+  onToggleWhatsappMessage,
+  onWhatsappMessageChange,
   onToggleFocusMode,
   onToggleAdDeduplication,
   onToggleAutoHide,
@@ -150,6 +156,28 @@ const SettingsModal: React.FC<SettingsModalProps> =
       maxWidth={600}
       color={misc.getPubliTheme() === 'dark' ? 'rgb(127 105 24)' : '#c59b2f'}
     >
+      <SettingControl
+        title="Mesaj WhatsApp"
+        description="Când este activat, la deschiderea WhatsApp va include mesajul predefinit."
+        isOn={settings.whatsappMessageEnabled}
+        onToggle={onToggleWhatsappMessage}
+        dataWwid="whatsapp-message-switch"
+        showDetails={settings.whatsappMessageEnabled}
+      >
+        <textarea
+          className={styles.controlInput}
+          value={settings.whatsappMessage}
+          onChange={(e) => onWhatsappMessageChange(e.target.value)}
+          onClick={(e) => e.stopPropagation()}
+          placeholder="Introdu mesajul..."
+          data-wwid="whatsapp-message-input"
+          rows={2}
+          style={{ width: '100%', maxWidth: '100%', resize: 'none' }}
+        />
+      </SettingControl>
+
+      <div className={styles.controlSpacer}></div>
+
       <SettingControl
         title="Mod focus"
         description="Cănd activat anunțurile ascunse anterior nu se vor mai afișa deloc pe pagina de listare. Util pentru a vedea numai cea ce ii nou sau încă ne-ascuns."

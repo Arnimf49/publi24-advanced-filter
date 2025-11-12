@@ -18,6 +18,8 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
   const [settings, setSettings] = useState<SettingsData | null>(null);
 
   useEffect(() => {
+    const whatsappMessageEnabled = WWStorage.isWhatsappMessageEnabled();
+    const whatsappMessage = WWStorage.getWhatsappMessage();
     const focusMode = WWStorage.isFocusMode();
     const adDeduplication = WWStorage.isAdDeduplicationEnabled();
     const autoHide = WWStorage.isAutoHideEnabled();
@@ -27,6 +29,8 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
     const criteria = WWStorage.getAutoHideCriterias();
 
     setSettings({
+      whatsappMessageEnabled,
+      whatsappMessage,
       focusMode,
       adDeduplication,
       autoHide,
@@ -49,6 +53,17 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
       btsRisc: criteria.btsRisc ?? false,
       party: criteria.party ?? false,
     });
+  }, []);
+
+  const handleToggleWhatsappMessage = useCallback(() => {
+    const currentValue = WWStorage.isWhatsappMessageEnabled();
+    WWStorage.setWhatsappMessageEnabled(!currentValue);
+    setSettings(prev => prev ? { ...prev, whatsappMessageEnabled: !currentValue } : null);
+  }, []);
+
+  const handleWhatsappMessageChange = useCallback((message: string) => {
+    WWStorage.setWhatsappMessage(message);
+    setSettings(prev => prev ? { ...prev, whatsappMessage: message } : null);
   }, []);
 
   const handleToggleAdDeduplication = useCallback(() => {
@@ -156,6 +171,8 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
       <SettingsModal
         onClose={onClose}
         settings={settings}
+        onToggleWhatsappMessage={handleToggleWhatsappMessage}
+        onWhatsappMessageChange={handleWhatsappMessageChange}
         onToggleFocusMode={handleToggleFocusMode}
         onToggleAdDeduplication={handleToggleAdDeduplication}
         onToggleAutoHide={handleToggleAutoHide}
