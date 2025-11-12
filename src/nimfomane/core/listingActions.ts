@@ -12,14 +12,31 @@ export const listingActions = {
       NimfomaneStorage.setTopicProp(id, 'escortDeterminationTime', Date.now());
     }
 
+    const setTopicNotOfEscort = () => {
+      NimfomaneStorage.setTopicProp(id, 'isOfEscort', false);
+      NimfomaneStorage.setTopicProp(id, 'escortDeterminationTime', Date.now());
+    }
+
     const topicTitle = container.querySelector<HTMLLinkElement>('.ipsDataItem_title a[data-ipshover]')!;
-    const url = (container.querySelector('.ipsPagination_last a')! || topicTitle).getAttribute('href')!;
+    const url = (
+      container.querySelector('.ipsPagination_last a')!
+      || container.querySelector('.ipsPagination_page:last-child a')!
+      || topicTitle).getAttribute('href'
+    )!;
 
     const normalizedTitle = utils.normalizeDigits(topicTitle.innerText)
-    if (!normalizedTitle.match(/07(\d ?){8}/)
-      && !normalizedTitle.match(/indisponibil[aă]/i)) {
-      if (!await topicActions.determineTopPosterEscort(url)) {
-        NimfomaneStorage.setTopicProp(id, 'isOfEscort', false);
+    const hasPhoneOrIndisponibila = normalizedTitle.match(/07(\d ?){8}/) || normalizedTitle.match(/indisponibil[aă]/i);
+
+    if (!hasPhoneOrIndisponibila) {
+      const escortOfTopic = await topicActions.getEscortOfTopic(url, 4);
+      if (escortOfTopic) {
+        setTopicEscort(escortOfTopic[1], escortOfTopic[0]);
+        return;
+      }
+
+      const topPosterEscort = await topicActions.determineTopPosterEscort(url);
+      if (topPosterEscort === false) {
+        setTopicNotOfEscort();
         return;
       }
     }
@@ -36,8 +53,7 @@ export const listingActions = {
     if (escortOfTopic) {
       setTopicEscort(escortOfTopic[1], escortOfTopic[0]);
     } else {
-      NimfomaneStorage.setTopicProp(id, 'isOfEscort', false);
-      NimfomaneStorage.setTopicProp(id, 'escortDeterminationTime', Date.now());
+      setTopicNotOfEscort();
     }
   }
 }
