@@ -114,3 +114,24 @@ test('Should recalculate main topic image after 4 days.', async ({page}) => {
   await utilsNimfomane.open(page);
   await page.locator(`[data-wwtopic="${id}"] [data-wwid="topic-image"]`).isVisible();
 })
+
+test('Should update preview image on listing when opening escort images modal.', async ({page}) => {
+  await utilsNimfomane.open(page);
+  const {firstImage, user, id} = await utilsNimfomane.waitForFirstImage(page);
+  const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
+
+  await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImage', null);
+  await page.reload();
+  await page.waitForTimeout(600);
+
+  await expect(page.locator(`[data-wwtopic="${id}"][data-wwid="topic-image"] [data-wwid="no-image-icon"]`)).toBeVisible();
+
+  await page.goto(profileLink);
+  await page.locator('[data-wwid="all-photos-button"]').click();
+  await expect(page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').first()).toBeVisible();
+  await page.locator('[data-wwid="escort-images"] [data-wwid="close"]').click();
+  await expect(page.locator('[data-wwid="escort-images"]')).toHaveCount(0);
+
+  await utilsNimfomane.open(page);
+  await expect(page.locator(`[data-wwtopic="${id}"][data-wwid="topic-image"] img`)).toBeVisible();
+})

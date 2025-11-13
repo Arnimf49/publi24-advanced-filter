@@ -7,6 +7,11 @@ export interface Image {
 }
 
 export const escortActions = {
+  updatePreviewImage(user: string, imageUrl: string) {
+    NimfomaneStorage.setEscortProp(user, 'optimizedProfileImage', imageUrl);
+    NimfomaneStorage.setEscortProp(user, 'optimizedProfileImageTime', Date.now());
+  },
+
   async determineMainProfileImage(user: string) {
     let profileContentUrl = NimfomaneStorage.getEscort(user).profileLink + 'content';
     let pageChecks = 0;
@@ -52,12 +57,18 @@ export const escortActions = {
       const imageElements = pageData.querySelectorAll('.ipsStreamItem_snippet [data-background-src]');
 
       // @ts-ignore
-      return [...imageElements].map(el => {
+      const images = [...imageElements].map(el => {
         return {
           url: el.getAttribute('data-background-src'),
           date: el.closest('.ipsStreamItem_container').querySelector('time').innerText,
         }
       });
+
+      if (pageNum === 0 && images.length > 0) {
+        escortActions.updatePreviewImage(user, images[0].url);
+      }
+
+      return images;
     } catch (e: any | BrowserError) {
       if (e.code === 404) {
         return null;
