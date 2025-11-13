@@ -33,7 +33,7 @@ export const test = base.extend<{
       !testInfo.file.includes("/nimfomane/")
     ) {
       const duration = (Date.now() - start) / 1000;
-      const delay = Math.max(0, (process.env.CI == 'true' ? 20 : 8 - duration) * 1000);
+      const delay = Math.max(0, ((process.env.CI == 'true' ? 14 : 8) - duration) * 1000);
       await new Promise(r => setTimeout(r, delay));
     }
   },

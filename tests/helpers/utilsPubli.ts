@@ -83,6 +83,9 @@ export const utilsPubli = {
         if (altPage.isClosed()) {
           continue;
         }
+        if (altPage.url().startsWith("https://consent.google.com/ml?continue=")) {
+          throw new Error('Consent page on google!');
+        }
         if (altPage.url().startsWith("https://www.google.com/sorry/index")) {
           await solve(altPage, {
             delay: process.env.CI ? 200 : 64,
@@ -133,6 +136,53 @@ export const utilsPubli = {
     throw new Error('Attempted to find ad with condition, but searched through too many pages.');
   },
 
+  async findAdWithConditionNoLoader<T>(page: Page, conditionFn: (...args: any) => Promise<T>): Promise<T> {
+    const getCurrentPage = async () => {
+      const url = new URL(page.url());
+      const pagParam = url.searchParams.get('pag');
+      return pagParam ? parseInt(pagParam, 10) : 1;
+    };
+
+    const navigateToPage = async (pageNum: number) => {
+      const url = new URL(page.url());
+      if (pageNum === 1) {
+        url.searchParams.delete('pag');
+      } else {
+        url.searchParams.set('pag', pageNum.toString());
+      }
+      await page.goto(url.toString());
+      await page.waitForTimeout(2000);
+    };
+
+    const startPage = await getCurrentPage();
+    let results = await conditionFn();
+
+    if (results) {
+      return results;
+    }
+
+    for (let offset = 1; offset <= 4; offset++) {
+      const backwardPage = startPage - offset;
+      const forwardPage = startPage + offset;
+
+      if (backwardPage >= 1) {
+        await navigateToPage(backwardPage);
+        results = await conditionFn();
+        if (results) {
+          return results;
+        }
+      }
+
+      await navigateToPage(forwardPage);
+      results = await conditionFn();
+      if (results) {
+        return results;
+      }
+    }
+
+    throw new Error('Attempted to find ad with condition, but searched through too many pages.');
+  },
+
   async findAdWithDuplicates(page: Page, forceFind: boolean = false) {
     const getAdWithDuplicates = async () => {
       for (let article of await page.$$('[data-articleid]')) {
@@ -143,20 +193,17 @@ export const utilsPubli = {
       return null;
     };
 
-    if (forceFind) {
-      return await utilsPubli.findAdWithCondition(page, getAdWithDuplicates);
-    }
-
-    let result = await getAdWithDuplicates();
-    if (result) return result;
-
-    for (let i = 0; i < 5; i++) {
-      const nextButton = (await page.$$('.pagination .arrow'))[1];
-      if (!nextButton) break;
-      await nextButton.click();
-      result = await getAdWithDuplicates();
-      if (result) return result;
-      await page.waitForTimeout(2000);
+    if (!forceFind) {
+      for (let i = 0; i < 5; i++) {
+        let result = await getAdWithDuplicates();
+        if (result) {
+          return result;
+        }
+        const nextButton = (await page.$$('.pagination .arrow'))[1];
+        if (!nextButton) break;
+        await nextButton.click();
+        await page.waitForTimeout(2000);
+      }
     }
 
     return await utilsPubli.findAdWithCondition(page, getAdWithDuplicates);
@@ -216,7 +263,7 @@ export const utilsPubli = {
 
     if (articleId) {
       await page.waitForTimeout(100);
-      article = await utilsPubli.findAdWithCondition(page, async () => {
+      article = await utilsPubli.findAdWithConditionNoLoader(page, async () => {
         return await page.$(`[data-articleid="${articleId}"]`);
       });
     } else {

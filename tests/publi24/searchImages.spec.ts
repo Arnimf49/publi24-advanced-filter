@@ -180,6 +180,6 @@ test('Should show "date șterse, caută din nou" when image search results are c
 
   const messageElement = await imageResultsContainer.$('p');
   const className = await messageElement.getAttribute('class');
-  expect(className).toContain('noResultsFound');
+  expect(className).toContain('missingResults');
 });
 

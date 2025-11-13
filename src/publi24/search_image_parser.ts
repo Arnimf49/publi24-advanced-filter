@@ -1,5 +1,6 @@
 import {WWBrowserStorage} from "./core/browserStorage";
 import {IS_MOBILE_VIEW} from "../common/globals";
+import {utils} from "../common/utils";
 
 interface ImageSearchData {
   wwid: string;
@@ -154,7 +155,7 @@ async function readImageLinks(isMobile: boolean, done: (results: string[]) => vo
 
     (exactButton as HTMLElement).click();
 
-    console.debug("[WW-DEBUG]", 'Waiting for exact button to be selected...');
+    utils.debugLog('Waiting for exact button to be selected...');
     await waitForCondition(
       () => isExactMatchButtonSelected((isMobile ? getMobileExactLink() : getDesktopExactLink()) as HTMLElement),
       50
@@ -162,7 +163,7 @@ async function readImageLinks(isMobile: boolean, done: (results: string[]) => vo
 
     await wait(50);
 
-    console.debug("[WW-DEBUG]", 'Waiting for progress bars to be gone...');
+    utils.debugLog('Waiting for progress bars to be gone...');
     await waitForCondition(
       () => !document.querySelector('[id="rso"] [role="progressbar"]'),
       50
@@ -170,7 +171,7 @@ async function readImageLinks(isMobile: boolean, done: (results: string[]) => vo
 
     await wait(50);
 
-    console.debug("[WW-DEBUG]", 'Waiting for links to be fully loaded (none start with /)...');
+    utils.debugLog( 'Waiting for links to be fully loaded (none start with /)...');
     await waitForCondition(
       () => hasNoResults() || areLinksFullyLoaded(isMobile),
       50

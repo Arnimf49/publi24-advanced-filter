@@ -30,6 +30,7 @@ type SettingControlProps = {
   dataWwid?: string;
   dataCriteria?: string;
   showDetails?: boolean;
+  showChildren?: boolean;
 };
 
 const SettingControl: React.FC<SettingControlProps> =
@@ -40,7 +41,8 @@ const SettingControl: React.FC<SettingControlProps> =
    children,
    dataWwid,
    dataCriteria,
-   showDetails = true
+   showDetails = true,
+   showChildren = true
 }) => {
   const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).closest('input, button, a')) {
@@ -60,9 +62,13 @@ const SettingControl: React.FC<SettingControlProps> =
       </div>
       <div className={styles.controlContent} onClick={handleContentClick}>
         <div className={styles.controlTitle}>{title}</div>
-        {description && (
-          <div className={`${styles.controlDescription} ${!showDetails ? styles.isHidden : ''}`}>
+        {description && showDetails && (
+          <div className={`${styles.controlDescription}`}>
             {description}
+          </div>
+        )}
+        {children && showChildren && (
+          <div className={`${styles.controlDescription}`}>
             {children}
           </div>
         )}
@@ -162,7 +168,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
         isOn={settings.whatsappMessageEnabled}
         onToggle={onToggleWhatsappMessage}
         dataWwid="whatsapp-message-switch"
-        showDetails={settings.whatsappMessageEnabled}
+        showChildren={settings.whatsappMessageEnabled}
       >
         <textarea
           className={styles.controlInput}
@@ -176,7 +182,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
         />
       </SettingControl>
 
-      <div className={styles.controlSpacer}></div>
+      <hr style={{ opacity: 0.2, marginTop: '25px', marginBottom: '25px' }} />
 
       <SettingControl
         title="Mod focus"
@@ -193,13 +199,15 @@ const SettingsModal: React.FC<SettingsModalProps> =
         dataWwid="ad-deduplication-switch"
       />
 
+      <hr style={{ opacity: 0.2, marginTop: '25px', marginBottom: '25px' }} />
+
       <SettingControl
         title="Motiv implicit ascundere"
         description="Când este activat, motivul selectat va fi ales implicit la ascunderea manuală (dacă 'poze false' nu este deja selectat)."
         isOn={settings.defaultManualHideReasonEnabled}
         onToggle={onToggleDefaultManualHideReason}
         dataWwid="default-manual-hide-reason-switch"
-        showDetails={settings.defaultManualHideReasonEnabled}
+        showChildren={settings.defaultManualHideReasonEnabled}
       >
         <select
           className={styles.controlSelect}
@@ -213,8 +221,6 @@ const SettingsModal: React.FC<SettingsModalProps> =
           <option value="alta">alta</option>
         </select>
       </SettingControl>
-
-      <div className={styles.controlSpacer}></div>
 
       <SettingControl
         title="Ascundere automată"
@@ -242,6 +248,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
             onToggle={() => onToggleCriteria('maxAge')}
             dataWwid="auto-hide-criteria" dataCriteria="maxAge"
             showDetails={settings.maxAge}
+            showChildren={settings.maxAge}
           >
             <input
               type="number"
@@ -259,6 +266,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
             onToggle={() => onToggleCriteria('minHeight')}
             dataWwid="auto-hide-criteria" dataCriteria="minHeight"
             showDetails={settings.minHeight}
+            showChildren={settings.minHeight}
           >
             <input
               type="number"
@@ -276,6 +284,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
             onToggle={() => onToggleCriteria('maxHeight')}
             dataWwid="auto-hide-criteria" dataCriteria="maxHeight"
             showDetails={settings.maxHeight}
+            showChildren={settings.maxHeight}
           >
             <input
               type="number"
@@ -293,6 +302,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
             onToggle={() => onToggleCriteria('maxWeight')}
             dataWwid="auto-hide-criteria" dataCriteria="maxWeight"
             showDetails={settings.maxWeight}
+            showChildren={settings.maxWeight}
           >
             <input
               type="number"
@@ -362,12 +372,15 @@ const SettingsModal: React.FC<SettingsModalProps> =
         </div>
       )}
 
+      <hr style={{ opacity: 0.2, marginTop: '25px', marginBottom: '20px' }} />
+
       <h2 className={styles.header}>Transfer date</h2>
       {importMessage && <p className={misc.cx(importMessage[0], styles.importMessage)}>{importMessage[1]}</p>}
       <button onClick={handleExport} className={styles.button}>↑ export</button>
       <button onClick={onImport} className={styles.button}>↓ import</button>
 
       <hr style={{ opacity: 0.2, marginTop: '25px', marginBottom: '15px' }} />
+
       <p className={styles.footerText}>
         Pentru probleme sau idei scrie la <b>arnimf49@gmail.com</b>
       </p>
