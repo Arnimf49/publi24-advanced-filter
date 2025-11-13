@@ -62,7 +62,8 @@
       ],
       "js": [
         "dist/publi24/search_image_parser.js"
-      ]
+      ],
+      "run_at": "document_start"
     },
     {
       "matches": ["https://nimfomane.com/forum/*"],

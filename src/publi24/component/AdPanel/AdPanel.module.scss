@@ -53,6 +53,9 @@
       padding-right: 16px;
     }
   }
+  :global(.onAdPage.onMobile #content) & {
+    padding-bottom: 30px;
+  }
 }
 
 .linkSafe {
