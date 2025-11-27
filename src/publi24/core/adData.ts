@@ -34,7 +34,7 @@ export const adData = {
   },
 
   getPageDate(itemPage: DocumentFragment | HTMLElement): Date {
-    const dateText = itemPage.querySelector<HTMLElement>('[itemprop="validFrom"]')?.textContent?.trim();
+    const dateText = itemPage.querySelector<HTMLElement>('[itemprop="validFrom"], .detail-info div i, .valid-from')?.textContent?.trim();
     if (!dateText) {
       return new Date(0);
     }
@@ -42,21 +42,13 @@ export const adData = {
     return new Date(formattedDateText);
   },
 
-  getPageDescription(itemPage: DocumentFragment | HTMLElement): string {
-    const descriptionElement = itemPage.querySelector<HTMLElement>('[itemscope] [itemprop="description"]');
-    if (!descriptionElement) {
-      return '';
+  getPageImage(itemPage: DocumentFragment | HTMLElement): string | undefined {
+    if (IS_MOBILE_VIEW) {
+      const bgImageMatch = itemPage.querySelector<HTMLElement>('[itemprop="associatedMedia"] li')?.style.background?.match(/url\(['"]([^'"]+)['"]\)/);
+      return bgImageMatch ? bgImageMatch[1] : undefined;
     }
-    return descriptionElement.innerHTML
-      .replace(/<[^>]*>/gi, ' ')
-      .replace(/\s+/g, ' ')
-      .replace(/Publi24_\d+/, '')
-      .trim();
-  },
 
-  getPageTitle(itemPage: DocumentFragment | HTMLElement): string {
-    const titleElement = itemPage.querySelector<HTMLHeadingElement>('[itemscope] h1[itemprop="name"]');
-    return titleElement ? titleElement.innerHTML : '';
+    return itemPage.querySelector<HTMLImageElement>('[itemprop="image"], .detailViewImg')?.src;
   },
 
   getItemDate(item: Element) {
@@ -68,15 +60,22 @@ export const adData = {
     }
   },
 
-  getItemUrl(itemOrUrl: Element | string): string {
-    if (typeof itemOrUrl === 'string') {
-      return itemOrUrl;
+  getPageDescription(itemPage: DocumentFragment | HTMLElement): string {
+    const descriptionElement = itemPage.querySelector<HTMLElement>('[itemscope] [itemprop="description"], .article-description');
+    if (!descriptionElement) {
+      return '';
     }
-    if (itemOrUrl.className.indexOf('article-item') === -1) {
-      return location.toString();
-    }
-    const linkElement = itemOrUrl.querySelector<HTMLAnchorElement>('.article-title a');
-    return linkElement ? linkElement.href : location.toString(); // Provide fallback
+    return descriptionElement.innerHTML
+      .replace(/<[^>]*>/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/Publi24_\d+/, '')
+      .replace(/ID anunț\s*:\s*\d+/, '')
+      .trim();
+  },
+
+  getPageTitle(itemPage: DocumentFragment | HTMLElement): string {
+    const titleElement = itemPage.querySelector<HTMLHeadingElement>('[itemscope] h1[itemprop="name"], .article-detail h1, .detail-title h1');
+    return titleElement ? titleElement.innerHTML : '';
   },
 
   getItemLocation(item: Element | DocumentFragment | HTMLElement | string, itemIsOnAdPage: boolean = false): string {
@@ -92,7 +91,7 @@ export const adData = {
         if (IS_MOBILE_VIEW) {
           locationText = targetElement.querySelector<HTMLElement>('[class="location"]')?.innerText;
         } else {
-          locationText = targetElement.querySelector<HTMLElement>('[itemtype="https://schema.org/Place"]')?.innerText;
+          locationText = targetElement.querySelector<HTMLElement>('[itemtype="https://schema.org/Place"], .detail-info div p')?.innerText;
         }
       } else {
         if (item instanceof Element) {
@@ -106,6 +105,17 @@ export const adData = {
     }
 
     return locationText.trim().split(',').map((l: string) => l.replace(/[ \n]+/g, '')).sort().join(', ');
+  },
+
+  getItemUrl(itemOrUrl: Element | string): string {
+    if (typeof itemOrUrl === 'string') {
+      return itemOrUrl;
+    }
+    if (itemOrUrl.className.indexOf('article-item') === -1) {
+      return location.toString();
+    }
+    const linkElement = itemOrUrl.querySelector<HTMLAnchorElement>('.article-title a');
+    return linkElement ? linkElement.href : location.toString(); // Provide fallback
   },
 
   isDueToPhoneHidden(id: string): boolean {
@@ -219,13 +229,7 @@ export const adData = {
           }
         }
 
-        let image: string | null | undefined;
-        if (IS_MOBILE_VIEW) {
-          const bgImageMatch = itemPage.querySelector<HTMLElement>('[itemprop="associatedMedia"] li')?.style.background?.match(/url\(['"]([^'"]+)['"]\)/);
-          image = bgImageMatch ? bgImageMatch[1] : undefined;
-        } else {
-          image = itemPage.querySelector<HTMLImageElement>('[itemprop="image"]')?.src;
-        }
+
 
         return {
           IS_MOBILE_VIEW,
@@ -235,7 +239,7 @@ export const adData = {
           qrCode,
           title: adData.getPageTitle(itemPage),
           description: adData.getPageDescription(itemPage).substring(0, 290),
-          image,
+          image: adData.getPageImage(itemPage),
           location: pageLocationText,
           date: dateLib.diffDaysToDisplay(dateDiffDays, date),
           timestamp: date.getTime(),

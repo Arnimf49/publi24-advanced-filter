@@ -1,6 +1,5 @@
 import {test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
-import {ElementHandle} from "playwright-core";
 import {expect} from "playwright/test";
 
 test('Should hide without a reason.', async ({ page, context }) => {

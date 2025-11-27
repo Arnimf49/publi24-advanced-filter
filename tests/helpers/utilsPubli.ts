@@ -13,6 +13,10 @@ export const utilsPubli = {
         if (consent) {
           await consent.click();
         }
+        const consent2 = await page.$('[id="didomi-notice-disagree-button"]');
+        if (consent2) {
+          await consent2.click();
+        }
         const years = await page.$('.overlay-18 .cta-btn-secondary');
         if (years) {
           await years.click();
