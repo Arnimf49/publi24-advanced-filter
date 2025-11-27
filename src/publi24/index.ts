@@ -30,7 +30,7 @@ WWStorage.upgrade()
         .getAttribute('data-url')!
         .replace(/^.*?adid=([^&]+)&.*$/, "$1");
 
-      const item = document.body.querySelector<HTMLElement>('[itemtype="https://schema.org/Offer"]');
+      const item = document.body.querySelector<HTMLElement>('[itemtype="https://schema.org/Offer"], .content-data .detail-left');
       item!.setAttribute('data-articleid', id.toUpperCase());
 
       const container = document.createElement('div');
