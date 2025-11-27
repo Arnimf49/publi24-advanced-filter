@@ -233,19 +233,16 @@ export const adActions = {
   },
 
   async analyzeFoundImages(id: string, item: Element): Promise<void> {
+    WWStorage.clearAdDeadLinks(id);
+    WWStorage.clearAdDuplicatesInOtherLocation(id);
+
     const results: { [key: string]: string[] } = await WWBrowserStorage.get(`ww:image_results:${id}`);
     const imageLinks: string[] = results[`ww:image_results:${id}`] || [];
     const publi24AdLinks: string[] = imageLinks
       .filter((link: string) => link.match(/^https:\/\/(www\.)?publi24\.ro\/.+\/anunt\/.+$/));
 
-    WWStorage.clearAdDeadLinks(id);
-    WWStorage.clearAdDuplicatesInOtherLocation(id);
     const currentAdLocation: string = adData.getItemLocation(item);
     const pageResultForDate = await adData.loadInAdPage(item);
-    if (pageResultForDate instanceof Error) {
-      console.error("Failed to load ad page for date:", pageResultForDate);
-      return;
-    }
     const currentAdDate: Date = adData.getPageDate(pageResultForDate as DocumentFragment | HTMLElement);
 
     const pageResults = await Promise.all(publi24AdLinks.map((link: string) =>
@@ -264,7 +261,6 @@ export const adActions = {
       }
 
       const page = pageResult as DocumentFragment | HTMLElement;
-
       const location: string = adData.getItemLocation(page, true);
 
       if (location !== currentAdLocation && !(location.includes('Sector') && currentAdLocation.includes('Sector'))) {

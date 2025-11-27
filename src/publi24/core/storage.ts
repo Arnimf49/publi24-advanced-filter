@@ -162,8 +162,7 @@ export const WWStorage = {
   },
 
   hasAdDuplicatesInOtherLocation(id: string): boolean {
-    const duplicates = WWStorage.getAdProp<string[] | null>(id, 'duplicatesInOtherLoc');
-    return !!duplicates && duplicates.length > 0;
+    return WWStorage.getAdDuplicatesInOtherLocation(id).length > 0;
   },
 
   getAdDuplicatesInOtherLocation(id: string): string[] {
