@@ -13,7 +13,7 @@ export const utilsPubli = {
         if (consent) {
           await consent.click();
         }
-        const consent2 = await page.$('[id="didomi-notice-disagree-button"]');
+        const consent2 = await page.$('[id="didomi-notice-agree-button"]');
         if (consent2) {
           await consent2.click();
         }
