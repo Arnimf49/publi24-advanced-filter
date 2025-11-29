@@ -8,4 +8,5 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 dist
-unknown-domains.json
+src-mapper/unknown-domains.json
+src-mapper/bad-domains.json

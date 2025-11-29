@@ -1,6 +1,7 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
+import json from '@rollup/plugin-json';
 import postcss from 'rollup-plugin-postcss';
 import replace from '@rollup/plugin-replace';
 import autoprefixer from 'autoprefixer';
@@ -25,13 +26,14 @@ const makeStyledSource = (root, file) => ({
   },
   external: ['react', 'react-dom/client', 'react-dom'],
   plugins: [
+    json(),
     replace({
       preventAssignment: true,
       'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
       'process.env.PROMOTER': JSON.stringify(isPromoter ? 'true' : 'false'),
       'process.env.WATCH_MODE': JSON.stringify(isWatchMode),
     }),
-    resolve({ browser: true }),
+    resolve({ browser: true, extensions: ['.js', '.ts', '.tsx', '.json'] }),
     commonjs(),
     typescript({
       tsconfig: './tsconfig.json',
@@ -64,12 +66,13 @@ const makeSimpleSource = (root, file) => ({
     sourcemap: !isProduction,
   },
   plugins: [
+    json(),
     replace({
       preventAssignment: true,
       'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
       'process.env.WATCH_MODE': JSON.stringify(isWatchMode),
     }),
-    resolve({ browser: true }),
+    resolve({ browser: true, extensions: ['.js', '.ts', '.tsx', '.json'] }),
     commonjs(),
     typescript({
       tsconfig: './tsconfig.json',

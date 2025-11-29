@@ -116,10 +116,11 @@
   align-items: center;
   justify-content: center;
 
+  transition: all 0.2s ease 0s;
+
   * {
     vertical-align: baseline;
   }
-  transition: all 0.2s ease 0s;
 
   [data-wwid="duplicates-count"] {
     font-weight: bold;
