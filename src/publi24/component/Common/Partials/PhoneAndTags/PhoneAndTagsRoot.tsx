@@ -38,6 +38,7 @@ const PhoneAndTagsRoot: React.FC<PhoneAndTagsRoot> = ({
     : undefined;
   const bmiWarn = bmi ? bmi <= 17 || bmi >= 23 : false;
   const ageWarn = age ? age > 35 : false;
+  const firstSeen = WWStorage.getPhoneFirstSeen(phone);
 
   return (
     <PhoneAndTags
@@ -50,6 +51,7 @@ const PhoneAndTagsRoot: React.FC<PhoneAndTagsRoot> = ({
       height={height}
       weight={weight}
       whatsappMessage={whatsappMessage}
+      firstSeen={firstSeen}
     >
       {children}
     </PhoneAndTags>

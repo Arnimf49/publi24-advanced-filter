@@ -26,6 +26,7 @@ interface PhoneItem {
   height?: any;
   weight?: any;
   age?: any;
+  firstSeen?: number;
   [key: string]: any;
 }
 
@@ -126,6 +127,11 @@ export const WWStorage = {
   setAdPhone(id: string, phone: string): void {
     WWStorage.setAdProp(id, 'phone', phone);
     WWStorage.delAdProp(id, 'noPhone');
+    
+    const firstSeen = WWStorage.getPhoneProp<number>(phone, 'firstSeen');
+    if (!firstSeen) {
+      WWStorage.setPhoneProp(phone, 'firstSeen', Date.now());
+    }
   },
 
   getAdPhone(id: string): string | null | undefined {
@@ -364,6 +370,16 @@ export const WWStorage = {
 
   getPhoneAge(phone: string): any {
     return WWStorage.getPhoneProp(phone, 'age');
+  },
+
+  getPhoneFirstSeen(phone: string): number {
+    const firstSeen = WWStorage.getPhoneProp<number>(phone, 'firstSeen');
+    if (!firstSeen) {
+      const now = Date.now();
+      WWStorage.setPhoneProp(phone, 'firstSeen', now);
+      return now;
+    }
+    return firstSeen;
   },
 
   getFavorites(): string[] {

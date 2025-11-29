@@ -2,6 +2,8 @@ import React, { CSSProperties } from 'react';
 import styles from './PhoneAndTags.module.scss';
 import {misc} from "../../../../core/misc";
 import {IS_MOBILE_VIEW} from "../../../../../common/globals";
+import {LeafIcon} from "../../Icons/LeafIcon";
+import {dateLib} from "../../../../core/dateLib";
 
 type ContactInfoProps = {
   phone: string;
@@ -13,6 +15,7 @@ type ContactInfoProps = {
   bmi?: number;
   bmiWarn?: boolean;
   whatsappMessage?: string | null;
+  firstSeen: number;
   children?: React.ReactNode;
 };
 
@@ -26,6 +29,7 @@ const PhoneAndTags: React.FC<ContactInfoProps> = ({
    bmi,
    bmiWarn = false,
    whatsappMessage = null,
+   firstSeen,
    children,
  }) => {
   const headingStyle: CSSProperties = {
@@ -55,6 +59,15 @@ const PhoneAndTags: React.FC<ContactInfoProps> = ({
     ? `https://wa.me/+4${whatsappPhone}?text=${encodeURIComponent(whatsappMessage)}`
     : `https://wa.me/+4${whatsappPhone}`;
 
+  const daysSinceFirstSeen = Math.floor((Date.now() - firstSeen) / 8.64e+7);
+  const monthsSinceFirstSeen = daysSinceFirstSeen / 30;
+
+  const leafState: 'fresh' | 'stale' | 'old' =
+    monthsSinceFirstSeen < 1 ? 'fresh' :
+    monthsSinceFirstSeen < 6 ? 'stale' : 'old';
+
+  const { daysString } = dateLib.calculateTimeSince(firstSeen);
+
   return (
     <>
       <h4 style={headingStyle}>
@@ -63,6 +76,13 @@ const PhoneAndTags: React.FC<ContactInfoProps> = ({
         ) : (
           <span className={styles.phone} data-wwid="phone-number">{phone}</span>
         )}
+        <button
+          className={styles.leafButton}
+          data-wwid="leaf-button"
+        >
+          <LeafIcon state={leafState} />
+          <span className={styles.leafTooltip}>Văzut prima data de extensie: <br/> {daysString}</span>
+        </button>
         <a
           href={whatsappUrl}
           target="_blank"
