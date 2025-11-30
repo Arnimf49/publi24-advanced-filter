@@ -69,6 +69,7 @@ const SAFE_LAST_DOMAIN_PARTS: string[] = [
   'sexy-escorte.com',
   'escortero.net',
   'escorteromania.info',
+  'escorterecomandate.com',
 ];
 
 const PRIO_DOMAINS: string[] = [

@@ -9,4 +9,3 @@ node_modules/
 /playwright/.cache/
 dist
 src-mapper/unknown-domains.json
-src-mapper/bad-domains.json

@@ -183,3 +183,53 @@ test('Should show "date șterse, caută din nou" when image search results are c
   expect(className).toContain('missingResults');
 });
 
+
+test.skip('Collect unknown domain for image search.', async ({ page, context }, testInfo) => {
+  testInfo.setTimeout(60000 * 6);
+
+  await utilsPubli.open(context, page, {
+    page: +process.env.PAGE,
+  });
+
+  let atAd =  0;
+  let pages = 0;
+
+  while (true) {
+    const articles = await page.$$('[data-articleid]');
+    const ad =  articles[atAd];
+
+    if (!ad) {
+      if (pages === 1) {
+        break;
+      }
+
+      await ((await page.$$('.pagination .arrow'))[1]).click();
+      await page.waitForTimeout(3000);
+      atAd =  0;
+      ++pages;
+      continue;
+    }
+
+    ++atAd;
+
+    const adId = await ad.getAttribute('data-articleid')
+
+    const articleImageSearchButton = await ad.$('[data-wwid="investigate_img"]');
+    await articleImageSearchButton.isVisible();
+    await utilsPubli.awaitGooglePagesClose(articleImageSearchButton, context, page);
+
+    await utils.waitForInnerTextNot(
+      page,
+      `[data-articleid="${adId}"] [data-wwid="image-results"]`,
+      'nerulat',
+      4000,
+    );
+    // Wait for images post-processing.
+    await page.waitForTimeout(2000);
+
+    await collectUnknownDomains(ad);
+
+    await page.waitForTimeout(process.env.CI == 'true' ? 10000 : 4000);
+  }
+});
+
