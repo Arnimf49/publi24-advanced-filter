@@ -1,3 +1,4 @@
+import React from "react";
 import {misc} from "../../core/misc";
 
 export const NimfomaneIcon = () => {

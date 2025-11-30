@@ -29,7 +29,7 @@
     "removeComments": true,               // Do not emit comments to output.
 
     // JSX
-    "jsx": "react-jsx",                   // Support JSX in '.tsx' files: 'react-jsx' uses the new JSX transform.
+    "jsx": "react",                       // Support JSX in '.tsx' files: uses React.createElement.
 
     // JS Support
     "allowJs": false,                     // Do not allow javascript files to be compiled.

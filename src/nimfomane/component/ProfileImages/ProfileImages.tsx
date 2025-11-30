@@ -1,4 +1,4 @@
-import {FC, useState} from "react";
+import React, {FC, useState} from "react";
 import Modal from "../../../common/components/Modal/Modal";
 import {EscortImages} from "../TopicImage/EscortImages/EscortImages";
 import classes from './ProfileImages.module.scss'

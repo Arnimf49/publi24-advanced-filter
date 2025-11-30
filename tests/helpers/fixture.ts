@@ -1,7 +1,5 @@
 import { test as base, type BrowserContext } from '@playwright/test';
-import {$} from "execa";
 import {utils} from "./utils";
-
 
 export const test = base.extend<{
   context: BrowserContext;

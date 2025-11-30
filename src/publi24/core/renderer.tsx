@@ -1,3 +1,4 @@
+import React from "react";
 import {adData} from "./adData";
 import {adActions} from "./adActions";
 import {IS_AD_PAGE} from "./globals";

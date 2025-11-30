@@ -1,4 +1,5 @@
 import * as ReactDOM from "react-dom/client";
+import React from "react";
 import {TopicImageRoot} from "../component/TopicImage/TopicImageRoot";
 import {ProfileImages} from "../component/ProfileImages/ProfileImages";
 import {profileActions} from "./profileActions";

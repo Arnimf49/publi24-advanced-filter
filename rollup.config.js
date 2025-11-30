@@ -47,7 +47,11 @@ const makeStyledSource = (root, file) => ({
           ? '[hash:base64:5]'
           : '[name]__[local]___[hash:base64:5]',
       },
-      use: ['sass'],
+      use: {
+        sass: {
+          silenceDeprecations: ['legacy-js-api'],
+        },
+      },
       plugins: [
         autoprefixer(),
         isProduction ? cssnano() : null,

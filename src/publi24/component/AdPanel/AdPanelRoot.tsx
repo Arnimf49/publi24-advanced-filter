@@ -1,4 +1,4 @@
-import {FC, MouseEventHandler, useCallback, useEffect, useState} from "react";
+import React, {FC, MouseEventHandler, useCallback, useEffect, useState} from "react";
 import {adData} from "../../core/adData";
 import {WWStorage} from "../../core/storage";
 import {linksFilter} from "../../core/linksFilter";
@@ -38,7 +38,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const imageTime = WWStorage.getAdImagesInvestigatedTime(id);
   const {daysString: phoneInvestigatedSinceDays, stale: phoneInvestigateStale} = dateLib.calculateTimeSince(phoneTime);
   const {daysString: imageInvestigatedSinceDays, stale: imageInvestigateStale} = dateLib.calculateTimeSince(imageTime);
-  
+
   const imageResultsStatus = linksFilter.getImageResultsStatus(imageSearchDomains, imageInvestigateStale);
 
   const visible = adData.getItemVisibility(id);

@@ -1,4 +1,4 @@
-import {FC, MouseEventHandler} from "react";
+import React, {FC, MouseEventHandler} from "react";
 import classes from "./TopicImage.module.scss";
 import {Loader} from "../../../common/components/Loader/Loader";
 import {NoImageIcon} from "./NoImageIcon";
