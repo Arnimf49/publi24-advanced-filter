@@ -14,7 +14,7 @@ interface RenderOptions {
 }
 
 function renderAdElement(item: HTMLElement, id: string, renderOptions?: RenderOptions): () => void {
-  if (!IS_AD_PAGE && item.hasAttribute('onclick')) {
+  if (!IS_AD_PAGE() && item.hasAttribute('onclick')) {
     const txtWrap = item.querySelector<HTMLElement>('.article-txt-wrap');
     if (txtWrap) {
       txtWrap.onclick = (event: MouseEvent) => event.stopPropagation();

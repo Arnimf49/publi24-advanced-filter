@@ -31,7 +31,7 @@ const HideReason: React.FC<HideReasonProps> = ({
   const [showSubcategories, setShowSubcategories] = useState<boolean>(false);
 
   useLayoutEffect(() => {
-    if (containerRef.current && (IS_MOBILE_VIEW || IS_AD_PAGE)) {
+    if (containerRef.current && (IS_MOBILE_VIEW || IS_AD_PAGE())) {
       const bounding = containerRef.current.getBoundingClientRect();
       if (bounding.top < 120) {
         const scrollParent = utils.getScrollParent(containerRef.current);

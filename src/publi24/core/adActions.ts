@@ -289,11 +289,11 @@ export const adActions = {
 
       let imgs: string[] = [];
 
-      if (IS_AD_PAGE && IS_MOBILE_VIEW) {
+      if (IS_AD_PAGE() && IS_MOBILE_VIEW) {
         const matches = document.body.innerHTML.match(/https:\/\/s3\.publi24\.ro\/[^\/]+\/large\/[^.]+\.(jpg|webp|png)/g);
         imgs = matches ? [...new Set(matches)] : [];
       }
-      else if (IS_AD_PAGE) {
+      else if (IS_AD_PAGE()) {
         // @ts-ignore
         imgs = [...document.body.querySelectorAll<HTMLImageElement>('[id="detail-gallery"] img')]
           .map(img => img.getAttribute('src'))

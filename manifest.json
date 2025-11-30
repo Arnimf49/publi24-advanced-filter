@@ -44,7 +44,8 @@
       "css": [
         "library/splide/splide.min.css",
         "dist/publi24/styles.css"
-      ]
+      ],
+      "run_at": "document_start"
     },
     {
       "matches": [

@@ -1,4 +1,4 @@
-export const IS_AD_PAGE = !!document.querySelector('[data-url^="/DetailAd/IncrementViewHit"]');
+export const IS_AD_PAGE = () => !!document.querySelector('[data-url^="/DetailAd/IncrementViewHit"]');
 
 // export const htmlLog = (data: any): void => {
 //   const errorContainer = document.createElement('p');

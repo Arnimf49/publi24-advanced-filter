@@ -52,7 +52,7 @@ export const adData = {
   },
 
   getItemDate(item: Element) {
-    if (IS_AD_PAGE) {
+    if (IS_AD_PAGE()) {
       throw new Error('Not implemented: getItemDate for ad page');
     } else {
       const dateStr = item.querySelector<HTMLElement>('[class="article-date"]')!.innerText;
@@ -87,7 +87,7 @@ export const adData = {
       const targetElement = (item instanceof Element) ? item : item.firstChild as Element;
       if (!targetElement) return '';
 
-      if (IS_AD_PAGE || itemIsOnAdPage) {
+      if (IS_AD_PAGE() || itemIsOnAdPage) {
         if (IS_MOBILE_VIEW) {
           locationText = targetElement.querySelector<HTMLElement>('[class="location"]')?.innerText;
         } else {
@@ -187,7 +187,7 @@ export const adData = {
 
   async loadInAdsData(adUuids: string[], clean?: (failedUuid: string) => void): Promise<AdData[]> {
     let locationParts: string[] = [];
-    if (!IS_AD_PAGE) {
+    if (!IS_AD_PAGE()) {
       const countyInput = document.querySelector<HTMLInputElement>('[data-faceted="county_name"]');
       const locationInput = document.querySelector<HTMLInputElement>('[data-faceted="city_name"]');
 
@@ -272,7 +272,7 @@ export const adData = {
       }
     } else {
       let phoneNumberEncrypted: string | undefined | null;
-      if (IS_AD_PAGE) {
+      if (IS_AD_PAGE()) {
         phoneNumberEncrypted = document.querySelector<HTMLInputElement>('[id="EncryptedPhone"]')?.value;
       } else {
         phoneNumberEncrypted = await adData.acquireEncryptedPhoneNumber(item);
