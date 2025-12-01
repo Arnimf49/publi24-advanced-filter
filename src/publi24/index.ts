@@ -11,7 +11,7 @@ const waitForSiteLoad = () => new Promise<void>(resolve => {
     if (
       document.body &&
       (
-        document.querySelector('#content, .site-copyright, .footer, #footer')
+        document.querySelector('.site-copyright, .footer, #footer')
         || Date.now() - start > 300
       )
     ) {
