@@ -7,6 +7,7 @@ import {AutoHideCriterias, WWStorage} from "./storage";
 import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../../common/globals";
 import {AUTO_HIDE_CRITERIA} from "./hideReasons";
 import {utils} from "../../common/utils";
+import {iosUtils} from "./iosUtils";
 
 export type AdContentTuple = [string, number | boolean];
 
@@ -216,16 +217,20 @@ export const adActions = {
       const urlMatch: RegExpMatchArray | null = adData.getItemUrl(item).match(/\/([^./]+)\.html/);
       const addUrlId: string = urlMatch ? urlMatch[1] : ''; // Handle potential null match
       const encodedSearch: string = encodeURIComponent(`"${phoneNumber}" OR "${addUrlId}"`);
-      windowRef.location = `https://www.google.com/search?q=${encodedSearch}`;
+      const searchUrl = `https://www.google.com/search?q=${encodedSearch}`;
+      windowRef.location = searchUrl;
       WWStorage.setInvestigatedTime(id, Date.now());
 
-
       if (IS_SAFARI_IOS) {
-        setInterval(() => {
+        // Need to cause a nav since for some reason the extension doesn't load otherwise.
+        setTimeout(() => windowRef.location = `${searchUrl}&br=orion`, 400);
+        // Need to reload the pages since browser storage crashes.
+        const interval = setInterval(() => {
           if (windowRef?.closed) {
-            window.location.reload();
+            setTimeout(() => iosUtils.reloadAndFocus(id), 200);
+            clearInterval(interval);
           }
-        }, 300);
+        }, 100);
       }
     }
 
@@ -276,9 +281,7 @@ export const adActions = {
       const encodedLink = encodeURIComponent(imgLink);
       return `https://lens.google.com/uploadbyurl?url=${encodedLink}&hl=ro`;
     }
-    const openImageInvestigation = (imgLink: string): void => {
-      window.open(imageToLensUrl(imgLink));
-    }
+    const openImageInvestigation = (imgLink: string) => window.open(imageToLensUrl(imgLink));
 
     return async function (this: GlobalEventHandlers, e: MouseEvent): Promise<void> {
       e.preventDefault();
@@ -323,11 +326,12 @@ export const adActions = {
         imgs: imgs.map(url => imageToLensUrl(url)),
       });
 
+      let windows = []
       if (IS_MOBILE_VIEW && imgs.length > 0) {
-        openImageInvestigation(imgs[0]);
+        windows.push(openImageInvestigation(imgs[0]));
       }
       else {
-        imgs.forEach(img => openImageInvestigation(img));
+        windows = imgs.map(img => openImageInvestigation(img));
       }
 
       const interval = setInterval(async() => {
@@ -340,8 +344,14 @@ export const adActions = {
         ) {
           clearInterval(interval);
           done();
+
           if (IS_SAFARI_IOS) {
-            window.location.reload();
+            const iosInterval = setInterval(() => {
+              if (windows.every(w => w?.closed)) {
+                clearInterval(iosInterval);
+                setTimeout(() => iosUtils.reloadAndFocus(id), 200);
+              }
+            }, 300);
           }
         }
       }, 300);

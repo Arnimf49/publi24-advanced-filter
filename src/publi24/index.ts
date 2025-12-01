@@ -2,8 +2,9 @@ import {IS_AD_PAGE} from "./core/globals";
 import {WWStorage} from "./core/storage";
 import {renderer} from "./core/renderer";
 import {favorites} from "./core/favorites";
-import {IS_MOBILE_VIEW} from "../common/globals";
+import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../common/globals";
 import {misc} from "./core/misc";
+import {iosUtils} from "./core/iosUtils";
 
 const waitForSiteLoad = () => new Promise<void>(resolve => {
   const start = Date.now();
@@ -15,7 +16,12 @@ const waitForSiteLoad = () => new Promise<void>(resolve => {
         || Date.now() - start > 300
       )
     ) {
-      resolve();
+      if (IS_SAFARI_IOS) {
+        // Allow css loading.
+        setTimeout(resolve, 150);
+      } else {
+        resolve();
+      }
       clearInterval(interval);
     }
   }, 5)
@@ -64,6 +70,8 @@ const initializeListingPage = async () => {
     renderer.renderInfo();
     WWStorage.setHasBeenShownInfo();
   }
+
+  iosUtils.focusListingAdIfNeeded();
 };
 
 WWStorage.upgrade()

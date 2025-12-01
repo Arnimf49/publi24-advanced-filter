@@ -10,11 +10,12 @@ export const IS_SAFARI_IOS: boolean = [
   // iPad on iOS 13 detection
   || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
 
+// Used for ios debugging.
 // export const htmlLog = (data: any): void => {
 //   const errorContainer = document.createElement('p');
 //   errorContainer.style.padding = '20px';
 //   errorContainer.style.paddingBottom = '70px';
-//   if (data.message) {
+//   if (data?.message) {
 //       errorContainer.innerHTML = `${data.message}<br>${data.stack}`;
 //   } else {
 //       errorContainer.innerHTML = JSON.stringify(data, null, 2);
