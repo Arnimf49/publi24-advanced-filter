@@ -105,8 +105,8 @@ const AdsList: React.FC<AdsListProps> = ({
                       </i>
                       &nbsp;
                       <span className={item.isLocationDifferent ? styles.highlightText : ''}>
-                          {item.location}
-                        </span>
+                        {item.location}
+                      </span>
                     </p>
 
                     <p className={`${styles.articleDate} article-date`}>
@@ -115,8 +115,8 @@ const AdsList: React.FC<AdsListProps> = ({
                       </i>
                       &nbsp;
                       <span className={item.isDateOld ? styles.highlightText : ''}>
-                          {item.date}
-                        </span>
+                        {item.date}
+                      </span>
                     </p>
                   </div>
 

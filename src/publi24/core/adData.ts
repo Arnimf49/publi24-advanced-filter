@@ -84,19 +84,19 @@ export const adData = {
     if (typeof item === "string") {
       locationText = item;
     } else {
-      const targetElement = (item instanceof Element) ? item : item.firstChild as Element;
-      if (!targetElement) return '';
-
       if (IS_AD_PAGE() || itemIsOnAdPage) {
-        if (IS_MOBILE_VIEW) {
-          locationText = targetElement.querySelector<HTMLElement>('[class="location"]')?.innerText;
-        } else {
-          locationText = targetElement.querySelector<HTMLElement>('[itemtype="https://schema.org/Place"], .detail-info div p')?.innerText;
+        const targetElement = (item instanceof Element) ? item : item.firstChild as Element;
+        if (targetElement) {
+          if (IS_MOBILE_VIEW) {
+            locationText = targetElement.querySelector<HTMLElement>('.location')?.innerText;
+          } else {
+            locationText = targetElement.querySelector<HTMLElement>('[itemtype="https://schema.org/Place"], .detail-info div p')?.innerText;
+          }
         }
-      } else {
-        if (item instanceof Element) {
-          locationText = item.querySelector<HTMLElement>('[class="article-location"]')?.innerText;
-        }
+      }
+
+      if (!locationText) {
+        locationText = item.querySelector<HTMLElement>('.article-location')?.innerText;
       }
     }
 
