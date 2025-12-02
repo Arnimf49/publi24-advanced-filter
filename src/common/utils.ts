@@ -4,6 +4,13 @@ export const utils = {
       console.log(`[WW-DEBUG] ${message}`, data || '');
     }
   },
+
+  throwInTestingIfConfigured(): void {
+    if (typeof window !== 'undefined' && window.localStorage?.getItem('_pw_throw') === 'true') {
+      throw new Error('Testing error.');
+    }
+  },
+
   mostRepeated<T>(arr: T[], transformer: ((v: T) => string) = ((v) => v + '')): T {
     const counts = arr.reduce((acc, val) => {
       acc[transformer(val)] = acc[transformer(val)] ? {
@@ -110,5 +117,24 @@ export const utils = {
       char => 0x1F1E6 + char.charCodeAt(0) - 65
     );
     return String.fromCodePoint(...codePoints);
-  }
+  },
+
+  formatError(error: any): string {
+    const browserError = error as { code?: number; message?: string };
+
+    if (browserError.code && [503, 429].includes(browserError.code)) {
+      return "publi24 a limitat cererile, așteaptă un pic și reincarcă pagina";
+    }
+
+    const stackLine = (error?.stack?.split('\n')[1] || '')
+      .replace('at ', '')
+      .trim();
+    const baseMessage = error?.message || "Eroare necunoscută";
+
+    if (stackLine && stackLine !== baseMessage) {
+      return `${baseMessage} (${stackLine})`;
+    }
+
+    return baseMessage;
+  },
 }

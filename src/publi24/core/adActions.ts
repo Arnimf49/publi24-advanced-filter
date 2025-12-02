@@ -8,18 +8,12 @@ import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../../common/globals";
 import {AUTO_HIDE_CRITERIA} from "./hideReasons";
 import {utils} from "../../common/utils";
 import {iosUtils} from "./iosUtils";
+import {WWMemoryStorage} from "./memoryStorage";
 
 export type AdContentTuple = [string, number | boolean];
 
-
 async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
-  const pageResult = await adData.loadInAdPage(item);
-  if (pageResult instanceof Error) {
-    // Or handle error differently if needed, TS requires check
-    console.error("Failed to load ad page:", pageResult);
-    return [];
-  }
-  const page = pageResult as DocumentFragment | HTMLElement; // Type assertion after check
+  const page = await adData.loadInAdPage(item);
   const title: string = misc.removeDiacritics(adData.getPageTitle(page));
   const content: string = misc.removeDiacritics(adData.getPageTitle(page) + ' ' + adData.getPageDescription(page));
 
@@ -97,6 +91,70 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
   return data;
 }
 
+
+async function acquirePhoneNumber(item: Element, id: string): Promise<string | false> {
+  let phone: string | undefined;
+  let adPage: DocumentFragment | HTMLElement = await adData.loadInAdPage(item);
+
+  if (IS_MOBILE_VIEW) {
+    const phoneNumberMatch = adPage.innerHTML.match(/var cnt = ['"](\d+)['"]/);
+    if (phoneNumberMatch) {
+      phone = phoneNumberMatch[1];
+    }
+  } else {
+    let phoneNumberEncrypted: string | undefined | null;
+    if (IS_AD_PAGE()) {
+      phoneNumberEncrypted = document.querySelector<HTMLInputElement>('[id="EncryptedPhone"]')?.value;
+    } else {
+      phoneNumberEncrypted = await adData.acquireEncryptedPhoneNumber(item);
+    }
+
+
+    if (phoneNumberEncrypted) {
+      const response = await fetch('https://www.publi24.ro/DetailAd/PhoneNumberImages?Length=8', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: new URLSearchParams({
+          'EncryptedPhone': phoneNumberEncrypted,
+          'body': '',
+          'X-Requested-With': 'XMLHttpRequest'
+        })
+      });
+      if (!response.ok) {
+        throw new Error(`Phone number image fetch failed: ${response.status}`);
+      }
+      const phoneNumberImgBase64 = await response.text();
+      phone = await misc.readNumbersFromBase64Png(phoneNumberImgBase64);
+    }
+  }
+
+  if (!phone || !phone.trim()) {
+    WWStorage.setAdNoPhone(id);
+    return false;
+  }
+
+  const trimmedPhone = phone.trim();
+  const previousPhone = WWStorage.getAdPhone(id);
+
+  WWStorage.setAdPhone(id, trimmedPhone);
+  WWStorage.addPhoneAd(trimmedPhone, id, adData.getItemUrl(item));
+
+  if (previousPhone && previousPhone !== phone) {
+    WWStorage.removePhoneAd(previousPhone, id);
+    // @TODO: Grave side effect.
+    if (WWStorage.getFavorites().includes(previousPhone)) {
+      WWStorage.toggleFavorite(previousPhone);
+      WWStorage.toggleFavorite(trimmedPhone, true);
+    }
+  }
+
+  if (WWStorage.hasAdNoPhone(id)) {
+    WWStorage.setAdNoPhone(id, false);
+  }
+
+  return trimmedPhone;
+}
+
 function applyAutoHiding(phoneNumber: string, id: string, contentData: AdContentTuple[]): void {
   utils.debugLog('applyAutoHiding called', {phoneNumber, id, contentDataKeys: contentData.map(([k]) => k)});
 
@@ -133,6 +191,41 @@ function applyAutoHiding(phoneNumber: string, id: string, contentData: AdContent
     }
   } else {
     utils.debugLog('No auto-hide criteria matched', {phoneNumber, availableData: contentData});
+  }
+}
+
+async function searchPhoneResults(id: string, phoneNumber: string, item: HTMLElement, windowRef: Window | null): Promise<void> {
+  WWMemoryStorage.setAdAnalyzeError(id, null);
+
+  try {
+    utils.throwInTestingIfConfigured();
+
+    await WWBrowserStorage.set(`ww:search_started_for`, { wwid: id });
+    await WWBrowserStorage.set(`ww:search_results:${id}`, null);
+
+    const urlMatch: RegExpMatchArray | null = adData.getItemUrl(item).match(/\/([^./]+)\.html/);
+    const addUrlId: string = urlMatch ? urlMatch[1] : '';
+    const encodedSearch: string = encodeURIComponent(`"${phoneNumber}" OR "${addUrlId}"`);
+    const searchUrl = `https://www.google.com/search?q=${encodedSearch}`;
+
+    if (windowRef) {
+      windowRef.location = searchUrl;
+    }
+
+    WWStorage.setInvestigatedTime(id, Date.now());
+
+    if (IS_SAFARI_IOS && windowRef) {
+      setTimeout(() => windowRef.location = `${searchUrl}&br=orion`, 400);
+      const interval = setInterval(() => {
+        if (windowRef?.closed) {
+          setTimeout(() => iosUtils.reloadAndFocus(id), 200);
+          clearInterval(interval);
+        }
+      }, 100);
+    }
+  } catch (error) {
+    WWMemoryStorage.setAdAnalyzeError(id, "Eroare căutare rezultate telefon: " + utils.formatError(error));
+    throw error;
   }
 }
 
@@ -179,59 +272,42 @@ export const adActions = {
   },
 
   async investigateNumberAndSearch(item: HTMLElement, id: string, search: boolean = true): Promise<boolean> {
-    let windowRef: Window | null = null;
-    if (search) {
-      windowRef = window.open();
-    }
+    let windowRef: Window | null = search ? window.open() : null;
+    let phoneNumber: string | false, contentData: AdContentTuple[];
 
-    const [phoneNumber, contentData] = await Promise.all([
-      adData.acquirePhoneNumber(item, id),
-      investigateAdContent(item)
-    ]);
+    try {
+      [phoneNumber, contentData] = await Promise.all([
+        acquirePhoneNumber(item, id),
+        investigateAdContent(item)
+      ]);
 
-    contentData
-      .filter(([key]) => ['age', 'weight', 'height'].includes(key))
-      .forEach(([key, value]: AdContentTuple) =>
-        WWStorage.setAdProp(id, key, value))
+      contentData
+        .filter(([key]) => ['age', 'weight', 'height'].includes(key))
+        .forEach(([key, value]: AdContentTuple) =>
+          WWStorage.setAdProp(id, key, value))
 
-    if (!phoneNumber) {
+      if (!phoneNumber) {
+        WWStorage.setAnalyzedTime(id, Date.now());
+        return false;
+      }
+
+      contentData.forEach(([key, value]: AdContentTuple) =>
+        WWStorage.setPhoneProp(phoneNumber as string, key, value))
+
+      if (WWStorage.isPhoneHidden(phoneNumber)) {
+        adActions.setItemVisible(item, false);
+      } else if (WWStorage.isAutoHideEnabled()) {
+        applyAutoHiding(phoneNumber, id, contentData);
+      }
+
       WWStorage.setAnalyzedTime(id, Date.now());
-      return false;
+    } catch (error) {
+      WWMemoryStorage.setAdAnalyzeError(id, 'Eroare analiză anunț: ' + utils.formatError(error));
+      throw error;
     }
-
-    contentData.forEach(([key, value]: AdContentTuple) =>
-      WWStorage.setPhoneProp(phoneNumber, key, value))
-
-    if (WWStorage.isPhoneHidden(phoneNumber)) {
-      adActions.setItemVisible(item, false);
-    } else if (WWStorage.isAutoHideEnabled()) {
-      applyAutoHiding(phoneNumber, id, contentData);
-    }
-
-    WWStorage.setAnalyzedTime(id, Date.now());
 
     if (search && windowRef) {
-      await WWBrowserStorage.set(`ww:search_started_for`, { wwid: id });
-      await WWBrowserStorage.set(`ww:search_results:${id}`, null);
-
-      const urlMatch: RegExpMatchArray | null = adData.getItemUrl(item).match(/\/([^./]+)\.html/);
-      const addUrlId: string = urlMatch ? urlMatch[1] : ''; // Handle potential null match
-      const encodedSearch: string = encodeURIComponent(`"${phoneNumber}" OR "${addUrlId}"`);
-      const searchUrl = `https://www.google.com/search?q=${encodedSearch}`;
-      windowRef.location = searchUrl;
-      WWStorage.setInvestigatedTime(id, Date.now());
-
-      if (IS_SAFARI_IOS) {
-        // Need to cause a nav since for some reason the extension doesn't load otherwise.
-        setTimeout(() => windowRef.location = `${searchUrl}&br=orion`, 400);
-        // Need to reload the pages since browser storage crashes.
-        const interval = setInterval(() => {
-          if (windowRef?.closed) {
-            setTimeout(() => iosUtils.reloadAndFocus(id), 200);
-            clearInterval(interval);
-          }
-        }, 100);
-      }
+      await searchPhoneResults(id, phoneNumber, item, windowRef);
     }
 
     return true;
@@ -287,74 +363,84 @@ export const adActions = {
       e.preventDefault();
       e.stopPropagation();
 
+      WWMemoryStorage.setImageSearchError(id, null);
+
       if (this) (this as HTMLButtonElement).disabled = true;
-      WWBrowserStorage.set(`ww:image_results:${id}`, null);
 
-      let imgs: string[] = [];
+      try {
+        utils.throwInTestingIfConfigured();
 
-      if (IS_AD_PAGE() && IS_MOBILE_VIEW) {
-        const matches = document.body.innerHTML.match(/https:\/\/s3\.publi24\.ro\/[^\/]+\/large\/[^.]+\.(jpg|webp|png)/g);
-        imgs = matches ? [...new Set(matches)] : [];
-      }
-      else if (IS_AD_PAGE()) {
-        // @ts-ignore
-        imgs = [...document.body.querySelectorAll<HTMLImageElement>('[id="detail-gallery"] img')]
-          .map(img => img.getAttribute('src'))
-          .filter((src): src is string => !!src); // Type guard to filter out nulls
+        WWBrowserStorage.set(`ww:image_results:${id}`, null);
+        let imgs: string[] = [];
 
-        // Maybe the post has only one picture. In that case gallery is not shown.
-        if (imgs.length === 0) {
-          // @ts-ignore
-          imgs = [...document.body.querySelectorAll<HTMLImageElement>('.detailViewImg')]
-            .map(img => img.getAttribute('src'))
-            .filter((src): src is string => !!src); // Type guard
+        if (IS_AD_PAGE() && IS_MOBILE_VIEW) {
+          const matches = document.body.innerHTML.match(/https:\/\/s3\.publi24\.ro\/[^\/]+\/large\/[^.]+\.(jpg|webp|png)/g);
+          imgs = matches ? [...new Set(matches)] : [];
         }
-      }
-      else {
-        imgs = await adData.acquireSliderImages(item);
-      }
+        else if (IS_AD_PAGE()) {
+          // @ts-ignore
+          imgs = [...document.body.querySelectorAll<HTMLImageElement>('[id="detail-gallery"] img')]
+            .map(img => img.getAttribute('src'))
+            .filter((src): src is string => !!src); // Type guard to filter out nulls
 
-      const done = (): void => {
-        WWStorage.setAdImagesInvestigatedTime(id, Date.now());
-        adActions.analyzeFoundImages(id, item);
-        if (this) (this as HTMLButtonElement).disabled = false;
-      }
-
-      await WWBrowserStorage.set(`ww:img_search_started_for`, {
-        wwid: id,
-        count: imgs.length,
-        imgs: imgs.map(url => imageToLensUrl(url)),
-      });
-
-      let windows = []
-      if (IS_MOBILE_VIEW && imgs.length > 0) {
-        windows.push(openImageInvestigation(imgs[0]));
-      }
-      else {
-        windows = imgs.map(img => openImageInvestigation(img));
-      }
-
-      const interval = setInterval(async() => {
-        const results = await WWBrowserStorage.get(`ww:img_search_started_for`);
-        const searchData = results[`ww:img_search_started_for`];
-        if (
-          !searchData || searchData.count === 0
-          // On safari the browser storage api breaks after returning from another tab. Reload to reset.
-          || (results as any).__from__cache
-        ) {
-          clearInterval(interval);
-          done();
-
-          if (IS_SAFARI_IOS) {
-            const iosInterval = setInterval(() => {
-              if (windows.every(w => w?.closed)) {
-                clearInterval(iosInterval);
-                setTimeout(() => iosUtils.reloadAndFocus(id), 200);
-              }
-            }, 300);
+          // Maybe the post has only one picture. In that case gallery is not shown.
+          if (imgs.length === 0) {
+            // @ts-ignore
+            imgs = [...document.body.querySelectorAll<HTMLImageElement>('.detailViewImg')]
+              .map(img => img.getAttribute('src'))
+              .filter((src): src is string => !!src); // Type guard
           }
         }
-      }, 300);
+        else {
+          imgs = await adData.acquireSliderImages(item);
+        }
+
+        const done = (): void => {
+          WWStorage.setAdImagesInvestigatedTime(id, Date.now());
+          adActions.analyzeFoundImages(id, item);
+          if (this) (this as HTMLButtonElement).disabled = false;
+        }
+
+        await WWBrowserStorage.set(`ww:img_search_started_for`, {
+          wwid: id,
+          count: imgs.length,
+          imgs: imgs.map(url => imageToLensUrl(url)),
+        });
+
+        let windows = []
+        if (IS_MOBILE_VIEW && imgs.length > 0) {
+          windows.push(openImageInvestigation(imgs[0]));
+        }
+        else {
+          windows = imgs.map(img => openImageInvestigation(img));
+        }
+
+        const interval = setInterval(async() => {
+          const results = await WWBrowserStorage.get(`ww:img_search_started_for`);
+          const searchData = results[`ww:img_search_started_for`];
+          if (
+            !searchData || searchData.count === 0
+            // On safari the browser storage api breaks after returning from another tab. Reload to reset.
+            || (results as any).__from__cache
+          ) {
+            clearInterval(interval);
+            done();
+
+            if (IS_SAFARI_IOS) {
+              const iosInterval = setInterval(() => {
+                if (windows.every(w => w?.closed)) {
+                  clearInterval(iosInterval);
+                  setTimeout(() => iosUtils.reloadAndFocus(id), 200);
+                }
+              }, 300);
+            }
+          }
+        }, 300);
+      } catch (error) {
+        WWMemoryStorage.setImageSearchError(id, "Eroare la cautare rezultate imagine: " + utils.formatError(error));
+        if (this) (this as HTMLButtonElement).disabled = false;
+        throw error;
+      }
     };
   },
   async findVisibleAd () {

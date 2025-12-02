@@ -20,7 +20,7 @@ const waitForSiteLoad = () => new Promise<void>(resolve => {
         // Allow css loading.
         setTimeout(resolve, 150);
       } else {
-        resolve();
+        setTimeout(resolve, 15);
       }
       clearInterval(interval);
     }

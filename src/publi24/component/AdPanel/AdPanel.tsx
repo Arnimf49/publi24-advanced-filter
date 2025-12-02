@@ -9,6 +9,7 @@ import {DdcIcon} from "./DdcIcon";
 import {Loader} from "../../../common/components/Loader/Loader";
 import {misc} from "../../core/misc";
 import PhoneAndTagsRoot from "../Common/Partials/PhoneAndTags/PhoneAndTagsRoot";
+import ErrorDisplay from "../Common/ErrorDisplay/ErrorDisplay";
 
 interface ImageLink {
   link: string;
@@ -45,6 +46,7 @@ interface AdPanelProps {
   imageSearchDomains?: ImageSearchDomain[];
   imageResultsStatus?: 'green' | 'yellow' | 'red' | null;
   hasImagesInOtherLocation?: boolean;
+  errors?: string[];
 
   onVisibilityClick?: MouseEventHandler;
   onFavClick?: MouseEventHandler;
@@ -77,6 +79,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     imageSearchDomains,
     imageResultsStatus,
     hasImagesInOtherLocation,
+    errors = [],
     onVisibilityClick,
     onFavClick,
     onInvestigateClick,
@@ -91,7 +94,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     return styles.linkUnsafe;
   };
 
-  const loading = !hasNoPhone && !phone;
+  const loading = !hasNoPhone && !phone && errors.length === 0;
   const hasPhone = !hasNoPhone && phone;
 
   return (
@@ -173,6 +176,10 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
         )}
 
       </div>
+
+      {errors.length > 0 && errors.map((error, index) => (
+        <ErrorDisplay key={index} errorMessage={error} dataWwId="error" />
+      ))}
 
       {!visible && (
         <>

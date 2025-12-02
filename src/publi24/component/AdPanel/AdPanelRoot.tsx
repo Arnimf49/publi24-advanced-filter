@@ -9,6 +9,7 @@ import * as ReactDOM from "react-dom";
 import HideReasonRoot from "../Common/Partials/HideReason/HideReasonRoot";
 import ImageSlider from "./ImagesSlider/ImagesSlider";
 import AdsModalRoot from "../Common/Partials/AdsModal/AdsModalRoot";
+import {WWMemoryStorage} from "../../core/memoryStorage";
 
 interface AdPanelRootProps {
   id: string;
@@ -25,6 +26,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const [showImagesSlider, setShowImagesSlider] = useState(false);
   const [showDuplicates, setShowDuplicates] = useState(false);
   const [sliderImages, setSliderImages] = useState<string[]>([]);
+  const [memoryState, setMemoryState] = useState(WWMemoryStorage.getAdState(id));
 
   const itemUrl = adData.getItemUrl(item);
   const phone = WWStorage.getAdPhone(id) || '';
@@ -82,6 +84,15 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
     }
   }, [phone]);
 
+  useEffect(() => {
+    const updateMemoryState = () => setMemoryState({...WWMemoryStorage.getAdState(id)});
+    WWMemoryStorage.onAdMemoryChanged(id, updateMemoryState);
+
+    return () => {
+      WWMemoryStorage.removeOnAdMemoryChanged(id, updateMemoryState);
+    };
+  }, [id]);
+
   const onVisibilityClick: MouseEventHandler = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -129,6 +140,12 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
     setShowDuplicates(true);
   }, []);
 
+  const errors = [
+    memoryState.contentAnalyzeError,
+    memoryState.phoneSearchError,
+    memoryState.imageSearchError
+  ].filter((e): e is string => !!e);
+
   return (
     <div>
       <AdPanel
@@ -154,6 +171,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         phoneInvestigateStale={phoneInvestigateStale}
         imageInvestigatedSinceDays={imageInvestigatedSinceDays}
         imageInvestigateStale={imageInvestigateStale}
+        errors={errors}
         onVisibilityClick={onVisibilityClick}
         onFavClick={onFavClick}
         onInvestigateClick={onInvestigateClick}

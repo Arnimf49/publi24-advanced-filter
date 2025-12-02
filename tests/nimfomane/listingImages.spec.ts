@@ -117,7 +117,7 @@ test('Should recalculate main topic image after 4 days.', async ({page}) => {
 
 test('Should update preview image on listing when opening escort images modal.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {firstImage, user, id} = await utilsNimfomane.waitForFirstImage(page);
+  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
   const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
 
   await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImage', null);
