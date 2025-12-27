@@ -543,6 +543,24 @@ export const WWStorage = {
     return localStorage.getItem('ww:storage:version');
   },
 
+  getAnalyticsSentVersion(): number | null {
+    const value = localStorage.getItem('ww:analytics-sent-version');
+    return value ? parseInt(value, 10) : null;
+  },
+
+  setAnalyticsSentVersion(version: number): void {
+    localStorage.setItem('ww:analytics-sent-version', String(version));
+  },
+
+  getAnalyticsLastChecked(): number | null {
+    const value = localStorage.getItem('ww:analytics-last-checked');
+    return value ? parseInt(value, 10) : null;
+  },
+
+  setAnalyticsLastChecked(timestamp: number): void {
+    localStorage.setItem('ww:analytics-last-checked', String(timestamp));
+  },
+
 
   onAdChanged(id: string, callback: () => void) {
     _WW_CALLBACKS.adChanged[id] = _WW_CALLBACKS.adChanged[id] || [];

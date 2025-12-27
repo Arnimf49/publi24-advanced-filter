@@ -42,16 +42,16 @@
     "cors": "^2.8.5",
     "cssnano": "^7.0.6",
     "express": "^5.1.0",
+    "fingerprint-generator": "^2.1.74",
+    "fingerprint-injector": "^2.1.74",
     "postcss": "^8.5.3",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "recaptcha-solver": "^0.3.0",
     "rollup": "^4.24.0",
+    "rollup-plugin-postcss": "^4.0.2",
     "sass": "^1.86.3",
     "typescript": "^5.8.3",
-    "vite": "^7.2.4",
-    "rollup-plugin-postcss": "^4.0.2",
-    "fingerprint-generator": "^2.1.74",
-    "fingerprint-injector": "^2.1.74"
+    "vite": "^7.2.4"
   }
 }

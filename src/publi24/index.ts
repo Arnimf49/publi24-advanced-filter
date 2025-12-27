@@ -5,6 +5,7 @@ import {favorites} from "./core/favorites";
 import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../common/globals";
 import {misc} from "./core/misc";
 import {iosUtils} from "./core/iosUtils";
+import {sendAnalyticsEvent} from "./core/analytics";
 
 const waitForSiteLoad = () => new Promise<void>(resolve => {
   const start = Date.now();
@@ -78,6 +79,9 @@ WWStorage.upgrade()
   .then(waitForSiteLoad)
   .then(() => {
     console.log('Booting publi24-advanced-filter');
+
+    // @TODO: Remove once not needed.
+    sendAnalyticsEvent().catch(console.error);
 
     try {
       document.body.classList.add(misc.getPubliTheme());
