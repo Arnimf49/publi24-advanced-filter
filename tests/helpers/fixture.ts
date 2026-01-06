@@ -27,8 +27,9 @@ export const test = base.extend<{
     // Prevent too many requests, except for nimfomane tests
     if (
       !process.env.DEBUG &&
-      !process.env.PWDEBUG &&
-      !testInfo.file.includes("/nimfomane/")
+      !process.env.PWDEBUG
+      // Nimfomane also added rate limiting.
+      // !testInfo.file.includes("/nimfomane/")
     ) {
       const duration = (Date.now() - start) / 1000;
       const delay = Math.max(0, ((process.env.CI == 'true' ? 14 : 8) - duration) * 1000);
