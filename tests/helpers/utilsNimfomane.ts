@@ -8,14 +8,15 @@ export const utilsNimfomane = {
 
   async waitForFirstImage(page: Page) {
     let index = 0;
+    let lastError;
 
     while (index < 10) {
-      const parentHandle = page.locator('[data-wwid="topic-image"]').nth(index)
+      const parentHandle = page.locator('[data-wwid="topic-image"]').nth(index++)
       const firstImage = parentHandle.locator('img');
       try {
         await firstImage.waitFor();
       } catch (error) {
-        console.warn(error);
+        lastError = error;
         continue;
       }
       const src = await firstImage.getAttribute('src');
@@ -25,7 +26,7 @@ export const utilsNimfomane = {
       return {firstImage, src, user, id};
     }
 
-    throw new Error('Failed to find first image');
+    throw lastError;
   },
 
   async getUserProfileLink(page: Page, user: string) {

@@ -20,7 +20,7 @@ test('Should show first image as topic image.', async ({page}) => {
 
     if (await page.locator('.ipsPagination_next a').isVisible()) {
       await page.locator('.ipsPagination_next a').click()
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(2000);
     } else {
       throw new Error('Could not find the image')
     }

@@ -165,7 +165,10 @@ export const linksFilter = {
       const d2: number = PRIO_DOMAINS.findIndex((d: string) => l2.includes('//' + d));
 
       if (d1 !== -1 && d2 !== -1) {
-        return d1 - d2;
+        if (d1 !== d2) {
+          return d1 - d2;
+        }
+        return l1.localeCompare(l2);
       }
       if (d2 !== -1) {
         return 1;

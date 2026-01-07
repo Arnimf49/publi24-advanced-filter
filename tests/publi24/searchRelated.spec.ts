@@ -22,7 +22,9 @@ test('Should search for phone number and article id and show relevant results.',
       const nimfomaneLinks = [];
 
       for (let link of links) {
-        if ((await link.getAttribute('href')).match(/https:\/\/nimfomane\.com\/forum/)) {
+        const href = await link.getAttribute('href');
+        const text = await link.innerText();
+        if (href.match(/https:\/\/nimfomane\.com\/forum/) && !text.match(/^(https?:\/\/)|(www\.)/)) {
           nimfomaneLinks.push(link);
         }
       }

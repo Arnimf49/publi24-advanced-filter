@@ -256,7 +256,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                               target="_blank"
                               rel="noopener noreferrer"
                             >
-                              {link}
+                              {link.replace(/^https?:\/\/(www\.)?|^www\./, '')}
                             </a>
                           </div>
                         ))
