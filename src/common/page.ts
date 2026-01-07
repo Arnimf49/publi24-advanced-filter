@@ -4,6 +4,23 @@ export interface BrowserError extends Error {
   code?: number;
 }
 
+interface TypeConfig {
+  cooldown: number;
+  throttleAfter: number;
+}
+
+const DEFAULT_CONFIG: TypeConfig = {
+  cooldown: 10000,
+  throttleAfter: 20,
+};
+
+const CONFIG_OVERRIDES: Record<string, TypeConfig> = {
+  'nimfomane.com': {
+    cooldown: 12000,
+    throttleAfter: 10,
+  },
+};
+
 const PAGE_TYPE: Record<string, {
   CACHE: Record<string, Error | HTMLElement>,
   PAGE_LOAD_PROMISES: { [url: string]: PageLoadPromise },
@@ -11,8 +28,23 @@ const PAGE_TYPE: Record<string, {
   PAGE_LOAD_REQUESTS: number,
 }> = {}
 
+function getDomainFromUrl(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return 'unknown';
+  }
+}
+
+function getConfigForDomain(domain: string): TypeConfig {
+  return CONFIG_OVERRIDES[domain] || DEFAULT_CONFIG;
+}
+
 export const page = {
-  async load(url: string, type: string) {
+  async load(url: string) {
+    const domain = getDomainFromUrl(url);
+    const config = getConfigForDomain(domain);
+    const type = domain;
     if (!PAGE_TYPE[type]) {
       PAGE_TYPE[type] = {
         CACHE: {},
@@ -42,14 +74,14 @@ export const page = {
 
     PAGE_TYPE[type].PAGE_LOAD_REQUESTS++;
 
-    if (PAGE_TYPE[type].PAGE_LOAD_REQUESTS > 20) {
+    if (PAGE_TYPE[type].PAGE_LOAD_REQUESTS > config.throttleAfter) {
       PAGE_TYPE[type].ALL_PAGE_LOAD_PROMISES = PAGE_TYPE[type].ALL_PAGE_LOAD_PROMISES.filter(p => !p.is_resolved);
       await Promise.race([
         Promise.all(PAGE_TYPE[type].ALL_PAGE_LOAD_PROMISES),
-        new Promise<void>((r) => setTimeout(r, 11000))
+        new Promise<void>((r) => setTimeout(r, config.cooldown + 1000))
       ]);
-      if (PAGE_TYPE[type].PAGE_LOAD_REQUESTS > 20) {
-        await new Promise<void>((r) => setTimeout(r, 5000));
+      if (PAGE_TYPE[type].PAGE_LOAD_REQUESTS > config.throttleAfter) {
+        await new Promise<void>((r) => setTimeout(r, config.cooldown / 2));
       }
     }
 
@@ -67,7 +99,7 @@ export const page = {
     setTimeout(() => {
       PAGE_TYPE[type].PAGE_LOAD_REQUESTS = Math.max(0, PAGE_TYPE[type].PAGE_LOAD_REQUESTS - 1);
       delete PAGE_TYPE[type].PAGE_LOAD_PROMISES[url];
-    }, 10000);
+    }, config.cooldown);
 
     let pageResponse: Response;
     try {

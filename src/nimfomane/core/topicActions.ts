@@ -9,7 +9,7 @@ export const topicActions = {
     let url = lastPageUrl;
 
     do {
-      const pageData = await page.load(url, 'nimfomane:page');
+      const pageData = await page.load(url);
 
       const allUsers = pageData.querySelectorAll<HTMLLinkElement>('.cAuthorPane_author a');
       const escortUsers = Array.from(allUsers).filter(elementHelpers.isUserLinkEscort);
@@ -41,7 +41,7 @@ export const topicActions = {
   },
 
   async determineTopPosterEscort(lastPageUrl: string): Promise<boolean | null> {
-    const pageData = await page.load(lastPageUrl, 'nimfomane');
+    const pageData = await page.load(lastPageUrl);
 
     const topPostersSection = pageData.querySelector('.cTopicOverview__section--users');
     if (!topPostersSection) {
@@ -60,7 +60,7 @@ export const topicActions = {
       return true;
     }
 
-    const userPage = await page.load(url, 'nimfomane');
+    const userPage = await page.load(url);
     if (elementHelpers.isProfilePageEscort(userPage)) {
       NimfomaneStorage.setEscortProp(user, 'profileLink', url.replace(/\?.*$/, ''));
       return true;

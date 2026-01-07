@@ -10,7 +10,7 @@
     "rollup": "rollup -c -w",
     "pw-open": "npx playwright test --ui",
     "pw-debug": "npx playwright test --debug",
-    "pw-run": "npx playwright test",
+    "pw-run": "npx playwright test --project=publi24",
     "show-domains": "node misc/show-unknown-domains.js",
     "clean-unknown-domains": "node src-mapper/clean-unknown-domains.js",
     "domain-mapper:server": "node src-mapper/server.js",

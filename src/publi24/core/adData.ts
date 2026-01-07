@@ -182,7 +182,7 @@ export const adData = {
       throw new Error("loadInAdPage requires a valid URL");
     }
 
-    return page.load(url, 'publi24ad');
+    return page.load(url);
   },
 
   async loadInAdsData(adUuids: string[], clean?: (failedUuid: string) => void): Promise<AdData[]> {

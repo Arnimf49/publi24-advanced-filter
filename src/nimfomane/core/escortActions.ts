@@ -17,7 +17,7 @@ export const escortActions = {
     let pageChecks = 0;
 
     do {
-      const pageData = await page.load(profileContentUrl, 'nimfomane:page');
+      const pageData = await page.load(profileContentUrl);
 
       const image = pageData.querySelector('.ipsStreamItem_snippet [data-background-src]');
       if (image) {
@@ -47,7 +47,7 @@ export const escortActions = {
     }
 
     try {
-      const pageData = await page.load(url, 'nimfomane');
+      const pageData = await page.load(url);
       const pageExists = !!pageData.querySelector(`[data-page="${pageNum + 1}"]`)
 
       if (pageNum !== 0 && !pageExists) {
