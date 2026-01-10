@@ -13,6 +13,8 @@ test('Should add favorites and view them.', async ({ page, context }) => {
   await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (2)');
   await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
+  await expect(page.locator('[data-wwid="toggle-active"]')).toBeVisible();
+  await expect(page.locator('[data-wwid="toggle-inactive"]')).toBeVisible();
 
   const favs = await page.$$('[data-wwid="favorites-modal"] [data-articleid]');
   expect(favs.length).toEqual(2);
@@ -32,6 +34,7 @@ test('Should group favorites based on location.', async ({ page, context }) => {
   await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (2)');
   await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
+  await expect(page.locator('[data-wwid="toggle-active"]')).toHaveText('Active (2)');
 
   expect((await page.$$('[data-wwid="favorites-modal"] [data-wwid="in-location"] [data-wwid="control-panel"]'))
     .length).toEqual(1);
@@ -59,6 +62,9 @@ test('Should show favorites with no loading ads.', async ({ page, context }) => 
 
   await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
+  await expect(page.locator('[data-wwid="toggle-inactive"]')).toHaveText('Inactive (2)');
+
+  await page.locator('[data-wwid="toggle-inactive"]').click();
 
   const firstHeader = (await page.$$('[data-wwid="favorites-modal"] [data-wwid="favs-header"]'))[0];
   expect(await firstHeader.innerText()).toEqual('Fără anunțuri active (2)');
@@ -91,6 +97,7 @@ test('Should be able to remove favorite without available ads.', async ({ page, 
 
   await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
+  await page.locator('[data-wwid="toggle-inactive"]').click();
 
   await page.locator('[data-wwrmfav="076666654"]').click();
   await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (0)');
@@ -223,6 +230,7 @@ test('Should show new ad when previous was inactive but new appeared.', async ({
   await page.goto(url + '?pag=10');
   await page.locator('[data-wwid="favs-button"]').click();
   await page.waitForTimeout(100);
+  await page.locator('[data-wwid="toggle-inactive"]').click();
   expect(await (await page.$$('[data-wwid="favorites-modal"] [data-wwid="no-ads"] [data-wwid="phone-number"]'))[0].innerText())
     .toEqual(phone)
 
@@ -232,4 +240,36 @@ test('Should show new ad when previous was inactive but new appeared.', async ({
   await page.waitForTimeout(500);
   expect(await (await page.$('[data-wwid="favorites-modal"] [data-wwid="in-location"] [data-wwid="phone-number"]')).innerText())
     .toEqual(phone)
+})
+
+test('Should show appropriate empty messages for active and inactive tabs.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  await page.locator('[data-wwid="favs-button"]').click();
+  await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
+
+  await expect(page.locator('[data-wwid="toggle-active"]')).not.toBeVisible();
+  await expect(page.locator('[data-wwid="toggle-inactive"]')).not.toBeVisible();
+  await expect(page.locator('[data-wwid="favorites-modal"]')).toContainText('Nu ai încă anunțuri favorite. Apasă pe butonul cu steluța pe anunț ca să le adaugi aici.');
+
+  await page.locator('[data-wwid="close"]').click();
+  await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
+  await page.locator('[data-wwid="favs-button"]').click();
+  await page.locator('[data-wwid="toggle-inactive"]').click();
+  await expect(page.locator('[data-wwid="favorites-modal"]')).toContainText('Nu sunt favorite fără anunțuri active.');
+
+  await page.locator('[data-wwid="close"]').click();
+  await page.locator('[data-wwid="fav-toggle"][data-wwstate="on"]').first().click();
+  await page.evaluate(() => {
+    window.localStorage.setItem('ww:favs', JSON.stringify(['076666655']));
+    const data = JSON.stringify({
+      ads: ["157D910A-5D41-4801-ADB2-EAF84839F6AE|https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/la-mine-nu-ai-fost-fac-si-deplasari-la-hotel-sau-pensiune/480g243d8g747134dge5hdi17163i9dh.html"],
+      height: 155,
+    });
+    window.localStorage.setItem('ww2:phone:076666655', data);
+  });
+  await page.reload();
+
+  await page.locator('[data-wwid="favs-button"]').click();
+  await expect(page.locator('[data-wwid="favorites-modal"]')).toContainText('Nu ai anunțuri active favorite. Apasă pe butonul cu steluța pe anunț ca să le adaugi aici.');
 })

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Modal from '../../../../common/components/Modal/Modal';
 import ContentModal from '../../Common/Modal/ContentModal';
 import AdsList from '../../Common/Partials/AdList/AdsList';
@@ -27,7 +27,13 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
   notInLocationAds = [],
   noAdsItems = [],
 }) => {
-  const isEmpty = inLocationAds.length === 0 && notInLocationAds.length === 0 && noAdsItems.length === 0;
+  const [activeTab, setActiveTab] = useState<'active' | 'inactive'>('active');
+  
+  const activeCount = inLocationAds.length + notInLocationAds.length;
+  const inactiveCount = noAdsItems.length;
+  const isEmpty = activeCount === 0 && inactiveCount === 0;
+  const isActiveEmpty = activeCount === 0;
+  const isInactiveEmpty = inactiveCount === 0;
 
   return (
     <Modal
@@ -48,37 +54,72 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
         color={misc.getPubliTheme() === 'dark' ? 'rgb(101 44 62)' : '#b34c4c'}
       >
         <Ad/>
+        {!isEmpty && (
+          <div className={styles.toggleButtons}>
+            <button
+              type="button"
+              className={`${styles.toggleButton} ${activeTab === 'active' ? styles.active : ''}`}
+              onClick={() => setActiveTab('active')}
+              data-wwid="toggle-active"
+            >
+              <b>Active</b> <span className={styles.count}>({activeCount})</span>
+            </button>
+            <button
+              type="button"
+              className={`${styles.toggleButton} ${activeTab === 'inactive' ? styles.active : ''}`}
+              onClick={() => setActiveTab('inactive')}
+              data-wwid="toggle-inactive"
+            >
+              <b>Inactive</b> <span className={styles.count}>({inactiveCount})</span>
+            </button>
+          </div>
+        )}
+        
         {isEmpty ? (
           <p className={styles.emptyMessage}>
             Nu ai încă anunțuri favorite. Apasă pe butonul cu steluța pe anunț ca să le adaugi aici.
           </p>
+        ) : activeTab === 'active' ? (
+          <>
+            {isActiveEmpty ? (
+              <p className={styles.emptyMessage}>
+                Nu ai anunțuri active favorite. Apasă pe butonul cu steluța pe anunț ca să le adaugi aici.
+              </p>
+            ) : (
+              <>
+                {inLocationAds.length > 0 && (
+                  <div className={styles.section} data-wwid="in-location">
+                    <h4 className={styles.favoritesSectionHeader} data-wwid="favs-header">
+                      În locație <span className={styles.count}>({inLocationAds.length})</span>
+                    </h4>
+                    <AdsList adsData={inLocationAds} showDuplicates={true}/>
+                  </div>
+                )}
+
+                {notInLocationAds.length > 0 && (
+                  <div className={styles.section} data-wwid="not-in-location">
+                    <h4 className={styles.favoritesSectionHeader} data-wwid="favs-header">
+                      În alte locații <span className={styles.count}>({notInLocationAds.length})</span>
+                    </h4>
+                    <AdsList adsData={notInLocationAds} showDuplicates={true}/>
+                  </div>
+                )}
+              </>
+            )}
+          </>
         ) : (
           <>
-            {inLocationAds.length > 0 && (
-              <div className={styles.section} data-wwid="in-location">
-                <h4 className={styles.favoritesSectionHeader} data-wwid="favs-header">
-                  În locație <span className={styles.count}>({inLocationAds.length})</span>
-                </h4>
-                <AdsList adsData={inLocationAds} showDuplicates={true}/>
-              </div>
-            )}
-
-            {notInLocationAds.length > 0 && (
-              <div className={styles.section} data-wwid="not-in-location">
-                <h4 className={styles.favoritesSectionHeader} data-wwid="favs-header">
-                  În alte locații <span className={styles.count}>({notInLocationAds.length})</span>
-                </h4>
-                <AdsList adsData={notInLocationAds} showDuplicates={true}/>
-              </div>
-            )}
-
-            {noAdsItems.length > 0 && (
+            {isInactiveEmpty ? (
+              <p className={styles.emptyMessage}>
+                Nu sunt favorite fără anunțuri active.
+              </p>
+            ) : (
               <div className={styles.section} data-wwid="no-ads">
                 <h4 className={styles.favoritesSectionHeader} data-wwid="favs-header">
                   Fără anunțuri active <span className={styles.count}>({noAdsItems.length})</span>
                 </h4>
                 <p className={styles.noAdsInfoText}>
-                  Aceste telefoane nu au anunțuri active în momentul de față, dar în viitor pot apărea. {/* Corrected grammar */}
+                  Aceste telefoane nu au anunțuri active în momentul de față, dar în viitor pot apărea.
                 </p>
                 {noAdsItems.map((phone) => (
                   <div key={phone} className={styles.noAdItem}>
@@ -95,11 +136,11 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
                       <RemoveIcon/>
                     </button>
                   </div>
-              ))}
-          </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
-      </>
-    )}
     </ContentModal>
   </Modal>);
 };
