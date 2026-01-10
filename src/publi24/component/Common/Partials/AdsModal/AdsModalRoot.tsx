@@ -4,6 +4,7 @@ import AdsModal from "./AdsModal";
 import {WWStorage} from "../../../../core/storage";
 import HideReasonRoot from "../HideReason/HideReasonRoot";
 import GlobalLoader from "../../GlobalLoader/GlobalLoader";
+import {modalState} from "../../../../../common/modalState";
 
 type AdsModalRootProps = {
   close: () => void;
@@ -44,6 +45,13 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
     ).then(setAdsData);
   }, []);
 
+  const cleanupUrl = () => {
+    modalState.revertOpen();
+  };
+  useEffect(() => {
+    modalState.pushOpen('ads', {phone});
+  }, [phone]);
+
   if (!adsData) {
     return <GlobalLoader message={"La 20+ de anunțuri durează mai mult sa încarce, din cauză la limitari de Publi24."}/>;
   }
@@ -55,6 +63,7 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
       removed={removedNow}
       close={close}
       onHideAll={onHideAll}
+      onCleanup={cleanupUrl}
       hideReasonSelector={showHideReason
         && <HideReasonRoot
           phone={phone}

@@ -3,6 +3,7 @@ import GlobalLoader from '../../Common/GlobalLoader/GlobalLoader';
 import FavoritesModal from './FavoritesModal';
 import { WWStorage } from '../../../core/storage';
 import {adData, FavoritesData} from "../../../core/adData";
+import {modalState} from "../../../../common/modalState";
 
 type FavoritesModalRootProps = {
   onClose: () => void;
@@ -25,6 +26,13 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
     WWStorage.onFavsChanged(onFavsChange);
     return () => WWStorage.removeOnFavsChanged(onFavsChange);
   }, [fetchData]);
+
+  const cleanUpUrl = () => {
+    modalState.revertOpen();
+  };
+  useEffect(() => {
+    modalState.pushOpen('favorites');
+  }, []);
 
   const handleClearFavorites = useCallback(() => {
     WWStorage.clearFavorites();
@@ -54,6 +62,7 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
       inLocationAds={favoritesData.inLocation}
       notInLocationAds={favoritesData.notInLocation}
       noAdsItems={favoritesData.noAds}
+      onCleanup={cleanUpUrl}
     />
   );
 };

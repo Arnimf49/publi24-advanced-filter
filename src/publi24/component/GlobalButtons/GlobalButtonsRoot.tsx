@@ -4,6 +4,7 @@ import {WWStorage} from "../../core/storage";
 import FavoritesModalRoot from "./FavoritesModal/FavoritesModalRoot";
 import PhoneSearchModalRoot from "./PhoneSearchModal/PhoneSearchModalRoot";
 import SettingsModalRoot from "./SettingsModal/SettingsModalRoot";
+import {modalState} from "../../../common/modalState";
 
 type GlobalButtonsRootProps = {
 };
@@ -26,6 +27,12 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
     onFavsChanged();
     WWStorage.onFavsChanged(onFavsChanged);
     return () => WWStorage.removeOnFavsChanged(onFavsChanged);
+  }, []);
+
+  useEffect(() => {
+    if (modalState.consumeOpenIfType('favorites')) {
+      setFavsOpen(true);
+    }
   }, []);
 
   const onFavsClick: MouseEventHandler = useCallback(() => setFavsOpen(true), []);

@@ -8,6 +8,7 @@ type ModalProps = {
   close: () => void;
   scroll?: boolean;
   dataWwid?: string;
+  onCleanup?: () => void;
 };
 
 let MODALS_OPEN = 0;
@@ -18,6 +19,7 @@ const Modal: React.FC<ModalProps> =
   close,
   scroll = true,
   dataWwid,
+  onCleanup,
 }) => {
   useEffect(() => {
     const currentModalIndex = ++MODALS_OPEN;
@@ -53,6 +55,7 @@ const Modal: React.FC<ModalProps> =
         if (!MODALS_OPEN) {
           document.body.style.overflow = 'initial';
         }
+        onCleanup?.()
       }, 10);
     }
   }, []);

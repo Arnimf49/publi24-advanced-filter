@@ -9,6 +9,7 @@ import GlobalButtonsRoot from "../component/GlobalButtons/GlobalButtonsRoot";
 import InfoOverlay, {CutoutRect} from "../component/InfoOverlay/InfoOverlay";
 import {IS_MOBILE_VIEW} from "../../common/globals";
 import {misc} from "./misc";
+import AdsModalRoot from "../component/Common/Partials/AdsModal/AdsModalRoot";
 
 interface RenderOptions {
   showDuplicates?: boolean;
@@ -190,6 +191,25 @@ export const renderer = {
       WWStorage.setFindNextVisibleAd();
       nextPageArrow.click();
     });
+  },
+
+  renderAdsModal(phone: string): () => void {
+    const element = document.createElement('div');
+    element.setAttribute('data-ww', 'ads-modal-container');
+    document.body.appendChild(element);
+
+    const root = ReactDOM.createRoot(element);
+
+    const cleanup = () => {
+      root.unmount();
+      if (element.parentNode) {
+        element.parentNode.removeChild(element);
+      }
+    };
+
+    root.render(<AdsModalRoot phone={phone} close={cleanup} />);
+
+    return cleanup;
   },
 
   renderInfo(): void {

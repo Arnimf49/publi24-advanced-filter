@@ -15,6 +15,7 @@ type AdsModalProps = {
   removed?: number;
   adsData: AdData[] | null;
   hideReasonSelector?: React.ReactNode;
+  onCleanup?: () => void;
 };
 
 const AdsModal: React.FC<AdsModalProps> = ({
@@ -26,11 +27,13 @@ const AdsModal: React.FC<AdsModalProps> = ({
   removed,
   adsData,
   hideReasonSelector,
+  onCleanup,
 }) => {
   return (
     <Modal
       close={close}
       dataWwid="ads-modal"
+      onCleanup={onCleanup}
     >
       <ContentModal
         title={title}

@@ -2,23 +2,30 @@ import {adActions} from "./adActions";
 
 export const iosUtils = {
   reloadAndFocus(adId: string) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('ww-focus', adId);
-    window.location.href = url.toString();
+    localStorage.setItem('ww:focus', adId);
+    window.location.reload();
   },
 
   focusListingAdIfNeeded() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const focusAdId = urlParams.get('ww-focus');
+    const focusAdId = localStorage.getItem('ww:focus');
     if (focusAdId) {
-      urlParams.delete('ww-focus');
-      const newUrl = `${window.location.pathname}${urlParams.toString() ? '?' + urlParams.toString() : ''}${window.location.hash}`;
-      window.history.replaceState({}, '', newUrl);
+      localStorage.removeItem('ww:focus');
 
-      const adElement = document.querySelector<HTMLDivElement>(`[data-articleid="${focusAdId}"]`);
-      if (adElement) {
-        setTimeout(() => adActions.scrollIntoView(adElement), 400);
-      }
+      let attempts = 0;
+      const maxAttempts = 2000 / 200;
+      const interval = setInterval(() => {
+        attempts++;
+        const adElement =
+          Array.from(document.querySelectorAll<HTMLDivElement>(`[data-articleid="${focusAdId}"]`))
+          .pop();
+
+        if (adElement) {
+          adActions.scrollIntoView(adElement);
+        }
+        if (attempts >= maxAttempts) {
+          clearInterval(interval);
+        }
+      }, 400);
     }
   }
 };

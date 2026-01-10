@@ -6,6 +6,7 @@ import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../common/globals";
 import {misc} from "./core/misc";
 import {iosUtils} from "./core/iosUtils";
 import {sendAnalyticsEvent} from "./core/analytics";
+import {modalState} from "../common/modalState";
 
 const waitForSiteLoad = () => new Promise<void>(resolve => {
   const start = Date.now();
@@ -27,6 +28,13 @@ const waitForSiteLoad = () => new Promise<void>(resolve => {
     }
   }, 5)
 });
+
+const initializeCommon = () => {
+  const adsOpen = modalState.consumeOpenIfType('ads');
+  if (adsOpen) {
+    renderer.renderAdsModal(adsOpen.phone as string);
+  }
+};
 
 const initializeAdPage = async () => {
   document.body.classList.add('onAdPage');
@@ -101,5 +109,8 @@ WWStorage.upgrade()
     } else {
       return initializeListingPage();
     }
+  })
+  .then(() => {
+    initializeCommon();
   })
   .catch(console.error);

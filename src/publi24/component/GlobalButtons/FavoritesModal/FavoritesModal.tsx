@@ -17,6 +17,7 @@ type FavoritesModalProps = {
   inLocationAds: AdData[];
   notInLocationAds: AdData[];
   noAdsItems: string[];
+  onCleanup?: () => void;
 };
 
 const FavoritesModal: React.FC<FavoritesModalProps> = ({
@@ -26,9 +27,10 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
   inLocationAds = [],
   notInLocationAds = [],
   noAdsItems = [],
+  onCleanup,
 }) => {
   const [activeTab, setActiveTab] = useState<'active' | 'inactive'>('active');
-  
+
   const activeCount = inLocationAds.length + notInLocationAds.length;
   const inactiveCount = noAdsItems.length;
   const isEmpty = activeCount === 0 && inactiveCount === 0;
@@ -39,6 +41,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
     <Modal
       close={onClose}
       dataWwid="favorites-modal"
+      onCleanup={onCleanup}
     >
       <ContentModal
         title={<><StarIcon fill={misc.getPubliTheme() === 'dark' ? '#bfbfbf' : '#fff'}/> Favorite</>}
@@ -74,7 +77,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
             </button>
           </div>
         )}
-        
+
         {isEmpty ? (
           <p className={styles.emptyMessage}>
             Nu ai încă anunțuri favorite. Apasă pe butonul cu steluța pe anunț ca să le adaugi aici.

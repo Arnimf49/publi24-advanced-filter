@@ -214,7 +214,7 @@ async function searchPhoneResults(id: string, phoneNumber: string, item: HTMLEle
 
     WWStorage.setInvestigatedTime(id, Date.now());
 
-    if (IS_SAFARI_IOS && windowRef) {
+    if ((IS_SAFARI_IOS || localStorage.getItem('_testing_ios') === '1') && windowRef) {
       setTimeout(() => windowRef.location = `${searchUrl}&br=orion`, 400);
       const interval = setInterval(() => {
         if (windowRef?.closed) {
@@ -426,7 +426,7 @@ export const adActions = {
             clearInterval(interval);
             done();
 
-            if (IS_SAFARI_IOS) {
+            if ((IS_SAFARI_IOS || localStorage.getItem('_testing_ios') === '1')) {
               const iosInterval = setInterval(() => {
                 if (windows.every(w => w?.closed)) {
                   clearInterval(iosInterval);

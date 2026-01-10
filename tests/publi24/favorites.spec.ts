@@ -273,3 +273,15 @@ test('Should show appropriate empty messages for active and inactive tabs.', asy
   await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toContainText('Nu ai anunțuri active favorite. Apasă pe butonul cu steluța pe anunț ca să le adaugi aici.');
 })
+
+test('Should re-open on reload', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
+  await page.locator('[data-wwid="favs-button"]').click();
+  await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
+
+  await page.reload();
+  await page.waitForTimeout(200);
+  await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
+})

@@ -89,3 +89,29 @@ test('Should not close hide reason window when clicking category with subcategor
 
   expect(await (await firstAd.waitForSelector('[data-wwid="hide-reason"]')).innerText()).toContain('motiv ascundere: aspect: ');
 })
+
+test('Should re-open on reload', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  const ad: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
+  await (await ad.$('[data-wwid="duplicates"]')).click();
+  await expect(page.locator('[data-wwid="ads-modal"]')).toBeVisible();
+
+  await page.reload();
+  await expect(page.locator('[data-wwid="ads-modal"]')).toBeVisible();
+})
+
+test('Should re-open ads on reload when opened from favorites', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  const ad: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
+  await (await ad.$('[data-wwid="fav-toggle"]')).click();
+  await page.locator('[data-wwid="favs-button"]').click();
+  await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
+
+  await page.locator('[data-wwid="favorites-modal"] [data-wwid="duplicates"]').click();
+  await expect(page.locator('[data-wwid="ads-modal"]')).toBeVisible();
+
+  await page.reload();
+  await expect(page.locator('[data-wwid="ads-modal"]')).toBeVisible();
+})
