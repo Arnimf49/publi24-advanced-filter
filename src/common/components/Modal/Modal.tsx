@@ -22,19 +22,38 @@ const Modal: React.FC<ModalProps> =
   useEffect(() => {
     const currentModalIndex = ++MODALS_OPEN;
     document.body.style.overflow = 'hidden';
+    let closedByPopstate = false;
+
+    window.history.pushState({ modalIndex: currentModalIndex }, '');
 
     const closeOnKey = (e: KeyboardEvent): void => {
       if (e.key === 'Escape' && currentModalIndex === MODALS_OPEN) close();
     };
+
+    const handlePopState = (): void => {
+      if (currentModalIndex === MODALS_OPEN) {
+        closedByPopstate = true;
+        close();
+      }
+    };
+
     window.addEventListener('keydown',  closeOnKey);
+    window.addEventListener('popstate', handlePopState);
 
     return () => {
       window.removeEventListener('keydown', closeOnKey);
-      --MODALS_OPEN;
+      window.removeEventListener('popstate', handlePopState);
 
-      if (!MODALS_OPEN) {
-        document.body.style.overflow = 'initial';
+      if (!closedByPopstate) {
+        window.history.back();
       }
+
+      setTimeout(() => {
+        --MODALS_OPEN;
+        if (!MODALS_OPEN) {
+          document.body.style.overflow = 'initial';
+        }
+      }, 10);
     }
   }, []);
 
