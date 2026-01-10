@@ -16,8 +16,8 @@ const DEFAULT_CONFIG: TypeConfig = {
 
 const CONFIG_OVERRIDES: Record<string, TypeConfig> = {
   'nimfomane.com': {
-    cooldown: 12000,
-    throttleAfter: 10,
+    cooldown: 4000,
+    throttleAfter: 3,
   },
 };
 
@@ -45,6 +45,7 @@ export const page = {
     const domain = getDomainFromUrl(url);
     const config = getConfigForDomain(domain);
     const type = domain;
+
     if (!PAGE_TYPE[type]) {
       PAGE_TYPE[type] = {
         CACHE: {},
@@ -74,6 +75,7 @@ export const page = {
 
     PAGE_TYPE[type].PAGE_LOAD_REQUESTS++;
 
+    // @TODO: Something is not working well with this solution.
     if (PAGE_TYPE[type].PAGE_LOAD_REQUESTS > config.throttleAfter) {
       PAGE_TYPE[type].ALL_PAGE_LOAD_PROMISES = PAGE_TYPE[type].ALL_PAGE_LOAD_PROMISES.filter(p => !p.is_resolved);
       await Promise.race([
