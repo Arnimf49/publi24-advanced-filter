@@ -1,16 +1,16 @@
 import {WWBrowserStorage} from "./core/browserStorage";
+import {addSearchLoader, addContinueButton} from "./core/searchUI";
+import {IS_MOBILE_VIEW} from "../common/globals";
 
 let tries: number = 0;
+let isManual: boolean = false;
 
-async function extractResultLinks() {
-  const wwid = (await WWBrowserStorage.get('ww:search_started_for'))['ww:search_started_for']?.wwid;
+const currentUrl = new URL(window.location.href);
+const q: string | null = currentUrl.searchParams.get('q');
+const isSecondSearch = q?.includes('site:nimfomane.com');
+const topOffset = IS_MOBILE_VIEW ? 50 : 20;
 
-  if (!wwid) {
-    console.error("Item id not found");
-    clearInterval(interval);
-    return;
-  }
-
+function extractResultLinks(wwid: string) {
   const storageKey = `ww:search_results:${wwid}`;
 
   const results: NodeListOf<Element> =
@@ -19,10 +19,8 @@ async function extractResultLinks() {
 
   if (results.length === 0 && tries < 15) {
     tries++;
-    return;
+    return false;
   }
-
-  clearInterval(interval);
 
   WWBrowserStorage.get(storageKey)
     .then((data) => {
@@ -37,27 +35,56 @@ async function extractResultLinks() {
       return WWBrowserStorage.set(storageKey, finalUrls);
     })
     .then(() => {
-      const currentUrl = new URL(window.location.href);
-      const q: string | null = currentUrl.searchParams.get('q');
-
-      if (!q) {
-        console.error("Query parameter 'q' not found in URL.");
-        return;
-      }
-
-      if (q.includes('site:nimfomane.com')) {
-        window.close();
-        WWBrowserStorage.set('ww:search_started_for', null)
+      if (isSecondSearch) {
+        if (isManual) {
+          addContinueButton(() => {
+            window.close();
+            WWBrowserStorage.set('ww:search_started_for', null);
+          });
+        } else {
+          window.close();
+          WWBrowserStorage.set('ww:search_started_for', null);
+        }
       } else {
         currentUrl.searchParams.set('q', q + ' site:nimfomane.com');
         console.log("Redirecting to:", currentUrl.toString());
-        window.location.href = currentUrl.toString();
+        if (isManual) {
+          addContinueButton(() => {
+            window.location.href = currentUrl.toString();
+          });
+        } else {
+          window.location.href = currentUrl.toString();
+        }
       }
     })
     .catch((error: any) => {
       console.error("Error processing search results or redirecting:", error);
-      WWBrowserStorage.set('ww:search_started_for', null)
-    })
+      WWBrowserStorage.set('ww:search_started_for', null);
+    });
+
+  return true;
 }
 
-const interval: number = window.setInterval(extractResultLinks, 50);
+
+if (q) {
+  WWBrowserStorage.get('ww:search_started_for').then((data) => {
+    const searchData = data['ww:search_started_for'];
+
+    if (searchData?.wwid) {
+      let wwid = searchData.wwid;
+      isManual = searchData.manual ?? false;
+
+      addSearchLoader(`căutare după telefon (${isSecondSearch ? '2' : '1'}/2) ..`, isManual, isSecondSearch ? 100 : 50, topOffset);
+
+      const interval: number = window.setInterval(() => {
+        if (extractResultLinks(wwid)) {
+          clearInterval(interval);
+        }
+      }, 50);
+    } else {
+      console.log("No active phone search found.");
+    }
+  }).catch((error) => {
+    console.error("Failed to retrieve initial search state:", error);
+  });
+}

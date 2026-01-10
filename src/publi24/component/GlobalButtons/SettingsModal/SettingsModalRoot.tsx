@@ -26,6 +26,8 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
     const nextOnlyVisible = WWStorage.isNextOnlyVisibleEnabled();
     const defaultManualHideReasonEnabled = WWStorage.isDefaultManualHideReasonEnabled();
     const defaultManualHideReason = WWStorage.getDefaultManualHideReason();
+    const manualPhoneSearchEnabled = WWStorage.isManualPhoneSearchEnabled();
+    const manualImageSearchEnabled = WWStorage.isManualImageSearchEnabled();
     const criteria = WWStorage.getAutoHideCriterias();
 
     setSettings({
@@ -37,6 +39,8 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
       nextOnlyVisible,
       defaultManualHideReasonEnabled,
       defaultManualHideReason,
+      manualPhoneSearchEnabled,
+      manualImageSearchEnabled,
       maxAge: criteria.maxAge ?? false,
       maxAgeValue: criteria.maxAgeValue ?? DEFAULT_CRITERIA_VALUES.maxAgeValue,
       minHeight: criteria.minHeight ?? false,
@@ -109,6 +113,18 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
     setSettings(prev => prev ? { ...prev, defaultManualHideReason: reason } : null);
   }, []);
 
+  const handleToggleManualPhoneSearch = useCallback(() => {
+    const currentValue = WWStorage.isManualPhoneSearchEnabled();
+    WWStorage.setManualPhoneSearchEnabled(!currentValue);
+    setSettings(prev => prev ? { ...prev, manualPhoneSearchEnabled: !currentValue } : null);
+  }, []);
+
+  const handleToggleManualImageSearch = useCallback(() => {
+    const currentValue = WWStorage.isManualImageSearchEnabled();
+    WWStorage.setManualImageSearchEnabled(!currentValue);
+    setSettings(prev => prev ? { ...prev, manualImageSearchEnabled: !currentValue } : null);
+  }, []);
+
   const handleToggleCriteria = useCallback((criteriaKey: keyof AutoHideCriterias) => {
     if (criteriaKey.endsWith('Value')) return;
 
@@ -179,6 +195,8 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
         onToggleNextOnlyVisible={handleToggleNextOnlyVisible}
         onToggleDefaultManualHideReason={handleToggleDefaultManualHideReason}
         onDefaultManualHideReasonChange={handleDefaultManualHideReasonChange}
+        onToggleManualPhoneSearch={handleToggleManualPhoneSearch}
+        onToggleManualImageSearch={handleToggleManualImageSearch}
         onToggleCriteria={handleToggleCriteria}
         onCriteriaValueChange={handleCriteriaValueChange}
         handleExport={handleExport}

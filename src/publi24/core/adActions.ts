@@ -200,7 +200,7 @@ async function searchPhoneResults(id: string, phoneNumber: string, item: HTMLEle
   try {
     utils.throwInTestingIfConfigured();
 
-    await WWBrowserStorage.set(`ww:search_started_for`, { wwid: id });
+    await WWBrowserStorage.set(`ww:search_started_for`, { wwid: id, manual: WWStorage.isManualPhoneSearchEnabled() });
     await WWBrowserStorage.set(`ww:search_results:${id}`, null);
 
     const urlMatch: RegExpMatchArray | null = adData.getItemUrl(item).match(/\/([^./]+)\.html/);
@@ -405,6 +405,7 @@ export const adActions = {
           wwid: id,
           count: imgs.length,
           imgs: imgs.map(url => imageToLensUrl(url)),
+          manual: WWStorage.isManualImageSearchEnabled(),
         });
 
         let windows = []

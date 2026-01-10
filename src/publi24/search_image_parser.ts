@@ -1,12 +1,14 @@
 import {WWBrowserStorage} from "./core/browserStorage";
 import {IS_MOBILE_VIEW} from "../common/globals";
 import {utils} from "../common/utils";
+import {addSearchLoader, addContinueButton} from "./core/searchUI";
 
 interface ImageSearchData {
   wwid: string;
   imgs: string[];
   count: number;
   locked?: boolean;
+  manual?: boolean;
 }
 
 interface LockCheckData {
@@ -15,6 +17,7 @@ interface LockCheckData {
 }
 
 const STORAGE_KEY_IMG_SEARCH = `ww:img_search_started_for`;
+const topOffset = IS_MOBILE_VIEW ? 0 : 20;
 
 function getStorageLock(): Promise<void> {
   return new Promise<void>(resolve => {
@@ -210,11 +213,13 @@ async function parseResults(wwid: string): Promise<void> {
 
               const newCount = searchStatus.count - 1;
               const imgs = searchStatus.imgs;
+              const isManual = searchStatus.manual ?? false;
 
               WWBrowserStorage.set(searchStatusKey, {
                 wwid: searchStatus.wwid,
                 imgs,
                 count: newCount,
+                manual: isManual,
               }).then(() => {
                 console.log('Done. Found: ' + results.length);
                 console.log('Found: ' + results.join('\n'));
@@ -223,14 +228,32 @@ async function parseResults(wwid: string): Promise<void> {
                   const nextImageIndex = imgs.length - newCount;
                   if (nextImageIndex >= 0 && nextImageIndex < imgs.length) {
                     console.log('Next: ', imgs[nextImageIndex]);
-                    window.location.href = imgs[nextImageIndex];
+                    if (isManual) {
+                      addContinueButton(() => {
+                        window.location.href = imgs[nextImageIndex];
+                      });
+                    } else {
+                      window.location.href = imgs[nextImageIndex];
+                    }
                   } else {
                     console.warn("Calculated next image index is out of bounds. Closing window.");
-                    window.close();
+                    if (isManual) {
+                      addContinueButton(() => {
+                        window.close();
+                      });
+                    } else {
+                      window.close();
+                    }
                   }
                 } else {
                   console.warn("Closing window.");
-                  window.close();
+                  if (isManual) {
+                    addContinueButton(() => {
+                      window.close();
+                    });
+                  } else {
+                    window.close();
+                  }
                 }
               }).catch(error => {
                 console.error("Error setting search status:", error);
@@ -273,59 +296,23 @@ async function parseResults(wwid: string): Promise<void> {
   }
 }
 
-function addLoader(count: number, length: number): void {
-  const loader = document.createElement('div');
-  document.body.appendChild(loader);
-
-  const percent = ((length - count + 1) / length) * 100;
-
-  loader.style.background = 'rgb(59 63 71)';
-  loader.style.position = 'fixed';
-  loader.style.top = '60px';
-  loader.style.width = 'calc(100% - 50px)';
-  loader.style.left = '50%';
-  loader.style.transform = 'translateX(-50%)';
-  loader.style.height = '22px';
-  loader.style.padding = '4px';
-  loader.style.borderRadius = '4px';
-  loader.style.boxShadow = '2px 2px 12px 2px rgba(0,0,0,0.4)';
-  loader.style.zIndex = '9999';
-
-  const progress = document.createElement('div');
-  loader.appendChild(progress);
-
-  progress.style.width = `${Math.max(0, Math.min(100, percent))}%`;
-  progress.style.height = '100%';
-  progress.style.background = 'rgb(97 147 59)';
-  progress.style.borderRadius = '4px';
-  progress.style.transition = 'width 0.2s ease-in-out';
-
-  const text = document.createElement('div');
-  text.innerHTML = `căutare după poze (${length - count + 1}/${length}) ..`;
-  loader.appendChild(text);
-
-  text.style.position = 'absolute';
-  text.style.top = '50%';
-  text.style.left = '50%';
-  text.style.transform = 'translate(-50%, -50%)';
-  text.style.color = 'white';
-  text.style.mixBlendMode = 'overlay';
-  text.style.fontWeight = 'bold';
-  text.style.whiteSpace = 'nowrap';
-}
-
-
 WWBrowserStorage.get(STORAGE_KEY_IMG_SEARCH).then((data: { [key: string]: any }) => {
   const searchData = data[STORAGE_KEY_IMG_SEARCH] as ImageSearchData | undefined;
 
   if (searchData && searchData.count && searchData.count > 0 && searchData.wwid) {
     parseResults(searchData.wwid);
+    const isManual = searchData.manual ?? false;
 
-    if (IS_MOBILE_VIEW) {
+    if (isManual && !IS_MOBILE_VIEW) {
+      addSearchLoader(`căutare după poze ..`, isManual, 100, topOffset);
+    }
+    else if (IS_MOBILE_VIEW) {
       const count = searchData.count;
       const length = searchData.imgs?.length || 0;
+
       if (length > 0) {
-        addLoader(count, length);
+        const percent =((length - count + 1) / length) * 100;
+        addSearchLoader(`căutare după poze (${length - count + 1}/${length}) ..`, isManual, percent, topOffset);
       }
     }
   } else {

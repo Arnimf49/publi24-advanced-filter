@@ -1,4 +1,5 @@
 import {WWBrowserStorage} from "./browserStorage";
+import {IS_MOBILE_VIEW} from "../../common/globals";
 
 interface AdItem {
   visibility?: boolean;
@@ -127,7 +128,7 @@ export const WWStorage = {
   setAdPhone(id: string, phone: string): void {
     WWStorage.setAdProp(id, 'phone', phone);
     WWStorage.delAdProp(id, 'noPhone');
-    
+
     const firstSeen = WWStorage.getPhoneProp<number>(phone, 'firstSeen');
     if (!firstSeen) {
       WWStorage.setPhoneProp(phone, 'firstSeen', Date.now());
@@ -537,6 +538,22 @@ export const WWStorage = {
 
   getWhatsappMessage(): string {
     return localStorage.getItem('ww:whatsapp-message') || '';
+  },
+
+  setManualPhoneSearchEnabled(enabled: boolean): void {
+    localStorage.setItem('ww:manual-phone-search-enabled', enabled ? 'true' : 'false');
+  },
+
+  isManualPhoneSearchEnabled(): boolean {
+    return localStorage.getItem('ww:manual-phone-search-enabled') === 'true';
+  },
+
+  setManualImageSearchEnabled(enabled: boolean): void {
+    localStorage.setItem('ww:manual-image-search-enabled', enabled ? 'true' : 'false');
+  },
+
+  isManualImageSearchEnabled(): boolean {
+    return [IS_MOBILE_VIEW ? '' : null, 'true'].includes(localStorage.getItem('ww:manual-image-search-enabled'));
   },
 
   getVersion(): string | null {

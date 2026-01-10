@@ -58,6 +58,7 @@ export const utilsPubli = {
       }
 
       window.localStorage.setItem('ww:info-shown', config.infoShown || 'true');
+      window.localStorage.setItem('ww:manual-image-search-enabled', 'false');
       window.localStorage.setItem('_pw_init', 'true');
     }, {config, localStorageData})
 

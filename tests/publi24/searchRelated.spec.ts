@@ -1,6 +1,6 @@
 import {expect, test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
-import {ElementHandle, errors} from "playwright-core";
+import {ElementHandle, errors, Page} from "playwright-core";
 import {utils} from "../helpers/utils";
 
 test('Should search for phone number and article id and show relevant results.', async ({ page, context }, testInfo) => {
@@ -112,6 +112,48 @@ test('Should search for phone number and article id and show relevant results.',
   }
 
   expect(Object.keys(caseChecks).length, `Cases not met: ${Object.keys(caseChecks).join(', ')}`).toEqual(0)
+});
+
+test.only('Should be able to do manual search', async ({ page, context }, testInfo) => {
+  testInfo.setTimeout(60000);
+
+  await utilsPubli.open(context, page);
+
+  await page.click('[data-wwid="settings-button"]');
+  await page.locator('[data-wwid="manual-phone-search-switch"]').click();
+  await page.click('[data-wwid="close"]');
+
+  const firstAd = await utilsPubli.findFirstAdWithPhone(page);
+  const adId = await firstAd.getAttribute('data-articleid');
+
+  const articleSearchButton = await firstAd.$('[data-wwid="investigate"]');
+  await articleSearchButton.isVisible();
+
+  const pages: any[] = [];
+  context.on('page', p => pages.push(p));
+
+  await articleSearchButton.click();
+
+  expect(pages.length).toBeGreaterThan(0);
+  const searchPage: Page = pages[0];
+
+  await expect(searchPage.locator('[data-ww-manual-text]')).toContainText('manual');
+  await expect(searchPage.locator('[data-ww-search-continue]')).toContainText('Continuă');
+
+  await searchPage.locator('[data-ww-search-continue]').click();
+  await page.waitForTimeout(800);
+
+  await Promise.all([
+    searchPage.locator('[data-ww-search-continue]').click(),
+    searchPage.waitForEvent('close', { timeout: 5000 })
+  ])
+
+  await utils.waitForInnerTextNot(
+    page,
+    `[data-articleid="${adId}"] [data-wwid="search-results"]`,
+    'nerulat',
+    4000,
+  );
 });
 
 test('Should show "date șterse, caută din nou" when phone search results are cleared but analysis time exists', async ({ page, context }) => {

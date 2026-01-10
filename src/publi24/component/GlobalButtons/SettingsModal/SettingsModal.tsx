@@ -86,6 +86,8 @@ export type SettingsData = {
   nextOnlyVisible: boolean;
   defaultManualHideReasonEnabled: boolean;
   defaultManualHideReason: string;
+  manualPhoneSearchEnabled: boolean;
+  manualImageSearchEnabled: boolean;
 } & AutoHideCriterias;
 
 type SettingsModalProps = {
@@ -99,6 +101,8 @@ type SettingsModalProps = {
   onToggleNextOnlyVisible: () => void;
   onToggleDefaultManualHideReason: () => void;
   onDefaultManualHideReasonChange: (reason: string) => void;
+  onToggleManualPhoneSearch: () => void;
+  onToggleManualImageSearch: () => void;
   onToggleCriteria: (criteriaKey: keyof AutoHideCriterias) => void;
   onCriteriaValueChange: (criteriaKey: keyof AutoHideCriterias, value: number) => void;
   handleExport: () => void;
@@ -117,6 +121,8 @@ const SettingsModal: React.FC<SettingsModalProps> =
   onToggleNextOnlyVisible,
   onToggleDefaultManualHideReason,
   onDefaultManualHideReasonChange,
+  onToggleManualPhoneSearch,
+  onToggleManualImageSearch,
   onToggleCriteria,
   onCriteriaValueChange,
   handleExport,
@@ -162,6 +168,23 @@ const SettingsModal: React.FC<SettingsModalProps> =
       maxWidth={600}
       color={misc.getPubliTheme() === 'dark' ? 'rgb(127 105 24)' : '#c59b2f'}
     >
+      <SettingControl
+        title="Căutare telefon manuală"
+        description="Când este activat, căutarea telefon nu va închide automat rezultatele. Trebuie să apeși butonul de continuare."
+        isOn={settings.manualPhoneSearchEnabled}
+        onToggle={onToggleManualPhoneSearch}
+        dataWwid="manual-phone-search-switch"
+      />
+      <SettingControl
+        title="Căutare poze manuală"
+        description="Când este activat, căutarea poze nu va închide automat rezultatele. Trebuie să apeși butonul de continuare."
+        isOn={settings.manualImageSearchEnabled}
+        onToggle={onToggleManualImageSearch}
+        dataWwid="manual-image-search-switch"
+      />
+
+      <hr style={{ opacity: 0.2, marginTop: '25px', marginBottom: '25px' }} />
+
       <SettingControl
         title="Mesaj WhatsApp"
         description="Când este activat, la deschiderea WhatsApp va include mesajul predefinit."

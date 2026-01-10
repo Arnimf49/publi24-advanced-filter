@@ -1,6 +1,6 @@
 import {expect, test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
-import {ElementHandle} from "playwright-core";
+import {ElementHandle, Page} from "playwright-core";
 import {utils} from "../helpers/utils";
 import {collectUnknownDomains} from "../helpers/domainCollector";
 
@@ -183,6 +183,45 @@ test('Should show "date șterse, caută din nou" when image search results are c
   expect(className).toContain('missingResults');
 });
 
+
+test('Should be able to do manual search', async ({ page, context }, testInfo) => {
+  testInfo.setTimeout(60000);
+
+  await utilsPubli.open(context, page);
+
+  await page.click('[data-wwid="settings-button"]');
+  await page.locator('[data-wwid="manual-image-search-switch"]').click();
+  await page.click('[data-wwid="close"]');
+
+  const firstAd = await utilsPubli.findFirstAdWithPhone(page);
+  const adId = await firstAd.getAttribute('data-articleid');
+
+  const articleImageSearchButton = await firstAd.$('[data-wwid="investigate_img"]');
+  await articleImageSearchButton.isVisible();
+
+  const pages: any[] = [];
+  context.on('page', p => pages.push(p));
+
+  await articleImageSearchButton.click();
+
+  expect(pages.length).toBeGreaterThan(0);
+  const searchPage: Page = pages[0];
+
+  await expect(searchPage.locator('[data-ww-manual-text]')).toContainText('manual');
+  await expect(searchPage.locator('[data-ww-search-continue]')).toContainText('Continuă');
+
+  await Promise.all([
+    searchPage.waitForEvent('close', { timeout: 5000 }),
+    searchPage.locator('[data-ww-search-continue]').click(),
+  ])
+
+  await utils.waitForInnerTextNot(
+    page,
+    `[data-articleid="${adId}"] [data-wwid="image-results"]`,
+    'nerulat',
+    4000,
+  );
+});
 
 test.skip('Collect unknown domain for image search.', async ({ page, context }, testInfo) => {
   testInfo.setTimeout(60000 * 6);
