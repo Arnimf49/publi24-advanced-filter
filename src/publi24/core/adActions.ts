@@ -371,29 +371,7 @@ export const adActions = {
         utils.throwInTestingIfConfigured();
 
         WWBrowserStorage.set(`ww:image_results:${id}`, null);
-        let imgs: string[] = [];
-
-        if (IS_AD_PAGE() && IS_MOBILE_VIEW) {
-          const matches = document.body.innerHTML.match(/https:\/\/s3\.publi24\.ro\/[^\/]+\/large\/[^.]+\.(jpg|webp|png)/g);
-          imgs = matches ? [...new Set(matches)] : [];
-        }
-        else if (IS_AD_PAGE()) {
-          // @ts-ignore
-          imgs = [...document.body.querySelectorAll<HTMLImageElement>('[id="detail-gallery"] img')]
-            .map(img => img.getAttribute('src'))
-            .filter((src): src is string => !!src); // Type guard to filter out nulls
-
-          // Maybe the post has only one picture. In that case gallery is not shown.
-          if (imgs.length === 0) {
-            // @ts-ignore
-            imgs = [...document.body.querySelectorAll<HTMLImageElement>('.detailViewImg')]
-              .map(img => img.getAttribute('src'))
-              .filter((src): src is string => !!src); // Type guard
-          }
-        }
-        else {
-          imgs = await adData.acquireSliderImages(item);
-        }
+        let imgs: string[] = await adData.acquireSliderImages(item);
 
         const done = (): void => {
           WWStorage.setAdImagesInvestigatedTime(id, Date.now());
