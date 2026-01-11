@@ -14,6 +14,7 @@ import {CloseIcon} from "../../../../publi24/component/Common/Icons/CloseIcon";
 import {utils} from "../../../../common/utils";
 import {Loader} from "../../../../common/components/Loader/Loader";
 import ErrorDisplay from "../../ErrorDisplay/ErrorDisplay";
+import {IS_MOBILE_VIEW} from "../../../../common/globals";
 
 // @ts-ignore
 if (typeof browser === "undefined" && typeof chrome !== "undefined") {
@@ -89,12 +90,8 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
     return () => scrollParent.removeEventListener("scroll", handleScroll);
   }, [scrollParent, handleScroll, ended]);
 
-  return (
-    <div
-      className={classes.container}
-      ref={ref}
-      data-wwid="escort-images"
-    >
+  const headerContent = (
+    <div className={classes.header}>
       <img
         src={browser.runtime.getURL("icon.png")}
         onClick={() => window.open('https://chromewebstore.google.com/detail/publi24-filtru-avansat/pigkjfndnpblohnmphgbmecaelefaedn', '_blank')}
@@ -110,27 +107,43 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
       >
         <CloseIcon />
       </button>
+    </div>
+  );
 
-      {!images.length && !loading && !error &&
-        <div className={classes.noImages}>Nu sunt poze</div>
-      }
+  return (
+    <div
+      className={classes.container}
+      ref={ref}
+      data-wwid="escort-images"
+    >
+      {!IS_MOBILE_VIEW && headerContent}
 
-      {images.map((image, index) => (
-        <div key={index} data-wwid={'escort-image'} className={classes.image_container}>
-          <img src={image.url} loading='lazy' onClick={(e) => e.stopPropagation()} />
-          <div className={classes.image_date}>{image.date}</div>
-        </div>
-      ))}
+      <div className={classes.content}>
+        {!images.length && !loading && !error &&
+          <div className={classes.noImages}>Nu sunt poze</div>
+        }
 
-      {error && (
-        <div className={classes.errorWrapper}>
-          <ErrorDisplay errorMessage={error} dataWwId="escort-images-error" />
-        </div>
-      )}
+        {images.map((image, index) => (
+          <div key={index} data-wwid={'escort-image'} className={classes.image_container}>
+            <img src={image.url} loading='lazy' onClick={(e) => e.stopPropagation()} />
+            <div className={classes.image_date}>{image.date}</div>
+          </div>
+        ))}
 
-      {loading && <div>
-        <Loader classes={classes.loading}/>
-      </div>}
+        {error && (
+          <div className={classes.errorWrapper}>
+            <ErrorDisplay errorMessage={error} dataWwId="escort-images-error" />
+          </div>
+        )}
+
+        {loading && <div>
+          <Loader classes={classes.loading}/>
+        </div>}
+
+        <div className={classes.spacer} />
+      </div>
+
+      {IS_MOBILE_VIEW && headerContent}
     </div>
   );
 };

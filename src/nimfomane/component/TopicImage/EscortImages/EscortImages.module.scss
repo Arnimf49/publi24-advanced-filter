@@ -1,7 +1,52 @@
 .container {
   margin: 20px;
   padding-bottom: 300px;
+
+  :global(.onMobile) & {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    padding-bottom: 0;
+  }
 }
+
+.content {
+  :global(.onMobile) & {
+    flex: 1 1 auto;
+    padding: 20px;
+  }
+}
+
+.spacer {
+  padding-bottom: 300px;
+}
+
+.header {
+  position: sticky;
+  top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  z-index: 10;
+
+  :global(.onMobile) & {
+    position: sticky;
+    bottom: 0;
+    flex-shrink: 0;
+    padding: 20px;
+    margin-bottom: 0;
+  }
+}
+
+.filler {
+  position: absolute;
+  z-index: -1;
+  height: 100vh;
+  top: 0;
+}
+
 
 .image_container {
   position: relative;
@@ -34,12 +79,8 @@
 }
 
 .logo {
-  position: sticky;
   width: 60px;
-  top: 20px;
-  margin-bottom: 20px;
   cursor: pointer;
-  z-index: 10;
 
   :global(.onMobile) & {
     width: 42px;
@@ -53,11 +94,6 @@
   line-height: 0 !important;
   background: rgba(20,20,20,0.85);
   cursor: pointer;
-  position: sticky;
-  top: 20px;
-  float: right;
-  margin-bottom: 20px;
-  z-index: 10;
 
   svg {
     stroke: #ffffff;
@@ -91,4 +127,6 @@
   margin-bottom: 20px;
   display: flex;
   justify-content: center;
+  max-width: 100%;
+  overflow: hidden;
 }

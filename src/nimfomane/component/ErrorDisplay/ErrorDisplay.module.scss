@@ -4,6 +4,10 @@
   gap: 8px;
   padding: 12px 0 6px;
   font-size: 1rem;
+
+  :global(.onMobile) & {
+    font-size: 0.75rem;
+  }
 }
 
 .errorIcon {
@@ -24,4 +28,6 @@
 .errorText {
   color: #fc8181;
   line-height: 1.4;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
