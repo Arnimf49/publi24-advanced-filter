@@ -1,0 +1,40 @@
+.code {
+  background: rgba(0, 0, 0, 0.1);
+  color: inherit;
+  padding: 1px 4px;
+  border-radius: 4px;
+
+  :global(.dark) & {
+    background: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.safe {
+  background-color: #d1e1d1;
+  color: inherit;
+
+  :global(.dark) & {
+    background: rgb(58 75 51);
+    color: #89d789;
+  }
+}
+
+.suspicious {
+  background-color: #e5e38e;
+  color: inherit;
+
+  :global(.dark) & {
+    background: #54471e;
+    color: #f5d04b;
+  }
+}
+
+.unsafe {
+  background-color: #efe2e2;
+  color: inherit;
+
+  :global(.dark) & {
+    background: rgb(73 40 43);
+    color: #e18a8a;
+  }
+}

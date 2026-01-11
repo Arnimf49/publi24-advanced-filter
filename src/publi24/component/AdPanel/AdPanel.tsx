@@ -1,4 +1,4 @@
-import React, {MouseEventHandler} from 'react';
+import React, {MouseEventHandler, useState} from 'react';
 import styles from './AdPanel.module.scss';
 import {VisibilityIcon} from "../Common/Icons/VisibilityIcon";
 import {StarIcon} from "../Common/Icons/StarIcon";
@@ -10,6 +10,9 @@ import {Loader} from "../../../common/components/Loader/Loader";
 import {misc} from "../../core/misc";
 import PhoneAndTagsRoot from "../Common/Partials/PhoneAndTags/PhoneAndTagsRoot";
 import ErrorDisplay from "../Common/ErrorDisplay/ErrorDisplay";
+import InfoIcon from "../Common/Icons/InfoIcon";
+import PhoneSearchResultsHelp from "./Help/PhoneSearchResultsHelp";
+import ImageSearchResultsHelp from "./Help/ImageSearchResultsHelp";
 
 interface ImageLink {
   link: string;
@@ -91,6 +94,9 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     onViewDuplicatesClick,
   } = props;
 
+  const [showPhoneHelp, setShowPhoneHelp] = useState(false);
+  const [showImageHelp, setShowImageHelp] = useState(false);
+
   const getImageLinkClassName = (link: ImageLink): string => {
     if (link.isDead) return styles.linkDead;
     if (link.isSafe) return styles.linkSafe;
@@ -134,7 +140,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
 
         {hasPhone && (
           <button
-            title="Analiza telefon"
+            title="Analiză telefon"
             type="button"
             className={`${styles.button} ${styles.mainBgRadius} ${styles.investigateButton} mainbg radius`}
             data-wwid="investigate"
@@ -144,7 +150,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
           </button>
         )}
         <button
-          title="Analiza poze"
+          title="Analiză poze"
           type="button"
           className={`${styles.button} ${styles.mainBgRadius} ${styles.investigateImgButton} mainbg radius`}
           data-wwid="investigate_img"
@@ -232,7 +238,13 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
             {hasPhone && (
               <>
                 <h5 className={styles.resultsHeader}>
-                  <span className={`${styles.resultsTitleText} ${phoneSearchJustCompleted ? styles.searchComplete : ''}`} title="rezultate după analiza de telefon">
+                  <span
+                    className={`${styles.resultsTitleText} ${phoneSearchJustCompleted ? styles.searchComplete : ''}`}
+                    title="rezultate după analiza de telefon"
+                    onClick={() => setShowPhoneHelp(true)}
+                    data-wwid="search-results-title"
+                  >
+                    <InfoIcon size={15} />
                     Rezultate <PhoneIcon fill="currentColor" size={18} />
                   </span>
                   {phoneInvestigatedSinceDays && (
@@ -276,7 +288,13 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
             {!loading && (
               <>
                 <h5 className={styles.resultsHeader}>
-                  <span className={`${styles.resultsTitleText} ${imageSearchJustCompleted ? styles.searchComplete : ''}`} title="rezultate după analiza de poze">
+                  <span
+                    className={`${styles.resultsTitleText} ${imageSearchJustCompleted ? styles.searchComplete : ''}`}
+                    title="rezultate după analiza de poze"
+                    onClick={() => setShowImageHelp(true)}
+                    data-wwid="image-results-title"
+                  >
+                    <InfoIcon size={15} />
                     Rezultate <ImageIcon fill="currentColor" size={18} />
                   </span>
                   {imageResultsStatus && (
@@ -345,6 +363,9 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
           <Loader classes={styles.loader} color={misc.getPubliTheme() === 'dark' ? '#9fc2fa' : '#17b'}/>
         </div>
       )}
+
+      {showPhoneHelp && <PhoneSearchResultsHelp onClose={() => setShowPhoneHelp(false)} />}
+      {showImageHelp && <ImageSearchResultsHelp onClose={() => setShowImageHelp(false)} />}
     </div>
   );
 };

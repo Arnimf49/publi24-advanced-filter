@@ -1,0 +1,51 @@
+.generalModal {
+
+  p {
+    margin-bottom: 16px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    margin-bottom: 12px;
+
+    :global(.dark) & {
+      color: rgb(191, 191, 191);
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ul, ol {
+    margin-top: 0;
+    margin-bottom: 16px;
+    padding-left: 20px;
+    list-style: revert !important;
+    font-size: inherit;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    li {
+      padding-bottom: 2px;
+      line-height: 150%;
+      font-size: inherit;
+    }
+  }
+
+  ul {
+    list-style-type: disc !important;
+    li {
+      list-style: circle;
+    }
+  }
+
+  ol {
+    list-style-type: decimal !important;
+    li {
+      list-style: decimal;
+    }
+  }
+}
