@@ -9,7 +9,7 @@ test('Should show first image as topic image.', async ({page}) => {
   const {src, user} = await utilsNimfomane.waitForFirstImage(page);
   const profileUrl = await utilsNimfomane.getUserProfileLink(page, user);
 
-  await page.goto(profileUrl + 'content');
+  await utilsNimfomane.goto(page, profileUrl + 'content');
 
   while (true) {
     const image = page.locator('.ipsStreamItem_snippet [data-background-src]').first();
@@ -28,7 +28,7 @@ test('Should show first image as topic image.', async ({page}) => {
 })
 
 test('Should show loader in photo initially.', async ({page}) => {
-  await utilsNimfomane.open(page);
+  await utilsNimfomane.open(page, {loadStorage: false});
   const firstImageContainer = page.locator('[data-wwid="topic-image"]').first();
   await firstImageContainer.waitFor();
   await firstImageContainer.locator('[data-wwid="loader"]').isVisible();
@@ -51,7 +51,7 @@ test('Should show no image icon when no photos found.', async ({page}) => {
 })
 
 test('Should show no image icon when topic not of escort.', async ({page}) => {
-  await utilsNimfomane.open(page, 'https://nimfomane.com/forum/forum/30-escorte-baia-mare/');
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/30-escorte-baia-mare/'});
   await page.locator(`[data-wwtopic="174418"] [data-wwid="no-image-icon"]`).isVisible();
 })
 
@@ -66,23 +66,24 @@ test('Should show all images modal when clicking the topic image.', async ({page
 
 test('Should show images after listing pagination navigation.', async ({page}) => {
   await utilsNimfomane.open(page);
+  await page.waitForTimeout(2000);
   await page.locator('.ipsPagination_next a').first().click();
   await page.waitForTimeout(1000);
   await page.locator('[data-wwid="topic-image"]').first().isVisible();
 })
 
 test('Should not show images on non escort or massage listings.', async ({page}) => {
-  await utilsNimfomane.open(page, 'https://nimfomane.com/forum/forum/127-masaj-erotic/');
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/127-masaj-erotic/'});
   await page.locator('[data-wwid="topic-image"]').first().isVisible();
 
-  await utilsNimfomane.open(page, 'https://nimfomane.com/forum/forum/135-masaj-erotic-timisoara/');
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/135-masaj-erotic-timisoara/'});
   await page.locator('[data-wwid="topic-image"]').first().isVisible();
 
-  await utilsNimfomane.open(page, 'https://nimfomane.com/forum/forum/201-discutii-generale-cluj/');
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/201-discutii-generale-cluj/'});
   await page.waitForTimeout(1500);
   expect(await page.$$('[data-wwid="topic-image"]')).toHaveLength(0);
 
-  await utilsNimfomane.open(page, 'https://nimfomane.com/forum/forum/354-decernarea-premiilor-pentru-escorte/');
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/354-decernarea-premiilor-pentru-escorte/'});
   await page.waitForTimeout(1500);
   expect(await page.$$('[data-wwid="topic-image"]')).toHaveLength(0);
 })
@@ -95,6 +96,7 @@ test('Should reload topic escort after 6 days.', async ({page}) => {
   await utilsNimfomane.setTopicStorageProp(page, id, 'escortDeterminationTime', Date.now() - (8.64e+7 * 6 - 2000));
   await utilsNimfomane.open(page);
   await page.locator(`[data-wwtopic="${id}"] [data-wwid="no-image-icon"]`).isVisible();
+
 
   await utilsNimfomane.setTopicStorageProp(page, id, 'escortDeterminationTime', Date.now() - (8.64e+7 * 7));
   await utilsNimfomane.open(page);
@@ -121,12 +123,13 @@ test('Should update preview image on listing when opening escort images modal.',
   const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
 
   await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImage', null);
-  await page.reload();
+  await utilsNimfomane.throttleReload(page);
   await page.waitForTimeout(600);
 
   await expect(page.locator(`[data-wwtopic="${id}"][data-wwid="topic-image"] [data-wwid="no-image-icon"]`)).toBeVisible();
 
-  await page.goto(profileLink);
+  await utilsNimfomane.goto(page, profileLink);
+
   await page.locator('[data-wwid="all-photos-button"]').click();
   await expect(page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').first()).toBeVisible();
   await page.locator('[data-wwid="escort-images"] [data-wwid="close"]').click();

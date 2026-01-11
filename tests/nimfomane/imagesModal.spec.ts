@@ -19,15 +19,16 @@ test('Should load more images when scrolling.', async ({page}) => {
 
   await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toBeVisible();
   await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toHaveCount(0);
-  await expect(page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').first()).toBeVisible();
+  await expect(page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').first()).toBeVisible({timeout: 4000});
 
   const imagesCount = await page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').count();
 
   if (imagesCount > 3) {
+    await page.waitForTimeout(1000);
     await page.locator('[data-wwid="escort-image-modal"]').locator('[data-wwid="escort-image"]:last-child').scrollIntoViewIfNeeded();
 
     await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toBeVisible();
-    await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toHaveCount(0);
+    await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toHaveCount(0, {timeout: 15000});
 
     const newCount = await page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').count();
     expect(newCount).toBeGreaterThan(imagesCount);

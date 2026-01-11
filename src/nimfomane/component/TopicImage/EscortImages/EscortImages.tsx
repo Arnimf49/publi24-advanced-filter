@@ -43,7 +43,7 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
 
     try {
       while (loadedLength < 5) {
-        const newImages = await escortActions.loadImages(user, currentPage);
+        const newImages = await escortActions.loadImages(user, currentPage, 200);
 
         if (newImages === null) {
           setEnded(true);
@@ -114,7 +114,7 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
 
       {images.map((image, index) => (
         <div key={index} data-wwid={'escort-image'} className={classes.image_container}>
-          <img src={image.url} onClick={(e) => e.stopPropagation()} />
+          <img src={image.url} loading='lazy' onClick={(e) => e.stopPropagation()} />
           <div className={classes.image_date}>{image.date}</div>
         </div>
       ))}

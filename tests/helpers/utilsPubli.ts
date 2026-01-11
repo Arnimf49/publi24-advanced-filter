@@ -73,7 +73,7 @@ export const utilsPubli = {
     utilsPubli.clearPopups(page);
   },
 
-  async awaitGooglePagesClose(triggerButton: (ElementHandle | (() => Promise<ElementHandle>)), context: BrowserContext, page: Page) {
+  async resolveGooglePage(triggerButton: (ElementHandle | (() => Promise<ElementHandle>)), context: BrowserContext, page: Page, close: boolean = true) {
     const attemptGoogleCaptchaSolve = async () => {
       const secondaryPages: Page[] = [];
 
@@ -97,7 +97,9 @@ export const utilsPubli = {
             wait: process.env.CI ? 7000 : 5000,
           });
         }
-        await altPage.waitForEvent('close')
+        if (close) {
+          await altPage.waitForEvent('close')
+        }
       }
     }
 

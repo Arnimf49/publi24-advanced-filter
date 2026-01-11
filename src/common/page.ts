@@ -1,32 +1,42 @@
-type PageLoadPromise = Promise<Response> & { is_resolved?: boolean };
-
 export interface BrowserError extends Error {
   code?: number;
 }
 
 interface TypeConfig {
-  cooldown: number;
   throttleAfter: number;
+  cooldown: number;
+  delayBetween?: number;
 }
 
 const DEFAULT_CONFIG: TypeConfig = {
-  cooldown: 10000,
   throttleAfter: 20,
+  cooldown: 10000,
+  delayBetween: 0,
 };
 
 const CONFIG_OVERRIDES: Record<string, TypeConfig> = {
   'nimfomane.com': {
-    cooldown: 4000,
-    throttleAfter: 3,
+    throttleAfter: 4,
+    cooldown: 12500,
+    delayBetween: 1700,
   },
 };
 
+interface QueueItem {
+  url: string;
+  resolve: (value: Document) => void;
+  reject: (reason: Error) => void;
+  priority: number;
+}
+
 const PAGE_TYPE: Record<string, {
-  CACHE: Record<string, Error | HTMLElement>,
-  PAGE_LOAD_PROMISES: { [url: string]: PageLoadPromise },
-  ALL_PAGE_LOAD_PROMISES: PageLoadPromise[],
-  PAGE_LOAD_REQUESTS: number,
-}> = {}
+  CACHE: Record<string, Error | Document>;
+  queue: QueueItem[];
+  running: boolean;
+  cooldowns: number[];
+  lastStartedAt: number;
+  pendingRequests: Map<string, Promise<Document>>;
+}> = {};
 
 function getDomainFromUrl(url: string): string {
   try {
@@ -40,8 +50,79 @@ function getConfigForDomain(domain: string): TypeConfig {
   return CONFIG_OVERRIDES[domain] || DEFAULT_CONFIG;
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function waitUntilAllowed(type: string, config: TypeConfig) {
+  while (true) {
+    const now = Date.now();
+
+    PAGE_TYPE[type].cooldowns = PAGE_TYPE[type].cooldowns.filter(t => t > now);
+
+    if (PAGE_TYPE[type].cooldowns.length < config.throttleAfter) {
+      const sinceLast = now - PAGE_TYPE[type].lastStartedAt;
+      const delayBetween = config.delayBetween || 0;
+      if (sinceLast >= delayBetween) return;
+
+      await sleep(delayBetween - sinceLast);
+    } else {
+      const waitUntil = Math.min(...PAGE_TYPE[type].cooldowns);
+      await sleep(waitUntil - now);
+    }
+  }
+}
+
+function startRequest(type: string, config: TypeConfig, item: QueueItem) {
+  const now = Date.now();
+  PAGE_TYPE[type].lastStartedAt = now;
+  PAGE_TYPE[type].cooldowns.push(now + config.cooldown);
+
+  executeRequest(type, item);
+}
+
+async function executeRequest(type: string, item: QueueItem) {
+  try {
+    const pageResponse = await fetch(item.url);
+
+    if (!pageResponse.ok) {
+      const error = new Error(`Failed to load ${item.url}`) as BrowserError;
+      error.code = pageResponse.status;
+      if (pageResponse.status >= 400 && pageResponse.status < 500 && pageResponse.status !== 429) {
+        PAGE_TYPE[type].CACHE[item.url] = error;
+      }
+      item.reject(error);
+      return;
+    }
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(await pageResponse.text(), 'text/html');
+    PAGE_TYPE[type].CACHE[item.url] = doc;
+    item.resolve(doc);
+  } catch (fetchError) {
+    const error = fetchError instanceof Error ? fetchError : new Error(`Network error fetching ${item.url}`);
+    (error as BrowserError).code = 503;
+    item.reject(error);
+  }
+}
+
+async function runQueue(type: string, config: TypeConfig) {
+  if (PAGE_TYPE[type].running) return;
+  PAGE_TYPE[type].running = true;
+
+  while (PAGE_TYPE[type].queue.length > 0) {
+    await waitUntilAllowed(type, config);
+
+    PAGE_TYPE[type].queue.sort((a, b) => b.priority - a.priority);
+    const item = PAGE_TYPE[type].queue.shift()!;
+    startRequest(type, config, item);
+  }
+
+  PAGE_TYPE[type].running = false;
+}
+
 export const page = {
-  async load(url: string) {
+  async load(url: string, priority: number = 100): Promise<Document> {
     const domain = getDomainFromUrl(url);
     const config = getConfigForDomain(domain);
     const type = domain;
@@ -49,81 +130,43 @@ export const page = {
     if (!PAGE_TYPE[type]) {
       PAGE_TYPE[type] = {
         CACHE: {},
-        PAGE_LOAD_PROMISES: {},
-        ALL_PAGE_LOAD_PROMISES: [],
-        PAGE_LOAD_REQUESTS: 0,
+        queue: [],
+        running: false,
+        cooldowns: [],
+        lastStartedAt: 0,
+        pendingRequests: new Map(),
       };
     }
 
-    const returnFromCache = (cacheUrl: string): HTMLElement => {
-      const cachedItem = PAGE_TYPE[type].CACHE[cacheUrl];
+    if (PAGE_TYPE[type].CACHE[url]) {
+      const cachedItem = PAGE_TYPE[type].CACHE[url];
       if (cachedItem instanceof Error) {
         throw cachedItem;
       }
-      return cachedItem as HTMLElement;
+      return cachedItem;
     }
 
-    if (PAGE_TYPE[type].CACHE[url]) {
-      return returnFromCache(url);
-    }
-    // @ts-ignore
-    if (PAGE_TYPE[type].PAGE_LOAD_PROMISES[url]) {
-      await PAGE_TYPE[type].PAGE_LOAD_PROMISES[url];
-      await new Promise<void>((r) => setTimeout(r, 200));
-      return returnFromCache(url);
-    }
-
-    PAGE_TYPE[type].PAGE_LOAD_REQUESTS++;
-
-    // @TODO: Something is not working well with this solution.
-    if (PAGE_TYPE[type].PAGE_LOAD_REQUESTS > config.throttleAfter) {
-      PAGE_TYPE[type].ALL_PAGE_LOAD_PROMISES = PAGE_TYPE[type].ALL_PAGE_LOAD_PROMISES.filter(p => !p.is_resolved);
-      await Promise.race([
-        Promise.all(PAGE_TYPE[type].ALL_PAGE_LOAD_PROMISES),
-        new Promise<void>((r) => setTimeout(r, config.cooldown + 1000))
-      ]);
-      if (PAGE_TYPE[type].PAGE_LOAD_REQUESTS > config.throttleAfter) {
-        await new Promise<void>((r) => setTimeout(r, config.cooldown / 2));
+    const existingRequest = PAGE_TYPE[type].pendingRequests.get(url);
+    if (existingRequest) {
+      const queueIndex = PAGE_TYPE[type].queue.findIndex(item => item.url === url);
+      if (queueIndex !== -1 && PAGE_TYPE[type].queue[queueIndex].priority < priority) {
+        PAGE_TYPE[type].queue[queueIndex].priority = priority;
       }
+      return existingRequest;
     }
 
-    const promise: PageLoadPromise = fetch(url);
-    PAGE_TYPE[type].PAGE_LOAD_PROMISES[url] = promise;
-    const trackablePromise = promise.then(() => {
-      promise.is_resolved = true;
-    }).catch(() => {
-      promise.is_resolved = true
+    const promise = new Promise<Document>((resolve, reject) => {
+      const item = { url, resolve, reject, priority };
+      PAGE_TYPE[type].queue.push(item);
+      runQueue(type, config);
     });
-    PAGE_TYPE[type].ALL_PAGE_LOAD_PROMISES.push(promise);
 
-    trackablePromise.catch(e => console.warn("Page load tracking promise failed:", e));
+    PAGE_TYPE[type].pendingRequests.set(url, promise);
 
-    setTimeout(() => {
-      PAGE_TYPE[type].PAGE_LOAD_REQUESTS = Math.max(0, PAGE_TYPE[type].PAGE_LOAD_REQUESTS - 1);
-      delete PAGE_TYPE[type].PAGE_LOAD_PROMISES[url];
-    }, config.cooldown);
+    promise.finally(() => {
+      PAGE_TYPE[type].pendingRequests.delete(url);
+    });
 
-    let pageResponse: Response;
-    try {
-      pageResponse = await promise;
-    } catch (fetchError) {
-      const error = fetchError instanceof Error ? fetchError : new Error(`Network error fetching ${url}`);
-      (error as BrowserError).code = 503;
-      PAGE_TYPE[type].CACHE[url] = error;
-      throw error;
-    }
-
-    if (!pageResponse.ok) {
-      const error = new Error(`Failed to load ${url}`) as BrowserError;
-      error.code = pageResponse.status;
-      PAGE_TYPE[type].CACHE[url] = error;
-      throw error;
-    }
-
-    const template = document.createElement('div');
-    template.innerHTML = await pageResponse.text();
-    PAGE_TYPE[type].CACHE[url] = template;
-
-    return template;
+    return promise;
   }
 }

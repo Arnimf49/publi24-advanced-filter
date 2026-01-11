@@ -9,8 +9,13 @@ import {FingerprintGenerator} from "fingerprint-generator";
 import {FingerprintInjector} from "fingerprint-injector";
 
 const EXTENSION_PATH = dirname(path.join(fileURLToPath(import.meta.url), '../..'));
-export const STORAGE_JSON = 'tests/helpers/localStorage.json';
-export const COOKIES_JSON = 'tests/helpers/cookies.json';
+export const PUBLI24_STORAGE_JSON = 'tests/data/publi24/localStorage.json';
+export const PUBLI24_COOKIES_JSON = 'tests/data/publi24/cookies.json';
+export const NIMFOMANE_STORAGE_JSON = 'tests/data/nimfomane/localStorage.json';
+
+// Legacy exports for backward compatibility
+export const STORAGE_JSON = PUBLI24_STORAGE_JSON;
+export const COOKIES_JSON = PUBLI24_COOKIES_JSON;
 
 const utils = {
   async makeContext() {

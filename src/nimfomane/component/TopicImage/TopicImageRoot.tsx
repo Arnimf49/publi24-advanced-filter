@@ -15,12 +15,14 @@ if (typeof browser === "undefined" && typeof chrome !== "undefined") {
 interface TopicImageRootProps {
   id: string;
   container: HTMLDivElement;
+  priority: number;
 }
 
 export const TopicImageRoot: FC<TopicImageRootProps> =
 ({
   id,
   container,
+  priority,
 }) => {
   const [isModalOpen, setImageModalOpen] = useState(false);
   const [topic, setTopic] = useState(NimfomaneStorage.getTopic(id));
@@ -42,7 +44,7 @@ export const TopicImageRoot: FC<TopicImageRootProps> =
   useEffect(() => {
     if (topic.isOfEscort === undefined
       || (topic.escortDeterminationTime && (Date.now() - topic.escortDeterminationTime) > 8.64e+7 * 6)) {
-      listingActions.determineTopicEscort(container, id).catch(console.error);
+      listingActions.determineTopicEscort(container, id, priority).catch(console.error);
     }
     if (!escort && topic.isOfEscort === true && topic.ownerUser) {
       setEscort(NimfomaneStorage.getEscort(topic.ownerUser))
@@ -52,7 +54,7 @@ export const TopicImageRoot: FC<TopicImageRootProps> =
   useEffect(() => {
     if (topic.ownerUser && ((topic.isOfEscort === true && escort?.optimizedProfileImage === undefined)
       || (escort?.optimizedProfileImageTime && (Date.now() - escort.optimizedProfileImageTime) > 8.64e+7 * 4))) {
-      escortActions.determineMainProfileImage(topic.ownerUser).catch(console.error);
+      escortActions.determineMainProfileImage(topic.ownerUser, priority).catch(console.error);
     }
   }, [topic, escort]);
 

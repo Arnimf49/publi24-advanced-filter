@@ -52,7 +52,7 @@ test('Should set poze false as selected reason if unsafe image results are prese
 
     if (await ad.$('[data-wwid="investigate_img"]')) {
       await ad.scrollIntoViewIfNeeded();
-      await utilsPubli.awaitGooglePagesClose(await ad.$('[data-wwid="investigate_img"]'), context, page);
+      await utilsPubli.resolveGooglePage(await ad.$('[data-wwid="investigate_img"]'), context, page);
       await page.waitForTimeout(4000);
 
       try {

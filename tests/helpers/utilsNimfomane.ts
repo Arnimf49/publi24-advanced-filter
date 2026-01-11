@@ -1,32 +1,79 @@
 import {Page} from "playwright-core";
+import fs from "node:fs";
+import {NIMFOMANE_STORAGE_JSON} from "./utils";
+import {expect} from "playwright/test";
+
+let atLoad = 0;
 
 export const utilsNimfomane = {
-  async open(page: Page, url?: string) {
-    await page.goto(url || `https://nimfomane.com/forum/forum/35-escorte-din-cluj/`);
+  async throttleNavigation<T>(page: Page, callback: () => Promise<T>) {
+    if (atLoad !== 0) {
+      await page.goto('about:blank');
+      await page.waitForTimeout(3000);
+    }
+    ++atLoad;
+    return await callback();
+  },
+
+  async throttleReload(page: Page) {
+    const url = page.url();
+    await page.goto('about:blank');
+    await page.waitForTimeout(3000);
+    return page.goto(url);
+  },
+
+  async goto(page: Page, url: string) {
+    let response = await utilsNimfomane.throttleNavigation(page, () => page.goto(url));
+    if (response.status() === 404) {
+      response = await utilsNimfomane.throttleReload(page);
+    }
+    expect(response.status()).toEqual(200);
+    return response;
+  },
+
+  async open(page: Page, config: {url?: string, loadStorage?: boolean} = {}) {
+    const url = typeof config === 'string' ? config : config.url;
+    const loadStorage = typeof config === 'object' ? config.loadStorage : true;
+
+    if (loadStorage !== false && fs.existsSync(NIMFOMANE_STORAGE_JSON)) {
+      const localStorageData = JSON.parse(fs.readFileSync(NIMFOMANE_STORAGE_JSON, 'utf-8'));
+      await page.addInitScript((data: any) => {
+        if (window.localStorage.getItem('_pw_init_nimfo') === 'true') {
+          return;
+        }
+
+        for (const [key, value] of Object.entries(data)) {
+          window.localStorage.setItem(key, value as string);
+        }
+
+        window.localStorage.setItem('_pw_init_nimfo', 'true');
+      }, localStorageData);
+    }
+
+    await utilsNimfomane.goto(page, url || `https://nimfomane.com/forum/forum/35-escorte-din-cluj/`);
     await page.waitForTimeout(600);
   },
 
   async waitForFirstImage(page: Page) {
-    let index = 0;
-    let lastError;
+    for (let i = 0; i < 6; i++) {
+      let index = 10;
+      while (index >= 0) {
+        const parentHandle = page.locator('[data-wwid="topic-image"]').nth(index--)
+        const firstImage = parentHandle.locator('img');
 
-    while (index < 10) {
-      const parentHandle = page.locator('[data-wwid="topic-image"]').nth(index++)
-      const firstImage = parentHandle.locator('img');
-      try {
-        await firstImage.waitFor();
-      } catch (error) {
-        lastError = error;
-        continue;
+        if (await firstImage.isVisible()) {
+          const src = await firstImage.getAttribute('src');
+          const user = await parentHandle.getAttribute('data-wwuser');
+          const id = await parentHandle.getAttribute('data-wwtopic');
+
+          return {firstImage, src, user, id};
+        }
       }
-      const src = await firstImage.getAttribute('src');
-      const user = await parentHandle.getAttribute('data-wwuser');
-      const id = await parentHandle.getAttribute('data-wwtopic');
 
-      return {firstImage, src, user, id};
+      await page.waitForTimeout(1000);
     }
 
-    throw lastError;
+    throw new Error('Failed to find first image in time');
   },
 
   async getUserProfileLink(page: Page, user: string) {

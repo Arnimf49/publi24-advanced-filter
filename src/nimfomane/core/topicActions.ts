@@ -4,12 +4,12 @@ import {elementHelpers} from "./elementHelpers";
 import {NimfomaneStorage} from "./storage";
 
 export const topicActions = {
-  async getEscortOfTopic(lastPageUrl: string, minPostCount?: number): Promise<[string, string] | null> {
+  async getEscortOfTopic(lastPageUrl: string, minPostCount?: number, priority: number = 100): Promise<[string, string] | null> {
     let pageChecked = 0;
     let url = lastPageUrl;
 
     do {
-      const pageData = await page.load(url);
+      const pageData = await page.load(url, priority);
 
       const allUsers = pageData.querySelectorAll<HTMLLinkElement>('.cAuthorPane_author a');
       const escortUsers = Array.from(allUsers).filter(elementHelpers.isUserLinkEscort);
@@ -40,8 +40,8 @@ export const topicActions = {
     return null;
   },
 
-  async determineTopPosterEscort(lastPageUrl: string): Promise<boolean | null> {
-    const pageData = await page.load(lastPageUrl);
+  async determineTopPosterEscort(lastPageUrl: string, priority: number = 100): Promise<boolean | null> {
+    const pageData = await page.load(lastPageUrl, priority);
 
     const topPostersSection = pageData.querySelector('.cTopicOverview__section--users');
     if (!topPostersSection) {
@@ -60,7 +60,7 @@ export const topicActions = {
       return true;
     }
 
-    const userPage = await page.load(url);
+    const userPage = await page.load(url, priority);
     if (elementHelpers.isProfilePageEscort(userPage)) {
       NimfomaneStorage.setEscortProp(user, 'profileLink', url.replace(/\?.*$/, ''));
       return true;

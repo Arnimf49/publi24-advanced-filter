@@ -12,12 +12,12 @@ export const escortActions = {
     NimfomaneStorage.setEscortProp(user, 'optimizedProfileImageTime', Date.now());
   },
 
-  async determineMainProfileImage(user: string) {
+  async determineMainProfileImage(user: string, priority: number = 100) {
     let profileContentUrl = NimfomaneStorage.getEscort(user).profileLink + 'content';
     let pageChecks = 0;
 
     do {
-      const pageData = await page.load(profileContentUrl);
+      const pageData = await page.load(profileContentUrl, priority);
 
       const image = pageData.querySelector('.ipsStreamItem_snippet [data-background-src]');
       if (image) {
@@ -40,14 +40,14 @@ export const escortActions = {
     NimfomaneStorage.setEscortProp(user, 'optimizedProfileImageTime', Date.now());
   },
 
-  async loadImages(user: string, pageNum: number): Promise<Image[] | null> {
+  async loadImages(user: string, pageNum: number, priority: number = 100): Promise<Image[] | null> {
     let url = NimfomaneStorage.getEscort(user).profileLink + 'content';
     if (pageNum !== 0) {
       url += '/page/' + (pageNum + 1);
     }
 
     try {
-      const pageData = await page.load(url);
+      const pageData = await page.load(url, priority);
       const pageExists = !!pageData.querySelector(`[data-page="${pageNum + 1}"]`)
 
       if (pageNum !== 0 && !pageExists) {

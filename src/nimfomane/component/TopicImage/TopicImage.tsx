@@ -23,7 +23,7 @@ export const TopicImage: FC<TopicImageProps> =
       data-wwtopic={id}
     >
       {isLoading ? <Loader color={'#555'} classes={classes.loader}/> : null}
-      {typeof url === "string" ? <img className={classes.image} src={url}/> : null}
+      {typeof url === "string" ? <img className={classes.image} src={url} loading="lazy"/> : null}
       {url === null ? <NoImageIcon/> : null}
     </div>
   );

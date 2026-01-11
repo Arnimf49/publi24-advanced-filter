@@ -33,7 +33,7 @@ export const adData = {
     return id.split('|');
   },
 
-  getPageDate(itemPage: DocumentFragment | HTMLElement): Date {
+  getPageDate(itemPage: Document): Date {
     const dateText = itemPage.querySelector<HTMLElement>('[itemprop="validFrom"], .detail-info div i, .valid-from')?.textContent?.trim();
     if (!dateText) {
       return new Date(0);
@@ -42,7 +42,7 @@ export const adData = {
     return new Date(formattedDateText);
   },
 
-  getPageImage(itemPage: DocumentFragment | HTMLElement): string | undefined {
+  getPageImage(itemPage: Document): string | undefined {
     if (IS_MOBILE_VIEW) {
       const bgImageMatch = itemPage.querySelector<HTMLElement>('[itemprop="associatedMedia"] li')?.style.background?.match(/url\(['"]([^'"]+)['"]\)/);
       return bgImageMatch ? bgImageMatch[1] : undefined;
@@ -60,7 +60,7 @@ export const adData = {
     }
   },
 
-  getPageDescription(itemPage: DocumentFragment | HTMLElement): string {
+  getPageDescription(itemPage: Document): string {
     const descriptionElement = itemPage.querySelector<HTMLElement>('[itemscope] [itemprop="description"], .article-description');
     if (!descriptionElement) {
       return '';
@@ -73,19 +73,19 @@ export const adData = {
       .trim();
   },
 
-  getPageTitle(itemPage: DocumentFragment | HTMLElement): string {
+  getPageTitle(itemPage: Document): string {
     const titleElement = itemPage.querySelector<HTMLHeadingElement>('[itemscope] h1[itemprop="name"], .article-detail h1, .detail-title h1');
     return titleElement ? titleElement.innerHTML : '';
   },
 
-  getItemLocation(item: Element | DocumentFragment | HTMLElement | string, itemIsOnAdPage: boolean = false): string {
+  getItemLocation(item: Element | Document | string, itemIsOnAdPage: boolean = false): string {
     let locationText: string | null | undefined;
 
     if (typeof item === "string") {
       locationText = item;
     } else {
       if (IS_AD_PAGE() || itemIsOnAdPage) {
-        const targetElement = (item instanceof Element) ? item : item.firstChild as Element;
+        const targetElement = (item instanceof Element) ? item : item.body;
         if (targetElement) {
           if (IS_MOBILE_VIEW) {
             locationText = targetElement.querySelector<HTMLElement>('.location')?.innerText;
@@ -175,7 +175,7 @@ export const adData = {
     return thisSeenTime < newestTime;
   },
 
-  async loadInAdPage(itemOrUrl: Element | string | null, _url?: string): Promise<HTMLElement> {
+  async loadInAdPage(itemOrUrl: Element | string | null, _url?: string): Promise<Document> {
     const url: string = _url || (itemOrUrl ? adData.getItemUrl(itemOrUrl) : '');
 
     if (!url) {
@@ -201,7 +201,7 @@ export const adData = {
 
     const itemDataPromises = adUuids.map(async (adUuid): Promise<AdData | null> => {
       const [id, url] = adData.uuidParts(adUuid);
-      let itemPage: DocumentFragment | HTMLElement;
+      let itemPage: Document;
 
       try {
         itemPage = await adData.loadInAdPage(url);
@@ -274,7 +274,7 @@ export const adData = {
       const adPage = await adData.loadInAdPage(item);
 
       if (IS_MOBILE_VIEW) {
-        const matches = adPage.innerHTML.match(/https:\/\/s3\.publi24\.ro\/[^.]+\.(?:jpg|webp|png)/g) ?? [];
+        const matches = adPage.body.innerHTML.match(/https:\/\/s3\.publi24\.ro\/[^.]+\.(?:jpg|webp|png)/g) ?? [];
         return [...new Set(matches)];
       }
 

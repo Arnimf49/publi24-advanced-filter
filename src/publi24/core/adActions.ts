@@ -94,10 +94,10 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
 
 async function acquirePhoneNumber(item: Element, id: string): Promise<string | false> {
   let phone: string | undefined;
-  let adPage: DocumentFragment | HTMLElement = await adData.loadInAdPage(item);
+  let adPage: Document = await adData.loadInAdPage(item);
 
   if (IS_MOBILE_VIEW) {
-    const phoneNumberMatch = adPage.innerHTML.match(/var cnt = ['"](\d+)['"]/);
+    const phoneNumberMatch = adPage.body.innerHTML.match(/var cnt = ['"](\d+)['"]/);
     if (phoneNumberMatch) {
       phone = phoneNumberMatch[1];
     }
@@ -324,7 +324,7 @@ export const adActions = {
 
     const currentAdLocation: string = adData.getItemLocation(item);
     const pageResultForDate = await adData.loadInAdPage(item);
-    const currentAdDate: Date = adData.getPageDate(pageResultForDate as DocumentFragment | HTMLElement);
+    const currentAdDate: Date = adData.getPageDate(pageResultForDate as Document);
 
     const pageResults = await Promise.all(publi24AdLinks.map((link: string) =>
       adData.loadInAdPage(null, link).catch((e) => {
@@ -341,7 +341,7 @@ export const adActions = {
         return;
       }
 
-      const page = pageResult as DocumentFragment | HTMLElement;
+      const page = pageResult as Document;
       const location: string = adData.getItemLocation(page, true);
 
       if (location !== currentAdLocation && !(location.includes('Sector') && currentAdLocation.includes('Sector'))) {

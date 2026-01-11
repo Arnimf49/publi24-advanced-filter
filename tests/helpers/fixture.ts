@@ -1,5 +1,6 @@
 import { test as base, type BrowserContext } from '@playwright/test';
 import {utils} from "./utils";
+import {Page} from "playwright-core";
 
 export const test = base.extend<{
   context: BrowserContext;
@@ -8,7 +9,7 @@ export const test = base.extend<{
   context: async ({}, use, testInfo) => {
     const context = await utils.makeContext();
 
-    const setupDebugLogListener = (page) => {
+    const setupDebugLogListener = (page: Page) => {
       page.on('console', (msg) => {
         const text = msg.text();
         if (text.startsWith('[WW-DEBUG]')) {
@@ -24,15 +25,22 @@ export const test = base.extend<{
     await use(context);
     await context.close();
 
-    // Prevent too many requests, except for nimfomane tests
     if (
       !process.env.DEBUG &&
-      !process.env.PWDEBUG
-      // Nimfomane also added rate limiting.
-      // !testInfo.file.includes("/nimfomane/")
+      !process.env.PWDEBUG &&
+      testInfo.file.includes("/publi24/")
     ) {
       const duration = (Date.now() - start) / 1000;
       const delay = Math.max(0, ((process.env.CI == 'true' ? 14 : 8) - duration) * 1000);
+      await new Promise(r => setTimeout(r, delay));
+    }
+
+    if (
+      !process.env.DEBUG &&
+      !process.env.PWDEBUG &&
+      testInfo.file.includes("/nimfomane/")
+    ) {
+      const delay = (process.env.CI == 'true' ? 6 : 4) * 1000;
       await new Promise(r => setTimeout(r, delay));
     }
   },

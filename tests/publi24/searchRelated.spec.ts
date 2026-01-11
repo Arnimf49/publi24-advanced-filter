@@ -4,7 +4,7 @@ import {ElementHandle, errors, Page} from "playwright-core";
 import {utils} from "../helpers/utils";
 
 test('Should search for phone number and article id and show relevant results.', async ({ page, context }, testInfo) => {
-  testInfo.setTimeout(60000 * 5);
+  testInfo.setTimeout(60000 * 3);
 
   await utilsPubli.open(context, page);
 
@@ -82,7 +82,7 @@ test('Should search for phone number and article id and show relevant results.',
       continue;
     }
 
-    await utilsPubli.awaitGooglePagesClose(articleSearchButton, context, page);
+    await utilsPubli.resolveGooglePage(articleSearchButton, context, page);
 
     try {
       await utils.waitForInnerTextNot(
@@ -114,7 +114,7 @@ test('Should search for phone number and article id and show relevant results.',
   expect(Object.keys(caseChecks).length, `Cases not met: ${Object.keys(caseChecks).join(', ')}`).toEqual(0)
 });
 
-test.only('Should be able to do manual search', async ({ page, context }, testInfo) => {
+test('Should be able to do manual search', async ({ page, context }, testInfo) => {
   testInfo.setTimeout(60000);
 
   await utilsPubli.open(context, page);
@@ -132,7 +132,7 @@ test.only('Should be able to do manual search', async ({ page, context }, testIn
   const pages: any[] = [];
   context.on('page', p => pages.push(p));
 
-  await articleSearchButton.click();
+  await utilsPubli.resolveGooglePage(articleSearchButton, context, page, false);
 
   expect(pages.length).toBeGreaterThan(0);
   const searchPage: Page = pages[0];

@@ -100,7 +100,7 @@ test('Should search for images and show relevant results.', async ({ page, conte
 
     const articleImageSearchButton = await ad.$('[data-wwid="investigate_img"]');
     await articleImageSearchButton.isVisible();
-    await utilsPubli.awaitGooglePagesClose(articleImageSearchButton, context, page);
+    await utilsPubli.resolveGooglePage(articleImageSearchButton, context, page);
 
     await utils.waitForInnerTextNot(
       page,
@@ -146,7 +146,7 @@ test('Should be able to search images on ads without phone.', async ({ page, con
   await (await ad.waitForSelector(`[data-wwid="no-phone-message"]`)).isVisible();
   expect(await ad.$(`[data-wwid="search-results"]`)).toBeNull();
 
-  await utilsPubli.awaitGooglePagesClose(await ad.$('[data-wwid="investigate_img"]'), context, page);
+  await utilsPubli.resolveGooglePage(await ad.$('[data-wwid="investigate_img"]'), context, page);
 
   await utils.waitForInnerTextNot(
     page,
@@ -202,7 +202,7 @@ test('Should be able to do manual search', async ({ page, context }, testInfo) =
   const pages: any[] = [];
   context.on('page', p => pages.push(p));
 
-  await articleImageSearchButton.click();
+  await utilsPubli.resolveGooglePage(articleImageSearchButton, context, page, false);
 
   expect(pages.length).toBeGreaterThan(0);
   const searchPage: Page = pages[0];
@@ -255,7 +255,7 @@ test.skip('Collect unknown domain for image search.', async ({ page, context }, 
 
     const articleImageSearchButton = await ad.$('[data-wwid="investigate_img"]');
     await articleImageSearchButton.isVisible();
-    await utilsPubli.awaitGooglePagesClose(articleImageSearchButton, context, page);
+    await utilsPubli.resolveGooglePage(articleImageSearchButton, context, page);
 
     await utils.waitForInnerTextNot(
       page,

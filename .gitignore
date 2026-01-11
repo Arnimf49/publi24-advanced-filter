@@ -2,8 +2,7 @@ web-ext-artifacts
 .idea
 node_modules/
 /test-results/
-/tests/helpers/localStorage.json
-/tests/helpers/cookies.json
+/tests/data/
 /playwright-report/
 /blob-report/
 /playwright/.cache/

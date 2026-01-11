@@ -4,7 +4,7 @@ import {elementHelpers} from "./elementHelpers";
 import {topicActions} from "./topicActions";
 
 export const listingActions = {
-  async determineTopicEscort(container: HTMLDivElement, id: string) {
+  async determineTopicEscort(container: HTMLDivElement, id: string, priority: number = 100) {
     const setTopicEscort = (user: string, link: string) => {
       NimfomaneStorage.setEscortProp(user, 'profileLink', link);
       NimfomaneStorage.setTopicProp(id, 'isOfEscort', true);
@@ -28,13 +28,13 @@ export const listingActions = {
     const hasPhoneOrIndisponibila = normalizedTitle.match(/07(\d ?){8}/) || normalizedTitle.match(/indisponibil[aă]/i);
 
     if (!hasPhoneOrIndisponibila) {
-      const escortOfTopic = await topicActions.getEscortOfTopic(url, 4);
+      const escortOfTopic = await topicActions.getEscortOfTopic(url, 4, priority);
       if (escortOfTopic) {
         setTopicEscort(escortOfTopic[1], escortOfTopic[0]);
         return;
       }
 
-      const topPosterEscort = await topicActions.determineTopPosterEscort(url);
+      const topPosterEscort = await topicActions.determineTopPosterEscort(url, priority);
       if (topPosterEscort === false) {
         setTopicNotOfEscort();
         return;
@@ -48,7 +48,7 @@ export const listingActions = {
       return;
     }
 
-    const escortOfTopic = await topicActions.getEscortOfTopic(url);
+    const escortOfTopic = await topicActions.getEscortOfTopic(url, undefined, priority);
 
     if (escortOfTopic) {
       setTopicEscort(escortOfTopic[1], escortOfTopic[0]);

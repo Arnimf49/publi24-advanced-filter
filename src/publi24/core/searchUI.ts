@@ -4,11 +4,6 @@ export function addSearchLoader(text: string, isManual: boolean, progress?: numb
   const existingLoader = document.querySelector('[data-ww-search-loader]') as HTMLElement;
   const loader = existingLoader || document.createElement('div');
 
-  if (!existingLoader) {
-    document.body.appendChild(loader);
-    loader.setAttribute('data-ww-search-loader', 'true');
-  }
-
   loader.style.background = 'rgb(59 63 71)';
   loader.style.position = 'fixed';
   loader.style.top = `${60 + (topOffset || 0)}px`;

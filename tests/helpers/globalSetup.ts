@@ -1,21 +1,23 @@
-import {COOKIES_JSON, STORAGE_JSON, utils} from "./utils";
+import {PUBLI24_COOKIES_JSON, PUBLI24_STORAGE_JSON, NIMFOMANE_STORAGE_JSON, utils} from "./utils";
 import fs from "node:fs";
 import {utilsPubli} from "./utilsPubli";
+import {utilsNimfomane} from "./utilsNimfomane";
 
-const MAX_AGE_MS = 15 * 60 * 1000; // 15 min
 
-export default async () => {
-  const shouldSkip = fs.existsSync(STORAGE_JSON) && fs.existsSync(COOKIES_JSON) && (() => {
-    const stats = fs.statSync(STORAGE_JSON);
+async function setupPubli24() {
+  const MAX_AGE_MS = 15 * 60 * 1000; // 15 min
+  const shouldSkip = fs.existsSync(PUBLI24_STORAGE_JSON) && fs.existsSync(PUBLI24_COOKIES_JSON) && (() => {
+    const stats = fs.statSync(PUBLI24_STORAGE_JSON);
     const age = Date.now() - stats.mtimeMs;
     return age < MAX_AGE_MS;
   })();
 
   if (shouldSkip) {
-    console.log('[global-setup] Skipping localStorage save (cache is fresh)');
+    console.log('[global-setup:publi24] Skipping localStorage save (cache is fresh)');
     return;
   }
 
+  console.log('[global-setup:publi24] Setting up publi24 data...');
   const context = await utils.makeContext();
   const page = await context.newPage();
 
@@ -23,9 +25,7 @@ export default async () => {
   utilsPubli.clearPopups(page);
   const article = await utilsPubli.findAdWithDuplicates(page, true);
 
-  // Do an action to ensure all popups closed properly.
-  // Do a google search to save images solving.
-  await utilsPubli.awaitGooglePagesClose(await article.waitForSelector('[data-wwid="investigate_img"]'), context, page);
+  await utilsPubli.resolveGooglePage(await article.waitForSelector('[data-wwid="investigate_img"]'), context, page);
 
   const localStorageData = await page.evaluate(() => {
     const data: any = {};
@@ -36,8 +36,51 @@ export default async () => {
     return data;
   });
 
-  fs.writeFileSync('tests/helpers/localStorage.json', JSON.stringify(localStorageData, null, 2));
-  fs.writeFileSync('tests/helpers/cookies.json', JSON.stringify(await context.cookies(), null, 2));
+  fs.writeFileSync(PUBLI24_STORAGE_JSON, JSON.stringify(localStorageData, null, 2));
+  fs.writeFileSync(PUBLI24_COOKIES_JSON, JSON.stringify(await context.cookies(), null, 2));
 
   await context.close();
+  console.log('[global-setup:publi24] Setup complete');
+}
+
+async function setupNimfomane() {
+  const MAX_AGE_MS = 40 * 60 * 1000;
+  const shouldSkip = fs.existsSync(NIMFOMANE_STORAGE_JSON) && (() => {
+    const stats = fs.statSync(NIMFOMANE_STORAGE_JSON);
+    const age = Date.now() - stats.mtimeMs;
+    return age < MAX_AGE_MS;
+  })();
+
+  if (shouldSkip) {
+    console.log('[global-setup:nimfomane] Skipping localStorage save (cache is fresh)');
+    return;
+  }
+
+  console.log('[global-setup:nimfomane] Setting up nimfomane data...');
+  const context = await utils.makeContext();
+  const page = await context.newPage();
+
+  await utilsNimfomane.open(page, {loadStorage: false});
+  await utilsNimfomane.waitForFirstImage(page);
+
+  const localStorageData = await page.evaluate(() => {
+    const data: any = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      data[key] = localStorage.getItem(key);
+    }
+    return data;
+  });
+
+  fs.writeFileSync(NIMFOMANE_STORAGE_JSON, JSON.stringify(localStorageData, null, 2));
+
+  await context.close();
+  console.log('[global-setup:nimfomane] Setup complete');
+}
+
+export default async () => {
+  await Promise.all([
+    setupPubli24(),
+    setupNimfomane(),
+  ]);
 };

@@ -5,10 +5,11 @@ import {ProfileImages} from "../component/ProfileImages/ProfileImages";
 import {profileActions} from "./profileActions";
 
 export const renderer = {
-  registerTopicItem(container: HTMLDivElement, id: string) {
+  registerTopicItem(container: HTMLDivElement, id: string, index: number) {
+    const priority = 90 - index * 2;
     const imageContainer = document.createElement('div');
     const root = ReactDOM.createRoot(imageContainer);
-    root.render(<TopicImageRoot id={id} container={container}/>);
+    root.render(<TopicImageRoot id={id} container={container} priority={priority}/>);
 
 
     const mainDataContainer = container.querySelector('.ipsDataItem_main');

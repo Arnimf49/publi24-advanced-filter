@@ -16,7 +16,7 @@ test('Should search and focus ad on listing', async ({ page, context }) => {
   const adId = await firstAd.getAttribute('data-articleid');
 
   setTimeout(() => page.locator('.pagination').scrollIntoViewIfNeeded(), 500);
-  await utilsPubli.awaitGooglePagesClose(async () => await firstAd.$('[data-wwid="investigate"]'), context, page);
+  await utilsPubli.resolveGooglePage(async () => await firstAd.$('[data-wwid="investigate"]'), context, page);
   await page.waitForTimeout(800);
 
   await expect(page.locator(`[data-articleid="${adId}"]`)).toBeInViewport();
@@ -37,10 +37,9 @@ test('Should search and focus ad in ads modal', async ({ page, context }) => {
   const modalAd = modalAds[modalAds.length - 1];
   const adId = await modalAd.getAttribute('data-articleid');
 
-  await utilsPubli.awaitGooglePagesClose(async () => await modalAd.$('[data-wwid="investigate"]'), context, page);
+  await utilsPubli.resolveGooglePage(async () => await modalAd.$('[data-wwid="investigate"]'), context, page);
   await page.waitForTimeout(800);
 
-  await page.pause();
   await expect(page.locator('[data-wwid="ads-modal"]')).toBeVisible();
   await expect(page.locator(`[data-wwid="ads-modal"] [data-articleid="${adId}"]`)).toBeInViewport();
 })
@@ -63,7 +62,7 @@ test('Should search and focus ad in favorites', async ({ page, context }) => {
   const lastFavoriteAd = favoriteAds[favoriteAds.length - 1];
   const adId = await lastFavoriteAd.getAttribute('data-articleid');
 
-  await utilsPubli.awaitGooglePagesClose(async () => await lastFavoriteAd.$('[data-wwid="investigate"]'), context, page);
+  await utilsPubli.resolveGooglePage(async () => await lastFavoriteAd.$('[data-wwid="investigate"]'), context, page);
   await page.waitForTimeout(800);
 
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();

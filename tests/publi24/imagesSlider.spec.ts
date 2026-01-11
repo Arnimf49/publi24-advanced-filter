@@ -56,7 +56,7 @@ test('Should search images from slider.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
   const firstAd =  await utilsPubli.selectAd(page);
 
-  await utilsPubli.awaitGooglePagesClose(async () => {
+  await utilsPubli.resolveGooglePage(async () => {
     await (await firstAd.$('[class="art-img"]')).click()
     return page.waitForSelector('[data-wwid="images-slider"] [data-wwid="analyze-images"]')
   }, context , page);
