@@ -1,5 +1,5 @@
 import {NimfomaneStorage} from "./storage";
-import {BrowserError, page} from "../../common/page";
+import {page} from "../../common/page";
 
 export interface Image {
   url: string;
@@ -46,34 +46,27 @@ export const escortActions = {
       url += '/page/' + (pageNum + 1);
     }
 
-    try {
-      const pageData = await page.load(url, priority);
-      const pageExists = !!pageData.querySelector(`[data-page="${pageNum + 1}"]`)
+    const pageData = await page.load(url, priority);
+    const pageExists = !!pageData.querySelector(`[data-page="${pageNum + 1}"]`)
 
-      if (pageNum !== 0 && !pageExists) {
-        return null;
-      }
-
-      const imageElements = pageData.querySelectorAll('.ipsStreamItem_snippet [data-background-src]');
-
-      // @ts-ignore
-      const images = [...imageElements].map(el => {
-        return {
-          url: el.getAttribute('data-background-src'),
-          date: el.closest('.ipsStreamItem_container').querySelector('time').innerText,
-        }
-      });
-
-      if (pageNum === 0 && images.length > 0) {
-        escortActions.updatePreviewImage(user, images[0].url);
-      }
-
-      return images;
-    } catch (e: any | BrowserError) {
-      if (e.code === 404) {
-        return null;
-      }
-      throw e;
+    if (pageNum !== 0 && !pageExists) {
+      return null;
     }
+
+    const imageElements = pageData.querySelectorAll('.ipsStreamItem_snippet [data-background-src]');
+
+    // @ts-ignore
+    const images = [...imageElements].map(el => {
+      return {
+        url: el.getAttribute('data-background-src'),
+        date: el.closest('.ipsStreamItem_container').querySelector('time').innerText,
+      }
+    });
+
+    if (pageNum === 0 && images.length > 0) {
+      escortActions.updatePreviewImage(user, images[0].url);
+    }
+
+    return images;
   }
 }

@@ -138,3 +138,17 @@ test('Should update preview image on listing when opening escort images modal.',
   await utilsNimfomane.open(page);
   await expect(page.locator(`[data-wwtopic="${id}"][data-wwid="topic-image"] img`)).toBeVisible();
 })
+
+test('Should show error icon when topic image fails to load.', async ({page}) => {
+  await utilsNimfomane.open(page);
+  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+  const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
+
+  await page.route(profileLink + 'content*', route => route.abort('failed'));
+
+  await utilsNimfomane.deleteUserProfileStorage(page, user);
+  await utilsNimfomane.open(page);
+
+  await page.pause();
+  await expect(page.locator(`[data-wwtopic="${id}"] [data-wwid="image-error-icon"]`)).toBeVisible();
+})

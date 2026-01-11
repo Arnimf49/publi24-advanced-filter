@@ -1,7 +1,8 @@
-import React, {FC, MouseEventHandler} from "react";
+import React, {FC, MouseEventHandler, useState} from "react";
 import classes from "./TopicImage.module.scss";
 import {Loader} from "../../../common/components/Loader/Loader";
 import {NoImageIcon} from "./NoImageIcon";
+import {ImageErrorIcon} from "./ImageErrorIcon";
 
 interface TopicImageProps {
   url?: string | null;
@@ -9,10 +10,13 @@ interface TopicImageProps {
   onClick?: MouseEventHandler;
   user?: string;
   id: string;
+  loadError?: string | null;
 }
 
 export const TopicImage: FC<TopicImageProps> =
-({id, url, user, isLoading, onClick}) => {
+({id, url, user, isLoading, onClick, loadError}) => {
+  const [hasError, setHasError] = useState(false);
+
   return (
     <div
       className={`${classes.container} 
@@ -22,9 +26,10 @@ export const TopicImage: FC<TopicImageProps> =
       data-wwuser={user}
       data-wwtopic={id}
     >
-      {isLoading ? <Loader color={'#555'} classes={classes.loader}/> : null}
-      {typeof url === "string" ? <img className={classes.image} src={url} loading="lazy"/> : null}
-      {url === null ? <NoImageIcon/> : null}
+      {isLoading && !loadError ? <Loader color={'#555'} classes={classes.loader}/> : null}
+      {typeof url === "string" && !hasError && !loadError ? <img className={classes.image} src={url} loading="lazy" onError={() => setHasError(true)}/> : null}
+      {url === null && !loadError ? <NoImageIcon/> : null}
+      {(hasError || loadError) ? <ImageErrorIcon/> : null}
     </div>
   );
 }

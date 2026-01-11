@@ -1,0 +1,27 @@
+.errorContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0 6px;
+  font-size: 1rem;
+}
+
+.errorIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #fc8181;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.875rem;
+  color: #fc8181;
+  flex-shrink: 0;
+}
+
+.errorText {
+  color: #fc8181;
+  line-height: 1.4;
+}

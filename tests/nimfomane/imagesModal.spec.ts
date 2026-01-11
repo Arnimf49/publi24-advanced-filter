@@ -34,3 +34,18 @@ test('Should load more images when scrolling.', async ({page}) => {
     expect(newCount).toBeGreaterThan(imagesCount);
   }
 })
+
+test('Should display error when images fail to load.', async ({page}) => {
+  await utilsNimfomane.open(page);
+  const {user} = await utilsNimfomane.waitForFirstImage(page);
+  const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
+
+  await page.route(profileLink + 'content*', route => route.abort('failed'));
+
+  await utilsNimfomane.open(page);
+  await page.locator(`[data-wwid="topic-image"][data-wwuser="${user}"]`).click();
+
+  await page.pause();
+  await expect(page.locator('[data-wwid="escort-images-error"]')).toBeVisible();
+  await expect(page.locator('[data-wwid="escort-images-error"]')).toContainText('Failed to fetch. Code: 503');
+})

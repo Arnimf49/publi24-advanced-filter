@@ -13,6 +13,7 @@ import classes from './EscortImages.module.scss';
 import {CloseIcon} from "../../../../publi24/component/Common/Icons/CloseIcon";
 import {utils} from "../../../../common/utils";
 import {Loader} from "../../../../common/components/Loader/Loader";
+import ErrorDisplay from "../../ErrorDisplay/ErrorDisplay";
 
 // @ts-ignore
 if (typeof browser === "undefined" && typeof chrome !== "undefined") {
@@ -30,6 +31,7 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
   const [loadedPages, setLoadedPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [ended, setEnded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
   const scrollParent = useMemo(() => utils.getScrollParent(ref.current, false) as HTMLDivElement, [ref.current])
@@ -57,8 +59,9 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
           currentPage += 1;
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Image load failed", err);
+      setError(err?.message + '. Code: ' + err?.code);
     } finally {
       setLoading(false);
     }
@@ -108,7 +111,7 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
         <CloseIcon />
       </button>
 
-      {!images.length && !loading &&
+      {!images.length && !loading && !error &&
         <div className={classes.noImages}>Nu sunt poze</div>
       }
 
@@ -118,6 +121,12 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
           <div className={classes.image_date}>{image.date}</div>
         </div>
       ))}
+
+      {error && (
+        <div className={classes.errorWrapper}>
+          <ErrorDisplay errorMessage={error} dataWwId="escort-images-error" />
+        </div>
+      )}
 
       {loading && <div>
         <Loader classes={classes.loading}/>

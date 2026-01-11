@@ -27,6 +27,7 @@ export const TopicImageRoot: FC<TopicImageRootProps> =
   const [isModalOpen, setImageModalOpen] = useState(false);
   const [topic, setTopic] = useState(NimfomaneStorage.getTopic(id));
   const [escort, setEscort] = useState(topic?.ownerUser ? NimfomaneStorage.getEscort(topic.ownerUser) : null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     NimfomaneStorage.onTopicChanged(id, setTopic);
@@ -44,7 +45,10 @@ export const TopicImageRoot: FC<TopicImageRootProps> =
   useEffect(() => {
     if (topic.isOfEscort === undefined
       || (topic.escortDeterminationTime && (Date.now() - topic.escortDeterminationTime) > 8.64e+7 * 6)) {
-      listingActions.determineTopicEscort(container, id, priority).catch(console.error);
+      listingActions.determineTopicEscort(container, id, priority).catch((error) => {
+        console.error(error);
+        setLoadError(error?.message || 'Failed to load topic');
+      });
     }
     if (!escort && topic.isOfEscort === true && topic.ownerUser) {
       setEscort(NimfomaneStorage.getEscort(topic.ownerUser))
@@ -54,7 +58,10 @@ export const TopicImageRoot: FC<TopicImageRootProps> =
   useEffect(() => {
     if (topic.ownerUser && ((topic.isOfEscort === true && escort?.optimizedProfileImage === undefined)
       || (escort?.optimizedProfileImageTime && (Date.now() - escort.optimizedProfileImageTime) > 8.64e+7 * 4))) {
-      escortActions.determineMainProfileImage(topic.ownerUser, priority).catch(console.error);
+      escortActions.determineMainProfileImage(topic.ownerUser, priority).catch((error) => {
+        console.error(error);
+        setLoadError(error?.message || 'Failed to load image');
+      });
     }
   }, [topic, escort]);
 
@@ -75,6 +82,7 @@ export const TopicImageRoot: FC<TopicImageRootProps> =
         user={topic.ownerUser}
         isLoading={isImageLoading}
         onClick={escort?.optimizedProfileImage ? (() => setImageModalOpen(true)) : undefined}
+        loadError={loadError}
       />
 
       {isModalOpen && topic.ownerUser && (
