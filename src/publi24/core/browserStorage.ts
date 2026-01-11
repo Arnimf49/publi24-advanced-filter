@@ -66,22 +66,35 @@ export const WWBrowserStorage = {
     if (!IS_SAFARI_IOS) {
       // This is also broken on safari.
       browser.storage.local.onChanged.addListener(listener);
-    } else {
-      const currentValues: Record<string, any> = {};
 
-      setInterval(async () => {
-        const newValues = await WWBrowserStorage.get(watchKeys);
-        const changes: Record<string, StorageChange> = {};
-
-        Object.entries(newValues).forEach(([key, data]) => {
-          if (currentValues[key] === data) {
-            changes[key] = {oldValue: currentValues[key], newValue: data};
-            currentValues[key] = data;
-          }
-        });
-
-        listener(changes);
-      }, 500);
+      return () => browser.storage.local.onChanged.removeListener(listener)
     }
-  }
+
+    const currentValues: Record<string, any> = {};
+    const interval = setInterval(async () => {
+      const newValues = await WWBrowserStorage.get(watchKeys);
+      const changes: Record<string, StorageChange> = {};
+
+      Object.entries(newValues).forEach(([key, data]) => {
+        if (currentValues[key] === data) {
+          changes[key] = {oldValue: currentValues[key], newValue: data};
+          currentValues[key] = data;
+        }
+      });
+
+      listener(changes);
+    }, 500);
+
+    return () => clearInterval(interval);
+  },
+
+  when(key: string, value: any, then: () => any) {
+    const conditionChecker = (changes: { [key: string]: StorageChange }) => {
+      if (changes[key]?.newValue === value) {
+        removeListener();
+        then();
+      }
+    }
+    const removeListener = this.listen(conditionChecker)
+  },
 };

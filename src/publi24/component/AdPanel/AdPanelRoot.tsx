@@ -27,6 +27,10 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const [showDuplicates, setShowDuplicates] = useState(false);
   const [sliderImages, setSliderImages] = useState<string[]>([]);
   const [memoryState, setMemoryState] = useState(WWMemoryStorage.getAdState(id));
+  const [phoneSearchJustCompleted, setPhoneSearchJustCompleted] = useState(false);
+  const [imageSearchJustCompleted, setImageSearchJustCompleted] = useState(false);
+  const [prevPhoneTime, setPrevPhoneTime] = useState<number | null | 'unset'>('unset');
+  const [prevImageTime, setPrevImageTime] = useState<number | null | 'unset'>('unset');
 
   const itemUrl = adData.getItemUrl(item);
   const phone = WWStorage.getAdPhone(id) || '';
@@ -92,6 +96,26 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
       WWMemoryStorage.removeOnAdMemoryChanged(id, updateMemoryState);
     };
   }, [id]);
+
+  useEffect(() => {
+    if (phoneTime !== prevPhoneTime) {
+      setPrevPhoneTime(phoneTime || null);
+    }
+    if (phoneTime !== prevPhoneTime && prevPhoneTime !== 'unset') {
+      setPhoneSearchJustCompleted(true);
+      setTimeout(() => setPhoneSearchJustCompleted(false), 4000);
+    }
+  }, [phoneTime]);
+
+  useEffect(() => {
+    if (imageTime !== prevImageTime) {
+      setPrevImageTime(imageTime || null);
+    }
+    if (imageTime !== prevImageTime && prevImageTime !== 'unset') {
+      setImageSearchJustCompleted(true);
+      setTimeout(() => setImageSearchJustCompleted(false), 4000);
+    }
+  }, [imageTime]);
 
   const onVisibilityClick: MouseEventHandler = useCallback((e) => {
     e.preventDefault();
@@ -171,6 +195,8 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         phoneInvestigateStale={phoneInvestigateStale}
         imageInvestigatedSinceDays={imageInvestigatedSinceDays}
         imageInvestigateStale={imageInvestigateStale}
+        phoneSearchJustCompleted={phoneSearchJustCompleted}
+        imageSearchJustCompleted={imageSearchJustCompleted}
         errors={errors}
         onVisibilityClick={onVisibilityClick}
         onFavClick={onFavClick}

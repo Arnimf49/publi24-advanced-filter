@@ -1,8 +1,8 @@
 import {IS_MOBILE_VIEW} from "../../common/globals";
 
 export function addSearchLoader(text: string, isManual: boolean, progress?: number, topOffset?: number): void {
-  const existingLoader = document.querySelector('[data-ww-search-loader]') as HTMLElement;
-  const loader = existingLoader || document.createElement('div');
+  const loader = document.createElement('div');
+  document.body.appendChild(loader);
 
   loader.style.background = 'rgb(59 63 71)';
   loader.style.position = 'fixed';
@@ -27,12 +27,9 @@ export function addSearchLoader(text: string, isManual: boolean, progress?: numb
   progressBar.style.borderRadius = '4px';
   progressBar.style.transition = 'width 0.2s ease-in-out';
 
-  let textEl = loader.querySelector('[data-ww-loader-text]') as HTMLElement;
-  if (!textEl) {
-    textEl = document.createElement('div');
-    textEl.setAttribute('data-ww-loader-text', 'true');
-    loader.appendChild(textEl);
-  }
+  let textEl = document.createElement('div');
+  textEl.setAttribute('data-ww-loader-text', 'true');
+  loader.appendChild(textEl);
   textEl.innerHTML = text;
 
   textEl.style.position = 'absolute';

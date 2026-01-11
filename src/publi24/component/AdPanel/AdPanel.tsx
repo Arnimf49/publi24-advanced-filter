@@ -46,6 +46,8 @@ interface AdPanelProps {
   imageSearchDomains?: ImageSearchDomain[];
   imageResultsStatus?: 'green' | 'yellow' | 'red' | null;
   hasImagesInOtherLocation?: boolean;
+  phoneSearchJustCompleted?: boolean;
+  imageSearchJustCompleted?: boolean;
   errors?: string[];
 
   onVisibilityClick?: MouseEventHandler;
@@ -79,6 +81,8 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     imageSearchDomains,
     imageResultsStatus,
     hasImagesInOtherLocation,
+    phoneSearchJustCompleted,
+    imageSearchJustCompleted,
     errors = [],
     onVisibilityClick,
     onFavClick,
@@ -228,7 +232,9 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
             {hasPhone && (
               <>
                 <h5 className={styles.resultsHeader}>
-                  <span>Rezultate după telefon</span>
+                  <span className={`${styles.resultsTitleText} ${phoneSearchJustCompleted ? styles.searchComplete : ''}`} title="rezultate după analiza de telefon">
+                    Rezultate <PhoneIcon fill="currentColor" size={18} />
+                  </span>
                   {phoneInvestigatedSinceDays && (
                     <span
                       className={`${styles.investigationStatus} ${phoneInvestigateStale ? styles.stale : styles.fresh}`}>
@@ -270,7 +276,9 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
             {!loading && (
               <>
                 <h5 className={styles.resultsHeader}>
-                  <span>Rezultate după imagine</span>
+                  <span className={`${styles.resultsTitleText} ${imageSearchJustCompleted ? styles.searchComplete : ''}`} title="rezultate după analiza de poze">
+                    Rezultate <ImageIcon fill="currentColor" size={18} />
+                  </span>
                   {imageResultsStatus && (
                     <div className={`${styles.statusCircle} ${styles[`status${imageResultsStatus.charAt(0).toUpperCase() + imageResultsStatus.slice(1)}`]}`} />
                   )}

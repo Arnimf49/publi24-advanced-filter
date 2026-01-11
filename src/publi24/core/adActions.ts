@@ -210,9 +210,8 @@ async function searchPhoneResults(id: string, phoneNumber: string, item: HTMLEle
 
     if (windowRef) {
       windowRef.location = searchUrl;
+      WWBrowserStorage.when(`ww:search_started_for`, null, () => WWStorage.setInvestigatedTime(id, Date.now()));
     }
-
-    WWStorage.setInvestigatedTime(id, Date.now());
 
     if ((IS_SAFARI_IOS || localStorage.getItem('_testing_ios') === '1') && windowRef) {
       setTimeout(() => windowRef.location = `${searchUrl}&br=orion`, 400);
