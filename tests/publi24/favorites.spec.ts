@@ -120,7 +120,7 @@ test('Should add favorites and remove one.', async ({ page, context }) => {
   await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (1)');
 })
 
-test('Should add favorites and remove all.', async ({ page, context }) => {
+test('Should add favorites and remove all with confirmation.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (0)');
@@ -130,9 +130,19 @@ test('Should add favorites and remove all.', async ({ page, context }) => {
   await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
 
   await page.locator('[data-wwid="favs-button"]').click();
-  await page.locator('[data-wwid="clear-favorites"]').click();
-  await expect(page.locator('[data-wwid="favorites-modal"]')).not.toBeVisible();
 
+  const clearButton = page.locator('[data-wwid="clear-favorites"]');
+  await expect(clearButton).toHaveText('șterge tot');
+  await expect(clearButton).toHaveAttribute('data-wwconfirm', 'false');
+
+  await clearButton.click();
+  await expect(clearButton).toHaveText('sigur?');
+  await expect(clearButton).toHaveAttribute('data-wwconfirm', 'true');
+  await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (3)');
+
+  await clearButton.click();
+  await expect(page.locator('[data-wwid="favorites-modal"]')).not.toBeVisible();
   await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (0)');
 })
 

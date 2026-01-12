@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useRef, MouseEventHandler} from 'react';
 import Modal from '../../../../common/components/Modal/Modal';
 import ContentModal from '../../Common/Modal/ContentModal';
 import AdsList from '../../Common/Partials/AdList/AdsList';
@@ -30,12 +30,28 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
   onCleanup,
 }) => {
   const [activeTab, setActiveTab] = useState<'active' | 'inactive'>('active');
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const deleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const activeCount = inLocationAds.length + notInLocationAds.length;
   const inactiveCount = noAdsItems.length;
   const isEmpty = activeCount === 0 && inactiveCount === 0;
   const isActiveEmpty = activeCount === 0;
   const isInactiveEmpty = inactiveCount === 0;
+
+  const handleClearClick: MouseEventHandler = (event) => {
+    event.stopPropagation();
+
+    if (deleteTimeoutRef.current) {
+      onClearFavorites();
+    } else {
+      setConfirmDelete(true);
+      deleteTimeoutRef.current = setTimeout(() => {
+        deleteTimeoutRef.current = null;
+        setConfirmDelete(false);
+      }, 5000);
+    }
+  };
 
   return (
     <Modal
@@ -48,10 +64,11 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
         headerActions={<button
           type="button"
           className={styles.clearFavoritesButton}
-          onClick={onClearFavorites}
+          onClick={handleClearClick}
           data-wwid="clear-favorites"
+          data-wwconfirm={confirmDelete ? 'true' : 'false'}
         >
-          <b>șterge lista</b>
+          <b>{confirmDelete ? 'sigur?' : 'șterge tot'}</b>
         </button>}
         onClose={onClose}
         color={misc.getPubliTheme() === 'dark' ? 'rgb(101 44 62)' : '#b34c4c'}
