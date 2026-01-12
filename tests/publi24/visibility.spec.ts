@@ -58,7 +58,7 @@ test('Should hide with a reason and be able to change reason.', async ({ page, c
   expect(await (await firstAd.waitForSelector('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: poze false');
 })
 
-test('Should show subcategories when clicking category with subcategories.', async ({ page, context }) => {
+test('Should allow selecting subcategories for hide reason.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
   const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
@@ -77,11 +77,19 @@ test('Should show subcategories when clicking category with subcategories.', asy
 
   const selectedButton = await firstAd.$('[data-wwid="selected-category"]');
   expect(selectedButton).toBeTruthy();
-  expect(await selectedButton.innerText()).toEqual('aspect');
+  expect(await selectedButton.innerText()).toEqual('aspect ⬇');
 
   await subcategories[0].click();
   await page.waitForTimeout(100);
   expect(await (await firstAd.waitForSelector('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: aspect: înălțime');
+  expect(await subcategories[0].getAttribute('data-wwselected')).toEqual('true');
+  expect(await selectedButton.getAttribute('data-wwselected')).toEqual('');
+
+  await selectedButton.click();
+  await page.waitForTimeout(100);
+  expect(await (await firstAd.waitForSelector('[data-wwid="hide-reason"]')).innerText()).toEqual('motiv ascundere: aspect');
+  expect(await subcategories[0].getAttribute('data-wwselected')).toEqual('');
+  expect(await selectedButton.getAttribute('data-wwselected')).toEqual('true');
 })
 
 
@@ -107,7 +115,29 @@ test('Should allow going back from subcategories to main categories.', async ({ 
   expect(mainReasons).toHaveLength(5);
 
   const title = await firstAd.$('[data-wwid="hide-reason-selection"] span');
-  expect(await title.innerText()).toEqual('motivul ascunderii?');
+  expect(await title.innerText()).toEqual('Motivul ascunderii?');
+})
+
+test('Should close hide reason modal with close button without changing visibility.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
+  const adId = await firstAd.getAttribute('data-articleid');
+  await (await firstAd.$('[data-wwid="toggle-hidden"]')).click();
+  await page.waitForTimeout(100);
+
+  const closeButton = await firstAd.$('[data-wwid="close-hide-reason"]');
+  expect(closeButton).toBeTruthy();
+
+  await closeButton.click();
+  await page.waitForTimeout(100);
+
+  await utilsPubli.assertAdHidden(firstAd);
+  expect(await firstAd.$('[data-wwid="hide-reason-selection"]')).toBeNull();
+
+  await page.reload();
+  const ad =  await page.$(`[data-articleid="${adId}"]`);
+  await utilsPubli.assertAdHidden(ad);
 })
 
 test('Should hide phone number and thus hide duplicate ads.', async ({ page, context }) => {

@@ -160,6 +160,10 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
     setShowHideReason(false);
   }, [phone]);
 
+  const onHideReasonClose = useCallback(() => {
+    setShowHideReason(false);
+  }, []);
+
   const onViewDuplicatesClick = useCallback(() => {
     setShowDuplicates(true);
   }, []);
@@ -225,6 +229,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
           phone={phone}
           selectedReason={defaultHideReason}
           onCancel={onHideReasonCancel}
+          onClose={onHideReasonClose}
         />,
         item.querySelector('[data-wwid="hide-reason-container"]') as HTMLElement,
       )}

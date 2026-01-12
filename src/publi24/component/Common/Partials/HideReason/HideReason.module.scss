@@ -33,10 +33,49 @@
     background: rgb(235 235 235);
     border-radius: 10px;
     padding: 5px;
+    position: relative;
 
     :global(.dark) & {
       background: #3d4145;
       color: #bfbfbf;
+    }
+  }
+
+  .closeButton {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgb(73 73 73);
+    color: rgb(235 235 235);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+
+    svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+    }
+
+    &:hover {
+      background: rgb(93 93 93);
+    }
+
+    :global(.dark) & {
+      background: #bfbfbf;
+      color: #3d4145;
+
+      &:hover {
+        background: #afafaf;
+      }
     }
   }
 

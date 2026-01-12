@@ -13,6 +13,7 @@ type HideReasonRootProps = {
   selectedReason?: string | null;
   onCancel?: () => void,
   onReason?: () => void,
+  onClose?: () => void,
 };
 
 const HideReasonRoot: React.FC<HideReasonRootProps> = ({
@@ -20,6 +21,7 @@ const HideReasonRoot: React.FC<HideReasonRootProps> = ({
   selectedReason = null,
   onCancel,
   onReason,
+  onClose,
 }) => {
   const defaultReason = useMemo(() => {
     if (selectedReason) return null;
@@ -58,6 +60,7 @@ const HideReasonRoot: React.FC<HideReasonRootProps> = ({
       defaultReason={defaultReason}
       onReasonSelect={onReasonSelect}
       onShowClick={onCancel}
+      onClose={onClose}
     />
   );
 };

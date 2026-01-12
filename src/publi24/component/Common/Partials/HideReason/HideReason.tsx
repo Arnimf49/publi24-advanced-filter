@@ -6,6 +6,7 @@ import {IS_MOBILE_VIEW} from "../../../../../common/globals";
 import {utils} from "../../../../../common/utils";
 import {MANUAL_HIDE_REASONS} from "../../../../core/hideReasons";
 import {ManualHideReasonWithKey} from "./HideReasonRoot";
+import {CloseIcon} from "../../Icons/CloseIcon";
 
 const REASONS = Object.keys(MANUAL_HIDE_REASONS);
 
@@ -15,6 +16,7 @@ type HideReasonProps = {
   defaultReason?: string | null;
   onReasonSelect: (reason: ManualHideReasonWithKey, subcategory?: string) => void;
   onShowClick?: () => void;
+  onClose?: () => void;
 };
 
 const HideReason: React.FC<HideReasonProps> = ({
@@ -22,6 +24,7 @@ const HideReason: React.FC<HideReasonProps> = ({
  defaultReason = null,
  onReasonSelect,
  onShowClick,
+ onClose,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -95,9 +98,20 @@ const HideReason: React.FC<HideReasonProps> = ({
       ref={containerRef}
     >
       <div className={styles.reasonButtonsContainer}>
-        <span className={styles.title}>
-          motivul ascunderii?
-        </span>
+        <div className={styles.title}>
+          <span>Motivul ascunderii?</span>
+          {onClose && (
+            <button
+              type="button"
+              className={styles.closeButton}
+              onClick={onClose}
+              data-wwid="close-hide-reason"
+              aria-label="Închide"
+            >
+              <CloseIcon />
+            </button>
+          )}
+        </div>
 
         {showSubcategories && selectedCategory ? (
           <>
@@ -115,15 +129,17 @@ const HideReason: React.FC<HideReasonProps> = ({
               className={misc.cx(styles.reasonButton, styles.reasonSelected)}
               onClick={() => {
                 if (selectedCategory) {
+                  setSelected(selectedCategory);
                   onReasonSelect({
                     key: selectedCategory,
                     config: MANUAL_HIDE_REASONS[selectedCategory]
                   }, '');
                 }
               }}
+              data-wwselected={selected === selectedCategory ? "true" : ""}
               data-wwid="selected-category"
             >
-              {selectedCategory}
+              {selectedCategory} {"⬇"}
             </button>
 
             {MANUAL_HIDE_REASONS[selectedCategory].subcategories?.map((subcategory) => (
