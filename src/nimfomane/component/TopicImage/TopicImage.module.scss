@@ -24,6 +24,7 @@
   }
 }
 
+// Condensed view.
 :global(.onMobile .ww_topic_image_registered .ipsDataItem_main), :global(.onMobile .ww_topic_image_registered .ipsDataItem_stats) {
   margin-left: 80px !important;
 }
@@ -35,6 +36,34 @@
   position: absolute;
   right: 8px;
   top: 65px;
+}
+
+// Expanded view.
+:global(.ww_topic_image_registered .ipsTopicSnippet__top){
+  margin-left: 80px;
+  min-height: 85px;
+}
+:global(.ww_topic_image_registered .ipsTopicSnippet__bottom),
+:global(.ww_topic_image_registered .ipsTopicSnippet__snippet) {
+  margin-left: 110px;
+  :global(.onMobile) & {
+    margin-left: initial;
+  }
+}
+:global(.ww_topic_image_registered.ipsTopicSnippet) {
+  .container {
+    position: absolute;
+    margin: 0;
+
+    :global(body:not(.onMobile)) & {
+      height: 110px;
+    }
+
+    :global(.onMobile) & {
+      top: initial;
+      transform: none;
+    }
+  }
 }
 
 .clickable {

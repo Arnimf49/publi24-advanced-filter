@@ -12,7 +12,7 @@ export const renderer = {
     root.render(<TopicImageRoot id={id} container={container} priority={priority}/>);
 
 
-    const mainDataContainer = container.querySelector('.ipsDataItem_main');
+    const mainDataContainer = container.querySelector('.ipsDataItem_main, .ipsTopicSnippet__top');
     if (mainDataContainer) {
       container.insertBefore(imageContainer, mainDataContainer);
       container.classList.add('ww_topic_image_registered');
