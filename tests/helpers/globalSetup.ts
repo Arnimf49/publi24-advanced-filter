@@ -1,5 +1,6 @@
 import {PUBLI24_COOKIES_JSON, PUBLI24_STORAGE_JSON, NIMFOMANE_STORAGE_JSON, utils} from "./utils";
 import fs from "node:fs";
+import path from "node:path";
 import {utilsPubli} from "./utilsPubli";
 import {utilsNimfomane} from "./utilsNimfomane";
 
@@ -27,16 +28,11 @@ async function setupPubli24() {
 
   await utilsPubli.resolveGooglePage(await article.waitForSelector('[data-wwid="investigate_img"]'), context, page);
 
-  const localStorageData = await page.evaluate(() => {
-    const data: any = {};
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      data[key] = localStorage.getItem(key);
-    }
-    return data;
-  });
+  const localStorageData = await utils.getLocalStorageData(page);
 
+  fs.mkdirSync(path.dirname(PUBLI24_STORAGE_JSON), { recursive: true });
   fs.writeFileSync(PUBLI24_STORAGE_JSON, JSON.stringify(localStorageData, null, 2));
+  fs.mkdirSync(path.dirname(PUBLI24_COOKIES_JSON), { recursive: true });
   fs.writeFileSync(PUBLI24_COOKIES_JSON, JSON.stringify(await context.cookies(), null, 2));
 
   await context.close();
@@ -63,15 +59,9 @@ async function setupNimfomane() {
   await utilsNimfomane.open(page, {loadStorage: false});
   await utilsNimfomane.waitForFirstImage(page);
 
-  const localStorageData = await page.evaluate(() => {
-    const data: any = {};
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      data[key] = localStorage.getItem(key);
-    }
-    return data;
-  });
+  const localStorageData = await utils.getLocalStorageData(page);
 
+  fs.mkdirSync(path.dirname(NIMFOMANE_STORAGE_JSON), { recursive: true });
   fs.writeFileSync(NIMFOMANE_STORAGE_JSON, JSON.stringify(localStorageData, null, 2));
 
   await context.close();

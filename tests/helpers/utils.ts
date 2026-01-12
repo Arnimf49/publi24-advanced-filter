@@ -81,6 +81,17 @@ const utils = {
         body: modifiedBody,
       });
     });
+  },
+
+  async getLocalStorageData(page: Page) {
+    return await page.evaluate(() => {
+      const data: any = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        data[key] = localStorage.getItem(key);
+      }
+      return data;
+    });
   }
 }
 
