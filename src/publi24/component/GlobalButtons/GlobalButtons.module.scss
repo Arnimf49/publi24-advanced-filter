@@ -133,3 +133,52 @@
     }
   }
 }
+
+@keyframes popAnimation {
+  0% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.05);
+    background: #c55858;
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@keyframes popAnimationDark {
+  0% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.07);
+    background-color: rgb(95, 57, 74);
+    color: #f08a8a;
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+.savesButtonAnimating {
+  animation: popAnimation 0.2s ease-out;
+
+  :global(.onMobile) & {
+    animation: none;
+  }
+
+  :global(.dark) & {
+    animation: popAnimationDark 0.2s ease-out;
+  }
+
+  :global(.dark) & .savesIcon {
+    animation: iconColorAnimation 0.2s ease-out;
+  }
+}
+
+@keyframes iconColorAnimation {
+  50% {
+    fill: #f08a8a;
+  }
+}

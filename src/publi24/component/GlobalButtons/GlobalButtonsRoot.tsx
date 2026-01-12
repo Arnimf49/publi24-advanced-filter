@@ -14,8 +14,8 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
   const [isFavsOpen, setFavsOpen] = useState(false);
   const [isPhoneSearchOpen, setPhoneSearchOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
-  const [favsCount, setFavsCount] = useState<number>(0);
-  const [favsWithNoAdsCount, setFavsWithNoAdsCount] = useState<number>(0);
+  const [favsCount, setFavsCount] = useState<number | null>(null);
+  const [favsWithNoAdsCount, setFavsWithNoAdsCount] = useState<number | null>(null);
 
   useEffect(() => {
     const onFavsChanged = () => {
