@@ -71,10 +71,18 @@
   cursor: pointer;
   display: inline-flex;
 
+  :global(.dark) & {
+    background: #2f2f2f;
+  }
+
   svg {
-    stroke: black;
+    stroke: #2f2f2f;
     width: 24px;
     height: 24px;
+
+    :global(.dark) & {
+      stroke: rgb(191, 191, 191);
+    }
   }
 }
 
