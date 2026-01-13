@@ -8,6 +8,36 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '2.42',
+    releaseDate: '13 ianuarie 2026',
+    changeNew: [
+      'Setare nouă: căutare manuală pentru telefon și poze.',
+      'Pe Desktop implicit căutare manuală pornită în setări pe poze.',
+      'Modal cu explicații la apăsare pe titluri rezultate.',
+      'Animație puls când rezultatele sunt actualizate.',
+      'Layout nou butoane globale cu logo și meniu.',
+      'Tutorial refăcut și adăugat în meniu.',
+      'Istoricul versiunilor în meniu.',
+      'Separarea anunțurilor active și inactive în modalul de favorite.',
+      'Animație pe butonul modalului de favorite la schimbare.',
+      'Protecție la ștergerea tuturor pe modalul de favorite.',
+      'Reafișare modal la reîncărcarea paginii, îmbunătățind UX pe iOS.',
+    ],
+    changeImprove: [
+      'Modalele se închid la apăsarea înapoi și nu navighează pagina.',
+      'Motiv ascundere îmbunătățit.',
+      'Redenumire titlurilor de rezultate sub anunț.',
+      'Afișare eroare la încărcarea pozelor.',
+      'Prevenire limitare rată îmbunătățită și încărcare leneșă imagini.',
+      'Afiș mai scurt al link-urilor rezultate pe căutare telefon.',
+      'Firefox: scos stilul "neclar" de pe modaluri pentru performanță mai bună.',
+    ],
+    changeFix: [
+      'Înălțimea imaginilor în modalul de imagini.',
+      'Căutare poze nefuncțională în pagina anunțului când rulat din modalul de duplicate.',
+    ],
+  },
+  {
     version: '2.41',
     releaseDate: '28 decembrie 2025',
     changeNew: [
