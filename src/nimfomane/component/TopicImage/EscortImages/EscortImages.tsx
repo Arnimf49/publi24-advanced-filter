@@ -15,6 +15,7 @@ import {utils} from "../../../../common/utils";
 import {Loader} from "../../../../common/components/Loader/Loader";
 import ErrorDisplay from "../../ErrorDisplay/ErrorDisplay";
 import {IS_MOBILE_VIEW} from "../../../../common/globals";
+import {P24faLogoLight} from "../../../../common/components/Logo/P24faLogoLight";
 
 // @ts-ignore
 if (typeof browser === "undefined" && typeof chrome !== "undefined") {
@@ -92,8 +93,7 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
 
   const headerContent = (
     <div className={classes.header}>
-      <img
-        src={browser.runtime.getURL("icon.png")}
+      <P24faLogoLight
         onClick={() => window.open('https://chromewebstore.google.com/detail/publi24-filtru-avansat/pigkjfndnpblohnmphgbmecaelefaedn', '_blank')}
         className={classes.logo}
         data-wwid="logo"

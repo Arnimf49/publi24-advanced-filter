@@ -87,10 +87,12 @@
 
 .logo {
   width: 60px;
+  height: 60px;
   cursor: pointer;
 
   :global(.onMobile) & {
     width: 42px;
+    height: 42px;
   }
 }
 
