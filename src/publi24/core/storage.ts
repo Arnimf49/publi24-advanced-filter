@@ -578,6 +578,14 @@ export const WWStorage = {
     localStorage.setItem('ww:analytics-last-checked', String(timestamp));
   },
 
+  getVersionSeen(): string | null {
+    return localStorage.getItem('ww:version-seen');
+  },
+
+  setVersionSeen(version: string): void {
+    localStorage.setItem('ww:version-seen', version);
+  },
+
 
   onAdChanged(id: string, callback: () => void) {
     _WW_CALLBACKS.adChanged[id] = _WW_CALLBACKS.adChanged[id] || [];

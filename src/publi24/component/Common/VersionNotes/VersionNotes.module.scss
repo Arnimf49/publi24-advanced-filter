@@ -1,0 +1,58 @@
+.versionNotes {
+  padding: 16px 0;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+
+.version {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: inherit;
+}
+
+.releaseDate {
+  font-size: 14px;
+  color: #666;
+  opacity: 0.8;
+}
+
+.changeSection {
+  margin-bottom: 12px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.changeTitle {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: inherit;
+}
+
+.changeList {
+  margin: 0;
+  padding-left: 24px;
+  
+  li {
+    margin-bottom: 4px;
+    line-height: 1.5;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}

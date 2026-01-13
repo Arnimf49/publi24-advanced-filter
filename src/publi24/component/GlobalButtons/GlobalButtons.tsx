@@ -4,6 +4,7 @@ import {PhoneIcon} from "../Common/Icons/PhoneIcon";
 import {SettingsIcon} from "../Common/Icons/SettingsIcon";
 import {StarIcon} from "../Common/Icons/StarIcon";
 import {MenuIcon} from "../Common/Icons/MenuIcon";
+import HistoryIcon from "../Common/Icons/HistoryIcon";
 import {P24faLogoDark} from "../../../common/components/Logo/P24faLogoDark";
 import {P24faLogoLight} from "../../../common/components/Logo/P24faLogoLight";
 import {misc} from "../../core/misc";
@@ -16,9 +17,11 @@ type GlobalButtonsProps = {
   onSearchClick: MouseEventHandler;
   onSettingsClick: MouseEventHandler;
   onFavsClick: MouseEventHandler;
+  onVersionHistoryClick: MouseEventHandler;
   onMenuClick: MouseEventHandler;
   isMenuOpen: boolean;
   onMenuClose: () => void;
+  hasNewVersion: boolean;
 };
 
 const GlobalButtons: React.FC<GlobalButtonsProps> =
@@ -28,9 +31,11 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
   onSearchClick,
   onSettingsClick,
   onFavsClick,
+  onVersionHistoryClick,
   onMenuClick,
   isMenuOpen,
   onMenuClose,
+  hasNewVersion,
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const prevCountRef = useRef<null | number>(null);
@@ -89,8 +94,9 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
 
       <button
         type="button"
-        className={styles.menuButton}
+        className={`${styles.menuButton} ${hasNewVersion ? styles.menuButtonNewVersion: ''}`}
         data-wwid="menu-button"
+        data-wwanimating={hasNewVersion}
         title="Meniu"
         onClick={onMenuClick}
         aria-label="Menu"
@@ -101,6 +107,19 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
       {isMenuOpen && (
         <div ref={menuRef} className={styles.menuDropdown}>
           <div className={styles.menuArrow}/>
+          <button
+            type="button"
+            className={`${styles.menuItem} ${hasNewVersion ? styles.menuItemNewVersion : ''}`}
+            data-wwid="version-history-button"
+            data-wwanimating={hasNewVersion}
+            onClick={(e) => {
+              onVersionHistoryClick(e);
+              onMenuClose();
+            }}
+          >
+            <HistoryIcon fill="currentColor"/>
+            <span>Istoric verziuni</span>
+          </button>
           <button
             type="button"
             className={styles.menuItem}
@@ -132,7 +151,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
 
       <button
         type="button"
-        className={`${styles.savesButton} ${isAnimating ? styles.savesButtonAnimating : ''}`}
+        className={`${styles.savesButton} ${isAnimating ? styles.savesButtonAnimating : ''} ${favsWithNoAdsCount === 0 ? styles.savesButtonOnlyActive : ''}`}
         data-wwid="favs-button"
         onClick={onFavsClick}
         title={'Favorite'}

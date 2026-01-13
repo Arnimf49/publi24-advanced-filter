@@ -9,7 +9,11 @@
     margin-bottom: 12px;
 
     :global(.dark) & {
-      color: rgb(191, 191, 191);
+      color: rgb(220, 220, 220);
+    }
+
+    :global(.light) & {
+      color: rgb(30, 30, 30);
     }
 
     &:last-child {

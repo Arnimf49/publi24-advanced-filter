@@ -143,6 +143,22 @@
   }
 }
 
+.menuButtonNewVersion {
+  animation: newVersionPulse 7.2s ease-in-out infinite;
+
+  &::before {
+    animation: newVersionPulseColor 7.2s ease-in-out infinite;
+  }
+
+  :global(.dark) & {
+    animation: newVersionPulseDark 7.2s ease-in-out infinite;
+
+    &::before {
+      animation: newVersionPulseColorDark 7.2s ease-in-out infinite;
+    }
+  }
+}
+
 .savesButton {
   display: flex;
   align-items: center;
@@ -165,6 +181,12 @@
 
   &:hover {
     background: #a24343;
+  }
+
+  &.savesButtonOnlyActive {
+    :global(.onMobile) & {
+      padding-right: 12px;
+    }
   }
 
   span span {
@@ -248,6 +270,116 @@
 @keyframes iconColorAnimation {
   50% {
     fill: #f08a8a;
+  }
+}
+
+@keyframes newVersionPulse {
+  0%, 100% {
+    transform: scale(1);
+    background: #c59b2f;
+  }
+  3.75% {
+    transform: scale(1.08);
+    background: #d4b050;
+  }
+  7.5% {
+    transform: scale(1);
+    background: #c59b2f;
+  }
+  11.25% {
+    transform: scale(1.08);
+    background: #d4b050;
+  }
+  15% {
+    transform: scale(1);
+    background: #c59b2f;
+  }
+  18.75% {
+    transform: scale(1.08);
+    background: #d4b050;
+  }
+  22.5%, 97.5% {
+    transform: scale(1);
+    background: #c59b2f;
+  }
+}
+
+@keyframes newVersionPulseColor {
+  0%, 100% {
+    background: #c59b2f;
+  }
+  3.75% {
+    background: #d4b050;
+  }
+  7.5% {
+    background: #c59b2f;
+  }
+  11.25% {
+    background: #d4b050;
+  }
+  15% {
+    background: #c59b2f;
+  }
+  18.75% {
+    background: #d4b050;
+  }
+  22.5%, 97.5% {
+    background: #c59b2f;
+  }
+}
+
+@keyframes newVersionPulseDark {
+  0%, 100% {
+    transform: scale(1);
+    background: rgb(84, 71, 30);
+  }
+  3.75% {
+    transform: scale(1.08);
+    background: rgb(104, 91, 50);
+  }
+  7.5% {
+    transform: scale(1);
+    background: rgb(84, 71, 30);
+  }
+  11.25% {
+    transform: scale(1.08);
+    background: rgb(104, 91, 50);
+  }
+  15% {
+    transform: scale(1);
+    background: rgb(84, 71, 30);
+  }
+  18.75% {
+    transform: scale(1.08);
+    background: rgb(104, 91, 50);
+  }
+  22.5%, 97.5% {
+    transform: scale(1);
+    background: rgb(84, 71, 30);
+  }
+}
+
+@keyframes newVersionPulseColorDark {
+  0%, 100% {
+    background: rgb(84, 71, 30);
+  }
+  3.75% {
+    background: rgb(104, 91, 50);
+  }
+  7.5% {
+    background: rgb(84, 71, 30);
+  }
+  11.25% {
+    background: rgb(104, 91, 50);
+  }
+  15% {
+    background: rgb(84, 71, 30);
+  }
+  18.75% {
+    background: rgb(104, 91, 50);
+  }
+  22.5%, 97.5% {
+    background: rgb(84, 71, 30);
   }
 }
 
@@ -352,5 +484,75 @@
     &:hover {
       background: rgba(255, 255, 255, 0.1);
     }
+  }
+}
+
+.menuItemNewVersion {
+  animation: menuItemVersionPulse 7.2s ease-in-out infinite;
+
+  :global(.dark) & {
+    animation: menuItemVersionPulseDark 7.2s ease-in-out infinite;
+  }
+}
+
+@keyframes menuItemVersionPulse {
+  0%, 100% {
+    transform: scale(1);
+    background: rgba(0, 0, 0, 0.03);
+  }
+  3.75% {
+    transform: scale(1.05);
+    background: rgba(0, 0, 0, 0.09);
+  }
+  7.5% {
+    transform: scale(1);
+    background: rgba(0, 0, 0, 0.03);
+  }
+  11.25% {
+    transform: scale(1.05);
+    background: rgba(0, 0, 0, 0.09);
+  }
+  15% {
+    transform: scale(1);
+    background: rgba(0, 0, 0, 0.03);
+  }
+  18.75% {
+    transform: scale(1.05);
+    background: rgba(0, 0, 0, 0.09);
+  }
+  22.5%, 97.5% {
+    transform: scale(1);
+    background: rgba(0, 0, 0, 0.03);
+  }
+}
+
+@keyframes menuItemVersionPulseDark {
+  0%, 100% {
+    transform: scale(1);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  3.75% {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.12);
+  }
+  7.5% {
+    transform: scale(1);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  11.25% {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.12);
+  }
+  15% {
+    transform: scale(1);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  18.75% {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.12);
+  }
+  22.5%, 97.5% {
+    transform: scale(1);
+    background: rgba(255, 255, 255, 0.05);
   }
 }
