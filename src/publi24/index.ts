@@ -7,6 +7,7 @@ import {misc} from "./core/misc";
 import {iosUtils} from "./core/iosUtils";
 import {sendAnalyticsEvent} from "./core/analytics";
 import {modalState} from "../common/modalState";
+import {utils} from "../common/utils";
 
 const waitForSiteLoad = () => new Promise<void>(resolve => {
   const start = Date.now();
@@ -102,6 +103,10 @@ WWStorage.upgrade()
 
     if (IS_MOBILE_VIEW) {
       document.body.classList.add('onMobile');
+    }
+
+    if (utils.getBrowserType() === 'Firefox') {
+      document.body.classList.add('isFirefox');
     }
 
     if (IS_AD_PAGE()) {

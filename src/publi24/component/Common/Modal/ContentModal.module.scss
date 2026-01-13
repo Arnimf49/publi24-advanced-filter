@@ -12,6 +12,11 @@
   align-items: center;
   box-sizing: border-box;
 
+  :global(.isFirefox) & {
+    backdrop-filter: none;
+    background: rgba(60, 60, 60, 0.95);
+  }
+
   @media screen and (min-width: 1000px) {
     padding-left: 0px;
     padding-right: 20px;

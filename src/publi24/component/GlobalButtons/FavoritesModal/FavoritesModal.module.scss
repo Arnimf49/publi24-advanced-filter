@@ -90,6 +90,11 @@
   background: rgba(236, 236, 236, 0.819);
   backdrop-filter: blur(4px);
 
+  :global(.isFirefox) & {
+    backdrop-filter: none;
+    background: rgba(236, 236, 236, 0.95);
+  }
+
   &::after,
   &::before {
     position: absolute;
@@ -100,6 +105,10 @@
     background: inherit;
     backdrop-filter: inherit;
     top: 0;
+
+    :global(.isFirefox) & {
+      backdrop-filter: none;
+    }
   }
   &::after {
     left: 100%;
@@ -127,6 +136,10 @@
   :global(.dark) & {
     background: rgba(31, 31, 31, 0.84);
     color: #bfbfbf;
+
+    :global(.isFirefox) & {
+      background: rgba(31, 31, 31, 0.95);
+    }
   }
 }
 

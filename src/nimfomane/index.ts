@@ -2,6 +2,7 @@ import {NimfomaneStorage} from "./core/storage";
 import {IS_MOBILE_VIEW} from "../common/globals";
 import {renderer} from "./core/renderer";
 import {elementHelpers} from "./core/elementHelpers";
+import {utils} from "../common/utils";
 
 const IS_TOPIC_PAGE = window.location.pathname.match(/^\/forum\/topic\//);
 const IS_PROFILE_PAGE = window.location.pathname.match(/^\/forum\/profile\//);
@@ -40,6 +41,10 @@ NimfomaneStorage.upgrade()
 
     if (IS_MOBILE_VIEW) {
       document.body.classList.add('onMobile');
+    }
+
+    if (utils.getBrowserType() === 'Firefox') {
+      document.body.classList.add('isFirefox');
     }
 
     if (IS_LISTING_PAGE && IS_ESCORT_LISTING) {

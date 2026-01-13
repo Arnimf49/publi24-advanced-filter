@@ -83,6 +83,11 @@
   transform: translate(-50%, 0);
   display: inline-block;
   text-align: center;
+
+  :global(.isFirefox) & {
+    backdrop-filter: none;
+    background: rgba(34, 34, 34, 0.85);
+  }
 }
 
 .logo {
