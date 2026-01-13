@@ -24,6 +24,7 @@ type GlobalButtonsProps = {
   isMenuOpen: boolean;
   onMenuClose: () => void;
   hasNewVersion: boolean;
+  currentVersion: string;
 };
 
 const GlobalButtons: React.FC<GlobalButtonsProps> =
@@ -39,6 +40,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
   isMenuOpen,
   onMenuClose,
   hasNewVersion,
+  currentVersion,
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const prevCountRef = useRef<null | number>(null);
@@ -110,6 +112,10 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
       {isMenuOpen && (
         <div ref={menuRef} className={styles.menuDropdown}>
           <div className={styles.menuArrow}/>
+          <div className={styles.menuHeader}>
+            <span className={styles.menuTitle}>Publi24 filtru avansat</span>
+            <span className={styles.menuVersion}>v{currentVersion}</span>
+          </div>
           <button
             type="button"
             className={styles.menuItem}

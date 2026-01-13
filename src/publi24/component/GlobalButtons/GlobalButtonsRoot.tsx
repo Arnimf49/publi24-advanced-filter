@@ -67,6 +67,8 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
   const onTutorialClick: MouseEventHandler = useCallback(() => {
     renderer.renderInfo();
   }, []);
+  const currentVersion = versionHistory[0]?.version;
+
   return (
     <>
       <GlobalButtons
@@ -81,6 +83,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
         isMenuOpen={isMenuOpen}
         onMenuClose={onMenuClose}
         hasNewVersion={hasNewVersion}
+        currentVersion={currentVersion}
       />
 
       {isFavsOpen &&

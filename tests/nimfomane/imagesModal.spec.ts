@@ -45,7 +45,7 @@ test('Should display error when images fail to load.', async ({page}) => {
   await utilsNimfomane.open(page);
   await page.locator(`[data-wwid="topic-image"][data-wwuser="${user}"]`).click();
 
-  await page.pause();
+  
   await expect(page.locator('[data-wwid="escort-images-error"]')).toBeVisible();
   await expect(page.locator('[data-wwid="escort-images-error"]')).toContainText('Failed to fetch. Code: 503');
 })

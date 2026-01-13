@@ -29,7 +29,7 @@ type TutorialOverlayProps = {
 const getTutorialSteps = (): TutorialStep[] => [
   {
     type: 'welcome',
-    text: 'Bine ai venit la Publi24 Filtru Avansat.\nÎți prezint în scurt funcționalitățile.',
+    text: 'Bine ai venit la Publi24 filtru avansat.\nÎți prezint în scurt funcționalitățile.',
     nextButtonPosition: 'bottom-right'
   },
   {
