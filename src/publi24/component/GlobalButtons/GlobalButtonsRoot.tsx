@@ -7,6 +7,7 @@ import SettingsModalRoot from "./SettingsModal/SettingsModalRoot";
 import VersionHistoryModal from "./VersionHistoryModal/VersionHistoryModal";
 import {modalState} from "../../../common/modalState";
 import {versionHistory} from "../../data/versionHistory";
+import {renderer} from "../../core/renderer";
 
 type GlobalButtonsRootProps = {
 };
@@ -63,6 +64,9 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
   }, []);
   const onMenuClick: MouseEventHandler = useCallback(() => setMenuOpen(prev => !prev), []);
   const onMenuClose = useCallback(() => setMenuOpen(false), []);
+  const onTutorialClick: MouseEventHandler = useCallback(() => {
+    renderer.renderInfo();
+  }, []);
   return (
     <>
       <GlobalButtons
@@ -72,6 +76,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
         onSearchClick={onSearchClick}
         onSettingsClick={onSettingsClick}
         onVersionHistoryClick={onVersionHistoryClick}
+        onTutorialClick={onTutorialClick}
         onMenuClick={onMenuClick}
         isMenuOpen={isMenuOpen}
         onMenuClose={onMenuClose}

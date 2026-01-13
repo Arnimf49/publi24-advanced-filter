@@ -6,7 +6,7 @@ import {WWStorage} from "./storage";
 import * as ReactDOM from "react-dom/client";
 import AdPanelRoot from "../component/AdPanel/AdPanelRoot";
 import GlobalButtonsRoot from "../component/GlobalButtons/GlobalButtonsRoot";
-import InfoOverlay, {CutoutRect} from "../component/InfoOverlay/InfoOverlay";
+import TutorialOverlay from "../component/TutorialOverlay/TutorialOverlay";
 import {IS_MOBILE_VIEW} from "../../common/globals";
 import {misc} from "./misc";
 import AdsModalRoot from "../component/Common/Partials/AdsModal/AdsModalRoot";
@@ -222,84 +222,32 @@ export const renderer = {
 
       const firstAd = firstPhone.closest<HTMLDivElement>('[data-articleid]');
       if (!firstAd) {
-        clearInterval(interval); // Stop if the ad element isn't found
+        clearInterval(interval);
         return;
       }
 
       clearInterval(interval);
 
-      // Wait for things around to load.
-      setTimeout(() => {
-        adActions.scrollIntoView(firstAd);
+      const infoContainer = document.createElement('div');
+      document.body.appendChild(infoContainer);
+      document.body.style.overflow = 'hidden';
 
-        // Wait for docking elements to finish animation.
-        setTimeout(() => {
-          let shownStep: number = 0;
-          const infoContainer = document.createElement('div');
-          document.body.appendChild(infoContainer);
-          document.body.style.overflow = 'hidden';
+      const root = ReactDOM.createRoot(infoContainer);
 
-          const errorCleanup = (error: any): void => {
-            if (infoContainer.parentNode) {
-              infoContainer.parentNode.removeChild(infoContainer);
-            }
-            document.body.style.overflow = 'initial';
-            console.error(error);
-          }
+      const cleanup = (): void => {
+        root.unmount();
+        if (infoContainer.parentNode) {
+          infoContainer.parentNode.removeChild(infoContainer);
+        }
+        document.body.style.overflow = 'initial';
+      };
 
-          try {
-            const elToCutout = (el: Element | null): CutoutRect | null => {
-              if (!el) return null;
-              const rect = el.getBoundingClientRect();
-              return {
-                x: rect.x - 2,
-                y: rect.y - 2,
-                yy: rect.y + rect.height + 2,
-                xm: rect.x + rect.width / 2,
-                xrc: rect.x + rect.width - 15,
-                xlc: rect.x + 15,
-                width: rect.width + 4,
-                height: rect.height + 4,
-              }
-            };
-
-            const adButtonsCutouts: CutoutRect[] = [
-              firstAd.querySelector('[data-wwid="toggle-hidden"]'),
-              firstAd.querySelector('[data-wwid="fav-toggle"]'),
-              firstAd.querySelector('[data-wwid="investigate"]'),
-              firstAd.querySelector('[data-wwid="investigate_img"]'),
-              firstAd.querySelector('.art-img'),
-            ].map(elToCutout).filter((c): c is CutoutRect => c !== null);
-
-            const globalButtonsCutouts: CutoutRect[] = [
-              document.querySelector('[data-wwid="phone-search"]'),
-              document.querySelector('[data-wwid="favs-button"]'),
-              document.querySelector('[data-wwid="settings-button"]'),
-            ].map(elToCutout).filter((c): c is CutoutRect => c !== null);
-
-            const root = ReactDOM.createRoot(infoContainer);
-            root.render(<InfoOverlay cutouts={adButtonsCutouts} adButtonsInfo={true}/>);
-
-            infoContainer.addEventListener('click', () => {
-              try {
-                if (shownStep === 1) {
-                  root.unmount();
-                  document.body.style.overflow = 'initial';
-                  return;
-                }
-
-                root.render(<InfoOverlay cutouts={globalButtonsCutouts} globalButtonsInfo={true}/>)
-
-                ++shownStep;
-              } catch (error) {
-                errorCleanup(error);
-              }
-            });
-          } catch (error) {
-            errorCleanup(error);
-          }
-        }, 700);
-      }, 500);
+      try {
+        root.render(<TutorialOverlay firstAd={firstAd} onComplete={cleanup} />);
+      } catch (error) {
+        cleanup();
+        console.error(error);
+      }
     }, 100);
   },
 };

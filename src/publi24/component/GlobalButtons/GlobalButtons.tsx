@@ -5,6 +5,7 @@ import {SettingsIcon} from "../Common/Icons/SettingsIcon";
 import {StarIcon} from "../Common/Icons/StarIcon";
 import {MenuIcon} from "../Common/Icons/MenuIcon";
 import HistoryIcon from "../Common/Icons/HistoryIcon";
+import TutorialIcon from "../Common/Icons/TutorialIcon";
 import {P24faLogoDark} from "../../../common/components/Logo/P24faLogoDark";
 import {P24faLogoLight} from "../../../common/components/Logo/P24faLogoLight";
 import {misc} from "../../core/misc";
@@ -18,6 +19,7 @@ type GlobalButtonsProps = {
   onSettingsClick: MouseEventHandler;
   onFavsClick: MouseEventHandler;
   onVersionHistoryClick: MouseEventHandler;
+  onTutorialClick: MouseEventHandler;
   onMenuClick: MouseEventHandler;
   isMenuOpen: boolean;
   onMenuClose: () => void;
@@ -32,6 +34,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
   onSettingsClick,
   onFavsClick,
   onVersionHistoryClick,
+  onTutorialClick,
   onMenuClick,
   isMenuOpen,
   onMenuClose,
@@ -107,6 +110,18 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
       {isMenuOpen && (
         <div ref={menuRef} className={styles.menuDropdown}>
           <div className={styles.menuArrow}/>
+          <button
+            type="button"
+            className={styles.menuItem}
+            data-wwid="tutorial-button"
+            onClick={(e) => {
+              onTutorialClick(e);
+              onMenuClose();
+            }}
+          >
+            <TutorialIcon fill="currentColor"/>
+            <span>Tutorial</span>
+          </button>
           <button
             type="button"
             className={`${styles.menuItem} ${hasNewVersion ? styles.menuItemNewVersion : ''}`}
