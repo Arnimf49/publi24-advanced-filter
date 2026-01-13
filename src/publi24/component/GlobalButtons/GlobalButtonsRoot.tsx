@@ -14,6 +14,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
   const [isFavsOpen, setFavsOpen] = useState(false);
   const [isPhoneSearchOpen, setPhoneSearchOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
+  const [isMenuOpen, setMenuOpen] = useState(false);
   const [favsCount, setFavsCount] = useState<number | null>(null);
   const [favsWithNoAdsCount, setFavsWithNoAdsCount] = useState<number | null>(null);
 
@@ -38,6 +39,8 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
   const onFavsClick: MouseEventHandler = useCallback(() => setFavsOpen(true), []);
   const onSearchClick: MouseEventHandler = useCallback(() => setPhoneSearchOpen(true), []);
   const onSettingsClick: MouseEventHandler = useCallback(() => setSettingsOpen(true), []);
+  const onMenuClick: MouseEventHandler = useCallback(() => setMenuOpen(prev => !prev), []);
+  const onMenuClose = useCallback(() => setMenuOpen(false), []);
 
   return (
     <>
@@ -47,6 +50,9 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
         onFavsClick={onFavsClick}
         onSearchClick={onSearchClick}
         onSettingsClick={onSettingsClick}
+        onMenuClick={onMenuClick}
+        isMenuOpen={isMenuOpen}
+        onMenuClose={onMenuClose}
       />
 
       {isFavsOpen &&

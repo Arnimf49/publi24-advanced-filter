@@ -14,6 +14,7 @@ test('Should open whatsapp with one click.', async ({ page, context }) => {
 test('Should include predefined message in WhatsApp link when enabled', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
+  await page.locator('[data-wwid="menu-button"]').click();
   await page.locator('[data-wwid="settings-button"]').click();
   await page.locator('[data-wwid="whatsapp-message-switch"]').click();
 

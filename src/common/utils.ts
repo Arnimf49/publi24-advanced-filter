@@ -137,4 +137,19 @@ export const utils = {
 
     return baseMessage;
   },
+
+  getBrowserType(): 'Chrome' | 'Firefox' {
+    // @ts-ignore
+    if (typeof InstallTrigger !== 'undefined') return 'Firefox';
+    if (!!window.chrome && (!!window.chrome.runtime)) return 'Chrome';
+    return 'Chrome';
+  },
+
+  openExtensionPage(): void {
+    const browserType = utils.getBrowserType();
+    const url = browserType === 'Firefox'
+      ? 'https://addons.mozilla.org/ro/firefox/addon/publi24-filtru-avansat/'
+      : 'https://chromewebstore.google.com/detail/publi24-filtru-avansat/pigkjfndnpblohnmphgbmecaelefaedn?hl=ro';
+    window.open(url, '_blank');
+  },
 }

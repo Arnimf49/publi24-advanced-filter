@@ -1,121 +1,193 @@
-.globalButton {
+.globalButtonsContainer {
   position: fixed !important;
-  font-weight: bold;
-  border-radius: 6px;
-  padding: 8px;
-  border: 1px solid white;
-  box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  line-height: 1;
   bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  padding-right: 5px;
+  border-radius: 9999px;
+  background: #f8f8f8;
+  box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.2);
 
   :global(.onMobile) & {
-    bottom: 64px;
-    padding: 7px 17px 7px 17px;
+    bottom: 66px;
+    left: 6px;
+    transform: translateX(0%);
+    box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.15);
+
+    :global(.dark) & {
+      background: rgb(40 41 42);
+      box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.35);
+    }
   }
 
   :global(.dark) & {
-    border-color: #3c3f41;
-    color: #bfbfbf;
+    background: rgb(40 41 42);
+  }
+}
+
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.logoButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+  border-radius: 9999px;
+  overflow: hidden;
+
+  .logo {
+    width: 42px;
+    height: 42px;
+    display: block;
+  }
+
+  :global(.onMobile) & .logo {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+.logoButtonBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #f8f8f8;
+  box-sizing: content-box;
+  width: calc(40px + 8px);
+  height: calc(40px + 8px);
+  display: block;
+  border-radius: 9999px;
+
+  :global(.onMobile) & {
+    width: calc(34px + 8px);
+    height: calc(34px + 8px);
+  }
+
+  :global(.dark) & {
+    background: rgb(40 41 42);
+  }
+}
+
+.menuButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  background: #c59b2f;
+  padding: 9px;
+  transition: background-color 0.2s ease;
+  height: 40px;
+  box-sizing: border-box;
+  position: relative;
+  margin: 1px 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    transition: background-color 0.2s ease;
+    right: 97%;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    background: #c59b2f;
+  }
+
+  &:hover {
+    background: #b48d28;
+
+    &::before {
+      background: #b48d28;
+    }
   }
 
   svg {
     display: block;
   }
-}
-
-.searchButton {
-  composes: globalButton;
-  background: #1177bb;
-  left: calc(50% - 120px);
-  transform: translateX(-50%);
-
-  &:hover {
-    background: #0b629b;
-  }
-
-  svg {
-    stroke: #FFF;
-  }
 
   :global(.onMobile) & {
-    left: 10px;
-    transform: none;
-  }
-
-  :global(.dark) & {
-    background-color: rgb(60, 84, 123);
-    svg {
-      stroke: #9fc2fa;
-    }
-    &:hover svg {
-       stroke: #c7d9f6;
-    }
-  }
-}
-
-.settingsButton {
-  composes: globalButton;
-  background: #c59b2f;
-  left: calc(50% + 120px);
-  transform: translateX(-50%);
-
-  &:hover {
-    background: #b48d28;
-  }
-
-  :global(.onMobile) & {
-    left: 76px;
-    transform: none;
+    padding: 8px;
+    height: 34px;
   }
 
   :global(.dark) & {
     background-color: rgb(84, 71, 30);
-    svg {
-      fill: #f5d04b;
+
+    &::before {
+      background-color: rgb(84, 71, 30);
     }
-    &:hover svg {
-      fill: #f6e9bd;
+
+    svg {
+      stroke: #f5d04b;
+    }
+
+    &:hover {
+      svg {
+        stroke: #f6e9bd;
+      }
     }
   }
 }
 
 .savesButton {
-  composes: globalButton;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  border: none;
   background: #b34c4c;
-  padding: 13px 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  min-width: 180px;
-  position: relative;
+  padding: 0 12px;
+  padding-right: 14px;
+  border-radius: 0 9999px 9999px 0;
+  font-weight: bold;
+  color: white;
+  line-height: 1;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  height: 40px;
+  box-sizing: border-box;
+  margin: 1px 0;
 
   &:hover {
     background: #a24343;
   }
 
+  span span {
+    font-weight: normal !important;
+  }
+
   .savesIcon {
-    left: 12px;
     width: 22px;
     height: 22px;
     fill: white;
-    vertical-align: middle;
-    position: absolute;
+    flex-shrink: 0;
   }
 
   :global(.onMobile) & {
-    left: 142px;
-    padding: 12px 12px 12px 36px;
-    transform: none;
-    min-width: auto;
+    padding-left: 6px;
+    padding-right: 8px;
+    gap: 4px;
+    font-size: 14px;
+    height: 34px;
 
     .savesIcon {
-      left: 12px;
+      width: 20px;
+      height: 20px;
     }
   }
 
@@ -136,37 +208,33 @@
 
 @keyframes popAnimation {
   0% {
-    transform: translateX(-50%) scale(1);
+    transform: scale(1);
   }
   50% {
-    transform: translateX(-50%) scale(1.05);
+    transform: scale(1.05);
     background: #c55858;
   }
   100% {
-    transform: translateX(-50%) scale(1);
+    transform: scale(1);
   }
 }
 
 @keyframes popAnimationDark {
   0% {
-    transform: translateX(-50%) scale(1);
+    transform: scale(1);
   }
   50% {
-    transform: translateX(-50%) scale(1.07);
+    transform: scale(1.07);
     background-color: rgb(95, 57, 74);
     color: #f08a8a;
   }
   100% {
-    transform: translateX(-50%) scale(1);
+    transform: scale(1);
   }
 }
 
 .savesButtonAnimating {
   animation: popAnimation 0.2s ease-out;
-
-  :global(.onMobile) & {
-    animation: none;
-  }
 
   :global(.dark) & {
     animation: popAnimationDark 0.2s ease-out;
@@ -180,5 +248,109 @@
 @keyframes iconColorAnimation {
   50% {
     fill: #f08a8a;
+  }
+}
+
+.menuDropdown {
+  position: fixed;
+  bottom: calc(10px + 40px + 3px + 3px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #f8f8f8;
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.2);
+  z-index: 3000;
+  min-width: 190px;
+
+  :global(.onMobile) & {
+    left: 0px;
+    transform: none;
+    bottom: calc(10px + 34px + 3px + 3px);
+
+    :global(.dark) & {
+      background: rgb(40 41 42);
+      box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  :global(.dark) & {
+    background: rgb(40 41 42);
+  }
+}
+
+.menuArrow {
+  position: absolute;
+  bottom: -6px;
+  left: 47%;
+  margin-left: -56px;
+  width: 12px;
+  height: 12px;
+  background: #f8f8f8;
+  transform: rotate(45deg);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+
+  :global(.onMobile) & {
+    left: 55px;
+    margin-left: 0;
+
+    :global(.dark) & {
+      background: rgb(40 41 42);
+    }
+  }
+
+  :global(.dark) & {
+    background: rgb(40 41 42);
+  }
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.03);
+  color: #333;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+  position: relative;
+  z-index: 1;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  :global(.onMobile) & {
+    padding: 8px 12px;
+    font-size: 14px;
+    gap: 8px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  :global(.dark) & {
+    background: rgba(255, 255, 255, 0.05);
+    color: #e0e0e0;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
   }
 }

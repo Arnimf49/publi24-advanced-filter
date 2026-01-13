@@ -65,6 +65,7 @@ test('Should skip to next visible over a page and ignore new one.', async ({ pag
 
   await utilsPubli.open(context, page, {page: tryPage, clearStorage: true});
 
+  await page.locator('[data-wwid="menu-button"]').click();
   await page.locator('[data-wwid="settings-button"]').click();
   await page.locator('[data-wwid="auto-hiding"]').click();
   await page.locator('[data-wwid="next-only-visible"]').click();

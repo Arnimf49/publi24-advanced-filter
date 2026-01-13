@@ -189,6 +189,7 @@ test('Should be able to do manual search', async ({ page, context }, testInfo) =
 
   await utilsPubli.open(context, page);
 
+  await page.click('[data-wwid="menu-button"]');
   await page.click('[data-wwid="settings-button"]');
   await page.locator('[data-wwid="manual-image-search-switch"]').click();
   await page.click('[data-wwid="close"]');

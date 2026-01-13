@@ -3,6 +3,7 @@ import {utilsPubli} from "../helpers/utilsPubli";
 import {Page} from "playwright-core";
 
 const setupHideSetting = async (page: Page, criteria: string, options?: {defaultValue?: string | number, value?: string | number, noOpen?: boolean}) => {
+  await (await page.$('[data-wwid="menu-button"]')).click();
   await (await page.$('[data-wwid="settings-button"]')).click();
   if (!options?.noOpen) {
     await (await page.$('[data-wwid="auto-hiding"]')).click();

@@ -5,6 +5,7 @@ import {expect} from "playwright/test";
 test('Should select default manual hide reason when enabled', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
+  await (await page.$('[data-wwid="menu-button"]')).click();
   await (await page.$('[data-wwid="settings-button"]')).click();
   const defaultSwitch = await page.$('[data-wwid="default-manual-hide-reason-switch"]');
   expect(defaultSwitch).toBeTruthy();
@@ -38,6 +39,7 @@ test('Should set poze false as selected reason if unsafe image results are prese
   testInfo.setTimeout(120000);
   await utilsPubli.open(context, page);
 
+  await (await page.$('[data-wwid="menu-button"]')).click();
   await (await page.$('[data-wwid="settings-button"]')).click();
   await (await page.$('[data-wwid="default-manual-hide-reason-switch"]')).click();
   await page.keyboard.press('Escape');

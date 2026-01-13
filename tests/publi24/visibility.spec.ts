@@ -162,6 +162,7 @@ test('Should toggle focus mode and not see hidden ads.', async ({ page, context 
   const firstAdId = await firstAd.getAttribute('data-articleid');
   const secondAdId = await secondad.getAttribute('data-articleid');
 
+  await page.locator('[data-wwid="menu-button"]').click();
   await page.locator('[data-wwid="settings-button"]').click();
   await page.locator('[data-wwid="focus-mode-switch"]').click();
   await page.waitForTimeout(1500);
@@ -169,6 +170,7 @@ test('Should toggle focus mode and not see hidden ads.', async ({ page, context 
   await expect(page.locator(`[data-articleid="${firstAdId}"]`)).toBeHidden();
   await expect(page.locator(`[data-articleid="${secondAdId}"]`)).toBeHidden();
 
+  await page.locator('[data-wwid="menu-button"]').click();
   await page.locator('[data-wwid="settings-button"]').click();
   await page.locator('[data-wwid="focus-mode-switch"]').click();
   await page.waitForTimeout(1500);
@@ -186,6 +188,7 @@ test('Should toggle ad deduplication and see only newest ad.', async ({ page, co
 
   let duplicateArticleIds: string[] = await utilsPubli.getDuplicateAdIds(page, firstAd);
 
+  await page.locator('[data-wwid="menu-button"]').click();
   await page.locator('[data-wwid="settings-button"]').click();
   await page.locator('[data-wwid="ad-deduplication-switch"]').click();
   await page.waitForTimeout(1500);

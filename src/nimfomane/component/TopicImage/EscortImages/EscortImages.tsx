@@ -94,7 +94,7 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
   const headerContent = (
     <div className={classes.header}>
       <P24faLogoLight
-        onClick={() => window.open('https://chromewebstore.google.com/detail/publi24-filtru-avansat/pigkjfndnpblohnmphgbmecaelefaedn', '_blank')}
+        onClick={utils.openExtensionPage}
         className={classes.logo}
         data-wwid="logo"
       />

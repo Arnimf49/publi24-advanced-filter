@@ -4,24 +4,31 @@ interface P24faLogoDarkProps {
   className?: string;
   onClick?: () => void;
   'data-wwid'?: string;
+  padding?: boolean;
 }
 
-export const P24faLogoDark: FC<P24faLogoDarkProps> = ({ className, onClick, 'data-wwid': dataWwid }) => {
+export const P24faLogoDark: FC<P24faLogoDarkProps> = ({ className, padding, onClick, 'data-wwid': dataWwid }) => {
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
-    <div style={{ background: '#333', borderRadius: '9999px' }} className={className} onClick={onClick} data-wwid={dataWwid}>
+    <div style={{ background: '#313138', borderRadius: '9999px', cursor: 'pointer' }} className={className} onClick={handleClick} data-wwid={dataWwid}>
       <svg
         viewBox="0 0 44.979167 44.979167"
         version="1.1"
-        style={{padding: '4.6%'}}
+        style={{padding: padding === undefined || padding ? '4.6%' : 0}}
       >
       <defs>
         <linearGradient id="p24fa-dark-linearGradient33592">
-          <stop style={{ stopColor: '#919191', stopOpacity: 1 }} offset="0.24693961" />
-          <stop style={{ stopColor: '#b9b7b7', stopOpacity: 1 }} offset="1" />
+          <stop style={{ stopColor: 'rgb(110,131,164)', stopOpacity: 1 }} offset="0.24693961" />
+          <stop style={{ stopColor: 'rgb(123,144,176)', stopOpacity: 1 }} offset="1" />
         </linearGradient>
         <linearGradient id="p24fa-dark-linearGradient21744">
-          <stop style={{ stopColor: '#919191', stopOpacity: 1 }} offset="0.22157221" />
-          <stop style={{ stopColor: '#b9b7b7', stopOpacity: 1 }} offset="1" />
+          <stop style={{ stopColor: 'rgb(110,131,164)', stopOpacity: 1 }} offset="0.22157221" />
+          <stop style={{ stopColor: 'rgb(123,144,176)', stopOpacity: 1 }} offset="1" />
         </linearGradient>
         <linearGradient id="p24fa-dark-linearGradient16093">
           <stop style={{ stopColor: '#6893e0', stopOpacity: 1 }} offset="0" />
@@ -29,7 +36,7 @@ export const P24faLogoDark: FC<P24faLogoDarkProps> = ({ className, onClick, 'dat
         </linearGradient>
         <linearGradient id="p24fa-dark-linearGradient8263">
           <stop style={{ stopColor: '#f5d04b', stopOpacity: 1 }} offset="0" />
-          <stop style={{ stopColor: '#54471e', stopOpacity: 1 }} offset="1" />
+          <stop style={{ stopColor: '#ab8f2b', stopOpacity: 1 }} offset="1" />
         </linearGradient>
         <linearGradient
           xlinkHref="#p24fa-dark-linearGradient8263"
@@ -73,6 +80,7 @@ export const P24faLogoDark: FC<P24faLogoDarkProps> = ({ className, onClick, 'dat
         />
       </defs>
       <g>
+        <circle style={{fill: 'rgb(232,234,241)'}} r={9} cx={22} cy={10}/>
         <path
           style={{ fill: 'url(#p24fa-dark-linearGradient8265)', strokeWidth: 0.264496, fillOpacity: 1 }}
           d="m 22.407418,20.91862 c -1.276934,0.03063 -2.558788,0.512569 -3.509347,1.465027 0.01822,0.03756 0.03733,0.07504 0.05529,0.112654 0.703236,1.47279 1.042335,3.514681 1.292944,5.901966 0.250612,2.387285 0.365942,5.081964 0.411862,7.623307 0.07138,3.950112 -0.02642,7.466712 -0.07441,8.869226 a 22.489584,22.489584 0 0 0 1.905826,0.08837 22.489584,22.489584 0 0 0 1.906861,-0.08837 c -0.04799,-1.402513 -0.145797,-4.919118 -0.07441,-8.869226 0.04592,-2.54134 0.161767,-5.236026 0.412378,-7.623307 0.250609,-2.387282 0.589713,-4.429179 1.292944,-5.901966 0.02117,-0.04433 0.04358,-0.08855 0.06511,-0.132808 -0.942031,-0.988226 -2.310549,-1.477841 -3.685046,-1.444873 z"

@@ -4,15 +4,22 @@ interface P24faLogoLightProps {
   className?: string;
   onClick?: () => void;
   'data-wwid'?: string;
+  padding?: boolean;
 }
 
-export const P24faLogoLight: FC<P24faLogoLightProps> = ({ className, onClick, 'data-wwid': dataWwid }) => {
+export const P24faLogoLight: FC<P24faLogoLightProps> = ({ className, padding, onClick, 'data-wwid': dataWwid }) => {
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
-    <div style={{ background: 'white', borderRadius: '9999px' }} className={className} onClick={onClick} data-wwid={dataWwid}>
+    <div style={{ background: 'white', borderRadius: '9999px', cursor: 'pointer' }} className={className} onClick={handleClick} data-wwid={dataWwid}>
       <svg
         viewBox="0 0 44.979167 44.979167"
         version="1.1"
-        style={{padding: '4.6%'}}
+        style={{padding: padding === undefined || padding ? '4.6%' : 0}}
       >
         <defs>
           <linearGradient id="p24fa-light-linearGradient33592">

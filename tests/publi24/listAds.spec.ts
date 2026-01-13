@@ -6,7 +6,8 @@ test('Should search for phone number and list all attached ads.', async ({ page,
   const firstAd =  await utilsPubli.findFirstAdWithPhone(page);
   const phone = await (await firstAd.$('[data-wwid="phone-number"]')).innerText();
 
-  await page.locator('[data-wwid="phone-search"]').click();
+  await page.locator('[data-wwid="menu-button"]').click();
+  await page.locator('[data-wwid="phone-search-button"]').click();
   await expect(page.locator('[data-wwid="ads-modal"]')).toBeVisible();
 
   await page.locator('[data-wwid="phone-input"]').type(phone);

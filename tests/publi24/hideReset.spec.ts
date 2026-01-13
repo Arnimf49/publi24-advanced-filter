@@ -3,6 +3,7 @@ import {utilsPubli} from "../helpers/utilsPubli";
 import {Page} from "playwright-core";
 
 const setupHideSetting = async (page: Page, criteria: string) => {
+  await page.locator('[data-wwid="menu-button"]').click();
   await page.locator('[data-wwid="settings-button"]').click();
   await page.locator('[data-wwid="auto-hiding"]').click();
   await page.locator(`[data-wwcriteria="${criteria}"]`).click();
@@ -51,6 +52,7 @@ test('Should reset auto-hide after expiry.', async ({ page, context }) => {
   const phone = await utilsPubli.getPhoneByArticleId(page, adId);
   await assertResetTimeIsSet(page, phone, 15);
 
+  await page.locator('[data-wwid="menu-button"]').click();
   await page.locator('[data-wwid="settings-button"]').click();
   await page.locator('[data-wwid="auto-hiding"]').click();
   await page.locator('[data-wwid="close"]').click();

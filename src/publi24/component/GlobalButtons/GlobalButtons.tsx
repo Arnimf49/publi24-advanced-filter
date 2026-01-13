@@ -3,7 +3,12 @@ import styles from './GlobalButtons.module.scss';
 import {PhoneIcon} from "../Common/Icons/PhoneIcon";
 import {SettingsIcon} from "../Common/Icons/SettingsIcon";
 import {StarIcon} from "../Common/Icons/StarIcon";
+import {MenuIcon} from "../Common/Icons/MenuIcon";
+import {P24faLogoDark} from "../../../common/components/Logo/P24faLogoDark";
+import {P24faLogoLight} from "../../../common/components/Logo/P24faLogoLight";
+import {misc} from "../../core/misc";
 import {IS_MOBILE_VIEW} from "../../../common/globals";
+import {utils} from "../../../common/utils";
 
 type GlobalButtonsProps = {
   favsCount: number | null;
@@ -11,6 +16,9 @@ type GlobalButtonsProps = {
   onSearchClick: MouseEventHandler;
   onSettingsClick: MouseEventHandler;
   onFavsClick: MouseEventHandler;
+  onMenuClick: MouseEventHandler;
+  isMenuOpen: boolean;
+  onMenuClose: () => void;
 };
 
 const GlobalButtons: React.FC<GlobalButtonsProps> =
@@ -20,9 +28,13 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
   onSearchClick,
   onSettingsClick,
   onFavsClick,
+  onMenuClick,
+  isMenuOpen,
+  onMenuClose,
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const prevCountRef = useRef<null | number>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (favsWithNoAdsCount === null || favsCount === null) {
@@ -41,29 +53,82 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
     }
   }, [favsCount, favsWithNoAdsCount]);
 
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (menuRef.current && !menuRef.current.contains(target)) {
+        const menuButton = document.querySelector('[data-wwid="menu-button"]');
+        if (menuButton && menuButton.contains(target)) {
+          return;
+        }
+        onMenuClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMenuOpen, onMenuClose]);
+
+  const isDark = misc.getPubliTheme() === 'dark';
+  const LogoComponent = isDark ? P24faLogoDark : P24faLogoLight;
+
   return (
-    <>
-      <button
-        type="button"
-        className={styles.searchButton}
-        data-wwid="phone-search"
-        title="Caută după număr de telefon"
-        onClick={onSearchClick}
-        aria-label="Search by phone number"
-      >
-        <PhoneIcon/>
-      </button>
+    <div className={styles.globalButtonsContainer}>
+      <div className={styles.logoWrapper}>
+        <button
+          type="button"
+          className={styles.logoButton}
+          title="Logo"
+          aria-label="Logo"
+        >
+          <LogoComponent className={styles.logo} padding={false} onClick={utils.openExtensionPage}/>
+        </button>
+      </div>
 
       <button
         type="button"
-        className={styles.settingsButton}
-        data-wwid="settings-button"
-        title="Setări"
-        onClick={onSettingsClick}
-        aria-label="Settings"
+        className={styles.menuButton}
+        data-wwid="menu-button"
+        title="Meniu"
+        onClick={onMenuClick}
+        aria-label="Menu"
       >
-        <SettingsIcon/>
+        <MenuIcon/>
       </button>
+
+      {isMenuOpen && (
+        <div ref={menuRef} className={styles.menuDropdown}>
+          <div className={styles.menuArrow}/>
+          <button
+            type="button"
+            className={styles.menuItem}
+            data-wwid="phone-search-button"
+            onClick={(e) => {
+              onSearchClick(e);
+              onMenuClose();
+            }}
+          >
+            <PhoneIcon fill='currentColor'/>
+            <span>Caută anunțuri</span>
+          </button>
+          <button
+            type="button"
+            className={styles.menuItem}
+            data-wwid="settings-button"
+            onClick={(e) => {
+              onSettingsClick(e);
+              onMenuClose();
+            }}
+          >
+            <SettingsIcon fill="currentColor"/>
+            <span>Setări</span>
+          </button>
+        </div>
+      )}
+
+      <div className={styles.logoButtonBg}/>
 
       <button
         type="button"
@@ -73,12 +138,14 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
         title={'Favorite'}
       >
         <StarIcon className={styles.savesIcon}/>
-        {IS_MOBILE_VIEW
-          ? `${favsCount || 0}${favsWithNoAdsCount ? '+' + favsWithNoAdsCount : ''}`
-          : `Favorite (${favsCount || 0}${favsWithNoAdsCount ? '+' + favsWithNoAdsCount : ''})`
-        }
+        <span>
+          {IS_MOBILE_VIEW
+            ? <>{favsCount || 0}<span>{favsWithNoAdsCount ? '+' + favsWithNoAdsCount : ''}</span></>
+            : <>Favorite {favsCount || 0}<span>{favsWithNoAdsCount ? '+' + favsWithNoAdsCount : ''}</span></>
+          }
+        </span>
       </button>
-    </>
+    </div>
   );
 };
 
