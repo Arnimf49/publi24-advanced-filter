@@ -21,6 +21,7 @@ export const iosUtils = {
 
         if (adElement) {
           adActions.scrollIntoView(adElement);
+          clearInterval(interval);
         }
         if (attempts >= maxAttempts) {
           clearInterval(interval);

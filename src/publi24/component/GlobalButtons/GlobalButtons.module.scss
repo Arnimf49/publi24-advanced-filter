@@ -1,5 +1,5 @@
 .globalButtonsContainer {
-  position: fixed !important;
+  position: fixed;
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
@@ -14,6 +14,7 @@
   box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.2);
 
   :global(.onMobile) & {
+    position: absolute;
     bottom: 66px;
     left: 6px;
     transform: translateX(0%);

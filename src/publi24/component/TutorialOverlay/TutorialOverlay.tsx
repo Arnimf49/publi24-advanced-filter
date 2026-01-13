@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import styles from './TutorialOverlay.module.scss';
-import {IS_MOBILE_VIEW} from "../../../common/globals";
+import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../../../common/globals";
 import {P24faLogoLight} from "../../../common/components/Logo/P24faLogoLight";
 
 export type CutoutRect = {
@@ -34,7 +34,7 @@ const getTutorialSteps = (): TutorialStep[] => [
   },
   {
     type: 'element',
-    text: 'Poza principală al anunțului acum deschide toate pozele anunțului la click.',
+    text: 'Poza principală al anunțului acum deschide toate pozele la click.',
     selectors: ['.art-img'],
     nextButtonPosition: 'bottom-right',
     tooltipPosition: 'bottom'
@@ -223,27 +223,36 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({ firstAd, onComplete }
   };
 
   const maskId = "tutorial-cutout-mask";
+  const clipPathId = "tutorial-cutout-clip";
   const tooltipData = getTooltipData();
 
   return (
     <>
       <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
-          <mask id={maskId}>
-            <rect width="5000" height="5000" fill="white"/>
-            {cutouts.map((cutout, index) => (
-              <rect
-                key={index}
-                x={cutout.x}
-                y={cutout.y}
-                width={cutout.width}
-                height={cutout.height}
-                rx="3"
-                ry="3"
-                fill="black"
-              />
-            ))}
-          </mask>
+          {IS_SAFARI_IOS ? (
+            <clipPath id={clipPathId} clipPathUnits="userSpaceOnUse">
+              <path d={`M 0 0 L 5000 0 L 5000 5000 L 0 5000 Z ${cutouts.map(cutout => 
+                `M ${cutout.x} ${cutout.y} L ${cutout.x} ${cutout.y + cutout.height} L ${cutout.x + cutout.width} ${cutout.y + cutout.height} L ${cutout.x + cutout.width} ${cutout.y} Z`
+              ).join(' ')}`} fillRule="evenodd" />
+            </clipPath>
+          ) : (
+            <mask id={maskId}>
+              <rect width="5000" height="5000" fill="white"/>
+              {cutouts.map((cutout, index) => (
+                <rect
+                  key={index}
+                  x={cutout.x}
+                  y={cutout.y}
+                  width={cutout.width}
+                  height={cutout.height}
+                  rx="3"
+                  ry="3"
+                  fill="black"
+                />
+              ))}
+            </mask>
+          )}
         </defs>
       </svg>
 
@@ -251,7 +260,7 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({ firstAd, onComplete }
         key={currentStep}
         className={styles.overlay}
         data-wwid="info-container"
-        style={{ mask: `url(#${maskId})` }}
+        style={IS_SAFARI_IOS ? { WebkitClipPath: `url(#${clipPathId})`, clipPath: `url(#${clipPathId})` } : { mask: `url(#${maskId})` }}
         onClick={handleNext}
       >
         {step.type === 'welcome' && (
