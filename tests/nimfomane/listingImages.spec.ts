@@ -61,7 +61,7 @@ test('Should show all images modal when clicking the topic image.', async ({page
 
   await firstImage.click();
   await page.locator('[data-wwid="escort-images"]').isVisible();
-  await page.locator('[data-wwid="escort-images"] img').isVisible();
+  await page.locator('[data-wwid="escort-images"] img').first().isVisible();
 })
 
 test('Should show images after listing pagination navigation.', async ({page}) => {
@@ -147,8 +147,7 @@ test('Should show error icon when topic image fails to load.', async ({page}) =>
   await page.route(profileLink + 'content*', route => route.abort('failed'));
 
   await utilsNimfomane.deleteUserProfileStorage(page, user);
-  await utilsNimfomane.open(page);
+  await utilsNimfomane.throttleReload(page);
 
-  
   await expect(page.locator(`[data-wwtopic="${id}"] [data-wwid="image-error-icon"]`)).toBeVisible();
 })

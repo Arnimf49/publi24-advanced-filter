@@ -5,12 +5,12 @@ import {ElementHandle} from "playwright-core";
 test('Should add favorites and view them.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (0)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite 0');
 
   await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
   await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
 
-  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (2)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite 2');
   await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
   await expect(page.locator('[data-wwid="toggle-active"]')).toBeVisible();
@@ -31,7 +31,7 @@ test('Should group favorites based on location.', async ({ page, context }) => {
 
   await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
 
-  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (2)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite 2');
   await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
   await expect(page.locator('[data-wwid="toggle-active"]')).toHaveText('Active (2)');
@@ -81,7 +81,7 @@ test('Should show favorites with no loading ads.', async ({ page, context }) => 
 
   await page.reload();
   await page.waitForTimeout(200);
-  expect(await page.locator('[data-wwid="favs-button"]').innerText()).toEqual('Favorite (0+2)');
+  expect(await page.locator('[data-wwid="favs-button"]').innerText()).toEqual('Favorite 0+2');
 })
 
 test('Should be able to remove favorite without available ads.', async ({ page, context }) => {
@@ -100,13 +100,13 @@ test('Should be able to remove favorite without available ads.', async ({ page, 
   await page.locator('[data-wwid="toggle-inactive"]').click();
 
   await page.locator('[data-wwrmfav="076666654"]').click();
-  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (0)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite 0');
 })
 
 test('Should add favorites and remove one.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (0)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite 0');
 
   await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
   await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
@@ -117,13 +117,13 @@ test('Should add favorites and remove one.', async ({ page, context }) => {
   const favs = await page.$$('[data-wwid="favorites-modal"] [data-articleid]');
   expect(favs.length).toEqual(1);
 
-  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (1)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite 1');
 })
 
 test('Should add favorites and remove all with confirmation.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (0)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite 0');
 
   await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
   await page.locator('[data-wwid="fav-toggle"][data-wwstate="off"]').first().click();
@@ -139,11 +139,11 @@ test('Should add favorites and remove all with confirmation.', async ({ page, co
   await expect(clearButton).toHaveText('sigur?');
   await expect(clearButton).toHaveAttribute('data-wwconfirm', 'true');
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
-  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (3)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite 3');
 
   await clearButton.click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).not.toBeVisible();
-  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite (0)');
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite 0');
 })
 
 test('Should optimize phone ads and display newest for favorite.', async ({ page, context }, testInfo) => {

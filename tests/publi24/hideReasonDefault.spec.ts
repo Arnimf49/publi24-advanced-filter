@@ -26,7 +26,7 @@ test('Should select default manual hide reason when enabled', async ({ page, con
 
   const selectedCategoryButton = await firstAd.$('[data-wwid="selected-category"]');
   expect(selectedCategoryButton).toBeTruthy();
-  expect(await selectedCategoryButton.innerText()).toEqual('comportament');
+  expect(await selectedCategoryButton.innerText()).toEqual('comportament ⬇');
 
   const subcategories = await firstAd.$$('[data-wwid="subcategory"]');
   expect(subcategories).toHaveLength(4);

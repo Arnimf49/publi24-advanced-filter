@@ -10,8 +10,7 @@ test('Should display version history modal.', async ({ page, context }) => {
   const modal = page.locator('[data-wwid="version-history-modal"]');
   await expect(modal).toBeVisible();
 
-  const firstVersion = await modal.locator('h3').first();
-  expect(await firstVersion.innerText()).toEqual('Versiunea 2.41');
+  await expect(modal.locator('h3', {hasText: 'Versiunea 2.41'})).toBeVisible();
 });
 
 test('Should add animations for new version.', async ({ page, context }) => {

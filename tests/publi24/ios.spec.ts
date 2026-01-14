@@ -2,7 +2,7 @@ import {expect, test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
 import {ElementHandle, Page} from "playwright-core";
 
-const enabelIosTesting = async (page: Page) => {
+const enableIosTesting = async (page: Page) => {
   await page.evaluate(() => {
     window.localStorage.setItem('_testing_ios', '1');
   });
@@ -10,11 +10,12 @@ const enabelIosTesting = async (page: Page) => {
 
 test('Should search and focus ad on listing', async ({ page, context }) => {
   await utilsPubli.open(context, page);
-  await enabelIosTesting(page);
+  await enableIosTesting(page);
 
   const firstAd = await utilsPubli.findFirstAdWithPhone(page);
   const adId = await firstAd.getAttribute('data-articleid');
 
+  await page.waitForTimeout(800);
   setTimeout(() => page.locator('.pagination').scrollIntoViewIfNeeded(), 500);
   await utilsPubli.resolveGooglePage(async () => await firstAd.$('[data-wwid="investigate"]'), context, page);
   await page.waitForTimeout(800);
@@ -24,7 +25,7 @@ test('Should search and focus ad on listing', async ({ page, context }) => {
 
 test('Should search and focus ad in ads modal', async ({ page, context }) => {
   await utilsPubli.open(context, page);
-  await enabelIosTesting(page);
+  await enableIosTesting(page);
 
   const ad: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
   await (await ad.$('[data-wwid="duplicates"]')).click();
@@ -46,7 +47,7 @@ test('Should search and focus ad in ads modal', async ({ page, context }) => {
 
 test('Should search and focus ad in favorites', async ({ page, context }) => {
   await utilsPubli.open(context, page);
-  await enabelIosTesting(page);
+  await enableIosTesting(page);
 
   const ads = await page.$$('[data-wwid="fav-toggle"][data-wwstate="off"]');
   for (let i = 0; i < Math.min(5, ads.length); i++) {
