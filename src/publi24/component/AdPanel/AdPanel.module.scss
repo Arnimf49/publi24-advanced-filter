@@ -388,36 +388,41 @@
 @keyframes searchCompleteStripesMove {
   0% {
     background-position: 0 0;
-    transform: scale(1.07);
-    margin-right: 7px;
   }
   95% {
-    transform: scale(1.07);
     background-position: 90% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+@keyframes searchCompleteScale {
+  0%, 95% {
+    transform: scale(1.07);
     margin-right: 7px;
   }
   100% {
     transform: scale(1);
-    background-position: 100% 0;
     margin-right: 0;
   }
 }
 
-@keyframes svgStrokePulse {
+@keyframes colorPulseReduced {
   0%, 30%, 60%, 100% {
-    stroke: currentColor;
+    --pulse-color: currentColor;
   }
   15%, 45%, 85% {
-    stroke: rgb(149 87 167);
+    --pulse-color: rgb(149 87 167);
   }
 }
 
-@keyframes svgStrokePulseDark {
+@keyframes colorPulseReducedDark {
   0%, 30%, 60%, 100% {
-    stroke: currentColor;
+    --pulse-color: currentColor;
   }
   15%, 45%, 85% {
-    stroke: rgb(239, 174, 255);
+    --pulse-color: rgb(239, 174, 255);
   }
 }
 
@@ -439,7 +444,7 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: searchCompleteStripesMove 4s linear forwards;
+  animation: searchCompleteStripesMove 4s linear forwards, searchCompleteScale 4s linear forwards;
 
   :global(.dark) & {
     background-image: repeating-linear-gradient(
@@ -457,11 +462,35 @@
   }
 
   svg {
-    animation: svgStrokePulse 4s ease-in-out;
+    animation: colorPulseReduced 4s ease-in-out;
+    stroke: var(--pulse-color);
   }
 
   :global(.dark) & svg {
-    animation: svgStrokePulseDark 4s ease-in-out;
+    animation: colorPulseReducedDark 4s ease-in-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    background-image: none;
+    background-clip: initial;
+    -webkit-background-clip: initial;
+    -webkit-text-fill-color: initial;
+    animation: colorPulseReduced 4s ease-in-out, searchCompleteScale 4s linear forwards;
+    color: var(--pulse-color);
+
+    :global(.dark) & {
+      background-image: none;
+      animation: colorPulseReducedDark 4s ease-in-out;
+    }
+
+    svg {
+      animation: colorPulseReduced 4s ease-in-out;
+      stroke: var(--pulse-color);
+    }
+
+    :global(.dark) & svg {
+      animation: colorPulseReducedDark 4s ease-in-out;
+    }
   }
 }
 

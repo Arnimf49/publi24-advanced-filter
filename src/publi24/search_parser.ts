@@ -1,5 +1,5 @@
 import {WWBrowserStorage} from "./core/browserStorage";
-import {addSearchLoader, addContinueButton} from "./core/searchUI";
+import {addSearchLoader, addContinueButton, withRetry} from "./core/searchUI";
 import {IS_MOBILE_VIEW} from "../common/globals";
 
 let tries: number = 0;
@@ -74,7 +74,7 @@ if (q) {
       let wwid = searchData.wwid;
       isManual = searchData.manual ?? false;
 
-      addSearchLoader(`căutare după telefon (${isSecondSearch ? '2' : '1'}/2) ..`, isManual, isSecondSearch ? 100 : 50, topOffset);
+      withRetry(() => addSearchLoader(`căutare după telefon (${isSecondSearch ? '2' : '1'}/2) ..`, isManual, isSecondSearch ? 100 : 50, topOffset));
 
       const interval: number = window.setInterval(() => {
         if (extractResultLinks(wwid)) {

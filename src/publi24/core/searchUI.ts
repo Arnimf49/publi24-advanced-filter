@@ -1,5 +1,14 @@
 import {IS_MOBILE_VIEW} from "../../common/globals";
 
+export function withRetry(callback: () => any) {
+  try {
+    callback();
+  } catch (error) {
+    console.warn(error);
+    setTimeout(callback, 50);
+  }
+}
+
 export function addSearchLoader(text: string, isManual: boolean, progress?: number, topOffset?: number): void {
   const loader = document.createElement('div');
   document.body.appendChild(loader);

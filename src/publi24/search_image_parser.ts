@@ -1,7 +1,7 @@
 import {WWBrowserStorage} from "./core/browserStorage";
 import {IS_MOBILE_VIEW} from "../common/globals";
 import {utils} from "../common/utils";
-import {addSearchLoader, addContinueButton} from "./core/searchUI";
+import {addSearchLoader, addContinueButton, withRetry} from "./core/searchUI";
 
 interface ImageSearchData {
   wwid: string;
@@ -304,7 +304,7 @@ WWBrowserStorage.get(STORAGE_KEY_IMG_SEARCH).then((data: { [key: string]: any })
     const isManual = searchData.manual ?? false;
 
     if (isManual && !IS_MOBILE_VIEW) {
-      addSearchLoader(`căutare după poze ..`, isManual, 100, topOffset);
+      withRetry(() => addSearchLoader(`căutare după poze ..`, isManual, 100, topOffset));
     }
     else if (IS_MOBILE_VIEW) {
       const count = searchData.count;
@@ -312,7 +312,7 @@ WWBrowserStorage.get(STORAGE_KEY_IMG_SEARCH).then((data: { [key: string]: any })
 
       if (length > 0) {
         const percent =((length - count + 1) / length) * 100;
-        addSearchLoader(`căutare după poze (${length - count + 1}/${length}) ..`, isManual, percent, topOffset);
+        withRetry(() => addSearchLoader(`căutare după poze (${length - count + 1}/${length}) ..`, isManual, percent, topOffset));
       }
     }
   } else {
