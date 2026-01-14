@@ -47,7 +47,8 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
 
   const imageResultsStatus = linksFilter.getImageResultsStatus(imageSearchDomains, imageInvestigateStale);
 
-  const visible = adData.getItemVisibility(id);
+  const isInTutorial = WWStorage.isAdTutorial(id);
+  const visible = isInTutorial || adData.getItemVisibility(id);
   let hideReason = WWStorage.getPhoneHiddenReason(phone);
   const defaultHideReason = imageSearchDomains?.some(({links}) => links.some(({isSafe}) => !isSafe)) ? 'poze false' : null;
   let automaticHideReason = !!(hideReason && hideReason.match(/^automat:/));
@@ -72,7 +73,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   }, []);
 
   useEffect(() => {
-    adActions.setItemVisible(item, adData.getItemVisibility(id));
+    adActions.setItemVisible(item, isInTutorial || adData.getItemVisibility(id));
     WWStorage.getAdSearchResults(id).then(setSearches);
   }, [renderCycle]);
 

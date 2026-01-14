@@ -586,6 +586,13 @@ export const WWStorage = {
     localStorage.setItem('ww:version-seen', version);
   },
 
+  setAdTutorial(id: string, enabled: boolean): void {
+    WWStorage.setAdProp(id, 'tutorial', enabled);
+  },
+
+  isAdTutorial(id: string): boolean {
+    return WWStorage.getAdProp<boolean>(id, 'tutorial') === true;
+  },
 
   onAdChanged(id: string, callback: () => void) {
     _WW_CALLBACKS.adChanged[id] = _WW_CALLBACKS.adChanged[id] || [];

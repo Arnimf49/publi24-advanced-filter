@@ -214,19 +214,27 @@ export const renderer = {
 
   renderInfo(): void {
     const interval: ReturnType<typeof setInterval> = setInterval(() => {
-      const firstPhone = document.querySelector<HTMLElement>('[data-wwid="phone-number"]');
+      let firstAd = Array.from(document.querySelectorAll<HTMLElement>('[data-articleid]')).find(el => {
+        return WWStorage.getAdPhone(el.getAttribute('data-articleid')!);
+      })
+      let articleId = firstAd?.getAttribute('data-articleid');
 
-      if (!firstPhone) {
-        return;
-      }
-
-      const firstAd = firstPhone.closest<HTMLDivElement>('[data-articleid]');
-      if (!firstAd) {
-        clearInterval(interval);
+      if (!firstAd || !articleId) {
         return;
       }
 
       clearInterval(interval);
+
+      const previousDisplay = firstAd.style.display;
+      const wasHidden = previousDisplay === 'none';
+      let unmountAdPanel: (() => void) | null = null;
+
+      if (wasHidden) {
+        unmountAdPanel = renderer.registerAdItem(firstAd, articleId);
+      }
+
+      firstAd.style.display = '';
+      WWStorage.setAdTutorial(articleId, true);
 
       const infoContainer = document.createElement('div');
       document.body.appendChild(infoContainer);
@@ -235,6 +243,11 @@ export const renderer = {
       const root = ReactDOM.createRoot(infoContainer);
 
       const cleanup = (): void => {
+        WWStorage.delAdProp(articleId, 'tutorial');
+        firstAd.style.display = previousDisplay;
+        if (unmountAdPanel) {
+          unmountAdPanel();
+        }
         root.unmount();
         if (infoContainer.parentNode) {
           infoContainer.parentNode.removeChild(infoContainer);

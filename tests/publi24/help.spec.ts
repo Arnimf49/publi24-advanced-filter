@@ -52,3 +52,62 @@ test('Should show info icons on result titles and open help modals.', async ({co
   await expect(page.locator('[data-wwid="image-help-modal"]')).toBeVisible();
   await page.locator('[data-wwid="image-help-modal"] [data-wwid="close"]').click();
 });
+
+test('Should display tutorial correctly when ads are hidden.', async ({context, page}) => {
+  await utilsPubli.open(context, page, {page: 10});
+
+  const ads = await page.$$('[data-articleid]');
+  for (const ad of ads) {
+    const toggleButton = await ad.$('[data-wwid="toggle-hidden"]');
+    if (toggleButton) {
+      await toggleButton.click();
+      await page.waitForTimeout(100);
+    }
+  }
+
+  await page.evaluate(() => {
+    localStorage.setItem('ww:focus_mode', 'true');
+  });
+  await page.reload();
+  await page.waitForTimeout(400);
+
+  for (const ad of await page.$$('[data-articleid]')) {
+    const display = await ad.evaluate(el => getComputedStyle(el).display);
+    expect(display).toBe('none');
+  }
+
+  await page.locator('[data-wwid="menu-button"]').click();
+  await page.locator('[data-wwid="tutorial-button"]').click();
+  await page.waitForTimeout(300);
+
+  const container = page.locator('[data-wwid="info-container"]');
+  await expect(container).toBeVisible();
+
+  const visibleAds = await page.$$('[data-articleid]');
+  let foundVisibleAd = false;
+  let tutorialAdId: string | null = null;
+  let tutorialAd: any = null;
+
+  for (const ad of visibleAds) {
+    const display = await ad.evaluate(el => getComputedStyle(el).display);
+    if (display !== 'none') {
+      foundVisibleAd = true;
+      tutorialAdId = await ad.getAttribute('data-articleid');
+      tutorialAd = ad;
+      break;
+    }
+  }
+
+  expect(foundVisibleAd).toBe(true);
+  expect(tutorialAdId).not.toBeNull();
+  await utilsPubli.assertAdHidden(tutorialAd, {hidden: false});
+
+  for (let i = 0; i < 10; i++) {
+    await container.click();
+    await page.waitForTimeout(100);
+  }
+
+  const adAfterTutorial = await page.$(`[data-articleid="${tutorialAdId}"]`);
+  const displayAfterTutorial = await adAfterTutorial.evaluate(el => getComputedStyle(el).display);
+  expect(displayAfterTutorial).toBe('none');
+});
