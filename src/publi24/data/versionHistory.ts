@@ -8,6 +8,19 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '2.42.1',
+    releaseDate: '14 ianuarie 2026',
+    changeImprove: [
+      'Încărcare mai rapidă a UI-ului pe Google search.',
+    ],
+    changeFix: [
+      'Tutorial nefuncțional când mod focus activat.',
+      'Animație mai simplă pe \'Rezultate\' când sistemul cere animații reduse.',
+      'Aliniere button logo și închidere pe mobil în modalul de poze.',
+      'Anumite poze nu se încarcau.',
+    ],
+  },
+  {
     version: '2.42',
     releaseDate: '13 ianuarie 2026',
     changeNew: [
