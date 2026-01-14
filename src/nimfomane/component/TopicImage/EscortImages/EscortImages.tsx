@@ -16,6 +16,7 @@ import {Loader} from "../../../../common/components/Loader/Loader";
 import ErrorDisplay from "../../ErrorDisplay/ErrorDisplay";
 import {IS_MOBILE_VIEW} from "../../../../common/globals";
 import {P24faLogoLight} from "../../../../common/components/Logo/P24faLogoLight";
+import {nimfomaneUtils} from "../../../core/nimfomaneUtils";
 
 // @ts-ignore
 if (typeof browser === "undefined" && typeof chrome !== "undefined") {
@@ -126,7 +127,11 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
         {images.map((image, index) => (
           <div key={index} data-wwid={'escort-image'} className={classes.image_container}>
             <div className={classes.image_inner_container}>
-              <img src={image.url} loading='lazy' onClick={(e) => e.stopPropagation()} />
+              <img
+                src={nimfomaneUtils.normalizeCmsUrl(image.url)}
+                loading='lazy'
+                onClick={(e) => e.stopPropagation()}
+              />
               <div className={classes.image_date}>{image.date}</div>
             </div>
           </div>
