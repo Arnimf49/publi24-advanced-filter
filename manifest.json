@@ -53,7 +53,8 @@
       ],
       "js": [
         "dist/publi24/search_parser.js"
-      ]
+      ],
+      "run_at": "document_start"
     },
     {
       "matches": [
