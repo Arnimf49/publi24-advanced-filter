@@ -65,14 +65,11 @@ export const TopicImageRoot: FC<TopicImageRootProps> =
     }
   }, [topic, escort]);
 
-  const isP24faTopic = id === '232452';
   const isImageLoading = topic.isOfEscort === undefined ||
     (topic.isOfEscort === true && escort?.optimizedProfileImage === undefined);
-  const url = isP24faTopic
-    ? browser.runtime.getURL('icon.png')
-    : topic.isOfEscort === false
-      ? null
-      : escort?.optimizedProfileImage;
+  const url = topic.isOfEscort === false
+    ? null
+    : escort?.optimizedProfileImage;
 
   return (
     <>

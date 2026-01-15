@@ -19,11 +19,19 @@ export const COOKIES_JSON = PUBLI24_COOKIES_JSON;
 
 const utils = {
   async makeContext() {
-    const { fingerprint, headers } = new FingerprintGenerator().getFingerprint({
+    const { fingerprint, headers } = new FingerprintGenerator({
+      // Some languages case google full page consent redirect.
+      locales: [
+        'en-US',
+        'en-CA',
+      ]
+    }).getFingerprint({
       devices: ['desktop'],
       operatingSystems: ['linux'],
       browsers: ['chrome']
     });
+
+    console.log(fingerprint, headers)
 
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',

@@ -144,9 +144,9 @@ test('Should show error icon when topic image fails to load.', async ({page}) =>
   const {user, id} = await utilsNimfomane.waitForFirstImage(page);
   const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
 
-  await page.route(profileLink + 'content*', route => route.abort('failed'));
+  await page.route(profileLink + 'content*', route => route.abort());
 
-  await utilsNimfomane.deleteUserProfileStorage(page, user);
+  await utilsNimfomane.deleteTopicInfoStorage(page, id);
   await utilsNimfomane.throttleReload(page);
 
   await expect(page.locator(`[data-wwtopic="${id}"] [data-wwid="image-error-icon"]`)).toBeVisible();

@@ -90,6 +90,13 @@ export const utilsNimfomane = {
     )
   },
 
+  async deleteTopicInfoStorage(page: Page, id: string) {
+    return await page.evaluate(
+      (id) => localStorage.removeItem(`p24fa:nimfo:topic:${id}`),
+      id
+    )
+  },
+
   async setTopicStorageProp(page: Page, id: string, prop: string, value: any) {
     await page.evaluate(
       ({id, prop, value}) => {

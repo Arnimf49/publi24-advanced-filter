@@ -13,7 +13,13 @@ export const escortActions = {
   },
 
   async determineMainProfileImage(user: string, priority: number = 100) {
-    let profileContentUrl = NimfomaneStorage.getEscort(user).profileLink + 'content';
+    const escort = NimfomaneStorage.getEscort(user);
+
+    if (!escort.profileLink) {
+      throw new Error('Cannot determine profile image, missing escort data: ' + user);
+    }
+
+    let profileContentUrl = escort.profileLink + 'content';
     let pageChecks = 0;
 
     do {
