@@ -55,8 +55,8 @@ export function addSearchLoader(text: string, isManual: boolean, progress?: numb
   document.body.appendChild(manualText);
 
   manualText.innerHTML = `control ${isManual ? 'manual' : 'automat'} (vezi setări)`;
-  manualText.style.background = 'rgb(59 63 71)';
-  manualText.style.color = 'rgb(121,126,136)';
+  manualText.style.background = 'rgb(40 41 43)';
+  manualText.style.color = 'rgb(106 110 117)';
   manualText.style.position = 'fixed';
   manualText.style.top = `${91 + (topOffset || 0)}px`;
   manualText.style.left = '50%';
