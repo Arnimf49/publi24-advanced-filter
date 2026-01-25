@@ -8,6 +8,13 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '2.42.3',
+    releaseDate: '25 ianuarie 2026',
+    changeFix: [
+      'Configurări noi necesare pentru livrare pe Firefox.',
+    ],
+  },
+  {
     version: '2.42.2',
     releaseDate: '25 ianuarie 2026',
     changeFix: [
