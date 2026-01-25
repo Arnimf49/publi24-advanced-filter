@@ -1,5 +1,5 @@
 import {WWBrowserStorage} from "./browserStorage";
-import {IS_MOBILE_VIEW} from "../../common/globals";
+import {IS_MOBILE_VIEW, IS_PROMOTER} from "../../common/globals";
 
 interface AdItem {
   visibility?: boolean;
@@ -69,15 +69,6 @@ const _WW_CALLBACKS = {
 };
 
 export const WWStorage = {
-  getAdStoreKeys(id: string): string[] {
-    const upperId = id.toUpperCase();
-    const phone = WWStorage.getAdPhone(upperId);
-    const baseKey = `ww2:${upperId}`;
-    return [baseKey].concat(phone ? [
-      `ww2:phone:${phone}`,
-      `ww:favs`,
-    ] : []);
-  },
 
   getAdItem(id: string): AdItem {
     const upperId = id.toUpperCase();
@@ -553,7 +544,7 @@ export const WWStorage = {
   },
 
   isManualImageSearchEnabled(): boolean {
-    return [IS_MOBILE_VIEW ? '' : null, 'true'].includes(localStorage.getItem('ww:manual-image-search-enabled'));
+    return [(IS_MOBILE_VIEW || IS_PROMOTER) ? '' : null, 'true'].includes(localStorage.getItem('ww:manual-image-search-enabled'));
   },
 
   getVersion(): string | null {

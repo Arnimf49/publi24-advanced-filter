@@ -1,5 +1,5 @@
 import {NimfomaneStorage} from "./core/storage";
-import {IS_MOBILE_VIEW} from "../common/globals";
+import {IS_MOBILE_VIEW, IS_PROMOTER} from "../common/globals";
 import {renderer} from "./core/renderer";
 import {elementHelpers} from "./core/elementHelpers";
 import {utils} from "../common/utils";
@@ -33,7 +33,7 @@ const runWithObserver = (callback: () => any, changingContainerSelector: string)
 
 NimfomaneStorage.upgrade()
   .then(() => {
-    if (process.env.PROMOTER === 'true') {
+    if (IS_PROMOTER) {
       return;
     }
 
