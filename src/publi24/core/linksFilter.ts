@@ -207,20 +207,19 @@ export const linksFilter = {
           let flag = null;
           let displayDomain = originalDomain;
 
-          if (isSafeLastDomain) {
+          const escortListingFlag = getFlagForDomain(originalDomain);
+
+          if (isSafeLastDomain || escortListingFlag === '🇷🇴') {
             isDomainSafe = !duplicatesInOtherLoc.includes(link);
             isDomainSuspicious = duplicatesNotOldInOtherLoc.includes(link);
             flag = '🇷🇴';
             displayDomain = `🇷🇴  ${originalDomain}`;
-          } else {
-            const externalEscortListingFlag = getFlagForDomain(originalDomain);
-            if (externalEscortListingFlag) {
-              isDomainSafe = false;
-              isDomainSuspicious = true;
-              isEscortListing = true;
-              flag = externalEscortListingFlag;
-              displayDomain = `${externalEscortListingFlag} ${originalDomain}`;
-            }
+          } else if (escortListingFlag) {
+            isDomainSafe = false;
+            isDomainSuspicious = true;
+            isEscortListing = true;
+            flag = escortListingFlag;
+            displayDomain = `${escortListingFlag} ${originalDomain}`;
           }
 
           const linkObj: ProcessedLink = {
