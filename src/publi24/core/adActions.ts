@@ -61,7 +61,7 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
     }
   }
 
-  if (content.match(/(\W|^)(show\s+web|web\s+show|show\s+la\s+web|show\s+erotic\s+web|si\s+webb?)(\W|$)/i)) {
+  if (content.match(/(\W|^)(show\s+web|web\s+show|show\s+la\s+web|show\s+(a-zA-Z)+\s+web|si\s+webb?)(\W|$)/i)) {
     data.push(['showWeb', true]);
   }
   if (content.match(/(\W|^)(botox|siliconata|silicoane)(\W|$)/i)) {
