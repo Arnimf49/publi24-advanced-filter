@@ -1,7 +1,7 @@
 # Politica de confidențialitate
 
 - [English version](./PRIVACY_POLICY.md)
-- [Versiune în limba română](./PRIVACY_POLICY.ro.md)
+- [Verziune în limba română](./PRIVACY_POLICY.ro.md)
 
 Aceasta este politica de confidențialitate pentru extensia browser-ului `Publi24 advanced filter`.
 

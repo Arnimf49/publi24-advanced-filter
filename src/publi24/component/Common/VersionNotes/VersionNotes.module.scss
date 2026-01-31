@@ -1,8 +1,12 @@
 .versionNotes {
   padding: 16px 0;
-  margin-bottom: 8px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  
+  margin-bottom: 14px;
+  border-bottom: 2px solid #7a8a99;
+
+  :global(.dark) & {
+    border-color: #485e71;
+  }
+
   &:last-child {
     border-bottom: none;
   }
@@ -12,7 +16,7 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 12px;
+  margin-bottom: 4px;
 }
 
 .version {
@@ -30,7 +34,7 @@
 
 .changeSection {
   margin-bottom: 12px;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -46,11 +50,11 @@
 .changeList {
   margin: 0;
   padding-left: 24px;
-  
+
   li {
     margin-bottom: 4px;
     line-height: 1.5;
-    
+
     &:last-child {
       margin-bottom: 0;
     }

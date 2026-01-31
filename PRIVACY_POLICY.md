@@ -1,7 +1,7 @@
 # Privacy policy
 
 - [English version](./PRIVACY_POLICY.md)
-- [Versiune în limba română](./PRIVACY_POLICY.ro.md)
+- [Verziune în limba română](./PRIVACY_POLICY.ro.md)
 
 This is the privacy policy for the `Publi24 advanced filter` browser extension.
 
