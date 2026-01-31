@@ -43,6 +43,14 @@ export const TopicImageRoot: FC<TopicImageRootProps> =
   }, [topic.ownerUser]);
 
   useEffect(() => {
+    if (topic.publiLinkDeterminationTime && (Date.now() - topic.publiLinkDeterminationTime) > 8.64e+7 * 10) {
+      NimfomaneStorage.setTopicProp(id, 'isOfEscort', undefined);
+      NimfomaneStorage.setTopicProp(id, 'escortDeterminationTime', undefined);
+      NimfomaneStorage.setTopicProp(id, 'publiLink', undefined);
+      NimfomaneStorage.setTopicProp(id, 'publiLinkDeterminationTime', undefined);
+      return;
+    }
+
     if (topic.isOfEscort === undefined
       || (topic.escortDeterminationTime && (Date.now() - topic.escortDeterminationTime) > 8.64e+7 * 6)) {
       listingActions.determineTopicEscort(container, id, priority).catch((error) => {
@@ -53,12 +61,19 @@ export const TopicImageRoot: FC<TopicImageRootProps> =
     if (!escort && topic.isOfEscort === true && topic.ownerUser) {
       setEscort(NimfomaneStorage.getEscort(topic.ownerUser))
     }
+    if (topic.isOfEscort === false && topic.publiLink === undefined) {
+      listingActions.determineTopicPubli24Link(container, id, priority).catch((error) => {
+        console.error(error);
+      });
+    }
   }, [topic]);
 
   useEffect(() => {
     if (topic.ownerUser && ((topic.isOfEscort === true && escort?.optimizedProfileImage === undefined)
       || (escort?.optimizedProfileImageTime && (Date.now() - escort.optimizedProfileImageTime) > 8.64e+7 * 4))) {
-      escortActions.determineMainProfileImage(topic.ownerUser, priority).catch((error) => {
+      const isRecalculation = escort?.optimizedProfileImageTime !== undefined;
+      const imagePriority = isRecalculation ? 50 : priority;
+      escortActions.determineMainProfileImage(topic.ownerUser, imagePriority).catch((error) => {
         console.error(error);
         setLoadError(error?.message || 'Failed to load image');
       });
@@ -66,7 +81,8 @@ export const TopicImageRoot: FC<TopicImageRootProps> =
   }, [topic, escort]);
 
   const isImageLoading = topic.isOfEscort === undefined ||
-    (topic.isOfEscort === true && escort?.optimizedProfileImage === undefined);
+    (topic.isOfEscort === true && escort?.optimizedProfileImage === undefined) ||
+    (topic.isOfEscort === false && topic.publiLink === undefined);
   const url = topic.isOfEscort === false
     ? null
     : escort?.optimizedProfileImage;
@@ -80,6 +96,7 @@ export const TopicImageRoot: FC<TopicImageRootProps> =
         isLoading={isImageLoading}
         onClick={escort?.optimizedProfileImage ? (() => setImageModalOpen(true)) : undefined}
         loadError={loadError}
+        publiLink={topic.publiLink}
       />
 
       {isModalOpen && topic.ownerUser && (

@@ -3,6 +3,8 @@ interface TopicItem {
   isOfEscort?: boolean;
   ownerUser?: string;
   escortDeterminationTime?: number;
+  publiLink?: string | false;
+  publiLinkDeterminationTime?: number;
 }
 
 interface EscortItem {

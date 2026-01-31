@@ -61,11 +61,10 @@ export const escortActions = {
 
     const imageElements = pageData.querySelectorAll('.ipsStreamItem_snippet [data-background-src]');
 
-    // @ts-ignore
     const images = [...imageElements].map(el => {
       return {
-        url: el.getAttribute('data-background-src'),
-        date: el.closest('.ipsStreamItem_container').querySelector('time').innerText,
+        url: el.getAttribute('data-background-src')!,
+        date: el.closest('.ipsStreamItem_container')!.querySelector('time')!.innerText,
       }
     });
 

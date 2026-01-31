@@ -3,6 +3,19 @@ import {expect} from "playwright/test";
 import {test} from "../helpers/fixture";
 import {CheerioAPI} from "cheerio";
 import {utilsNimfomane} from "../helpers/utilsNimfomane";
+import {BrowserContext, Page} from "playwright-core";
+
+async function clickExpectOpens(context: BrowserContext, page: Page, selector: string, expectedUrl: string) {
+  const pages: any[] = [];
+  context.on('page', (p) => pages.push(p));
+
+  await page.locator(selector).click();
+  await page.waitForTimeout(800);
+
+  expect(pages.length).toBe(1);
+  expect(pages[0].url()).toBe(expectedUrl);
+  await pages[0].close();
+}
 
 test('Should show first image as topic image.', async ({page}) => {
   await utilsNimfomane.open(page);
@@ -150,4 +163,59 @@ test('Should show error icon when topic image fails to load.', async ({page}) =>
   await utilsNimfomane.throttleReload(page);
 
   await expect(page.locator(`[data-wwtopic="${id}"] [data-wwid="image-error-icon"]`)).toBeVisible();
+})
+
+test('Should show publi24 link overlay for non-escort topics.', async ({page, context}) => {
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/30-escorte-baia-mare/'});
+  const topicId = '174418';
+
+  await utils.modifyRouteBody(page, `https://nimfomane.com/forum/topic/${topicId}-**`, ($) => {
+    const commentContent = $('[data-role="commentContent"]').last();
+    commentContent.append('<a href="https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850332.html">publi24 link</a>');
+  });
+
+  await utilsNimfomane.deleteTopicInfoStorage(page, topicId);
+  await utilsNimfomane.throttleReload(page);
+
+  await expect(page.locator(`[data-wwtopic="${topicId}"] [data-wwid="publi24-link"]`)).toBeVisible();
+  await expect(page.locator(`[data-wwtopic="${topicId}"] [data-wwid="publi24-link"]`)).toContainText('publi24.ro');
+
+  await clickExpectOpens(context, page, `[data-wwtopic="${topicId}"]`, 'https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850332.html');
+})
+
+test('Should reload publi link after 10 days.', async ({page, context}) => {
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/30-escorte-baia-mare/'});
+  const topicId = '174418';
+
+  await utilsNimfomane.setTopicStorageProp(page, topicId, 'isOfEscort', false);
+  await utilsNimfomane.setTopicStorageProp(page, topicId, 'publiLink', 'https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850330.html');
+  await utilsNimfomane.setTopicStorageProp(page, topicId, 'publiLinkDeterminationTime', Date.now() - (8.64e+7 * 10 - 2000));
+  await utilsNimfomane.throttleReload(page);
+  await expect(page.locator(`[data-wwtopic="${topicId}"] [data-wwid="publi24-link"]`)).toBeVisible();
+
+  await utilsNimfomane.setTopicStorageProp(page, topicId, 'publiLinkDeterminationTime', Date.now() - (8.64e+7 * 11));
+  await utils.modifyRouteBody(page, `https://nimfomane.com/forum/topic/${topicId}-**`, ($) => {
+    const commentContent = $('[data-role="commentContent"]').first();
+    commentContent.append('<a href="https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850332.html">publi24 link</a>');
+  });
+  await utilsNimfomane.throttleReload(page);
+  await page.waitForTimeout(5000);
+
+  await clickExpectOpens(context, page, `[data-wwtopic="${topicId}"]`, 'https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850332.html');
+  await expect(page.locator(`[data-wwtopic="${topicId}"] [data-wwid="publi24-link"]`)).toBeVisible();
+})
+
+test('Should switch to escort type after 10 days if topic becomes escort.', async ({page}) => {
+  await utilsNimfomane.open(page);
+  const {id: topicId} = await utilsNimfomane.waitForFirstImage(page);
+
+  await utilsNimfomane.setTopicStorageProp(page, topicId, 'isOfEscort', false);
+  await utilsNimfomane.setTopicStorageProp(page, topicId, 'publiLink', 'https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850330.html');
+  await utilsNimfomane.setTopicStorageProp(page, topicId, 'publiLinkDeterminationTime', Date.now());
+  await utilsNimfomane.throttleReload(page);
+  await expect(page.locator(`[data-wwtopic="${topicId}"] [data-wwid="publi24-link"]`)).toBeVisible();
+
+  await utilsNimfomane.setTopicStorageProp(page, topicId, 'publiLinkDeterminationTime', Date.now() - (8.64e+7 * 11));
+  await utilsNimfomane.throttleReload(page);
+  await expect(page.locator(`[data-wwtopic="${topicId}"] img`)).toBeVisible();
 })

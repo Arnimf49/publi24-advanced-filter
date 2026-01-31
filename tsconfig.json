@@ -41,7 +41,7 @@
     "paths": {                            // Optional: Define module path aliases if needed later
       // Example: "@components/*": ["components/*"]
     },
-    "lib": ["es5", "dom"],
+    "lib": ["es5", "dom", "DOM.Iterable"],
   },
   "include": [
     "src/**/*.ts",                        // Include all .ts files in src

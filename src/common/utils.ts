@@ -69,6 +69,14 @@ export const utils = {
     return str;
   },
 
+  removeDiacritics(text: string): string {
+    const diacriticMap: { [key: string]: string } = {
+      'Ă': 'A', 'Â': 'A', 'Î': 'I', 'Ș': 'S', 'Ţ': 'T', 'Ț': 'T',
+      'ă': 'a', 'â': 'a', 'î': 'i', 'ș': 's', 'ţ': 't', 'ț': 't',
+    };
+    return text.replace(/[ĂÂÎȘŢȚăâîșţț]/g, (match: string): string => diacriticMap[match] || match);
+  },
+
   parseRomanianDate(input: string) {
     const now = new Date();
     const months: Record<string, number> = {

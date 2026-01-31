@@ -4,6 +4,33 @@ import {elementHelpers} from "./elementHelpers";
 import {NimfomaneStorage} from "./storage";
 
 export const topicActions = {
+  async getPubli24Link(lastPageUrl: string, priority: number = 100): Promise<string | false> {
+    let pageChecked = 0;
+    let url = lastPageUrl;
+
+    do {
+      const pageData = await page.load(url, priority);
+
+      const commentContents = pageData.querySelectorAll<HTMLElement>('[data-role="commentContent"]');
+      const reversedContents = Array.from(commentContents).reverse();
+
+      for (const content of reversedContents) {
+        const links = content.querySelectorAll<HTMLAnchorElement>('a');
+        for (const link of links) {
+          const href = link.getAttribute('href') || link.innerHTML.trim();
+          if (href && href.includes('publi24.ro/anunturi/')) {
+            return href;
+          }
+        }
+      }
+
+      url = pageData.querySelector('[rel="prev"]')?.getAttribute('href')!;
+      ++pageChecked;
+    } while (pageChecked < 5 && url);
+
+    return false;
+  },
+
   async getEscortOfTopic(lastPageUrl: string, minPostCount?: number, priority: number = 100): Promise<[string, string] | null> {
     let pageChecked = 0;
     let url = lastPageUrl;

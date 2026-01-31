@@ -14,8 +14,8 @@ export type AdContentTuple = [string, number | boolean];
 
 async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
   const page = await adData.loadInAdPage(item);
-  const title: string = misc.removeDiacritics(adData.getPageTitle(page));
-  const content: string = misc.removeDiacritics(adData.getPageTitle(page) + ' ' + adData.getPageDescription(page));
+  const title: string = utils.removeDiacritics(adData.getPageTitle(page));
+  const content: string = utils.removeDiacritics(adData.getPageTitle(page) + ' ' + adData.getPageDescription(page));
 
   utils.debugLog('Analyzing content', {content: content.trim().substring(0, 200) + '...'});
 

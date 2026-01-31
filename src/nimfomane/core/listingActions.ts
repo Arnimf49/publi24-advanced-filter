@@ -4,6 +4,19 @@ import {elementHelpers} from "./elementHelpers";
 import {topicActions} from "./topicActions";
 
 export const listingActions = {
+  async determineTopicPubli24Link(container: HTMLDivElement, id: string, priority: number = 100) {
+    const topicTitle = container.querySelector<HTMLLinkElement>('.ipsDataItem_title a[data-ipshover]')!;
+    const url = (
+      container.querySelector('.ipsPagination_last a')!
+      || container.querySelector('.ipsPagination_page:last-child a')!
+      || topicTitle).getAttribute('href'
+    )!;
+
+    const publiLink = await topicActions.getPubli24Link(url, priority);
+    NimfomaneStorage.setTopicProp(id, 'publiLink', publiLink);
+    NimfomaneStorage.setTopicProp(id, 'publiLinkDeterminationTime', Date.now());
+  },
+
   async determineTopicEscort(container: HTMLDivElement, id: string, priority: number = 100) {
     const setTopicEscort = (user: string, link: string) => {
       NimfomaneStorage.setEscortProp(user, 'profileLink', link);
@@ -24,8 +37,14 @@ export const listingActions = {
       || topicTitle).getAttribute('href'
     )!;
 
-    const normalizedTitle = utils.normalizeDigits(topicTitle.innerText)
-    const hasPhoneOrIndisponibila = normalizedTitle.match(/07(\d ?){8}/) || normalizedTitle.match(/indisponibil[aă]/i);
+    const normalizedTitle = utils.normalizeDigits(utils.removeDiacritics(topicTitle.innerText)).toLowerCase();
+
+    if (normalizedTitle.includes('discutii') || normalizedTitle.includes('general')) {
+      setTopicNotOfEscort();
+      return;
+    }
+
+    const hasPhoneOrIndisponibila = normalizedTitle.match(/07(\d ?){8}/) || normalizedTitle.match(/indisponibila/i);
 
     if (!hasPhoneOrIndisponibila) {
       const escortOfTopic = await topicActions.getEscortOfTopic(url, 4, priority);

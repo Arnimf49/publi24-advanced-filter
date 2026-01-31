@@ -16,9 +16,9 @@ const DEFAULT_CONFIG: TypeConfig = {
 
 const CONFIG_OVERRIDES: Record<string, TypeConfig> = {
   'nimfomane.com': {
-    throttleAfter: 4,
-    cooldown: 12500,
-    delayBetween: 1700,
+    throttleAfter: 3,
+    cooldown: 13500,
+    delayBetween: 1800,
   },
 };
 
