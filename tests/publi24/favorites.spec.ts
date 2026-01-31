@@ -176,6 +176,7 @@ test('Should optimize phone ads and display newest for favorite.', async ({ page
   }, phone);
 
   await page.locator('[data-wwid="close"]').click();
+  await page.waitForTimeout(100);
   await page.reload();
   const adCount = +await (await page.waitForSelector(`[data-articleid="${adId}"] [data-wwid="duplicates-count"]`)).innerText();
   await awaitOptimization(adCount * 5000);
@@ -246,6 +247,7 @@ test('Should show new ad when previous was inactive but new appeared.', async ({
     .toEqual(phone)
 
   await page.locator('[data-wwid="close"]').click();
+  await page.waitForTimeout(100);
   await page.goto(url);
   await page.waitForTimeout(1000);
   await page.locator('[data-wwid="favs-button"]').click();
