@@ -1,4 +1,5 @@
 const prevOpen: string[] = [];
+let currentModalState: ModalStateData | null = null;
 
 const MODAL_STATE_KEY = 'ww:modal-state';
 
@@ -7,15 +8,19 @@ interface ModalStateData {
   meta: Record<string, any>;
 }
 
+window.addEventListener('beforeunload', () => {
+  if (currentModalState) {
+    localStorage.setItem(MODAL_STATE_KEY, JSON.stringify(currentModalState));
+  }
+});
+
 export const modalState = {
   pushOpen(type: string, meta: Record<string, any> = {}): void {
-    const currentState = this.get();
-    if (currentState) {
-      prevOpen.push(currentState.type);
+    if (currentModalState) {
+      prevOpen.push(currentModalState.type);
     }
 
-    const newState: ModalStateData = { type, meta };
-    localStorage.setItem(MODAL_STATE_KEY, JSON.stringify(newState));
+    currentModalState = { type, meta };
   },
 
   consumeOpenIfType(type: string): Record<string, any> | null {
@@ -32,10 +37,9 @@ export const modalState = {
   revertOpen(): void {
     const prevType = prevOpen.pop();
     if (prevType) {
-      const newState: ModalStateData = { type: prevType, meta: {} };
-      localStorage.setItem(MODAL_STATE_KEY, JSON.stringify(newState));
+      currentModalState = { type: prevType, meta: {} };
     } else {
-      localStorage.removeItem(MODAL_STATE_KEY);
+      currentModalState = null;
     }
   },
 
