@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import AdsModal from '../../Common/Partials/AdsModal/AdsModal';
 import HideReasonRoot from '../../Common/Partials/HideReason/HideReasonRoot';
-import { WWStorage } from '../../../core/storage';
+import { WWStorage, AdUuid } from '../../../core/storage';
 import {AdData, adData} from '../../../core/adData';
 import {PhoneIcon} from "../../Common/Icons/PhoneIcon";
 import {misc} from "../../../core/misc";
@@ -15,7 +15,7 @@ const DEBOUNCE_DELAY = 1500;
 const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
   const [resultsData, setResultsData] = useState<AdData[] | null>(null);
   const [searchedPhone, setSearchedPhone] = useState<string | null>(null);
-  const [associatedUuids, setAssociatedUuids] = useState<string[]>([]);
+  const [associatedUuids, setAssociatedUuids] = useState<AdUuid[]>([]);
   const [showHideReason, setShowHideReason] = useState<boolean>(false);
 
   const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -62,10 +62,7 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
   const triggerHideActions = useCallback(() => {
     if (associatedUuids.length && searchedPhone) {
       associatedUuids.forEach((adUuid) => {
-        const parts = adData.uuidParts(adUuid);
-        if (parts.length > 0 && parts[0]) {
-          WWStorage.setAdVisibility(parts[0], false);
-        }
+        WWStorage.setAdVisibility(adUuid.id, false);
       });
       WWStorage.setPhoneHidden(searchedPhone);
       setShowHideReason(true);

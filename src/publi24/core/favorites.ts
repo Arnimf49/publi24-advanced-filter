@@ -1,4 +1,4 @@
-import {WWStorage} from "./storage";
+import {AdUuid, WWStorage} from "./storage";
 import {adData} from "./adData";
 
 const favorites = {
@@ -15,7 +15,7 @@ const favorites = {
       }
 
       let newestTime = -Infinity;
-      let newestUuid: string | undefined;
+      let newestUuid: AdUuid | undefined;
 
       for (let uuid of phoneAds) {
         const data = await adData.loadInAdsData([uuid]);

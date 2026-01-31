@@ -24,10 +24,7 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
 
     const duplicateUuids = WWStorage.getPhoneAds(phone);
     duplicateUuids.forEach((adUuid) => {
-      const parts = adData.uuidParts(adUuid);
-      if (parts.length > 0) {
-        WWStorage.setAdVisibility(parts[0], false);
-      }
+      WWStorage.setAdVisibility(adUuid.id, false);
     });
     WWStorage.setPhoneHidden(phone);
 

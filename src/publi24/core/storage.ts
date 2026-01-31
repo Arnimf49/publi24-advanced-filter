@@ -1,6 +1,11 @@
 import {WWBrowserStorage} from "./browserStorage";
 import {IS_MOBILE_VIEW, IS_PROMOTER} from "../../common/globals";
 
+export interface AdUuid {
+  id: string;
+  url: string;
+}
+
 interface AdItem {
   visibility?: boolean;
   phone?: string | null;
@@ -68,6 +73,39 @@ const _WW_CALLBACKS = {
   settingsChanged: [] as Array<() => void>,
 };
 
+function compressAdLink(url: string): string {
+  const match = url.match(/https:\/\/www\.publi24\.ro\/anunturi\/(.*)\/anunt\/[^/]+\/([^.]+)\.html/);
+  if (match) {
+    return `${match[1]}/${match[2]}`;
+  }
+  return url;
+}
+
+function decompressAdLink(compressed: string): string {
+  if (compressed.startsWith('http')) {
+    return compressed;
+  }
+  const parts = compressed.split('/');
+  if (parts.length >= 2) {
+    const id = parts[parts.length - 1];
+    const path = parts.slice(0, -1).join('/');
+    return `https://www.publi24.ro/anunturi/${path}/anunt/titlu-sters/${id}.html`;
+  }
+  return compressed;
+}
+
+function parseAdUuid(uuid: string): AdUuid {
+  const parts = uuid.split('|');
+  return {
+    id: parts[0],
+    url: parts.length >= 2 ? decompressAdLink(parts[1]) : ''
+  };
+}
+
+function serializeAdUuid(adUuid: AdUuid): string {
+  return `${adUuid.id}|${compressAdLink(adUuid.url)}`;
+}
+
 export const WWStorage = {
 
   getAdItem(id: string): AdItem {
@@ -85,7 +123,11 @@ export const WWStorage = {
   setAdProp(id: string, prop: string, value: any): void {
     const upperId = id.toUpperCase();
     const item = this.getAdItem(upperId);
-    item[prop] = value;
+    if (value === null || value === undefined) {
+      delete item[prop];
+    } else {
+      item[prop] = value;
+    }
     localStorage.setItem(`ww2:${upperId}`, JSON.stringify(item));
     _WW_STORE_CACHE.item[upperId] = { ...item };
     WWStorage.triggerAdChanged(id);
@@ -109,11 +151,12 @@ export const WWStorage = {
   },
 
   setAdVisibility(id: string, visible: boolean): void {
-    WWStorage.setAdProp(id, 'visibility', visible);
+    WWStorage.setAdProp(id, 'visibility', visible ? 1 : 0);
   },
 
   isAdVisible(id: string): boolean {
-    return WWStorage.getAdProp<boolean>(id, 'visibility') !== false;
+    const value = WWStorage.getAdProp<number | boolean>(id, 'visibility');
+    return value !== false && value !== 0;
   },
 
   setAdPhone(id: string, phone: string): void {
@@ -131,24 +174,26 @@ export const WWStorage = {
   },
 
   setAdNoPhone(id: string, value: boolean = true): void {
-    WWStorage.setAdProp(id, 'noPhone', value);
+    WWStorage.setAdProp(id, 'noPhone', value ? 1 : 0);
   },
 
   hasAdNoPhone(id: string): boolean {
-    return WWStorage.getAdProp<boolean>(id, 'noPhone') === true;
+    const value = WWStorage.getAdProp<number | boolean>(id, 'noPhone');
+    return value === true || value === 1;
   },
 
   addAdDuplicateInOtherLocation(id: string, link: string, old: boolean = true): void {
+    const compressedLink = compressAdLink(link);
     const list = WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLoc') || [];
-    if (!list.includes(link)) {
-      list.push(link);
+    if (!list.includes(compressedLink)) {
+      list.push(compressedLink);
       WWStorage.setAdProp(id, 'duplicatesInOtherLoc', list);
     }
 
     if (!old) {
       const notOldList = WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLocNotOld') || [];
-      if (!notOldList.includes(link)) {
-        notOldList.push(link);
+      if (!notOldList.includes(compressedLink)) {
+        notOldList.push(compressedLink);
         WWStorage.setAdProp(id, 'duplicatesInOtherLocNotOld', notOldList);
       }
     }
@@ -164,17 +209,20 @@ export const WWStorage = {
   },
 
   getAdDuplicatesInOtherLocation(id: string): string[] {
-    return WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLoc') || [];
+    const list = WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLoc') || [];
+    return list.map(link => decompressAdLink(link));
   },
 
   getAdNotOldDuplicatesInOtherLocation(id: string): string[] {
-    return WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLocNotOld') || [];
+    const list = WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLocNotOld') || [];
+    return list.map(link => decompressAdLink(link));
   },
 
   addAdDeadLink(id: string, link: string): void {
+    const compressedLink = compressAdLink(link);
     const list = WWStorage.getAdProp<string[]>(id, 'deadLinks') || [];
-    if (!list.includes(link)) {
-      list.push(link);
+    if (!list.includes(compressedLink)) {
+      list.push(compressedLink);
       WWStorage.setAdProp(id, 'deadLinks', list);
     }
   },
@@ -184,7 +232,8 @@ export const WWStorage = {
   },
 
   getAdDeadLinks(id: string): string[] {
-    return WWStorage.getAdProp<string[]>(id, 'deadLinks') || [];
+    const list = WWStorage.getAdProp<string[]>(id, 'deadLinks') || [];
+    return list.map(link => decompressAdLink(link));
   },
 
   setInvestigatedTime(id: string, timestamp: number): void {
@@ -251,7 +300,11 @@ export const WWStorage = {
 
   setPhoneProp(phone: string, prop: string, value: any): void {
     const item = this.getPhoneItem(phone);
-    item[prop] = value;
+    if (value === null || value === undefined) {
+      delete item[prop];
+    } else {
+      item[prop] = value;
+    }
     localStorage.setItem(`ww2:phone:${phone}`, JSON.stringify(item));
     _WW_STORE_CACHE.phone[phone] = { ...item };
     WWStorage.triggerPhoneChanged(phone);
@@ -263,7 +316,7 @@ export const WWStorage = {
   },
 
   setPhoneHidden(phone: string, h: boolean = true): void {
-    WWStorage.setPhoneProp(phone, 'hidden', h);
+    WWStorage.setPhoneProp(phone, 'hidden', h ? 1 : 0);
     if (!h) {
       WWStorage.setPhoneProp(phone, 'hideResetAt', null);
       WWStorage.setPhoneProp(phone, 'hideReason', null);
@@ -271,7 +324,8 @@ export const WWStorage = {
   },
 
   isPhoneHidden(phone: string): boolean {
-    return WWStorage.getPhoneProp<boolean>(phone, 'hidden') === true;
+    const value = WWStorage.getPhoneProp<number | boolean>(phone, 'hidden');
+    return value === true || value === 1;
   },
 
   getPhoneHideResetAt(phone: string): number | undefined {
@@ -282,12 +336,13 @@ export const WWStorage = {
     WWStorage.setPhoneProp(phone, 'hideResetAt', timestamp);
   },
 
-  getPhoneAds(phone: string): string[] {
+  getPhoneAds(phone: string): AdUuid[] {
     const ads = WWStorage.getPhoneProp<string[] | string>(phone, 'ads');
     if (typeof ads === 'string') {
       return [];
     }
-    return Array.isArray(ads) ? [...ads] : [];
+    const adsArray = Array.isArray(ads) ? [...ads] : [];
+    return adsArray.map(uuidStr => parseAdUuid(uuidStr));
   },
 
   addPhoneAd(phone: string, id: string, url: string): void {
@@ -296,42 +351,42 @@ export const WWStorage = {
     }
 
     const ads = WWStorage.getPhoneAds(phone);
-    const adEntry = `${id}|${url}`;
-    if (!ads.some(adString => adString.startsWith(`${id}|`))) {
-      ads.push(adEntry);
-      WWStorage.setPhoneProp(phone, 'ads', ads);
+    const newAdUuid: AdUuid = {id, url};
+    if (!ads.some(adUuid => adUuid.id === id)) {
+      ads.push(newAdUuid);
+      WWStorage.setPhoneProp(phone, 'ads', ads.map(adUuid => serializeAdUuid(adUuid)));
     }
   },
 
-  removePhoneAd(phone: string, uuidOrId: string): void {
+  removePhoneAd(phone: string, uuidOrId: string | AdUuid): void {
     if (!phone || !uuidOrId) {
       return;
     }
 
-    const id = uuidOrId.split('|').shift();
+    const id = typeof uuidOrId === 'string' ? uuidOrId : uuidOrId.id;
 
-    let ads = WWStorage.getPhoneAds(phone);
+    const ads = WWStorage.getPhoneAds(phone);
     const initialLength = ads.length;
-    ads = ads.filter(uuid => uuid.split('|').shift() !== id);
+    const filteredAds = ads.filter(adUuid => adUuid.id !== id);
 
-    if (ads.length < initialLength) {
-      WWStorage.setPhoneProp(phone, 'ads', ads);
+    if (filteredAds.length < initialLength) {
+      WWStorage.setPhoneProp(phone, 'ads', filteredAds.map(adUuid => serializeAdUuid(adUuid)));
     }
   },
 
-  setPhoneAdFirst(phone: string, uuid: string): void {
+  setPhoneAdFirst(phone: string, uuid: AdUuid): void {
     if (!phone || !uuid) {
       return;
     }
-    let ads = WWStorage.getPhoneAds(phone);
-    const index = ads.indexOf(uuid);
+    const ads = WWStorage.getPhoneAds(phone);
+    const index = ads.findIndex(adUuid => adUuid.id === uuid.id);
     if (index > 0) {
       ads.splice(index, 1);
       ads.unshift(uuid);
-      WWStorage.setPhoneProp(phone, 'ads', ads);
+      WWStorage.setPhoneProp(phone, 'ads', ads.map(adUuid => serializeAdUuid(adUuid)));
     } else if (index === -1) {
       ads.unshift(uuid);
-      WWStorage.setPhoneProp(phone, 'ads', ads);
+      WWStorage.setPhoneProp(phone, 'ads', ads.map(adUuid => serializeAdUuid(adUuid)));
     }
   },
 
@@ -664,7 +719,7 @@ export const WWStorage = {
 
   async upgrade(): Promise<void> {
     const version = WWStorage.getVersion();
-    const currentVersion = 5;
+    const currentVersion = 7;
     const parsedVersion = version ? parseInt(version, 10) : currentVersion;
 
     type MigrationFunction = () => void;
@@ -756,7 +811,7 @@ export const WWStorage = {
           const ads = WWStorage.getPhoneAds(fav);
           const first = ads[0];
           if (first) {
-            const firstPhone = WWStorage.getAdPhone(first.split('|').shift() as string);
+            const firstPhone = WWStorage.getAdPhone(first.id);
             if (!firstPhone) {
               WWStorage.toggleFavorite(fav);
             } else if (firstPhone !== fav) {
@@ -765,6 +820,117 @@ export const WWStorage = {
             }
           }
         })
+      },
+
+      // --- MIGRATION from v5 to v6 ---
+      5: () => {
+        console.log("Running migration v5 -> v6");
+        const allItems: Record<string, string> = { ...localStorage };
+
+        Object.entries(allItems).forEach(([key, value]) => {
+          try {
+            if (key.match(/^ww2:phone:/)) {
+              const phoneItem: PhoneItem = JSON.parse(value);
+              if (phoneItem.ads && Array.isArray(phoneItem.ads)) {
+                let modified = false;
+                phoneItem.ads = phoneItem.ads.map(adEntry => {
+                  const parts = adEntry.split('|');
+                  if (parts.length >= 2 && parts[1].startsWith('http')) {
+                    modified = true;
+                    return `${parts[0]}|${compressAdLink(parts[1])}`;
+                  }
+                  return adEntry;
+                });
+                if (modified) {
+                  localStorage.setItem(key, JSON.stringify(phoneItem));
+                }
+              }
+            } else if (key.match(/^ww2:[^:]+$/)) {
+              const adItem: AdItem = JSON.parse(value);
+              let modified = false;
+
+              if (adItem.duplicatesInOtherLoc && Array.isArray(adItem.duplicatesInOtherLoc)) {
+                adItem.duplicatesInOtherLoc = adItem.duplicatesInOtherLoc.map(link => {
+                  if (link.startsWith('http')) {
+                    modified = true;
+                    return compressAdLink(link);
+                  }
+                  return link;
+                });
+              }
+
+              if (adItem.duplicatesInOtherLocNotOld && Array.isArray(adItem.duplicatesInOtherLocNotOld)) {
+                adItem.duplicatesInOtherLocNotOld = adItem.duplicatesInOtherLocNotOld.map(link => {
+                  if (link.startsWith('http')) {
+                    modified = true;
+                    return compressAdLink(link);
+                  }
+                  return link;
+                });
+              }
+
+              if (adItem.deadLinks && Array.isArray(adItem.deadLinks)) {
+                adItem.deadLinks = adItem.deadLinks.map(link => {
+                  if (link.startsWith('http')) {
+                    modified = true;
+                    return compressAdLink(link);
+                  }
+                  return link;
+                });
+              }
+
+              if (modified) {
+                localStorage.setItem(key, JSON.stringify(adItem));
+              }
+            }
+          } catch (e) {
+            console.error(`Migration v5 error processing key ${key}:`, e);
+          }
+        });
+
+        _WW_STORE_CACHE.item = {};
+        _WW_STORE_CACHE.phone = {};
+        console.log("Migration v5 -> v6 complete: All links compressed");
+      },
+
+      // --- MIGRATION from v6 to v7 ---
+      6: () => {
+        console.log("Running migration v6 -> v7");
+        const allItems: Record<string, string> = { ...localStorage };
+        let cleanedCount = 0;
+
+        Object.entries(allItems).forEach(([key, value]) => {
+          try {
+            if (key.match(/^ww2:(phone:|[^:]+$)/)) {
+              const item = JSON.parse(value);
+              let modified = false;
+
+              Object.keys(item).forEach(prop => {
+                if (item[prop] === null || item[prop] === undefined) {
+                  delete item[prop];
+                  modified = true;
+                } else if (key.match(/^ww2:[^:]+$/) && (prop === 'visibility' || prop === 'noPhone') && typeof item[prop] === 'boolean') {
+                  item[prop] = item[prop] ? 1 : 0;
+                  modified = true;
+                } else if (key.match(/^ww2:phone:/) && prop === 'hidden' && typeof item[prop] === 'boolean') {
+                  item[prop] = item[prop] ? 1 : 0;
+                  modified = true;
+                }
+              });
+
+              if (modified) {
+                localStorage.setItem(key, JSON.stringify(item));
+                cleanedCount++;
+              }
+            }
+          } catch (e) {
+            console.error(`Migration v6 error processing key ${key}:`, e);
+          }
+        });
+
+        _WW_STORE_CACHE.item = {};
+        _WW_STORE_CACHE.phone = {};
+        console.log(`Migration v6 -> v7 complete: Removed null properties and converted booleans from ${cleanedCount} items`);
       }
     };
 

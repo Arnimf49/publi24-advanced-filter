@@ -1,7 +1,7 @@
 import {dateLib} from "./dateLib";
 import {misc} from "./misc";
 import {IS_AD_PAGE} from "./globals";
-import {WWStorage} from "./storage";
+import {AdUuid, WWStorage} from "./storage";
 import {IS_MOBILE_VIEW} from "../../common/globals";
 import {BrowserError, page} from "../../common/page";
 import {utils} from "../../common/utils";
@@ -29,10 +29,6 @@ export interface FavoritesData {
 }
 
 export const adData = {
-  uuidParts(id: string): string[] {
-    return id.split('|');
-  },
-
   getPageDate(itemPage: Document): Date {
     const dateText = itemPage.querySelector<HTMLElement>('[itemprop="validFrom"], .detail-info div i, .valid-from')?.textContent?.trim();
     if (!dateText) {
@@ -146,8 +142,7 @@ export const adData = {
       return false;
     }
 
-    const allAdIds = WWStorage.getPhoneAds(phone)
-      .map(uuid => adData.uuidParts(uuid)[0]);
+    const allAdIds = WWStorage.getPhoneAds(phone).map(adUuid => adUuid.id);
     const otherAdIds = allAdIds.filter(adId => id !== adId);
     const thisSeenTime = WWStorage.getSeenTime(id) || 0;
 
@@ -185,7 +180,7 @@ export const adData = {
     return page.load(url);
   },
 
-  async loadInAdsData(adUuids: string[], clean?: (failedUuid: string) => void): Promise<AdData[]> {
+  async loadInAdsData(adUuids: AdUuid[], clean?: (failedId: string) => void): Promise<AdData[]> {
     let locationParts: string[] = [];
     if (!IS_AD_PAGE()) {
       const countyInput = document.querySelector<HTMLInputElement>('[data-faceted="county_name"]');
@@ -200,7 +195,7 @@ export const adData = {
     }
 
     const itemDataPromises = adUuids.map(async (adUuid): Promise<AdData | null> => {
-      const [id, url] = adData.uuidParts(adUuid);
+      const {id, url} = adUuid;
       let itemPage: Document;
 
       try {
@@ -208,7 +203,7 @@ export const adData = {
       } catch (e) {
         const error = e as BrowserError;
         if (error.code !== 429 && clean) {
-          clean(id + '|' + url);
+          clean(id);
         }
         console.error(`Failed loading ad data for ${id}:`, e);
         return null;
@@ -297,7 +292,7 @@ export const adData = {
   },
 
 
-  async loadInFirstAvailableAd(uuids: string[], phone: string, requirePhone: boolean = false): Promise<AdData | null> {
+  async loadInFirstAvailableAd(uuids: AdUuid[], phone: string, requirePhone: boolean = false): Promise<AdData | null> {
     if (!uuids || uuids.length === 0) {
       return null;
     }
@@ -307,7 +302,7 @@ export const adData = {
 
     // This is to prevent showing in case of favorites ads without phone number.
     // As in this case it cannot be removed from favorites.
-    if (requirePhone && WWStorage.hasAdNoPhone(adData.uuidParts(currentUuid)[0])) {
+    if (requirePhone && WWStorage.hasAdNoPhone(currentUuid.id)) {
       return adData.loadInFirstAvailableAd(uuids, phone);
     }
 
