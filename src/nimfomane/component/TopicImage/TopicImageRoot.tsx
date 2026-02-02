@@ -1,10 +1,9 @@
 import React, {FC, useEffect, useState} from "react";
 import {TopicImage} from "./TopicImage";
 import {NimfomaneStorage} from "../../core/storage";
-import {listingActions} from "../../core/listingActions";
-import {escortActions} from "../../core/escortActions";
 import Modal from "../../../common/components/Modal/Modal";
 import {EscortImages} from "./EscortImages/EscortImages";
+import {NimfomaneMemoryStorage} from "../../core/memoryStorage";
 
 // @ts-ignore
 if (typeof browser === "undefined" && typeof chrome !== "undefined") {
@@ -14,75 +13,51 @@ if (typeof browser === "undefined" && typeof chrome !== "undefined") {
 
 interface TopicImageRootProps {
   id: string;
-  container: HTMLDivElement;
-  priority: number;
 }
 
 export const TopicImageRoot: FC<TopicImageRootProps> =
 ({
   id,
-  container,
-  priority,
 }) => {
   const [isModalOpen, setImageModalOpen] = useState(false);
-  const [topic, setTopic] = useState(NimfomaneStorage.getTopic(id));
-  const [escort, setEscort] = useState(topic?.ownerUser ? NimfomaneStorage.getEscort(topic.ownerUser) : null);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [_, setRenderCycle] = useState(0);
+
+  const topic = NimfomaneStorage.getTopic(id);
+  const topicMemoryState = NimfomaneMemoryStorage.getTopicState(id);
+  const escort = topic?.ownerUser ? NimfomaneStorage.getEscort(topic.ownerUser) : null;
+  const escortMemoryState = topic?.ownerUser ? NimfomaneMemoryStorage.getEscortState(topic.ownerUser) : null;
 
   useEffect(() => {
-    NimfomaneStorage.onTopicChanged(id, setTopic);
-    if (topic.isOfEscort && topic?.ownerUser) {
-      NimfomaneStorage.onEscortChanged(topic.ownerUser, setEscort);
+    const incrementRender = () => setRenderCycle(v => ++v);
+
+    NimfomaneStorage.onTopicChanged(id, incrementRender);
+    NimfomaneMemoryStorage.onTopicMemoryChanged(id, incrementRender);
+
+    if (topic.ownerUser) {
+      NimfomaneStorage.onEscortChanged(topic.ownerUser, incrementRender);
+      NimfomaneMemoryStorage.onEscortMemoryChanged(topic.ownerUser, incrementRender);
     }
+
     return () => {
-      NimfomaneStorage.removeOnTopicChanged(id, setTopic);
-      if (topic.isOfEscort && topic?.ownerUser) {
-        NimfomaneStorage.removeOnEscortChanged(topic.ownerUser, setEscort);
+      NimfomaneStorage.removeOnTopicChanged(id, incrementRender);
+      NimfomaneMemoryStorage.removeOnTopicMemoryChanged(id, incrementRender);
+      if (topic.ownerUser) {
+        NimfomaneStorage.removeOnEscortChanged(topic.ownerUser, incrementRender);
+        NimfomaneMemoryStorage.removeOnEscortMemoryChanged(topic.ownerUser, incrementRender);
       }
-    }
-  }, [topic.ownerUser]);
+    };
+  }, [id, topic.ownerUser]);
 
-  useEffect(() => {
-    if (topic.publiLinkDeterminationTime && (Date.now() - topic.publiLinkDeterminationTime) > 8.64e+7 * 10) {
-      NimfomaneStorage.setTopicProp(id, 'isOfEscort', undefined);
-      NimfomaneStorage.setTopicProp(id, 'escortDeterminationTime', undefined);
-      NimfomaneStorage.setTopicProp(id, 'publiLink', undefined);
-      NimfomaneStorage.setTopicProp(id, 'publiLinkDeterminationTime', undefined);
-      return;
-    }
+  const errors = [
+    topicMemoryState.topicAnalysisError,
+    escortMemoryState?.escortAnalysisError
+  ].filter((e): e is string => !!e);
 
-    if (topic.isOfEscort === undefined
-      || (topic.escortDeterminationTime && (Date.now() - topic.escortDeterminationTime) > 8.64e+7 * 6)) {
-      listingActions.determineTopicEscort(container, id, priority).catch((error) => {
-        console.error(error);
-        setLoadError(error?.message || 'Failed to load topic');
-      });
-    }
-    if (!escort && topic.isOfEscort === true && topic.ownerUser) {
-      setEscort(NimfomaneStorage.getEscort(topic.ownerUser))
-    }
-    if (topic.isOfEscort === false && topic.publiLink === undefined) {
-      listingActions.determineTopicPubli24Link(container, id, priority).catch((error) => {
-        console.error(error);
-      });
-    }
-  }, [topic]);
+  const loadError = errors.length > 0 ? errors.join(' | ') : null;
 
-  useEffect(() => {
-    if (topic.ownerUser && ((topic.isOfEscort === true && escort?.optimizedProfileImage === undefined)
-      || (escort?.optimizedProfileImageTime && (Date.now() - escort.optimizedProfileImageTime) > 8.64e+7 * 4))) {
-      const isRecalculation = escort?.optimizedProfileImageTime !== undefined;
-      const imagePriority = isRecalculation ? 50 : priority;
-      escortActions.determineMainProfileImage(topic.ownerUser, imagePriority).catch((error) => {
-        console.error(error);
-        setLoadError(error?.message || 'Failed to load image');
-      });
-    }
-  }, [topic, escort]);
-
-  const isImageLoading = topic.isOfEscort === undefined ||
-    (topic.isOfEscort === true && escort?.optimizedProfileImage === undefined) ||
-    (topic.isOfEscort === false && topic.publiLink === undefined);
+  const isImageLoading = !loadError && (topic.isOfEscort === undefined ||
+    (topic.isOfEscort && escort?.optimizedProfileImage === undefined) ||
+    (!topic.isOfEscort && topic.publiLink === undefined));
   const url = topic.isOfEscort === false
     ? null
     : escort?.optimizedProfileImage;
@@ -91,7 +66,6 @@ export const TopicImageRoot: FC<TopicImageRootProps> =
     <>
       <TopicImage
         url={url}
-        id={id}
         user={topic.ownerUser}
         isLoading={isImageLoading}
         onClick={escort?.optimizedProfileImage ? (() => setImageModalOpen(true)) : undefined}

@@ -2,6 +2,7 @@ import {Page} from "playwright-core";
 import fs from "node:fs";
 import {NIMFOMANE_STORAGE_JSON} from "./utils";
 import {expect} from "playwright/test";
+import {EscortItem, TopicItem} from "../../src/nimfomane/core/storage";
 
 let atLoad = 0;
 
@@ -54,23 +55,24 @@ export const utilsNimfomane = {
     await page.waitForTimeout(600);
   },
 
-  async waitForFirstImage(page: Page) {
+  async waitForFirstImage(page: Page, wait: number = 1000) {
     for (let i = 0; i < 6; i++) {
       let index = 10;
       while (index >= 0) {
-        const parentHandle = page.locator('[data-wwid="topic-image"]').nth(index--)
-        const firstImage = parentHandle.locator('img');
+        const parentHandle = page.locator('[data-wwtopic]').nth(index--)
+        const firstImage = parentHandle.locator('[data-wwid="topic-image-img"]');
 
         if (await firstImage.isVisible()) {
           const src = await firstImage.getAttribute('src');
-          const user = await parentHandle.getAttribute('data-wwuser');
+          const user = await parentHandle.locator('[data-wwid="topic-image"]')
+            .getAttribute('data-wwuser');
           const id = await parentHandle.getAttribute('data-wwtopic');
 
           return {firstImage, src, user, id};
         }
       }
 
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(wait);
     }
 
     throw new Error('Failed to find first image in time');
@@ -97,10 +99,20 @@ export const utilsNimfomane = {
     )
   },
 
-  async setTopicStorageProp(page: Page, id: string, prop: string, value: any) {
+  async getTopicStorageProp(page: Page, id: string, prop: keyof TopicItem) {
+    return await page.evaluate(
+      ({id, prop}) => {
+        const topic = JSON.parse(localStorage.getItem(`p24fa:nimfo:topic:${id}`) || '{}');
+        return topic[prop];
+      },
+      {id, prop}
+    )
+  },
+
+  async setTopicStorageProp(page: Page, id: string, prop: keyof TopicItem, value: any) {
     await page.evaluate(
       ({id, prop, value}) => {
-        const topic = JSON.parse(localStorage.getItem(`p24fa:nimfo:topic:${id}`));
+        const topic = JSON.parse(localStorage.getItem(`p24fa:nimfo:topic:${id}`) || '{}');
         topic[prop] = value;
         localStorage.setItem(`p24fa:nimfo:topic:${id}`, JSON.stringify(topic));
       },
@@ -108,14 +120,21 @@ export const utilsNimfomane = {
     )
   },
 
-  async setEscortStorageProp(page: Page, user: string, prop: string, value: any) {
+  async setEscortStorageProp(page: Page, user: string, prop: keyof EscortItem, value: any) {
     await page.evaluate(
       ({user, prop, value}) => {
-        const topic = JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${user}`));
+        const topic = JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${user}`) || '{}');
         topic[prop] = value;
         localStorage.setItem(`p24fa:nimfo:escort:${user}`, JSON.stringify(topic));
       },
       {user, prop, value}
+    )
+  },
+
+  async deleteEscortStorage(page: Page, user: string) {
+    return await page.evaluate(
+      (user) => localStorage.removeItem(`p24fa:nimfo:escort:${user}`),
+      user
     )
   },
 };

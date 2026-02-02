@@ -1,16 +1,19 @@
-interface TopicItem {
+export interface TopicItem {
   url?: string;
   isOfEscort?: boolean;
   ownerUser?: string;
   escortDeterminationTime?: number;
   publiLink?: string | false;
   publiLinkDeterminationTime?: number;
+  phone?: string;
 }
 
-interface EscortItem {
+export interface EscortItem {
   optimizedProfileImage?: string | null;
   optimizedProfileImageTime?: number;
   profileLink?: string;
+  phone?: string | false;
+  phoneDeterminationTime?: number;
 }
 
 const CALLBACKS = {
@@ -21,14 +24,6 @@ const CALLBACKS = {
 export const NimfomaneStorage = {
   getVersion(): string | null {
     return localStorage.getItem('p24fa:nimfo:storage:version');
-  },
-
-  getTopicStoreKeys(id: string): string[] {
-    const ownerUser = NimfomaneStorage.getTopic(id).ownerUser;
-    const baseKey = `p24fa:nimfo:topic:${id}`;
-    return [baseKey].concat(ownerUser ? [
-      `p24fa:nimfo:escort:${ownerUser}`,
-    ] : []);
   },
 
   getTopic(id: string): TopicItem {

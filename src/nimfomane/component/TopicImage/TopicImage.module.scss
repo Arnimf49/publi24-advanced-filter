@@ -1,5 +1,5 @@
 .container {
-  background: #e5e2e2;
+  background: #efeeee;
   border-radius: 5px;
   width: 100px;
   height: 100px;
@@ -15,12 +15,11 @@
 
   :global(.onMobile) & {
     width: 70px;
-    height: 85px;
+    height: calc(100% - 16px * 2);
     margin: 0;
     margin-right: 5px;
     position: absolute;
-    top: 50%;
-    transform: translate(0, -50%);
+    top: 16px;
   }
 }
 
@@ -60,6 +59,7 @@
     }
 
     :global(.onMobile) & {
+      height: 85px;
       top: initial;
       transform: none;
     }
@@ -75,6 +75,15 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+}
+
+.imageBg {
+  height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  filter: blur(12px);
 }
 
 .loader {
@@ -98,6 +107,10 @@
   font-weight: 600;
   cursor: pointer;
   user-select: none;
+
+  :global(.onMobile) & {
+    font-size: 12px;
+  }
 }
 
 .publiText {

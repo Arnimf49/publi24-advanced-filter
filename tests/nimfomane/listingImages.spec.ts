@@ -45,7 +45,7 @@ test('Should show loader in photo initially.', async ({page}) => {
   const firstImageContainer = page.locator('[data-wwid="topic-image"]').first();
   await firstImageContainer.waitFor();
   await firstImageContainer.locator('[data-wwid="loader"]').isVisible();
-  await firstImageContainer.locator('img, [data-wwid="no-image-icon"]').isVisible();
+  await firstImageContainer.locator('[data-wwid="topic-image-img"], [data-wwid="no-image-icon"]').isVisible();
 })
 
 test('Should show no image icon when no photos found.', async ({page}) => {
@@ -139,7 +139,7 @@ test('Should update preview image on listing when opening escort images modal.',
   await utilsNimfomane.throttleReload(page);
   await page.waitForTimeout(600);
 
-  await expect(page.locator(`[data-wwtopic="${id}"][data-wwid="topic-image"] [data-wwid="no-image-icon"]`)).toBeVisible();
+  await expect(page.locator(`[data-wwtopic="${id}"] [data-wwid="topic-image"] [data-wwid="no-image-icon"]`)).toBeVisible();
 
   await utilsNimfomane.goto(page, profileLink);
 
@@ -149,7 +149,7 @@ test('Should update preview image on listing when opening escort images modal.',
   await expect(page.locator('[data-wwid="escort-images"]')).toHaveCount(0);
 
   await utilsNimfomane.open(page);
-  await expect(page.locator(`[data-wwtopic="${id}"][data-wwid="topic-image"] img`)).toBeVisible();
+  await expect(page.locator(`[data-wwtopic="${id}"] [data-wwid="topic-image"] [data-wwid="topic-image-img"]`)).toBeVisible();
 })
 
 test('Should show error icon when topic image fails to load.', async ({page}) => {
@@ -157,9 +157,10 @@ test('Should show error icon when topic image fails to load.', async ({page}) =>
   const {user, id} = await utilsNimfomane.waitForFirstImage(page);
   const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
 
-  await page.route(profileLink + 'content*', route => route.abort());
+  await page.route(profileLink + 'content**', route => route.abort());
 
-  await utilsNimfomane.deleteTopicInfoStorage(page, id);
+  await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImage', undefined);
+  await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImageTime', undefined);
   await utilsNimfomane.throttleReload(page);
 
   await expect(page.locator(`[data-wwtopic="${id}"] [data-wwid="image-error-icon"]`)).toBeVisible();
@@ -180,7 +181,7 @@ test('Should show publi24 link overlay for non-escort topics.', async ({page, co
   await expect(page.locator(`[data-wwtopic="${topicId}"] [data-wwid="publi24-link"]`)).toBeVisible();
   await expect(page.locator(`[data-wwtopic="${topicId}"] [data-wwid="publi24-link"]`)).toContainText('publi24.ro');
 
-  await clickExpectOpens(context, page, `[data-wwtopic="${topicId}"]`, 'https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850332.html');
+  await clickExpectOpens(context, page, `[data-wwtopic="${topicId}"] [data-wwid="topic-image"]`, 'https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850332.html');
 })
 
 test('Should reload publi link after 10 days.', async ({page, context}) => {
@@ -201,7 +202,7 @@ test('Should reload publi link after 10 days.', async ({page, context}) => {
   await utilsNimfomane.throttleReload(page);
   await page.waitForTimeout(5000);
 
-  await clickExpectOpens(context, page, `[data-wwtopic="${topicId}"]`, 'https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850332.html');
+  await clickExpectOpens(context, page, `[data-wwtopic="${topicId}"] [data-wwid="topic-image"]`, 'https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850332.html');
   await expect(page.locator(`[data-wwtopic="${topicId}"] [data-wwid="publi24-link"]`)).toBeVisible();
 })
 
@@ -217,5 +218,5 @@ test('Should switch to escort type after 10 days if topic becomes escort.', asyn
 
   await utilsNimfomane.setTopicStorageProp(page, topicId, 'publiLinkDeterminationTime', Date.now() - (8.64e+7 * 11));
   await utilsNimfomane.throttleReload(page);
-  await expect(page.locator(`[data-wwtopic="${topicId}"] img`)).toBeVisible();
+  await expect(page.locator(`[data-wwtopic="${topicId}"] [data-wwid="topic-image-img"]`)).toBeVisible();
 })

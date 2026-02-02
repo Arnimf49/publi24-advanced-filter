@@ -53,10 +53,6 @@ NimfomaneStorage.upgrade()
         for (let index = 0; index < topicContainers.length; index++) {
           const container = topicContainers[index];
           const id = container.getAttribute('data-rowid')!;
-          const url = container.querySelector('.ipsDataItem_title [data-ipshover]')!.getAttribute('href')!
-            .replace(/\?.+$/, '');
-
-          NimfomaneStorage.setTopicProp(id, 'url', url);
 
           renderer.registerTopicItem(container, id, index);
         }

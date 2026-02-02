@@ -78,7 +78,7 @@ function startRequest(type: string, config: TypeConfig, item: QueueItem) {
   PAGE_TYPE[type].lastStartedAt = now;
   PAGE_TYPE[type].cooldowns.push(now + config.cooldown);
 
-  executeRequest(type, item);
+  executeRequest(type, item).catch(() => {});
 }
 
 async function executeRequest(type: string, item: QueueItem) {

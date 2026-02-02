@@ -1,4 +1,4 @@
-import React, {FC, MouseEventHandler, useState} from "react";
+import React, {FC, MouseEventHandler, useEffect, useState} from "react";
 import classes from "./TopicImage.module.scss";
 import {Loader} from "../../../common/components/Loader/Loader";
 import {NoImageIcon} from "./NoImageIcon";
@@ -10,13 +10,12 @@ interface TopicImageProps {
   isLoading?: boolean;
   onClick?: MouseEventHandler;
   user?: string;
-  id: string;
   loadError?: string | null;
   publiLink?: string | false;
 }
 
 export const TopicImage: FC<TopicImageProps> =
-({id, url, user, isLoading, onClick, loadError, publiLink}) => {
+({url, user, isLoading, onClick, loadError, publiLink}) => {
   const [hasError, setHasError] = useState(false);
 
   const handlePubliLinkClick = () => {
@@ -24,6 +23,10 @@ export const TopicImage: FC<TopicImageProps> =
       window.open(publiLink, '_blank');
     }
   };
+
+  useEffect(() => {
+    setHasError(false);
+  }, [url]);
 
   const handleClick = publiLink && typeof publiLink === 'string' ? handlePubliLinkClick : onClick;
 
@@ -35,16 +38,23 @@ export const TopicImage: FC<TopicImageProps> =
       onClick={handleClick}
       data-wwid="topic-image"
       data-wwuser={user}
-      data-wwtopic={id}
     >
       {isLoading && !loadError ? <Loader color={'#555'} classes={classes.loader}/> : null}
       {typeof url === "string" && !hasError && !loadError
-        ? <img
-          className={classes.image}
-          src={nimfomaneUtils.normalizeCmsUrl(url)}
-          loading="lazy"
-          onError={() => setHasError(true)}
-        />
+        ? <>
+          <img
+            className={classes.imageBg}
+            src={nimfomaneUtils.normalizeCmsUrl(url)}
+            loading="lazy"
+          />
+          <img
+            className={classes.image}
+            src={nimfomaneUtils.normalizeCmsUrl(url)}
+            loading="lazy"
+            onError={() => setHasError(true)}
+            data-wwid="topic-image-img"
+          />
+        </>
         : null}
       {url === null && !loadError && !publiLink && !isLoading ? <NoImageIcon/> : null}
       {(hasError || loadError) ? <ImageErrorIcon/> : null}

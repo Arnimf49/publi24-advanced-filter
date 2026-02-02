@@ -1,18 +1,77 @@
 import {NimfomaneStorage} from "./storage";
 import {page} from "../../common/page";
+import {utils} from "../../common/utils";
 
 export interface Image {
   url: string;
   date: string;
 }
 
+const extractPhoneFromElements = (elements: NodeListOf<HTMLElement> | HTMLElement[]): string | null => {
+  for (const element of elements) {
+    const normalized = utils.normalizeDigits(element.innerText);
+    const matches = normalized.match(/07(\d ?){8}/g);
+    if (matches) {
+      return matches[matches.length - 1].replace(/\s/g, '');
+    }
+  }
+  return null;
+};
+
 export const escortActions = {
+  async determinePhone(user: string, priority: number = 100) {
+    utils.debugLog('Determining escort phone', {user, priority});
+
+    const escort = NimfomaneStorage.getEscort(user);
+    if (!escort.profileLink) {
+      return;
+    }
+
+    let phone;
+    const profileUrl = escort.profileLink.replace(/\/$/, '');
+
+    const topicPageData = await page.load(`${profileUrl}/content/?type=forums_topic`, priority);
+    const topicTitles = topicPageData.querySelectorAll<HTMLElement>('.ipsDataItem_title');
+
+    phone = extractPhoneFromElements(topicTitles);
+    if (phone) {
+      NimfomaneStorage.setEscortProp(user, 'phone', phone);
+      NimfomaneStorage.setEscortProp(user, 'phoneDeterminationTime', Date.now());
+      return;
+    }
+
+    const profilePageData = await page.load(profileUrl, priority);
+    const genericItems = profilePageData.querySelectorAll<HTMLElement>('.ipsDataItem_generic');
+
+    phone = extractPhoneFromElements(genericItems);
+    if (phone) {
+      NimfomaneStorage.setEscortProp(user, 'phone', phone);
+      NimfomaneStorage.setEscortProp(user, 'phoneDeterminationTime', Date.now());
+      return;
+    }
+
+    const postPageData = await page.load(`${profileUrl}/content/?type=forums_topic_post`, priority);
+    const commentContents = postPageData.querySelectorAll<HTMLElement>('[data-role="commentContent"]');
+
+    phone = extractPhoneFromElements(commentContents);
+    if (phone) {
+      NimfomaneStorage.setEscortProp(user, 'phone', phone);
+      NimfomaneStorage.setEscortProp(user, 'phoneDeterminationTime', Date.now());
+      return;
+    }
+
+    NimfomaneStorage.setEscortProp(user, 'phone', false);
+    NimfomaneStorage.setEscortProp(user, 'phoneDeterminationTime', Date.now());
+  },
+
   updatePreviewImage(user: string, imageUrl: string) {
     NimfomaneStorage.setEscortProp(user, 'optimizedProfileImage', imageUrl);
     NimfomaneStorage.setEscortProp(user, 'optimizedProfileImageTime', Date.now());
   },
 
   async determineMainProfileImage(user: string, priority: number = 100) {
+    utils.debugLog('Determining escort main profile image', {user, priority});
+
     const escort = NimfomaneStorage.getEscort(user);
 
     if (!escort.profileLink) {

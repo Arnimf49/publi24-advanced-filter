@@ -59,11 +59,10 @@ export const utils = {
     // Handle emoji keycap digits
     str = str.replace(/(\d)\uFE0F\u20E3/g, '$1');
 
-    // Handle bold math digits 𝟎-𝟗
-    const boldDigits = "𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗";
+    // Handle bold math digits 𝟎-𝟗 (U+1D7CE to U+1D7D7)
     str = str.replace(/[\u{1D7CE}-\u{1D7D7}]/gu, (char) => {
-      const index = boldDigits.indexOf(char);
-      return index !== -1 ? String(index) : char;
+      const codePoint = char.codePointAt(0)!;
+      return String(codePoint - 0x1D7CE);
     });
 
     return str;

@@ -3,8 +3,21 @@ import React from "react";
 import {TopicImageRoot} from "../component/TopicImage/TopicImageRoot";
 import {ProfileImages} from "../component/ProfileImages/ProfileImages";
 import {profileActions} from "./profileActions";
+import {NimfomaneStorage} from "./storage";
+import {PanelRoot} from "../component/Panel/PanelRoot";
+import {analyzer} from "./analyzer";
+import {IS_MOBILE_VIEW} from "../../common/globals";
 
 export const renderer = {
+  registerProfileImages(container: HTMLDivElement, user: string) {
+    profileActions.determineEscort();
+
+    const buttonContainer = document.createElement('div');
+    const root = ReactDOM.createRoot(buttonContainer);
+    root.render(<ProfileImages user={user}/>);
+    container.appendChild(buttonContainer);
+  },
+
   registerTopicItem(container: HTMLDivElement, id: string, index: number) {
     let priority = 90 - index * 2;
 
@@ -13,10 +26,36 @@ export const renderer = {
       priority = 200;
     }
 
+    const url = container.querySelector<HTMLLinkElement>('.ipsDataItem_title [data-ipshover]')!.getAttribute('href')!
+      .replace(/\?.+$/, '');
+    NimfomaneStorage.setTopicProp(id, 'url', url);
+
+    container.setAttribute('data-wwtopic', id);
+
+    analyzer.analyzeTopic(container, id, priority).catch(console.error);
+
+    const unmountImage = renderer.renderTopicImage(container, id);
+    const unmountPanel = renderer.renderTopicPanel(container, id);
+
+    const cleanup = () => {
+      clearInterval(interval);
+      unmountImage();
+      unmountPanel();
+    };
+
+    const interval = setInterval(() => {
+      if (!document.contains(container)) {
+        cleanup();
+      }
+    }, 2000);
+
+    return cleanup;
+  },
+
+  renderTopicImage(container: HTMLDivElement, id: string): () => void {
     const imageContainer = document.createElement('div');
     const root = ReactDOM.createRoot(imageContainer);
-    root.render(<TopicImageRoot id={id} container={container} priority={priority}/>);
-
+    root.render(<TopicImageRoot id={id}/>);
 
     const mainDataContainer = container.querySelector('.ipsDataItem_main, .ipsTopicSnippet__top');
     if (mainDataContainer) {
@@ -26,20 +65,25 @@ export const renderer = {
       console.error('Main data container not found');
     }
 
-    const interval = setInterval(() => {
-      if (!document.contains(container)) {
-        clearInterval(interval);
-        root.unmount();
-      }
-    }, 2000);
+    return () => root.unmount();
   },
 
-  registerProfileImages(container: HTMLDivElement, user: string) {
-    profileActions.determineEscort();
+  renderTopicPanel(container: HTMLDivElement, id: string): () => void {
+    const panelContainer = document.createElement('div');
+    const root = ReactDOM.createRoot(panelContainer);
+    root.render(<PanelRoot id={id}/>);
 
-    const buttonContainer = document.createElement('div');
-    const root = ReactDOM.createRoot(buttonContainer);
-    root.render(<ProfileImages user={user}/>);
-    container.appendChild(buttonContainer);
+    if (IS_MOBILE_VIEW) {
+      container.appendChild(panelContainer);
+    } else {
+      const mainDataContainer = container.querySelector('.ipsDataItem_main, .ipsTopicSnippet__top');
+      if (mainDataContainer) {
+        container.insertBefore(panelContainer, mainDataContainer);
+      } else {
+        console.error('Main data container not found');
+      }
+    }
+
+    return () => root.unmount();
   }
 }

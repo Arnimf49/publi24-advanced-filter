@@ -1,0 +1,23 @@
+.panel {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+
+  :global(.onMobile) & {
+    margin-left: 80px
+  }
+  :global(.onMobile .ipsTopicSnippet) & {
+    margin-left: 0
+  }
+}
+
+.whatsapp {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+
+  svg {
+    height: 26px;
+    vertical-align: middle;
+  }
+}
