@@ -1,0 +1,150 @@
+.hideReason {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(2px);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+.reasonButtonsContainer {
+  width: 100%;
+  max-width: 90%;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+
+  .title {
+    font-weight: bold;
+    font-size: 16px;
+    color: rgb(73 73 73);
+    background: rgb(235 235 235);
+    border-radius: 10px;
+    padding: 5px 10px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .closeButton {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgb(73 73 73);
+    color: rgb(235 235 235);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+
+    svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+    }
+
+    &:hover {
+      background: rgb(93 93 93);
+    }
+  }
+
+  .reasonButtons {
+    display: flex;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    .reasonButton {
+      flex: 0 0 calc(25% - 7.5px);
+    }
+  }
+
+  .reasonButton {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    background: #ffffff;
+    color: #1e1e1e;
+    box-shadow: 1px 1px 3px 2px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+
+    &:hover {
+      background: #faf6f2;
+    }
+
+    &.showButton {
+      background: #c7dceb;
+      color: #2d4545;
+
+      &:hover {
+        background: #bddff8;
+      }
+    }
+
+    &.backButton {
+      background: #9e9e9e;
+      color: white;
+
+      &:hover {
+        background: #8e8e8e;
+      }
+    }
+
+    &.reasonSelected {
+      background: rgb(197, 155, 47);
+      color: white;
+    }
+  }
+
+  :global(.onMobile) & {
+    flex-direction: column;
+    padding: 0;
+    max-width: calc(100% - 20px);
+    gap: 6px;
+
+    .title {
+      width: 100%;
+      justify-content: center;
+      font-size: 13px;
+      padding: 3px 3px;
+    }
+
+    .closeButton {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .reasonButtons {
+      flex-wrap: wrap;
+      gap: 5px;
+      width: 100%;
+
+      .reasonButton {
+        font-size: 12px;
+        flex: 0 0 calc(33.333% - (2 * 5px) / 3);
+        padding: 4px 3px;
+      }
+    }
+  }
+}

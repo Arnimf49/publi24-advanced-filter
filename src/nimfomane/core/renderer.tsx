@@ -71,14 +71,20 @@ export const renderer = {
   renderTopicPanel(container: HTMLDivElement, id: string): () => void {
     const panelContainer = document.createElement('div');
     const root = ReactDOM.createRoot(panelContainer);
-    root.render(<PanelRoot id={id}/>);
+
+    const hideReasonContainer = document.createElement('div');
+    hideReasonContainer.setAttribute('data-wwid', 'hide-reason-container');
+    container.appendChild(hideReasonContainer);
+    container.style.position = 'relative';
+
+    root.render(<PanelRoot id={id} container={container}/>);
 
     if (IS_MOBILE_VIEW) {
       container.appendChild(panelContainer);
     } else {
       const mainDataContainer = container.querySelector('.ipsDataItem_main, .ipsTopicSnippet__top');
       if (mainDataContainer) {
-        container.insertBefore(panelContainer, mainDataContainer);
+        mainDataContainer.appendChild(panelContainer);
       } else {
         console.error('Main data container not found');
       }

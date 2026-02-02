@@ -6,6 +6,8 @@ export interface TopicItem {
   publiLink?: string | false;
   publiLinkDeterminationTime?: number;
   phone?: string;
+  hidden?: boolean;
+  hiddenReason?: string;
 }
 
 export interface EscortItem {
@@ -14,6 +16,8 @@ export interface EscortItem {
   profileLink?: string;
   phone?: string | false;
   phoneDeterminationTime?: number;
+  hidden?: boolean;
+  hiddenReason?: string;
 }
 
 const CALLBACKS = {
