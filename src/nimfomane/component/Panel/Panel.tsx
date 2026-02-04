@@ -13,20 +13,22 @@ type PanelProps = {
 export const Panel: React.FC<PanelProps> = ({ phone, visible, hiddenReason, onHideClick }) => {
   return (
     <div className={styles.panel}>
-      {!!phone && <WhatsAppButton
-        phone={phone}
-        className={styles.whatsapp}
-        size={20}
-      />}
-      <HideButton
-        visible={visible}
-        onClick={onHideClick}
-        size={20}
-        className={styles.hideButton}
-      />
+      <div className={styles.buttons}>
+        {!!phone && <WhatsAppButton
+          phone={phone}
+          className={styles.whatsapp}
+          size={22}
+        />}
+        <HideButton
+          visible={visible}
+          onClick={onHideClick}
+          size={22}
+          className={styles.hideButton}
+        />
+      </div>
       {!visible && hiddenReason && (
         <span className={styles.hideReason} data-wwid="hide-reason">
-          motiv: <b>{hiddenReason}</b>
+          ascuns, motiv: <b>{hiddenReason}</b>
         </span>
       )}
     </div>
