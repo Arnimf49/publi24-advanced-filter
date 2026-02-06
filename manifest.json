@@ -59,8 +59,8 @@
     {
       "matches": [
         "https://lens.google.com/*",
-        "https://www.google.com/search?vsrid=*",
-        "https://www.google.com/search?sca_esv=*"
+        "https://www.google.com/search*vsrid=*",
+        "https://www.google.com/search*sca_esv=*"
       ],
       "js": [
         "dist/publi24/search_image_parser.js"
