@@ -35,6 +35,7 @@ export const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
       rel="noopener noreferrer"
       className={className}
       title="Deschide Whatsapp"
+      data-wwid="whatsapp"
     >
       <svg
         viewBox="0 0 325 325"

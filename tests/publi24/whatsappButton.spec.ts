@@ -25,7 +25,7 @@ test('Should include predefined message in WhatsApp link when enabled', async ({
 
   const firstAd = await utilsPubli.findFirstAdWithPhone(page);
   const phone = await (await firstAd.$('[data-wwid="phone-number"]')).innerText();
-  
+
   const href = await (await firstAd.$('a[data-wwid="whatsapp"][target="_blank"]')).getAttribute('href');
   expect(href).toBe(`https://wa.me/+4${phone}?text=${encodeURIComponent(testMessage)}`);
 });
