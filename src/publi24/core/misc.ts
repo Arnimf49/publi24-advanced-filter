@@ -1,12 +1,8 @@
+import {browserApi} from "../../common/globals";
+
 declare const Jimp: any;
 declare const Tesseract: any;
 declare const QRCode: any;
-
-// @ts-ignore
-if (typeof browser === "undefined" && typeof chrome !== "undefined") {
-  // @ts-ignore
-  var browser = chrome;
-}
 
 export const misc = {
   cx(...args: (string | boolean | undefined | null)[]): string {
@@ -23,7 +19,7 @@ export const misc = {
 
   async readNumbersFromBase64Png(data: string): Promise<string> {
     const TESSERACT_PATH = `/library/tesseract/`;
-    const runtime = browser.runtime;
+    const runtime = browserApi.runtime;
 
     const jimpImg = await Jimp.read(Buffer.from(data, 'base64'));
 

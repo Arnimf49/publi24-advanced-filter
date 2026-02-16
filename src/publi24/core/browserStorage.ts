@@ -1,11 +1,5 @@
 import StorageChange = chrome.storage.StorageChange;
-import {IS_SAFARI_IOS} from "../../common/globals";
-
-// @ts-ignore
-if (typeof browser === "undefined" && typeof chrome !== "undefined") {
-  // @ts-ignore
-  var browser = chrome;
-}
+import {browserApi, IS_SAFARI_IOS} from "../../common/globals";
 
 const WWBrowserStorageCache: Record<string, any> = {};
 const watchKeys: string[] = [];
@@ -13,7 +7,7 @@ const watchKeys: string[] = [];
 export const WWBrowserStorage = {
   async get(key: string | string[]): Promise<Record<string, any>> {
     if (!IS_SAFARI_IOS) {
-      return browser.storage.local.get(key);
+      return browserApi.storage.local.get(key);
     }
 
     const keys = (typeof key === 'string' ? [key] : key);
@@ -23,7 +17,7 @@ export const WWBrowserStorage = {
       .forEach((k) => watchKeys.push(k));
 
     try {
-      const data = await browser.storage.local.get(key);
+      const data = await browserApi.storage.local.get(key);
       Object.entries(data).forEach(([cacheKey, value]) => {
         WWBrowserStorageCache[cacheKey] = value;
       });
@@ -41,13 +35,13 @@ export const WWBrowserStorage = {
 
   async set(key: string, data: any): Promise<void> {
     if (!IS_SAFARI_IOS) {
-      return browser.storage.local.set({ [key]: data });
+      return browserApi.storage.local.set({ [key]: data });
     }
 
     try {
       // Try to do a get first. When set breaks for some reason it doesn't even throw just breaks everything.
       // Get still throws and can be caught, so this is how we test that set will work.
-      await browser.storage.local.get(key);
+      await browserApi.storage.local.get(key);
     } catch (e: any) {
       console.error(e);
       // On safari the browser storage api breaks after returning from another tab. Reload to reset.
@@ -56,7 +50,7 @@ export const WWBrowserStorage = {
     }
 
     try {
-      return browser.storage.local.set({ [key]: data });
+      return browserApi.storage.local.set({ [key]: data });
     } catch (error) {
       throw error;
     }
@@ -65,9 +59,9 @@ export const WWBrowserStorage = {
   listen(listener: (changes: { [key: string]: StorageChange }) => void) {
     if (!IS_SAFARI_IOS) {
       // This is also broken on safari.
-      browser.storage.local.onChanged.addListener(listener);
+      browserApi.storage.local.onChanged.addListener(listener);
 
-      return () => browser.storage.local.onChanged.removeListener(listener)
+      return () => browserApi.storage.local.onChanged.removeListener(listener)
     }
 
     const currentValues: Record<string, any> = {};

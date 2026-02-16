@@ -1,4 +1,5 @@
 import {WWStorage} from "./storage";
+import {permissions} from "../../common/permissions";
 
 // @ts-ignore
 if (typeof browser === "undefined" && typeof chrome !== "undefined") {
@@ -141,11 +142,34 @@ function getOS(userAgent: string): string {
   return 'Unknown';
 }
 
+async function acquirePermission() {
+  const permissionsData = await permissions.getDataCollectionPermissions();
+  if (permissionsData.data_collection === undefined) {
+    // Data collection not available on Chrome.
+    return true;
+  }
+  if (
+    (
+      !permissionsData.data_collection.includes('websiteActivity')
+      || !permissionsData.data_collection.includes('technicalAndInteraction')
+    )
+    && !await permissions.requestDataCollectionPermissions()
+  ) {
+    console.warn('User does not consent to analytics.', permissionsData)
+    return false;
+  }
+  return true;
+}
+
 export async function sendAnalyticsEvent(): Promise<void> {
   const sentVersion = WWStorage.getAnalyticsSentVersion();
 
   if (sentVersion === 1) {
     console.log('Analytics event already sent, skipping');
+    return;
+  }
+
+  if (!await acquirePermission()) {
     return;
   }
 

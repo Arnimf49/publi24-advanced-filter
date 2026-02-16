@@ -9,6 +9,9 @@
   "permissions": [
     "storage"
   ],
+  "background": {
+    "service_worker": "dist/common/background.js"
+  },
   "host_permissions": [
     "https://www.google.com/*",
     "https://lens.google.com/*"
@@ -83,10 +86,15 @@
     "gecko": {
       "id": "{7eaabf41-0515-4d5b-9c4a-6d662618b504}",
       "data_collection_permissions": {
-        "required": [
-          "websiteActivity"
+        "optional": [
+          "websiteActivity",
+          "technicalAndInteraction"
         ]
-      }
+      },
+      "strict_min_version": "140"
+    },
+    "gecko_android": {
+      "strict_min_version": "142"
     }
   }
 }
