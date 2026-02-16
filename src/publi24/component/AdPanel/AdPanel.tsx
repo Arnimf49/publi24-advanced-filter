@@ -1,7 +1,7 @@
 import React, {MouseEventHandler, useState} from 'react';
 import styles from './AdPanel.module.scss';
 import {VisibilityIcon} from "../Common/Icons/VisibilityIcon";
-import {StarIcon} from "../Common/Icons/StarIcon";
+import {StarIcon} from "../../../common/components/Icons/StarIcon";
 import {PhoneIcon} from "../Common/Icons/PhoneIcon";
 import {ImageIcon} from "../Common/Icons/ImageIcon";
 import {NimfomaneIcon} from "./NimfomaneIcon";

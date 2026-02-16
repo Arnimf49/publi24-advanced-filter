@@ -1,6 +1,6 @@
 import React, {ChangeEventHandler, MouseEventHandler} from 'react';
 import Modal from '../../../../../common/components/Modal/Modal';
-import ContentModal from '../../Modal/ContentModal';
+import ContentModal from '../../../../../common/components/Modal/ContentModal';
 import AdsList from '../AdList/AdsList';
 import styles from './AdsModal.module.scss';
 import {AdData} from "../../../../core/adData";

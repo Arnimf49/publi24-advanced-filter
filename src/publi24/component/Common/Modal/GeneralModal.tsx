@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import Modal from '../../../../common/components/Modal/Modal';
-import ContentModal from './ContentModal';
+import ContentModal from '../../../../common/components/Modal/ContentModal';
 import {misc} from '../../../core/misc';
 import styles from './GeneralModal.module.scss';
 

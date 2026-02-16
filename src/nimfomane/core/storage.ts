@@ -20,9 +20,18 @@ export interface EscortItem {
   hiddenReason?: string;
 }
 
+interface StorageCache {
+  favs: string[] | null;
+}
+
+const STORAGE_CACHE: StorageCache = {
+  favs: null,
+};
+
 const CALLBACKS = {
   topicChanged: {} as Record<string, Array<(topic: TopicItem) => any>>,
   escortChanged: {} as Record<string, Array<(topic: EscortItem) => any>>,
+  favsChanged: [] as Array<() => void>,
 };
 
 export const NimfomaneStorage = {
@@ -73,6 +82,59 @@ export const NimfomaneStorage = {
   },
   triggerEscortChanged(user: string) {
     (CALLBACKS.escortChanged[user] || []).forEach(callback => callback(NimfomaneStorage.getEscort(user)));
+  },
+
+  getFavorites(): string[] {
+    if (STORAGE_CACHE.favs) {
+      return [...STORAGE_CACHE.favs];
+    }
+    const favsString = localStorage.getItem('p24fa:nimfo:favs');
+    const favs: string[] = favsString ? JSON.parse(favsString) : [];
+    STORAGE_CACHE.favs = favs;
+    return [...favs];
+  },
+
+  clearFavorites(): void {
+    localStorage.removeItem('p24fa:nimfo:favs');
+    STORAGE_CACHE.favs = null;
+    NimfomaneStorage.triggerFavsChanged();
+  },
+
+  toggleFavorite(user: string | undefined): void {
+    if (!user || user === '') {
+      return;
+    }
+
+    let items = NimfomaneStorage.getFavorites();
+    const isFavorite = items.includes(user);
+
+    if (isFavorite) {
+      items = items.filter(it => it !== user);
+    } else {
+      items.push(user);
+    }
+
+    localStorage.setItem('p24fa:nimfo:favs', JSON.stringify(items));
+    STORAGE_CACHE.favs = items;
+
+    NimfomaneStorage.triggerEscortChanged(user);
+    NimfomaneStorage.triggerFavsChanged();
+  },
+
+  isFavorite(user: string): boolean {
+    return NimfomaneStorage.getFavorites().includes(user);
+  },
+
+  onFavsChanged(callback: () => void) {
+    CALLBACKS.favsChanged.push(callback);
+  },
+
+  removeOnFavsChanged(callback: () => void) {
+    CALLBACKS.favsChanged = CALLBACKS.favsChanged.filter(c => c !== callback);
+  },
+
+  triggerFavsChanged() {
+    CALLBACKS.favsChanged.forEach(callback => callback());
   },
 
   async upgrade(): Promise<void> {

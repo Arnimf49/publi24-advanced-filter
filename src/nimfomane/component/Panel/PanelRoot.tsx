@@ -5,49 +5,56 @@ import {Panel} from './Panel';
 import HideReasonRoot from './HideReason/HideReasonRoot';
 
 type PanelRootProps = {
-  id: string;
+  id?: string;
+  escortUser?: string;
   container: HTMLElement;
 };
 
-export const PanelRoot: React.FC<PanelRootProps> = ({ id, container }) => {
+export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container }) => {
   const [_, setRenderCycle] = useState(0);
   const [showHideReason, setShowHideReason] = useState(false);
 
-  const topic = NimfomaneStorage.getTopic(id);
-  const isOfEscort = topic.isOfEscort && topic.ownerUser;
-  const phone = isOfEscort
-    ? NimfomaneStorage.getEscort(topic.ownerUser!).phone
-    : topic.phone;
+  const topic = id ? NimfomaneStorage.getTopic(id) : null;
+  const effectiveEscortUser = escortUser || (topic?.isOfEscort ? topic.ownerUser : null);
+  const isOfEscort = !!effectiveEscortUser;
+  const phone = isOfEscort && effectiveEscortUser
+    ? NimfomaneStorage.getEscort(effectiveEscortUser).phone
+    : topic?.phone;
 
-  const escort = isOfEscort ? NimfomaneStorage.getEscort(topic.ownerUser!) : null;
-  const hidden = isOfEscort ? escort?.hidden : topic.hidden;
-  const hiddenReason = isOfEscort ? escort?.hiddenReason : topic.hiddenReason;
+  const escort = isOfEscort && effectiveEscortUser ? NimfomaneStorage.getEscort(effectiveEscortUser) : null;
+  const hidden = isOfEscort ? escort?.hidden : topic?.hidden;
+  const hiddenReason = isOfEscort ? escort?.hiddenReason : topic?.hiddenReason;
   const visible = !hidden;
+  const isFav = isOfEscort && effectiveEscortUser ? NimfomaneStorage.isFavorite(effectiveEscortUser) : false;
 
   useEffect(() => {
     const incrementRender = () => setRenderCycle(v => ++v);
-    const topic = NimfomaneStorage.getTopic(id);
 
-    NimfomaneStorage.onTopicChanged(id, incrementRender);
-
-    if (topic.ownerUser) {
-      NimfomaneStorage.onEscortChanged(topic.ownerUser, incrementRender);
+    if (id) {
+      NimfomaneStorage.onTopicChanged(id, incrementRender);
+    }
+    if (effectiveEscortUser) {
+      NimfomaneStorage.onEscortChanged(effectiveEscortUser, incrementRender);
     }
 
     return () => {
-      NimfomaneStorage.removeOnTopicChanged(id, incrementRender);
-      if (topic.ownerUser) {
-        NimfomaneStorage.removeOnEscortChanged(topic.ownerUser, incrementRender);
+      if (id) {
+        NimfomaneStorage.removeOnTopicChanged(id, incrementRender);
+      }
+      if (effectiveEscortUser) {
+        NimfomaneStorage.removeOnEscortChanged(effectiveEscortUser, incrementRender);
       }
     };
-  }, [id]);
+  }, [id, effectiveEscortUser]);
 
   useEffect(() => {
-    const topicContainer = container.closest('[data-wwtopic]') as HTMLElement;
-    if (!topicContainer) return;
+    const parentContainer = container.getAttribute('data-wwid') === 'escort-card'
+      ? container
+      : container.closest('[data-wwtopic]') as HTMLElement;
+    if (!parentContainer) return;
 
-    const hideReasonContainer = topicContainer.querySelector('[data-wwid="hide-reason-container"]') as HTMLElement;
-    const children = Array.from(topicContainer.children) as HTMLElement[];
+    const hideReasonContainer = parentContainer.querySelector('[data-wwid="hide-reason-container"]') as HTMLElement;
+    const children = Array.from(parentContainer.children) as HTMLElement[];
 
     children.forEach(child => {
       if (child === hideReasonContainer) return;
@@ -65,12 +72,12 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, container }) => {
   const onHideClick = useCallback(() => {
     const newVisible = !visible;
 
-    if (isOfEscort && topic.ownerUser) {
-      NimfomaneStorage.setEscortProp(topic.ownerUser, 'hidden', !newVisible);
+    if (isOfEscort) {
+      NimfomaneStorage.setEscortProp(effectiveEscortUser, 'hidden', !newVisible);
       if (newVisible) {
-        NimfomaneStorage.setEscortProp(topic.ownerUser, 'hiddenReason', undefined);
+        NimfomaneStorage.setEscortProp(effectiveEscortUser, 'hiddenReason', undefined);
       }
-    } else {
+    } else if (id) {
       NimfomaneStorage.setTopicProp(id, 'hidden', !newVisible);
       if (newVisible) {
         NimfomaneStorage.setTopicProp(id, 'hiddenReason', undefined);
@@ -80,30 +87,36 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, container }) => {
     if (!newVisible) {
       setShowHideReason(true);
     }
-  }, [visible, isOfEscort, topic.ownerUser, id]);
+  }, [visible, isOfEscort, effectiveEscortUser, id]);
 
   const onHideReasonSelect = useCallback((reasonKey: string) => {
-    if (isOfEscort && topic.ownerUser) {
-      NimfomaneStorage.setEscortProp(topic.ownerUser, 'hiddenReason', reasonKey);
-    } else {
+    if (isOfEscort) {
+      NimfomaneStorage.setEscortProp(effectiveEscortUser, 'hiddenReason', reasonKey);
+    } else if (id) {
       NimfomaneStorage.setTopicProp(id, 'hiddenReason', reasonKey);
     }
-  }, [isOfEscort, topic.ownerUser, id]);
+  }, [isOfEscort, effectiveEscortUser, id]);
 
   const onHideReasonCancel = useCallback(() => {
-    if (isOfEscort && topic.ownerUser) {
-      NimfomaneStorage.setEscortProp(topic.ownerUser, 'hidden', false);
-      NimfomaneStorage.setEscortProp(topic.ownerUser, 'hiddenReason', undefined);
-    } else {
+    if (isOfEscort) {
+      NimfomaneStorage.setEscortProp(effectiveEscortUser, 'hidden', false);
+      NimfomaneStorage.setEscortProp(effectiveEscortUser, 'hiddenReason', undefined);
+    } else if (id) {
       NimfomaneStorage.setTopicProp(id, 'hidden', false);
       NimfomaneStorage.setTopicProp(id, 'hiddenReason', undefined);
     }
     setShowHideReason(false);
-  }, [isOfEscort, topic.ownerUser, id]);
+  }, [isOfEscort, effectiveEscortUser, id]);
 
   const onHideReasonClose = useCallback(() => {
     setShowHideReason(false);
   }, []);
+
+  const onFavClick = useCallback(() => {
+    if (isOfEscort) {
+      NimfomaneStorage.toggleFavorite(effectiveEscortUser);
+    }
+  }, [isOfEscort, effectiveEscortUser]);
 
   return (
     <>
@@ -111,7 +124,10 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, container }) => {
         phone={phone}
         visible={visible}
         hiddenReason={hiddenReason}
+        isEscort={isOfEscort}
+        isFav={isFav}
         onHideClick={onHideClick}
+        onFavClick={onFavClick}
       />
       {showHideReason && ReactDOM.createPortal(
         <HideReasonRoot

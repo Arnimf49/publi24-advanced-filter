@@ -47,6 +47,8 @@ NimfomaneStorage.upgrade()
       document.body.classList.add('isFirefox');
     }
 
+    renderer.renderGlobalButtons();
+
     if (IS_LISTING_PAGE && IS_ESCORT_LISTING) {
       const registerItems = () => {
         const topicContainers = [...document.querySelectorAll<HTMLDivElement>('[data-rowid]')];

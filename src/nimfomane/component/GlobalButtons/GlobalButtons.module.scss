@@ -1,0 +1,240 @@
+.globalButtonsContainer {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  padding-right: 5px;
+  border-radius: 9999px;
+  background: #f8f8f8;
+  box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.2);
+
+  :global(.onMobile) & {
+    position: absolute;
+    bottom: 66px;
+    left: 6px;
+    transform: translateX(0%);
+    box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.logoButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+  border-radius: 9999px;
+  overflow: hidden;
+
+  .logo {
+    width: 42px;
+    height: 42px;
+    display: block;
+  }
+
+  :global(.onMobile) & .logo {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+.logoButtonBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #f8f8f8;
+  box-sizing: content-box;
+  width: calc(40px + 8px);
+  height: calc(40px + 8px);
+  display: block;
+  border-radius: 9999px;
+
+  :global(.onMobile) & {
+    width: calc(34px + 8px);
+    height: calc(34px + 8px);
+  }
+}
+
+.menuButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  background: rgb(216 222 235);
+  padding: 9px;
+  transition: background 0.2s ease;
+  height: 40px;
+  box-sizing: border-box;
+  position: relative;
+  margin: 1px 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    transition: background 0.2s ease;
+    right: 97%;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    background: rgb(216 222 235);
+  }
+
+  &:hover {
+    background: rgb(217, 226, 246);
+
+    &::before {
+      background: rgb(217, 226, 246);
+    }
+  }
+
+  svg {
+    display: block;
+    stroke: rgb(31 48 80);
+  }
+
+  :global(.onMobile) & {
+    padding: 8px;
+    height: 34px;
+  }
+}
+
+.savesButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  border: none;
+  background: rgb(233, 218, 224);
+  color: rgb(137 71 97);
+  padding: 0 12px;
+  padding-right: 14px;
+  border-radius: 0 9999px 9999px 0;
+  font-weight: bold;
+  line-height: 1;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+  height: 40px;
+  box-sizing: border-box;
+  margin: 1px 0;
+
+  &:hover {
+    background: rgb(238, 225, 228);
+    color: rgb(151, 81, 109);
+
+    .savesIcon {
+      fill: rgb(151, 81, 109);
+    }
+  }
+
+  .savesIcon {
+    width: 22px;
+    height: 22px;
+    fill: rgb(137 71 97);
+    flex-shrink: 0;
+  }
+
+  :global(.onMobile) & {
+    padding-left: 6px;
+    padding-right: 8px;
+    gap: 4px;
+    font-size: 14px;
+    height: 34px;
+
+    .savesIcon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+@keyframes popAnimation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+    background: rgb(220, 193, 204);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.savesButtonAnimating {
+  animation: popAnimation 0.2s ease-out;
+}
+
+.menuDropdown {
+  position: fixed;
+  bottom: calc(10px + 40px + 3px + 3px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #f8f8f8;
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.2);
+  z-index: 3000;
+  min-width: 200px;
+
+  :global(.onMobile) & {
+    left: 0px;
+    transform: none;
+    bottom: calc(10px + 34px + 3px + 3px);
+  }
+}
+
+.menuArrow {
+  position: absolute;
+  bottom: -6px;
+  left: 47%;
+  margin-left: -56px;
+  width: 12px;
+  height: 12px;
+  background: #f8f8f8;
+  transform: rotate(45deg);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+
+  :global(.onMobile) & {
+    left: 55px;
+    margin-left: 0;
+  }
+}
+
+.menuHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 2px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.menuTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+
+  :global(.onMobile) & {
+    font-size: 12px;
+  }
+}

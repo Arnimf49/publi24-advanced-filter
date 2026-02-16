@@ -1,11 +1,11 @@
 import React, {useState, useRef, MouseEventHandler} from 'react';
 import Modal from '../../../../common/components/Modal/Modal';
-import ContentModal from '../../Common/Modal/ContentModal';
+import ContentModal from '../../../../common/components/Modal/ContentModal';
 import AdsList from '../../Common/Partials/AdList/AdsList';
 import styles from './FavoritesModal.module.scss';
 import {AdData} from "../../../core/adData";
 import PhoneAndTagsRoot from "../../Common/Partials/PhoneAndTags/PhoneAndTagsRoot";
-import {StarIcon} from "../../Common/Icons/StarIcon";
+import {StarIcon} from "../../../../common/components/Icons/StarIcon";
 import {RemoveIcon} from "../../Common/Icons/RemoveIcon";
 import {misc} from "../../../core/misc";
 import {Ad} from "./Ad";

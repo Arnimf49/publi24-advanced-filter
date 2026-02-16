@@ -32,6 +32,8 @@
   border-radius: 10px;
   margin: 0;
   flex-shrink: 0;
+  font-size: 27px;
+  line-height: 130%;
 
   svg {
     vertical-align: middle;
@@ -54,6 +56,10 @@
     border-bottom-left-radius: 0 !important;
     padding-left: 20px !important;
     padding-right: 20px !important;
+  }
+
+  @media only screen and (min-width: 40.063em) {
+    font-size: 37px
   }
 }
 

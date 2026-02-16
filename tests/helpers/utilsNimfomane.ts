@@ -32,6 +32,19 @@ export const utilsNimfomane = {
     return response;
   },
 
+  clearPopups(page: Page) {
+    setInterval(async () => {
+      try {
+        const consent = await page.$('[data-role="cookieConsentBar"] [type="submit"]');
+        if (consent) {
+          await consent.click();
+        }
+      } catch (e) {
+        // noop
+      }
+    }, 1000);
+  },
+
   async open(page: Page, config: {url?: string, loadStorage?: boolean} = {}) {
     const url = typeof config === 'string' ? config : config.url;
     const loadStorage = typeof config === 'object' ? config.loadStorage : true;
@@ -53,6 +66,8 @@ export const utilsNimfomane = {
 
     await utilsNimfomane.goto(page, url || `https://nimfomane.com/forum/forum/35-escorte-din-cluj/`);
     await page.waitForTimeout(600);
+
+    utilsNimfomane.clearPopups(page);
   },
 
   async waitForFirstImage(page: Page, wait: number = 1000) {
@@ -82,6 +97,16 @@ export const utilsNimfomane = {
     return await page.evaluate(
       (user) => JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${user}`)).profileLink,
       user
+    )
+  },
+
+  async getEscortStorageProp(page: Page, user: string, prop: keyof EscortItem) {
+    return await page.evaluate(
+      ({user, prop}) => {
+        const topic = JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${user}`) || '{}');
+        return topic[prop];
+      },
+      {user, prop}
     )
   },
 

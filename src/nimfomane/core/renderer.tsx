@@ -7,8 +7,23 @@ import {NimfomaneStorage} from "./storage";
 import {PanelRoot} from "../component/Panel/PanelRoot";
 import {analyzer} from "./analyzer";
 import {IS_MOBILE_VIEW} from "../../common/globals";
+import GlobalButtonsRoot from "../component/GlobalButtons/GlobalButtonsRoot";
 
 export const renderer = {
+  renderGlobalButtons() {
+    const globalButtonsContainer = document.createElement('div');
+
+    if (IS_MOBILE_VIEW) {
+      const bottomNav = document.querySelector<HTMLElement>('.focus-mobile-footer')!;
+      bottomNav.appendChild(globalButtonsContainer);
+      bottomNav.style.overflow = 'initial';
+    } else {
+      document.body.appendChild(globalButtonsContainer);
+    }
+    const globalButtonsRoot = ReactDOM.createRoot(globalButtonsContainer);
+    globalButtonsRoot.render(<GlobalButtonsRoot />);
+  },
+
   registerProfileImages(container: HTMLDivElement, user: string) {
     profileActions.determineEscort();
 
