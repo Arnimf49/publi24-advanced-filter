@@ -1,3 +1,4 @@
+export const browserApi = typeof browser !== "undefined" ? browser : chrome;
 export const IS_PROMOTER = process.env.PROMOTER === 'true';
 export const IS_MOBILE_VIEW: boolean = ('ontouchstart' in document.documentElement);
 export const IS_SAFARI_IOS: boolean = [

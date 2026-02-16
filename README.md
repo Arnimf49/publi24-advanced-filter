@@ -3,6 +3,9 @@
 - Chrome: https://chromewebstore.google.com/detail/publi24-advanced-filter/pigkjfndnpblohnmphgbmecaelefaedn?hl=en
 - Firefox: https://addons.mozilla.org/en-US/firefox/addon/publi24-filtru-avansat/
 
+- [Development](#development)
+- [For extension reviewers](#for-extensions-reviewers)
+
 ## Development
 
 ### Installation
@@ -64,3 +67,9 @@ Publi24 domain. Handles storing all other information and also upgrades to the s
 
 The library directory stores 3rd party packages. These are taken from CDNs and hardcoded as Chrome Web Store doesn't 
 really accept loading in JS files from the internet for security reasons.
+
+## For extensions reviewers
+
+External packages are in library committed. Their sources are either Github releases or NPM packages. 
+Please see `./misc/build-libraries.sh` and `./misc/checksum-libraries.sh`. You will need to run `npm i` before
+being able to use these scripts. You only need `./misc/checksum-libraries.sh` for verification.

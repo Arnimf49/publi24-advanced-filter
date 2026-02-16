@@ -3,12 +3,6 @@ import Modal from "../../../common/components/Modal/Modal";
 import {EscortImages} from "../TopicImage/EscortImages/EscortImages";
 import classes from './ProfileImages.module.scss'
 
-// @ts-ignore
-if (typeof browser === "undefined" && typeof chrome !== "undefined") {
-  // @ts-ignore
-  var browser = chrome;
-}
-
 interface ProfileImagesProps {
   user: string;
 }
