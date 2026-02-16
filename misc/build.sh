@@ -30,6 +30,6 @@ echo "Reverting manifest..."
 mv manifest.json.bk manifest.json
 
 echo "Creating main branch archive..."
-git archive --format=zip --output ./web-ext-artifacts/publi24_filtru_avansat--main.zip main
+git archive --format=zip --output ./web-ext-artifacts/publi24_filtru_avansat--head.zip HEAD
 
 echo "Build complete!"

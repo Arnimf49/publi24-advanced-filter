@@ -86,15 +86,16 @@
     "gecko": {
       "id": "{7eaabf41-0515-4d5b-9c4a-6d662618b504}",
       "data_collection_permissions": {
+        "required": ["none"],
         "optional": [
           "websiteActivity",
           "technicalAndInteraction"
         ]
       },
-      "strict_min_version": "140"
+      "strict_min_version": "140.0"
     },
     "gecko_android": {
-      "strict_min_version": "142"
+      "strict_min_version": "142.0"
     }
   }
 }
