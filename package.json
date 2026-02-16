@@ -45,13 +45,19 @@
     "fingerprint-generator": "^2.1.74",
     "fingerprint-injector": "^2.1.74",
     "postcss": "^8.5.3",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "recaptcha-solver": "^0.3.0",
     "rollup": "^4.24.0",
     "rollup-plugin-postcss": "^4.0.2",
     "sass": "^1.86.3",
     "typescript": "^5.8.3",
     "vite": "^7.2.4"
+  },
+  "dependencies": {
+    "@splidejs/splide": "4.1.4",
+    "jimp": "0.22.10",
+    "qrcode": "1.3.4",
+    "tesseract.js": "6.0.1"
   }
 }

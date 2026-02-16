@@ -31,8 +31,6 @@ const utils = {
       browsers: ['chrome']
     });
 
-    console.log(fingerprint, headers)
-
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',
       headless: false,
