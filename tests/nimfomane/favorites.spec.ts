@@ -75,23 +75,23 @@ test('Should be able to do panel actions from favorites modal.', async ({ page }
 test('Should load image when opening favorites after storage cleared.', async ({ page }) => {
   await utilsNimfomane.open(page);
   const {user, id} = await utilsNimfomane.waitForFirstImage(page);
-  
+
   await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
   await page.waitForTimeout(200);
-  
+
   await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImage', undefined);
-  
-  await page.goto('https://nimfomane.com/forum/forum/36-escorte-din-bucuresti/');
+
+  await page.goto(await utilsNimfomane.getUserProfileLink(page, user));
   await page.waitForTimeout(600);
-  
+
   await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
-  
+
   await expect(page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-card"]')).toHaveCount(1);
-  
+
   const imageSection = page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-card"] [data-wwid="escort-card-image-section"]');
   await expect(imageSection.locator('[data-wwid="loader"]')).toBeVisible();
-  
+
   await expect(imageSection.locator('[data-wwid="escort-card-image"]')).toBeVisible({timeout: 15000});
   await expect(imageSection.locator('[data-wwid="loader"]')).not.toBeVisible();
 });
@@ -99,24 +99,24 @@ test('Should load image when opening favorites after storage cleared.', async ({
 test('Should display no image or error icon if the case.', async ({ page }) => {
   await utilsNimfomane.open(page);
   const {user, id} = await utilsNimfomane.waitForFirstImage(page);
-  
+
   await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
   await page.waitForTimeout(200);
-  
+
   await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImage', null);
-  
+
   await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
-  
+
   const imageSection = page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-card"] [data-wwid="escort-card-image-section"]');
   await expect(imageSection.locator('[data-wwid="no-image-icon"]')).toBeVisible();
-  
-  await page.locator('[data-wwid="close-modal"]').click();
-  
+
+  await page.locator('[data-wwid="close"]').click();
+
   await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImage', 'https://invalid-url-that-will-fail.com/image.jpg');
-  
+
   await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
-  
+
   await expect(imageSection.locator('[data-wwid="image-error-icon"]')).toBeVisible({timeout: 5000});
 });

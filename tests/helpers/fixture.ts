@@ -27,21 +27,18 @@ export const test = base.extend<{
 
     if (
       !process.env.DEBUG &&
-      !process.env.PWDEBUG &&
-      testInfo.file.includes("/publi24/")
+      !process.env.PWDEBUG
     ) {
-      const duration = (Date.now() - start) / 1000;
-      const delay = Math.max(0, ((process.env.CI == 'true' ? 14 : 8) - duration) * 1000);
-      await new Promise(r => setTimeout(r, delay));
-    }
+      if (testInfo.file.includes("/publi24/")) {
+        const duration = (Date.now() - start) / 1000;
+        const delay = Math.max(0, ((process.env.CI == 'true' ? 14 : 8) - duration) * 1000);
+        await new Promise(r => setTimeout(r, delay));
+      }
 
-    if (
-      !process.env.DEBUG &&
-      !process.env.PWDEBUG &&
-      testInfo.file.includes("/nimfomane/")
-    ) {
-      const delay = (process.env.CI == 'true' ? 6 : 4) * 1000;
-      await new Promise(r => setTimeout(r, delay));
+      if (testInfo.file.includes("/nimfomane/")) {
+        const delay = (process.env.CI == 'true' ? 7 : 5) * 1000;
+        await new Promise(r => setTimeout(r, delay));
+      }
     }
   },
   extensionId: async ({ context }, use) => {

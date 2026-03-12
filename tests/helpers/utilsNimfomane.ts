@@ -10,7 +10,7 @@ export const utilsNimfomane = {
   async throttleNavigation<T>(page: Page, callback: () => Promise<T>) {
     if (atLoad !== 0) {
       await page.goto('about:blank');
-      await page.waitForTimeout(3000);
+      await page.waitForTimeout(4000);
     }
     ++atLoad;
     return await callback();
@@ -19,7 +19,7 @@ export const utilsNimfomane = {
   async throttleReload(page: Page) {
     const url = page.url();
     await page.goto('about:blank');
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(4000);
     return page.goto(url);
   },
 

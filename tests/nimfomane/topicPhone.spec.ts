@@ -5,7 +5,7 @@ import {utilsNimfomane} from "../helpers/utilsNimfomane";
 
 async function assertWhatsappButton(page: Page, topicId: string, expectedPhone: string) {
   const whatsappButton = page.locator(`[data-wwtopic="${topicId}"] a[href*="wa.me"]`);
-  await expect(whatsappButton).toBeVisible({timeout: 16000});
+  await expect(whatsappButton).toBeVisible({timeout: 20000});
 
   const href = await whatsappButton.getAttribute('href');
   expect(href).toBe(`https://wa.me/+4${expectedPhone}`);
