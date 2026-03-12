@@ -149,12 +149,6 @@ test('Should add favorites and remove all with confirmation.', async ({ page, co
 test('Should optimize phone ads and display newest for favorite.', async ({ page, context }, testInfo) => {
   testInfo.setTimeout(55000);
 
-  await utilsPubli.open(context, page);
-
-  const ad: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
-  const phone = await (await ad.$('[data-wwid="phone-number"]')).innerText();
-  await (await ad.$('[data-wwid="fav-toggle"]')).click();
-
   const awaitOptimization = async (timeout = 15000) =>
     await page.waitForEvent('console', {
         predicate:  msg =>
@@ -163,6 +157,13 @@ test('Should optimize phone ads and display newest for favorite.', async ({ page
       }
     );
 
+  await utilsPubli.open(context, page);
+
+  const ad: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
+  const phone = await (await ad.$('[data-wwid="phone-number"]')).innerText();
+
+  await (await ad.$('[data-wwid="fav-toggle"]')).click();
+  await utilsPubli.blockAllAdLoadsExceptPhone(page, phone);
   await page.reload();
   await awaitOptimization();
   await page.locator('[data-wwid="favs-button"]').click();

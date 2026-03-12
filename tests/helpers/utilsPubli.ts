@@ -351,5 +351,24 @@ export const utilsPubli = {
     await page.waitForTimeout(500);
 
     return newArticle;
-  }
+  },
+
+  async getPhoneAds(page: Page, phone: string): Promise<string[]> {
+    return await page.evaluate((innerPhone) => {
+      const data = JSON.parse(window.localStorage.getItem(`ww2:phone:${innerPhone}`) || '{}');
+      return (data.ads || []).map((entry: string) => entry);
+    }, phone);
+  },
+
+  async blockAllAdLoadsExceptPhone(page: Page, phone: string): Promise<void> {
+    const phoneAdUrlIds = (await utilsPubli.getPhoneAds(page, phone))
+      .map(item => item.split('|')[1].split('/').pop());
+
+    await page.route('https://www.publi24.ro/anunturi/**/*.html', (route) => {
+      if (phoneAdUrlIds.some(url => route.request().url().includes(url))) {
+        return route.continue();
+      }
+      return route.abort();
+    });
+  },
 };
