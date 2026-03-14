@@ -1,6 +1,7 @@
 import {WWStorage} from "./storage";
 import {utils} from "../../common/utils";
 import escortListingDomainsData from '../../../escort-listing-domains.json';
+import {dataCompression} from "./dataCompression";
 
 const BLACKLISTED_LINKS: string[] = [
   'https://meiwakucheck.com/',
@@ -116,8 +117,12 @@ function getFlagForDomain(domain: string): string | null {
 }
 
 export const linksFilter = {
+  isAdUrl(url: string) {
+    return url.startsWith("https://www.publi24.ro/") && url.includes("/anunt/");
+  },
+
   isUrlSameAd(url: string, adUrl: string) {
-    return url.startsWith("https://www.publi24.ro/") && url.includes("/anunt/") &&
+    return linksFilter.isAdUrl(url) &&
       url.replace(/.+\/([^.\/]+)\.html.*/, '$1') === adUrl.replace(/.+\/([^.\/]+)\.html.*/, '$1');
   },
 
@@ -202,6 +207,8 @@ export const linksFilter = {
         try {
           const urlObj = new URL(link);
           const originalDomain = urlObj.hostname.replace(/^www\./, '');
+          const isPubliLink = linksFilter.isAdUrl(link);
+          const compressedLink = isPubliLink ? dataCompression.compressAdLink(link) : link;
 
           const isSafeLastDomain = SAFE_LAST_DOMAIN_PARTS.some(part =>
             originalDomain.endsWith(part)
@@ -216,8 +223,8 @@ export const linksFilter = {
           const escortListingFlag = getFlagForDomain(originalDomain);
 
           if (isSafeLastDomain || escortListingFlag === '🇷🇴') {
-            isDomainSafe = !duplicatesInOtherLoc.includes(link);
-            isDomainSuspicious = duplicatesNotOldInOtherLoc.includes(link);
+            isDomainSafe = !duplicatesInOtherLoc.includes(compressedLink);
+            isDomainSuspicious = duplicatesNotOldInOtherLoc.includes(compressedLink);
             flag = '🇷🇴';
             displayDomain = `🇷🇴  ${originalDomain}`;
           } else if (escortListingFlag) {
@@ -230,7 +237,7 @@ export const linksFilter = {
 
           const linkObj: ProcessedLink = {
             link,
-            isDead: deadLinks.includes(link),
+            isDead: deadLinks.includes(compressedLink),
             isSafe: isDomainSafe,
             isSuspicious: isDomainSuspicious,
           };

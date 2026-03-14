@@ -1,5 +1,6 @@
 import {WWBrowserStorage} from "./browserStorage";
 import {IS_MOBILE_VIEW, IS_PROMOTER} from "../../common/globals";
+import {dataCompression} from "./dataCompression";
 
 export interface AdUuid {
   id: string;
@@ -73,37 +74,18 @@ const _WW_CALLBACKS = {
   settingsChanged: [] as Array<() => void>,
 };
 
-function compressAdLink(url: string): string {
-  const match = url.match(/https:\/\/www\.publi24\.ro\/anunturi\/(.*)\/anunt\/[^/]+\/([^.]+)\.html/);
-  if (match) {
-    return `${match[1]}/${match[2]}`;
-  }
-  return url;
-}
 
-function decompressAdLink(compressed: string): string {
-  if (compressed.startsWith('http')) {
-    return compressed;
-  }
-  const parts = compressed.split('/');
-  if (parts.length >= 2) {
-    const id = parts[parts.length - 1];
-    const path = parts.slice(0, -1).join('/');
-    return `https://www.publi24.ro/anunturi/${path}/anunt/titlu-sters/${id}.html`;
-  }
-  return compressed;
-}
 
 function parseAdUuid(uuid: string): AdUuid {
   const parts = uuid.split('|');
   return {
     id: parts[0],
-    url: parts.length >= 2 ? decompressAdLink(parts[1]) : ''
+    url: parts.length >= 2 ? dataCompression.decompressAdLink(parts[1]) : ''
   };
 }
 
 function serializeAdUuid(adUuid: AdUuid): string {
-  return `${adUuid.id}|${compressAdLink(adUuid.url)}`;
+  return `${adUuid.id}|${dataCompression.compressAdLink(adUuid.url)}`;
 }
 
 export const WWStorage = {
@@ -183,7 +165,7 @@ export const WWStorage = {
   },
 
   addAdDuplicateInOtherLocation(id: string, link: string, old: boolean = true): void {
-    const compressedLink = compressAdLink(link);
+    const compressedLink = dataCompression.compressAdLink(link);
     const list = WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLoc') || [];
     if (!list.includes(compressedLink)) {
       list.push(compressedLink);
@@ -209,17 +191,15 @@ export const WWStorage = {
   },
 
   getAdDuplicatesInOtherLocation(id: string): string[] {
-    const list = WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLoc') || [];
-    return list.map(link => decompressAdLink(link));
+    return WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLoc') || [];
   },
 
   getAdNotOldDuplicatesInOtherLocation(id: string): string[] {
-    const list = WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLocNotOld') || [];
-    return list.map(link => decompressAdLink(link));
+    return WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLocNotOld') || [];
   },
 
   addAdDeadLink(id: string, link: string): void {
-    const compressedLink = compressAdLink(link);
+    const compressedLink = dataCompression.compressAdLink(link);
     const list = WWStorage.getAdProp<string[]>(id, 'deadLinks') || [];
     if (!list.includes(compressedLink)) {
       list.push(compressedLink);
@@ -232,8 +212,7 @@ export const WWStorage = {
   },
 
   getAdDeadLinks(id: string): string[] {
-    const list = WWStorage.getAdProp<string[]>(id, 'deadLinks') || [];
-    return list.map(link => decompressAdLink(link));
+    return WWStorage.getAdProp<string[]>(id, 'deadLinks') || [];
   },
 
   setInvestigatedTime(id: string, timestamp: number): void {
@@ -837,7 +816,7 @@ export const WWStorage = {
                   const parts = adEntry.split('|');
                   if (parts.length >= 2 && parts[1].startsWith('http')) {
                     modified = true;
-                    return `${parts[0]}|${compressAdLink(parts[1])}`;
+                    return `${parts[0]}|${dataCompression.compressAdLink(parts[1])}`;
                   }
                   return adEntry;
                 });
@@ -853,7 +832,7 @@ export const WWStorage = {
                 adItem.duplicatesInOtherLoc = adItem.duplicatesInOtherLoc.map(link => {
                   if (link.startsWith('http')) {
                     modified = true;
-                    return compressAdLink(link);
+                    return dataCompression.compressAdLink(link);
                   }
                   return link;
                 });
@@ -863,7 +842,7 @@ export const WWStorage = {
                 adItem.duplicatesInOtherLocNotOld = adItem.duplicatesInOtherLocNotOld.map(link => {
                   if (link.startsWith('http')) {
                     modified = true;
-                    return compressAdLink(link);
+                    return dataCompression.compressAdLink(link);
                   }
                   return link;
                 });
@@ -873,7 +852,7 @@ export const WWStorage = {
                 adItem.deadLinks = adItem.deadLinks.map(link => {
                   if (link.startsWith('http')) {
                     modified = true;
-                    return compressAdLink(link);
+                    return dataCompression.compressAdLink(link);
                   }
                   return link;
                 });
