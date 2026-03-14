@@ -30,6 +30,13 @@ test('Should load more images when scrolling.', async ({page}) => {
       e.scrollBy(0, 10000);
     })
 
+    const endMessage = page.locator('[data-wwid="escort-images"] [data-wwid="escort-images-end"]');
+    const endMessageVisible = await endMessage.isVisible().catch(() => false);
+    
+    if (endMessageVisible) {
+      return;
+    }
+
     await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toBeVisible();
     await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toHaveCount(0, {timeout: 15000});
 

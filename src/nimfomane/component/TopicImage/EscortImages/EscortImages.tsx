@@ -143,6 +143,12 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
           </div>
         )}
 
+        {ended && images.length > 0 && (
+          <div className={classes.endMessage} data-wwid="escort-images-end">
+            final listă poze
+          </div>
+        )}
+
         {loading && <div>
           <Loader classes={classes.loading}/>
         </div>}

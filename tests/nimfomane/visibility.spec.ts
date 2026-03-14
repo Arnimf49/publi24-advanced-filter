@@ -80,6 +80,7 @@ test('Should hide publi topic.', async ({page}) => {
   await utilsNimfomane.setTopicStorageProp(page, topicId, 'publiLinkDeterminationTime', Date.now());
 
   await utilsNimfomane.throttleReload(page);
+  await page.waitForTimeout(500);
 
   const topic = page.locator(`[data-wwtopic="${topicId}"]`);
   await topic.locator('[data-wwid="toggle-hidden"]').click();
