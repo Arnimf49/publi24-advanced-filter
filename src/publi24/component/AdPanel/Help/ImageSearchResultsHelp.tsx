@@ -56,7 +56,7 @@ const ImageSearchResultsHelp: React.FC<ImageSearchResultsHelpProps> = ({ onClose
         <li><Code status="unsafe">anunțuri găsite în alte locații</Code> înseamnă că s-au găsit alte anunțuri din alte locații de pe publi24 cu aceleași poze.</li>
         <li>Culoarea unui rezultat semnifică dacă extensia vede acel rezultat unul <Code status="safe">sigur</Code>, <Code status="suspicious">suspicios</Code> sau <Code status="unsafe">periculos</Code>.</li>
         <li>Rezultatele care au culoarea <Code status="suspicious">galbenă</Code> sunt de la site-uri străine recunoscute de extensie. Acestea afișează și steagul țării din care provin.</li>
-        <li>Rezultatele cu <Code>gri</Code> sunt linkuri moarte, care dă 404, de la publi24 Căndva exista ceva dar n mai este acolo.</li>
+        <li>Rezultatele cu <Code>gri</Code> sunt linkuri moarte, care dă 404, de la publi24. Căndva exista ceva dar nu mai este acolo.</li>
       </ul>
       <p>Căutarea și afișul de rezultate este făcut într-un fel de a ajuta accesul rapid la informații dar și de a da semnale ușor vizibile. Până la urmă concluzia finală pe baza rezultatelor este la latură ta.</p>
     </GeneralModal>

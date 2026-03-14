@@ -89,6 +89,7 @@ export const renderer = {
   }: RegisterAdsOptions = {}): Array<() => void> {
     let itemsNodeList = context.querySelectorAll<HTMLElement>('[data-articleid]');
     let items = Array.from(itemsNodeList);
+    let hiddenCount = 0;
 
     if (applyFocusMode && WWStorage.isFocusMode()) {
       items = items.filter((item) => {
@@ -97,8 +98,22 @@ export const renderer = {
           return true;
         }
         item.style.display = 'none';
+        hiddenCount++;
         return false;
       })
+
+      if (hiddenCount > 0 && isFromListing) {
+        const list = context.querySelector('.article-list');
+        const pager = context.querySelector('.article-list ul.pagination');
+        const hiddenIndicator = document.createElement('div');
+        hiddenIndicator.setAttribute('data-wwid', 'hidden-count-indicator');
+        hiddenIndicator.className = 'article-item';
+        hiddenIndicator.style.textAlign = 'center';
+        hiddenIndicator.style.padding = '20px';
+        hiddenIndicator.style.color = '#666';
+        hiddenIndicator.textContent = `${hiddenCount} anunțuri ascunse de tot`;
+        list!.insertBefore(hiddenIndicator, pager!);
+      }
     }
 
     return items.map((item) => {
