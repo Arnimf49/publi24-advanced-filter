@@ -116,8 +116,17 @@ function getFlagForDomain(domain: string): string | null {
 }
 
 export const linksFilter = {
+  isUrlSameAd(url: string, adUrl: string) {
+    return url.startsWith("https://www.publi24.ro/") && url.includes("/anunt/") &&
+      url.replace(/.+\/([^.\/]+)\.html.*/, '$1') === adUrl.replace(/.+\/([^.\/]+)\.html.*/, '$1');
+  },
+
   filterLinks(links: string[], itemUrl: string): string[] {
-    return links.filter((l: string) => !BLACKLISTED_LINKS.some((b: string) => l.indexOf(b) === 0) && itemUrl !== l);
+    return links.filter(
+      (l: string) =>
+        !BLACKLISTED_LINKS.some((b: string) => l.indexOf(b) === 0)
+        && !linksFilter.isUrlSameAd(l, itemUrl)
+    );
   },
 
   getImageResultsStatus(imageSearchDomains: ImageLinkDomainGroup[] | undefined, isStale?: boolean): 'green' | 'yellow' | 'red' | null {
@@ -188,10 +197,7 @@ export const linksFilter = {
     const deadLinks: string[] = WWStorage.getAdDeadLinks(id);
 
     links
-      .filter((link: string): boolean => {
-        return !(link.startsWith("https://www.publi24.ro/") && !link.includes("/anunt/")) &&
-          link.replace(/.+\/([^.\/]+)\.html.*/, '$1') !== itemUrl.replace(/.+\/([^.\/]+)\.html.*/, '$1');
-      })
+      .filter((link: string): boolean => !linksFilter.isUrlSameAd(link, itemUrl))
       .forEach((link: string) => {
         try {
           const urlObj = new URL(link);
