@@ -128,7 +128,7 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
           <div key={index} data-wwid={'escort-image'} className={classes.image_container}>
             <div className={classes.image_inner_container}>
               <img
-                src={nimfomaneUtils.normalizeCmsUrl(image.url)}
+                src={nimfomaneUtils.imageFullSize(nimfomaneUtils.normalizeCmsUrl(image.url))}
                 loading='lazy'
                 onClick={(e) => e.stopPropagation()}
               />
