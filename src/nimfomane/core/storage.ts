@@ -18,6 +18,17 @@ export interface EscortItem {
   phoneDeterminationTime?: number;
   hidden?: boolean;
   hiddenReason?: string;
+  profileStats?: {
+    posts?: number;
+    joined?: string;
+    lastVisited?: string;
+    reputation?: string;
+    currentCity?: {
+      name: string;
+      topicUrl: string;
+    };
+  };
+  profileStatsTime?: number;
 }
 
 interface StorageCache {

@@ -38,6 +38,8 @@ test('Should display favorites in a modal.', async ({ page }) => {
   await expect(firstCard.locator('[data-wwid="escort-name"]')).toHaveAttribute('href', profileLink);
   await expect(firstCard.locator('img')).toBeVisible();
 
+  await expect(page.locator('[data-wwid="favorites-modal"] .favoritesSectionHeader')).toHaveCount(0);
+
   await firstCard.locator('img').click();
   await expect(page.locator('[data-wwid="escort-image-modal"]')).toBeVisible();
 });
@@ -60,7 +62,8 @@ test('Should be able to do panel actions from favorites modal.', async ({ page }
 
   const escortCard = page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-card"]');
   await escortCard.locator('[data-wwid="toggle-hidden"]').click();
-  await page.locator('[data-wwid="reason"]').filter({hasText: 'aspect'}).click();
+  await page.locator('[data-wwid="reason"]').filter({hasText: 'alta'}).click();
+  await page.locator('[data-wwid="subcategory"]').last().click();
   await page.waitForTimeout(100);
   const firstChild = escortCard.locator('> *:not([data-wwid="hide-reason-container"])').first();
   expect(await firstChild.evaluate((el: Element) => getComputedStyle(el).getPropertyValue('opacity'))).toEqual('0.5');

@@ -10,12 +10,14 @@ type HideReasonProps = {
   onReasonSelect: (reason: ManualHideReasonWithKey, subcategory?: string) => void;
   onShowClick?: () => void;
   onClose?: () => void;
+  layout?: 'horizontal' | 'vertical';
 };
 
 const HideReason: React.FC<HideReasonProps> = ({
   onReasonSelect,
   onShowClick,
   onClose,
+  layout = 'horizontal',
 }) => {
   const [selected, setSelected] = useState<null | string>(null);
   const [selectedCategory, setSelectedCategory] = useState<null | string>(null);
@@ -53,7 +55,7 @@ const HideReason: React.FC<HideReasonProps> = ({
   };
 
   return (
-    <div className={styles.hideReason} data-wwid="hide-reason-selection" style={{pointerEvents: 'auto'}}>
+    <div className={`${styles.hideReason} ${layout === 'vertical' ? styles.verticalLayout : ''}`} data-wwid="hide-reason-selection" style={{pointerEvents: 'auto'}}>
       <div className={styles.reasonButtonsContainer}>
         <div className={styles.title}>
           <span>Motivul ascunderii?</span>
@@ -136,7 +138,7 @@ const HideReason: React.FC<HideReasonProps> = ({
                   data-wwid="show-button"
                 >
                   arată
-                </button>
+              </button>
               )}
             </>
           )}

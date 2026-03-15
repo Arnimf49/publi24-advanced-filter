@@ -12,7 +12,19 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
 
   const fetchData = useCallback(() => {
     const favUsers = NimfomaneStorage.getFavorites();
-    setFavorites(favUsers);
+    const sortedFavs = [...favUsers].sort((a, b) => {
+      const escortA = NimfomaneStorage.getEscort(a);
+      const escortB = NimfomaneStorage.getEscort(b);
+      const dateA = escortA.profileStats?.lastVisited;
+      const dateB = escortB.profileStats?.lastVisited;
+      
+      if (!dateA && !dateB) return 0;
+      if (!dateA) return 1;
+      if (!dateB) return -1;
+      
+      return new Date(dateB).getTime() - new Date(dateA).getTime();
+    });
+    setFavorites(sortedFavs);
   }, []);
 
   useEffect(() => {

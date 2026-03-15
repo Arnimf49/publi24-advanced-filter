@@ -148,3 +148,45 @@
     }
   }
 }
+
+.verticalLayout {
+  .reasonButtonsContainer {
+    max-width: min(500px, calc(100% - 20px));
+    display: flex !important;
+    flex-direction: column;
+    position: absolute;
+    left: 50%;
+    top: 10px;
+    transform: translate(-50%, 0);
+    align-items: stretch;
+    padding: 5px;
+    gap: 5px;
+
+    :global(.onMobile) & {
+      top: 5px;
+    }
+
+    .title {
+      justify-content: center;
+      width: 100%;
+      font-size: 14px;
+      padding: 4px 8px;
+    }
+
+    .reasonButtons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      flex-grow: 0;
+
+      .reasonButton {
+        flex: unset;
+        padding: 6px 10px;
+        font-size: 12px;
+        max-width: 180px;
+        justify-self: center;
+        width: 100%;
+      }
+    }
+  }
+}

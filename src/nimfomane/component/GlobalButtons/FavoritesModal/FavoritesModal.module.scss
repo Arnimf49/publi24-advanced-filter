@@ -36,10 +36,73 @@
 
 .escortsList {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: 12px;
+}
+
+.section {
+  position: relative;
+  padding-bottom: 10px;
+
+  &:not(:last-child) {
+    margin-bottom: 15px;
+  }
+}
+
+.favoritesSectionHeader {
+  margin-bottom: 5px;
+  margin-top: 0;
+  font-weight: bold;
+  font-size: 17px;
+  color: #444;
+  position: sticky;
+  top: 80px;
+  display: block;
+  z-index: 4;
+  padding: 10px 0;
+  background: rgba(236, 236, 236, 0.819);
+  backdrop-filter: blur(4px);
+
+  :global(.isFirefox) & {
+    backdrop-filter: none;
+    background: rgba(236, 236, 236, 0.95);
+  }
+
+  &::after,
+  &::before {
+    position: absolute;
+    content: ' ';
+    display: block;
+    width: 10px;
+    height: 100%;
+    background: inherit;
+    backdrop-filter: inherit;
+    top: 0;
+
+    :global(.isFirefox) & {
+      backdrop-filter: none;
+    }
+  }
+  &::after {
+    left: 100%;
+  }
+  &::before {
+    right: 100%;
+  }
+
+  .count {
+    font-size: 13px;
+    vertical-align: middle;
+    color: #999;
+    font-weight: normal;
+  }
 
   :global(.onMobile) & {
-    grid-template-columns: 1fr;
+    top: 71px;
+    margin-top: 5px;
+
+    .count {
+      font-size: 12px;
+    }
   }
 }

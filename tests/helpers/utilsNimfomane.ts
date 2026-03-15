@@ -93,6 +93,26 @@ export const utilsNimfomane = {
     throw new Error('Failed to find first image in time');
   },
 
+  async getNthTopic(page: Page, n: number, wait: number = 1000) {
+    for (let i = 0; i < 6; i++) {
+      const parentHandle = page.locator('[data-wwtopic]').nth(n);
+      const firstImage = parentHandle.locator('[data-wwid="topic-image-img"]');
+
+      if (await firstImage.isVisible()) {
+        const src = await firstImage.getAttribute('src');
+        const user = await parentHandle.locator('[data-wwid="topic-image"]')
+          .getAttribute('data-wwuser');
+        const id = await parentHandle.getAttribute('data-wwtopic');
+
+        return {firstImage, src, user, id};
+      }
+
+      await page.waitForTimeout(wait);
+    }
+
+    throw new Error(`Failed to find topic ${n} in time`);
+  },
+
   async getUserProfileLink(page: Page, user: string) {
     return await page.evaluate(
       (user) => JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${user}`)).profileLink,
@@ -161,5 +181,52 @@ export const utilsNimfomane = {
       (user) => localStorage.removeItem(`p24fa:nimfo:escort:${user}`),
       user
     )
+  },
+
+  async interceptEscortStats(
+    page: Page,
+    user: string,
+    stats: {
+      posts?: number;
+      lastVisited?: string;
+      reputation?: string;
+      lastPostedSectionUrl?: string;
+    }
+  ) {
+    const cheerio = await import('cheerio');
+    const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
+    
+    await page.route(profileLink, async (route) => {
+      const response = await route.fetch();
+      let body = await response.text();
+
+      const $ = cheerio.load(body);
+
+      if (stats.posts !== undefined) {
+        const formattedPosts = stats.posts.toLocaleString('en-US');
+        $('#elProfileStats ul li:first-child').text(`Posts ${formattedPosts}`);
+      }
+
+      if (stats.lastVisited !== undefined) {
+        $('#elProfileStats ul li:nth-child(3) time').attr('datetime', stats.lastVisited);
+      }
+
+      if (stats.reputation !== undefined) {
+        $('.cProfileRepScore').text(stats.reputation);
+      }
+
+      if (stats.lastPostedSectionUrl) {
+        $('.ipsStreamItem_status a:last-child').slice(0, 3).each(function() {
+          $(this).attr('href', stats.lastPostedSectionUrl);
+        });
+      }
+
+      const modifiedBody = $.html();
+
+      await route.fulfill({
+        response,
+        body: modifiedBody,
+      });
+    });
   },
 };

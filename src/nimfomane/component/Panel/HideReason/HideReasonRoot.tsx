@@ -11,12 +11,14 @@ type HideReasonRootProps = {
   onReasonSelect: (reasonKey: string) => void,
   onCancel?: () => void,
   onClose?: () => void,
+  layout?: 'horizontal' | 'vertical';
 };
 
 const HideReasonRoot: React.FC<HideReasonRootProps> = ({
   onReasonSelect,
   onCancel,
   onClose,
+  layout = 'horizontal',
 }) => {
   const handleReasonSelect = useCallback((reasonWithKey: ManualHideReasonWithKey, subcategory?: string) => {
     const reasonKey = (subcategory && subcategory !== '') ? `${reasonWithKey.key}: ${subcategory}` : reasonWithKey.key;
@@ -28,6 +30,7 @@ const HideReasonRoot: React.FC<HideReasonRootProps> = ({
       onReasonSelect={handleReasonSelect}
       onShowClick={onCancel}
       onClose={onClose}
+      layout={layout}
     />
   );
 };

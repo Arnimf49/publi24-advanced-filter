@@ -4,6 +4,45 @@
   border-radius: 5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: relative;
+
+  :global(.onMobile) & {
+    padding: 14px 7px;
+  }
+
+  a {
+    color: rgb(48 76 129);
+    text-decoration: none;
+    font-weight: 600;
+
+    &:hover {
+      text-decoration: underline;
+      color: rgb(67, 97, 154);
+    }
+  }
+}
+
+.escortIndex {
+  background: white;
+  width: 26px;
+  height: 26px;
+  border-radius: 9999px;
+  position: absolute;
+  top: -4px;
+  z-index: 2;
+  left: -4px;
+  font-size: 12px;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .indexText {
+    color: #666;
+
+    .hash {
+      font-size: 10px;
+    }
+  }
 }
 
 .escortCardInset {
@@ -18,17 +57,19 @@
 
 .imageSection {
   flex-shrink: 0;
-  width: 100px;
-  height: 140px;
+  width: 150px;
+  height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #e0e0e0;
   border-radius: 5px;
   overflow: hidden;
+  position: relative;
 
   :global(.onMobile) & {
-    height: 120px;
+    width: 100px;
+    height: 175px;
   }
 }
 
@@ -37,27 +78,92 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  :global(.onMobile) & {
+    gap: 2px;
+  }
 }
 
 .escortName {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1f3050;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
+  font-size: 21px;
 
   :global(.onMobile) & {
-    font-size: 15px;
+    font-size: 16px;
   }
 }
 
 .panelContainer {
-  margin-top: 4px;
+  margin-top: 12px;
+
+  :global(.onMobile) & {
+    margin-top: 0;
+  }
 }
 
+.profileStats {
+  margin-top: 12px;
+
+  :global(.onMobile) & {
+    margin-top: 2px;
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+
+  :global(.onMobile) & {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(90deg, #e8eaf0 0%, #f5f7fa 100%);
+  border-radius: 4px;
+  overflow: hidden;
+  min-height: 28px;
+
+  :global(.onMobile) & {
+    min-height: 26px;
+    border-radius: 0;
+  }
+}
+
+.statLabel {
+  font-size: 14px;
+  color: rgb(104 105 117);
+  background: rgb(229 231 235);
+  padding: 4px 8px;
+  flex-shrink: 0;
+  min-width: 80px;
+
+  :global(.onMobile) & {
+    font-size: 10px;
+    padding: 4px 6px;
+    min-width: 55px;
+  }
+}
+
+.statValue {
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+
+  :global(.onMobile) & {
+    font-size: 11px;
+    padding: 4px 6px;
+  }
+}
 
 .profileImage {
   width: 100%;

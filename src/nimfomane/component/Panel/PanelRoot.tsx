@@ -8,9 +8,10 @@ type PanelRootProps = {
   id?: string;
   escortUser?: string;
   container: HTMLElement;
+  hideReasonLayout?: 'horizontal' | 'vertical';
 };
 
-export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container }) => {
+export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container, hideReasonLayout = 'horizontal' }) => {
   const [_, setRenderCycle] = useState(0);
   const [showHideReason, setShowHideReason] = useState(false);
 
@@ -134,6 +135,7 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container 
           onReasonSelect={onHideReasonSelect}
           onCancel={onHideReasonCancel}
           onClose={onHideReasonClose}
+          layout={hideReasonLayout}
         />,
         container.querySelector('[data-wwid="hide-reason-container"]') as HTMLElement,
       )}
