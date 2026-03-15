@@ -7,6 +7,7 @@ import * as cheerio from "cheerio";
 import {CheerioAPI} from "cheerio";
 import {FingerprintGenerator} from "fingerprint-generator";
 import {FingerprintInjector} from "fingerprint-injector";
+import fs from 'node:fs';
 
 const EXTENSION_PATH = dirname(path.join(fileURLToPath(import.meta.url), '../..'));
 export const PUBLI24_STORAGE_JSON = 'tests/data/publi24/localStorage.json';
@@ -17,8 +18,40 @@ export const NIMFOMANE_STORAGE_JSON = 'tests/data/nimfomane/localStorage.json';
 export const STORAGE_JSON = PUBLI24_STORAGE_JSON;
 export const COOKIES_JSON = PUBLI24_COOKIES_JSON;
 
+function getProxyServers(): string[] {
+  const proxyServers = process.env.PROXY_SERVERS;
+  if (!proxyServers) return [];
+  
+  const servers = proxyServers.split(',').map(s => s.trim()).filter(s => s);
+  
+  const disabledServers = process.env.PROXY_DISABLED_SERVERS;
+  if (!disabledServers) return servers;
+  
+  const disabled = new Set(disabledServers.split(',').map(s => s.trim()).filter(s => s));
+  return servers.filter(s => !disabled.has(s));
+}
+
+const PROXY_COUNTER_FILE = 'tests/data/.proxy-counter';
+
+function getProxyCounter(): number {
+  try {
+    if (fs.existsSync(PROXY_COUNTER_FILE)) {
+      return parseInt(fs.readFileSync(PROXY_COUNTER_FILE, 'utf-8').trim(), 10) || 0;
+    }
+  } catch (e) {
+    // ignore
+  }
+  return 0;
+}
+
+function incrementProxyCounter(): void {
+  const counter = getProxyCounter() + 1;
+  fs.mkdirSync(path.dirname(PROXY_COUNTER_FILE), { recursive: true });
+  fs.writeFileSync(PROXY_COUNTER_FILE, counter.toString());
+}
+
 const utils = {
-  async makeContext() {
+  async makeContext(useProxy: boolean = false) {
     const { fingerprint, headers } = new FingerprintGenerator({
       locales: ['en-US']
     }).getFingerprint({
@@ -26,6 +59,22 @@ const utils = {
       operatingSystems: ['linux'],
       browserListQuery: 'last 10 Chrome versions'
     });
+
+    const proxyServers = getProxyServers();
+    let proxyConfig: { server: string; username?: string; password?: string } | undefined;
+
+    if (useProxy && proxyServers.length > 0) {
+      const counter = getProxyCounter();
+      const index = counter % proxyServers.length;
+      const server = proxyServers[index];
+      incrementProxyCounter();
+      proxyConfig = {
+        server,
+        ...(process.env.PROXY_USERNAME ? { username: process.env.PROXY_USERNAME } : {}),
+        ...(process.env.PROXY_PASSWORD ? { password: process.env.PROXY_PASSWORD } : {}),
+      };
+      console.warn(`Using proxy ${index}: ${server}`);
+    }
 
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',
@@ -51,6 +100,7 @@ const utils = {
             executablePath: process.env.PLAYWRIGHT_LAUNCH_OPTIONS_EXECUTABLE_PATH,
           }
         : {}),
+      ...(proxyConfig ? { proxy: proxyConfig } : {}),
     });
     await new FingerprintInjector().attachFingerprintToPlaywright(context, { fingerprint, headers });
 

@@ -8,9 +8,13 @@ let atLoad = 0;
 
 export const utilsNimfomane = {
   async throttleNavigation<T>(page: Page, callback: () => Promise<T>) {
-    if (atLoad !== 0) {
+    if (atLoad !== 0 && !process.env.PROXY_SERVERS) {
       await page.goto('about:blank');
-      await page.waitForTimeout(4000);
+      if (process.env.CI === 'true') {
+        await page.waitForTimeout(8000);
+      } else {
+        await page.waitForTimeout(4000);
+      }
     }
     ++atLoad;
     return await callback();
@@ -18,8 +22,10 @@ export const utilsNimfomane = {
 
   async throttleReload(page: Page) {
     const url = page.url();
-    await page.goto('about:blank');
-    await page.waitForTimeout(4000);
+    if (!process.env.PROXY_SERVERS) {
+      await page.goto('about:blank');
+      await page.waitForTimeout(4000);
+    }
     return page.goto(url);
   },
 
@@ -195,7 +201,7 @@ export const utilsNimfomane = {
   ) {
     const cheerio = await import('cheerio');
     const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
-    
+
     await page.route(profileLink, async (route) => {
       const response = await route.fetch();
       let body = await response.text();

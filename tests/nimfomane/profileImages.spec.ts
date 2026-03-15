@@ -6,6 +6,8 @@ test('Should show all images button and open modal.', async ({page}) => {
   const {user} = await utilsNimfomane.waitForFirstImage(page);
   await utilsNimfomane.open(page, {url: await utilsNimfomane.getUserProfileLink(page, user)});
 
+  await page.waitForTimeout(500);
+
   await page.locator('[data-wwid="all-photos-button"]').isVisible();
   await page.locator('[data-wwid="all-photos-button"]').click();
 

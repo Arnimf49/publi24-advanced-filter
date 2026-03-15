@@ -7,7 +7,8 @@ export const test = base.extend<{
   extensionId: string;
 }>({
   context: async ({}, use, testInfo) => {
-    const context = await utils.makeContext();
+    const useProxy = testInfo.file.includes("/nimfomane/");
+    const context = await utils.makeContext(useProxy);
 
     const setupDebugLogListener = (page: Page) => {
       page.on('console', (msg) => {
@@ -35,7 +36,7 @@ export const test = base.extend<{
         await new Promise(r => setTimeout(r, delay));
       }
 
-      if (testInfo.file.includes("/nimfomane/")) {
+      if (!process.env.PROXY_SERVERS && testInfo.file.includes("/nimfomane/")) {
         const delay = (process.env.CI == 'true' ? 7 : 5) * 1000;
         await new Promise(r => setTimeout(r, delay));
       }

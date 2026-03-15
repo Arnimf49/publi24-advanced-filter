@@ -91,10 +91,12 @@ test('Should not show images on non escort or massage listings.', async ({page})
 
   await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/135-masaj-erotic-timisoara/'});
   await page.locator('[data-wwid="topic-image"]').first().isVisible();
+  await page.waitForTimeout(100);
 
   await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/201-discutii-generale-cluj/'});
   await page.waitForTimeout(1500);
   expect(await page.$$('[data-wwid="topic-image"]')).toHaveLength(0);
+  await page.waitForTimeout(100);
 
   await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/354-decernarea-premiilor-pentru-escorte/'});
   await page.waitForTimeout(1500);

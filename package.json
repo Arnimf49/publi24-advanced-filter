@@ -41,6 +41,7 @@
     "concurrently": "^9.2.1",
     "cors": "^2.8.5",
     "cssnano": "^7.0.6",
+    "dotenv": "^17.3.1",
     "express": "^5.1.0",
     "fingerprint-generator": "^2.1.79",
     "fingerprint-injector": "^2.1.79",

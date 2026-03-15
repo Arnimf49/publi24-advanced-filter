@@ -3,6 +3,9 @@ import fs from "node:fs";
 import path from "node:path";
 import {utilsPubli} from "./utilsPubli";
 import {utilsNimfomane} from "./utilsNimfomane";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 
 async function setupPubli24() {
