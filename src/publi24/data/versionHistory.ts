@@ -8,6 +8,22 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.0',
+    releaseDate: '16 martie 2026',
+    changeImprove: [
+      'Filtrare mai bună pe rezultate care duc la aceași anunț.',
+      '150 de site-uri suplimentare de tip escort indexate pentru rezultatele căutării de imagini.',
+      'Optimizarea mărimi datelor stocate (redus 35%).',
+    ],
+    changeNew: [
+      'Afiș numar de anunțuri ascunse pe pagina la modul \'Focus\'.'
+    ],
+    changeFix: [
+      'Modalul de duplicate se deschidea la navigare pe anunț.',
+      'Analiza de poze nu se încărca in toate contextele.',
+    ]
+  },
+  {
     version: '2.42.3',
     releaseDate: '25 ianuarie 2026',
     changeFix: [
