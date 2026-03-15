@@ -148,6 +148,14 @@ export const NimfomaneStorage = {
     CALLBACKS.favsChanged.forEach(callback => callback());
   },
 
+  getVersionSeen(): string | null {
+    return localStorage.getItem('p24fa:nimfo:version-seen');
+  },
+
+  setVersionSeen(version: string): void {
+    localStorage.setItem('p24fa:nimfo:version-seen', version);
+  },
+
   async upgrade(): Promise<void> {
     const version = NimfomaneStorage.getVersion();
     const currentVersion = 1;

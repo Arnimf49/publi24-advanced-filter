@@ -4,13 +4,13 @@ import {PhoneIcon} from "../Common/Icons/PhoneIcon";
 import {SettingsIcon} from "../Common/Icons/SettingsIcon";
 import {StarIcon} from "../../../common/components/Icons/StarIcon";
 import {MenuIcon} from "../../../common/components/Icons/MenuIcon";
-import HistoryIcon from "../Common/Icons/HistoryIcon";
 import TutorialIcon from "../Common/Icons/TutorialIcon";
 import {P24faLogoDark} from "../../../common/components/Logo/P24faLogoDark";
 import {P24faLogoLight} from "../../../common/components/Logo/P24faLogoLight";
 import {misc} from "../../core/misc";
 import {IS_MOBILE_VIEW} from "../../../common/globals";
 import {utils} from "../../../common/utils";
+import {HistoryIcon} from "../../../common/components/Icons/HistoryIcon";
 
 type GlobalButtonsProps = {
   favsCount: number | null;

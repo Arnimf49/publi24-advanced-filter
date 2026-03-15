@@ -18,4 +18,4 @@ const HistoryIcon: React.FC<HistoryIconProps> = ({ fill = 'currentColor' }) => {
   );
 };
 
-export default HistoryIcon;
+export {HistoryIcon}

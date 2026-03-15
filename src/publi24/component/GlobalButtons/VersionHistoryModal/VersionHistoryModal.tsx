@@ -1,6 +1,6 @@
 import React from 'react';
 import GeneralModal from '../../Common/Modal/GeneralModal';
-import VersionNotes from '../../Common/VersionNotes/VersionNotes';
+import VersionNotes from '../../../../common/components/VersionNotes/VersionNotes';
 import { versionHistory } from '../../../data/versionHistory';
 
 type VersionHistoryModalProps = {

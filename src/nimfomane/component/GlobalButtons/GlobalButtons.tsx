@@ -2,6 +2,7 @@ import React, {MouseEventHandler, useEffect, useRef, useState} from 'react';
 import styles from './GlobalButtons.module.scss';
 import {StarIcon} from '../../../common/components/Icons/StarIcon';
 import {MenuIcon} from '../../../common/components/Icons/MenuIcon';
+import {HistoryIcon} from '../../../common/components/Icons/HistoryIcon';
 import {P24faLogoLight} from '../../../common/components/Logo/P24faLogoLight';
 import {IS_MOBILE_VIEW} from '../../../common/globals';
 import {utils} from "../../../common/utils";
@@ -9,18 +10,24 @@ import {utils} from "../../../common/utils";
 type GlobalButtonsProps = {
   favsCount: number | null;
   onFavsClick: MouseEventHandler;
+  onVersionHistoryClick: MouseEventHandler;
   onMenuClick: MouseEventHandler;
   isMenuOpen: boolean;
   onMenuClose: () => void;
+  hasNewVersion: boolean;
+  currentVersion: string;
 };
 
 const GlobalButtons: React.FC<GlobalButtonsProps> =
 ({
   favsCount,
   onFavsClick,
+  onVersionHistoryClick,
   onMenuClick,
   isMenuOpen,
   onMenuClose,
+  hasNewVersion,
+  currentVersion,
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const prevCountRef = useRef<null | number>(null);
@@ -74,8 +81,9 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
 
       <button
         type="button"
-        className={styles.menuButton}
+        className={`${styles.menuButton} ${hasNewVersion ? styles.menuButtonNewVersion: ''}`}
         data-wwid="menu-button"
+        data-wwanimating={hasNewVersion}
         title="Meniu"
         onClick={onMenuClick}
         aria-label="Menu"
@@ -88,7 +96,21 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
           <div className={styles.menuArrow}/>
           <div className={styles.menuHeader}>
             <span className={styles.menuTitle}>Publi24 filtru avansat</span>
+            <span className={styles.menuVersion}>v{currentVersion}</span>
           </div>
+          <button
+            type="button"
+            className={`${styles.menuItem} ${hasNewVersion ? styles.menuItemNewVersion : ''}`}
+            data-wwid="version-history-button"
+            data-wwanimating={hasNewVersion}
+            onClick={(e) => {
+              onVersionHistoryClick(e);
+              onMenuClose();
+            }}
+          >
+            <HistoryIcon fill="currentColor"/>
+            <span>Istoric verziuni</span>
+          </button>
         </div>
       )}
 

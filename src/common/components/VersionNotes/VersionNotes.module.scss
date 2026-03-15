@@ -23,7 +23,7 @@
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: inherit;
+  color: #222;
 }
 
 .releaseDate {
@@ -42,14 +42,16 @@
 
 .changeTitle {
   margin: 0 0 8px 0;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  color: inherit;
+  color: #222;
 }
 
 .changeList {
   margin: 0;
   padding-left: 24px;
+  font-size: 15px;
+  color: #222;
 
   li {
     margin-bottom: 4px;

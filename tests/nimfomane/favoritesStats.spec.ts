@@ -1,5 +1,6 @@
-import {expect, test, Page} from "../helpers/fixture";
+import {expect, test} from "../helpers/fixture";
 import {utilsNimfomane} from "../helpers/utilsNimfomane";
+import {Page} from "playwright-core";
 
 async function expectFavoritesSectionHeaders(page: Page, visible: boolean, inLocationCount?: number, otherLocationsCount?: number) {
   if (visible) {

@@ -238,3 +238,151 @@
     font-size: 12px;
   }
 }
+
+.menuVersion {
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+  opacity: 0.7;
+
+  :global(.onMobile) & {
+    font-size: 11px;
+  }
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.03);
+  color: #333;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+  position: relative;
+  z-index: 1;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  :global(.onMobile) & {
+    padding: 8px 12px;
+    font-size: 14px;
+    gap: 8px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.menuItemNewVersion {
+  animation: menuItemVersionPulse 7.2s ease-in-out infinite;
+}
+
+@keyframes menuItemVersionPulse {
+  0%, 100% {
+    transform: scale(1);
+    background: rgba(0, 0, 0, 0.03);
+  }
+  3.75% {
+    transform: scale(1.05);
+    background: rgba(0, 0, 0, 0.09);
+  }
+  7.5% {
+    transform: scale(1);
+    background: rgba(0, 0, 0, 0.03);
+  }
+  11.25% {
+    transform: scale(1.05);
+    background: rgba(0, 0, 0, 0.09);
+  }
+  15% {
+    transform: scale(1);
+    background: rgba(0, 0, 0, 0.03);
+  }
+  18.75% {
+    transform: scale(1.05);
+    background: rgba(0, 0, 0, 0.09);
+  }
+  22.5%, 97.5% {
+    transform: scale(1);
+    background: rgba(0, 0, 0, 0.03);
+  }
+}
+
+.menuButtonNewVersion {
+  animation: newVersionPulse 7.2s ease-in-out infinite;
+
+  &::before {
+    animation: newVersionPulseColor 7.2s ease-in-out infinite;
+  }
+}
+
+@keyframes newVersionPulse {
+  0%, 100% {
+    transform: scale(1);
+    background: rgb(216 222 235);
+  }
+  3.75% {
+    transform: scale(1.08);
+    background: rgb(200, 208, 230);
+  }
+  7.5% {
+    transform: scale(1);
+    background: rgb(216 222 235);
+  }
+  11.25% {
+    transform: scale(1.08);
+    background: rgb(200, 208, 230);
+  }
+  15% {
+    transform: scale(1);
+    background: rgb(216 222 235);
+  }
+  18.75% {
+    transform: scale(1.08);
+    background: rgb(200, 208, 230);
+  }
+  22.5%, 97.5% {
+    transform: scale(1);
+    background: rgb(216 222 235);
+  }
+}
+
+@keyframes newVersionPulseColor {
+  0%, 100% {
+    background: rgb(216 222 235);
+  }
+  3.75% {
+    background: rgb(200, 208, 230);
+  }
+  7.5% {
+    background: rgb(216 222 235);
+  }
+  11.25% {
+    background: rgb(200, 208, 230);
+  }
+  15% {
+    background: rgb(216 222 235);
+  }
+  18.75% {
+    background: rgb(200, 208, 230);
+  }
+  22.5%, 97.5% {
+    background: rgb(216 222 235);
+  }
+}
