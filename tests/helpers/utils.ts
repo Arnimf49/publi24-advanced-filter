@@ -21,12 +21,12 @@ export const COOKIES_JSON = PUBLI24_COOKIES_JSON;
 function getProxyServers(): string[] {
   const proxyServers = process.env.PROXY_SERVERS;
   if (!proxyServers) return [];
-  
+
   const servers = proxyServers.split(',').map(s => s.trim()).filter(s => s);
-  
+
   const disabledServers = process.env.PROXY_DISABLED_SERVERS;
   if (!disabledServers) return servers;
-  
+
   const disabled = new Set(disabledServers.split(',').map(s => s.trim()).filter(s => s));
   return servers.filter(s => !disabled.has(s));
 }
@@ -73,7 +73,7 @@ const utils = {
         ...(process.env.PROXY_USERNAME ? { username: process.env.PROXY_USERNAME } : {}),
         ...(process.env.PROXY_PASSWORD ? { password: process.env.PROXY_PASSWORD } : {}),
       };
-      console.warn(`Using proxy ${index}: ${server}`);
+      console.info(`Using proxy ${index}: ${server}`);
     }
 
     const context = await chromium.launchPersistentContext('', {
