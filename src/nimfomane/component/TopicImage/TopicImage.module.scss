@@ -72,18 +72,11 @@
 
 .image {
   width: 100%;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.imageBg {
   height: 100%;
   position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  filter: blur(12px);
+  transform: translateY(-50%);
+  object-fit: cover;
 }
 
 .loader {

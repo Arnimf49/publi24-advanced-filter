@@ -43,11 +43,6 @@ export const TopicImage: FC<TopicImageProps> =
       {typeof url === "string" && !hasError && !loadError
         ? <>
           <img
-            className={classes.imageBg}
-            src={nimfomaneUtils.normalizeCmsUrl(url)}
-            loading="lazy"
-          />
-          <img
             className={classes.image}
             src={nimfomaneUtils.normalizeCmsUrl(url)}
             loading="lazy"
