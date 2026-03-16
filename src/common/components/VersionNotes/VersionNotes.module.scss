@@ -2,9 +2,11 @@
   padding: 16px 0;
   margin-bottom: 14px;
   border-bottom: 2px solid #7a8a99;
+  color: #222;
 
   :global(.dark) & {
     border-color: #485e71;
+    color: rgb(220, 220, 220);
   }
 
   &:last-child {
@@ -23,7 +25,6 @@
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: #222;
 }
 
 .releaseDate {
@@ -44,14 +45,12 @@
   margin: 0 0 8px 0;
   font-size: 15px;
   font-weight: 600;
-  color: #222;
 }
 
 .changeList {
   margin: 0;
   padding-left: 24px;
   font-size: 15px;
-  color: #222;
 
   li {
     margin-bottom: 4px;
