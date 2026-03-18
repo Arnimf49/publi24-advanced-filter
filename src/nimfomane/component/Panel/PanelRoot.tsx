@@ -54,6 +54,16 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container,
       : container.closest('[data-wwtopic]') as HTMLElement;
     if (!parentContainer) return;
 
+    if (visible) {
+      container.style.isolation = 'initial';
+      container.style.background = 'initial';
+    } else {
+      // Fixes performance issues. The background on body causes full rerenders
+      // due to mix-blend-mode.
+      container.style.isolation = 'isolate';
+      container.style.background = 'white';
+    }
+
     const hideReasonContainer = parentContainer.querySelector('[data-wwid="hide-reason-container"]') as HTMLElement;
     const children = Array.from(parentContainer.children) as HTMLElement[];
 
@@ -62,7 +72,7 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container,
 
       if (visible) {
         child.style.opacity = '1';
-        child.style.mixBlendMode = 'normal';
+        child.style.mixBlendMode = 'initial';
       } else {
         child.style.opacity = '0.5';
         child.style.mixBlendMode = 'luminosity';
