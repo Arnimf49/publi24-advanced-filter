@@ -18,15 +18,10 @@ export const Panel: React.FC<PanelProps> = ({ phone, visible, hiddenReason, isEs
   return (
     <div className={styles.panel}>
       <div className={styles.buttons}>
-        {!!phone && <WhatsAppButton
-          phone={phone}
-          className={styles.whatsapp}
-          size={22}
-        />}
         <HideButton
           visible={visible}
           onClick={onHideClick}
-          size={22}
+          size={24}
           className={styles.hideButton}
         />
         {isEscort && onFavClick && (
@@ -44,6 +39,11 @@ export const Panel: React.FC<PanelProps> = ({ phone, visible, hiddenReason, isEs
             />
           </button>
         )}
+        {!!phone && <WhatsAppButton
+          phone={phone}
+          className={styles.whatsapp}
+          size={25}
+        />}
       </div>
       {!visible && hiddenReason && (
         <span className={styles.hideReason} data-wwid="hide-reason">

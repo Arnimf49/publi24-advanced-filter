@@ -21,6 +21,10 @@
   display: flex;
   align-items: center;
   gap: 5px;
+
+  :global(.onMobile) & {
+    flex-direction: row-reverse;
+  }
 }
 
 .whatsapp {
