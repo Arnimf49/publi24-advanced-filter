@@ -14,11 +14,50 @@ You need to the following software to work on the project.
 
 - `nvm` - https://github.com/nvm-sh/nvm
 - `Chrome` or `Firefox`
+- `web-ext` - https://github.com/mozilla/web-ext
 
 To install dependencies run in order:
 
 1. `nvm install` - installs the necessary node version
 2. `npm i` - installs the dependencies
+
+### For extensions reviewers
+
+#### Full build verification
+
+Follow the steps below to verify the uploaded version generates the same source code.
+
+- Run `npm run build` to generate the extension zip.
+- Output to compare with: `./web-ext-artifacts/publi24_filtru_avansat-{version}-{firefox|chrome}.zip`
+
+> Note that `./misc/build.sh` is used since both Chrome and Firefox packages are generated, and
+different manifest format is required between them.
+
+#### Third party library verification
+
+To verify third party libraries refer to the following table.
+Not all files are packaged from a library in some cases to save on extensions size,
+example being Tesseract, which otherwise is quite large.
+
+| Library | Version | File | Source |
+|---------|---------|------|--------|
+| qrcode | 1.3.4 | [qrcode.js](library/qrcode.js) | npm |
+| jimp | 0.22.10 | [jimp.js](library/jimp.js) | npm |
+| splide | 4.1.4 | [splide.min.css](library/splide/splide.min.css), [splide.min.js](library/splide/splide.min.js) | npm |
+| react | 18.3.1 | [react.production.min.js](library/react/react.production.min.js) | npm |
+| react-dom | 18.3.1 | [react-dom.production.min.js](library/react/react-dom.production.min.js) | npm |
+| tesseract.js | 6.0.1 | [tesseract.min.js](library/tesseract/tesseract.min.js), [worker.min.js](library/tesseract/worker.min.js) | npm |
+| tesseract.js-core | 6.1.2 | [tesseract-core-simd-lstm.wasm.js](library/tesseract/tesseract-core-simd-lstm.wasm.js) | npm |
+| tessdata_fast | 4.1.0 | [eng.traineddata](library/tesseract/eng.traineddata) | https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/4.1.0/eng.traineddata |
+
+Verification is possible in a scripted way as well:
+
+- Verify the logic in [./misc/checksum-libraries.sh](./misc/checksum-libraries.sh) (54 lines simple script).
+- Run `./misc/checksum-libraries.sh` and expect OK on each line.
+
+##### Other notes on verification
+
+- Do not verify code under `src-mapper/`. This a development only tool and is not included in the extension build.
 
 ### Commands
 
