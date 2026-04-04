@@ -71,6 +71,7 @@ const SAFE_LAST_DOMAIN_PARTS: string[] = [
   'escortero.net',
   'escorteromania.info',
   'escorterecomandate.com',
+  'inspector-escorte.com',
 ];
 
 const PRIO_DOMAINS: string[] = [
@@ -106,7 +107,7 @@ interface ImageLinkDomainGroup {
 
 function getFlagForDomain(domain: string): string | null {
   for (const [cc, domains] of Object.entries(ESCORT_LISTING_SITE_DOMAINS)) {
-    if (domains.some(d => domain.endsWith(d))) {
+    if (domains.some(d => domain === d || domain.endsWith('.' + d))) {
       if (cc === 'general') {
         return '🌐';
       }
@@ -211,7 +212,9 @@ export const linksFilter = {
           const compressedLink = isPubliLink ? dataCompression.compressAdLink(link) : link;
 
           const isSafeLastDomain = SAFE_LAST_DOMAIN_PARTS.some(part =>
-            originalDomain.endsWith(part)
+            part.startsWith('.')
+              ? originalDomain.endsWith(part)
+              : originalDomain === part || originalDomain.endsWith('.' + part)
           );
 
           let isDomainSafe = false;
