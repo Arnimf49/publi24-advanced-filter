@@ -135,6 +135,27 @@ const utils = {
     });
   },
 
+  async modifyRouteJsonBody(page: Page, url: string, htmlKey: string, modifier: ($: CheerioAPI) => any, delay?: number) {
+    await page.route(url, async (route) => {
+      const response = await route.fetch();
+      const json = await response.json();
+
+      const $ = cheerio.load(json[htmlKey]);
+      modifier($);
+      json[htmlKey] = $.html();
+
+      if (delay) {
+        await new Promise(r => setTimeout(r, delay));
+      }
+
+      await route.fulfill({
+        response,
+        body: JSON.stringify(json),
+        contentType: 'application/json',
+      });
+    });
+  },
+
   async getLocalStorageData(page: Page) {
     return await page.evaluate(() => {
       const data: any = {};

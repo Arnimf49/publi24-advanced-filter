@@ -1,5 +1,6 @@
 import {NimfomaneStorage} from "./storage";
 import {page} from "../../common/page";
+import {jsonPage} from "./jsonPage";
 import {utils} from "../../common/utils";
 import {cityService} from "./cityService";
 
@@ -32,7 +33,7 @@ export const escortActions = {
     let phone;
     const profileUrl = escort.profileLink.replace(/\/$/, '');
 
-    const topicPageData = await page.load(`${profileUrl}/content/?type=forums_topic`, priority);
+    const topicPageData = await page.load(`${profileUrl}/content/?type=forums_topic`, {priority});
     const topicTitles = topicPageData.querySelectorAll<HTMLElement>('.ipsDataItem_title');
 
     phone = extractPhoneFromElements(topicTitles);
@@ -42,7 +43,7 @@ export const escortActions = {
       return;
     }
 
-    const profilePageData = await page.load(profileUrl, priority);
+    const profilePageData = await page.load(profileUrl, {priority});
     const genericItems = profilePageData.querySelectorAll<HTMLElement>('.ipsDataItem_generic');
 
     phone = extractPhoneFromElements(genericItems);
@@ -52,7 +53,7 @@ export const escortActions = {
       return;
     }
 
-    const postPageData = await page.load(`${profileUrl}/content/?type=forums_topic_post`, priority);
+    const postPageData = await page.load(`${profileUrl}/content/?type=forums_topic_post`, {priority});
     const commentContents = postPageData.querySelectorAll<HTMLElement>('[data-role="commentContent"]');
 
     phone = extractPhoneFromElements(commentContents);
@@ -80,11 +81,11 @@ export const escortActions = {
       throw new Error('Cannot determine profile image, missing escort data: ' + user);
     }
 
-    let profileContentUrl = escort.profileLink + 'content';
+    let profileContentUrl = escort.profileLink + 'content?all_activity=1&listResort=1';
     let pageChecks = 0;
 
     do {
-      const pageData = await page.load(profileContentUrl, priority);
+      const pageData = await jsonPage.load(profileContentUrl, {priority});
 
       const image = pageData.querySelector('.ipsStreamItem_snippet [data-background-src]');
       if (image) {
@@ -112,8 +113,9 @@ export const escortActions = {
     if (pageNum !== 0) {
       url += '/page/' + (pageNum + 1);
     }
+    url += '?all_activity=1&listResort=1';
 
-    const pageData = await page.load(url, priority);
+    const pageData = await jsonPage.load(url, {priority});
     const pageExists = !!pageData.querySelector(`[data-page="${pageNum + 1}"]`)
 
     if (pageNum !== 0 && !pageExists) {

@@ -54,8 +54,7 @@ test('Should show no image icon when no photos found.', async ({page}) => {
   const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
 
   const removeImages = ($: CheerioAPI) => $('[data-background-src]').remove();
-  await utils.modifyRouteBody(page, profileLink + 'content', removeImages);
-  await utils.modifyRouteBody(page, profileLink + 'content/*', removeImages);
+  await utils.modifyRouteJsonBody(page, profileLink + 'content**', 'rows', removeImages);
 
   await utilsNimfomane.deleteUserProfileStorage(page, user);
   await utilsNimfomane.open(page);

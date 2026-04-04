@@ -49,7 +49,7 @@ export const profileActions = {
 
   async loadProfileStats(user: string, profileUrl: string, priority: number = 110): Promise<void> {
     try {
-      const doc = await page.load(profileUrl, priority);
+      const doc = await page.load(profileUrl, {priority});
 
       const stats: EscortItem['profileStats'] = {};
 

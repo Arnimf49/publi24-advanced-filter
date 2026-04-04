@@ -6,6 +6,13 @@ interface TypeConfig {
   throttleAfter: number;
   cooldown: number;
   delayBetween?: number;
+  separateJsonThrottle?: false | Omit<TypeConfig, 'separateJsonThrottle'>;
+}
+
+export interface LoadOptions {
+  priority?: number;
+  json?: false | { htmlInKey: string };
+  headers?: Record<string, string>;
 }
 
 const DEFAULT_CONFIG: TypeConfig = {
@@ -19,6 +26,11 @@ const CONFIG_OVERRIDES: Record<string, TypeConfig> = {
     throttleAfter: 3,
     cooldown: 13500,
     delayBetween: 1800,
+    separateJsonThrottle: {
+      throttleAfter: 7,
+      cooldown: 6000,
+      delayBetween: 500,
+    },
   },
 };
 
@@ -27,6 +39,8 @@ interface QueueItem {
   resolve: (value: Document) => void;
   reject: (reason: Error) => void;
   priority: number;
+  json?: { htmlInKey: string };
+  headers?: Record<string, string>;
 }
 
 const PAGE_TYPE: Record<string, {
@@ -46,8 +60,17 @@ function getDomainFromUrl(url: string): string {
   }
 }
 
-function getConfigForDomain(domain: string): TypeConfig {
-  return CONFIG_OVERRIDES[domain] || DEFAULT_CONFIG;
+function getTypeAndConfig(domain: string, json: LoadOptions['json']): { type: string; config: Omit<TypeConfig, 'separateJsonThrottle'> } {
+  const domainConfig = CONFIG_OVERRIDES[domain] || DEFAULT_CONFIG;
+
+  if (json && domainConfig.separateJsonThrottle) {
+    return {
+      type: `json/${domain}`,
+      config: domainConfig.separateJsonThrottle as Omit<TypeConfig, 'separateJsonThrottle'>,
+    };
+  }
+
+  return { type: domain, config: domainConfig };
 }
 
 function sleep(ms: number): Promise<void> {
@@ -83,7 +106,12 @@ function startRequest(type: string, config: TypeConfig, item: QueueItem) {
 
 async function executeRequest(type: string, item: QueueItem) {
   try {
-    const pageResponse = await fetch(item.url);
+    const headers: HeadersInit = {
+      ...(item.json && { 'Accept': 'application/json, text/javascript, */*; q=0.01' }),
+      ...item.headers,
+    };
+
+    const pageResponse = await fetch(item.url, { headers });
 
     if (!pageResponse.ok) {
       const error = new Error(`Failed to load ${item.url}`) as BrowserError;
@@ -96,7 +124,13 @@ async function executeRequest(type: string, item: QueueItem) {
     }
 
     const parser = new DOMParser();
-    const doc = parser.parseFromString(await pageResponse.text(), 'text/html');
+    let doc: Document;
+    if (item.json) {
+      const data = await pageResponse.json();
+      doc = parser.parseFromString(data[item.json.htmlInKey], 'text/html');
+    } else {
+      doc = parser.parseFromString(await pageResponse.text(), 'text/html');
+    }
     PAGE_TYPE[type].CACHE[item.url] = doc;
     item.resolve(doc);
   } catch (fetchError) {
@@ -122,10 +156,11 @@ async function runQueue(type: string, config: TypeConfig) {
 }
 
 export const page = {
-  async load(url: string, priority: number = 100): Promise<Document> {
+  async load(url: string, options?: LoadOptions): Promise<Document> {
+    const priority = options?.priority ?? 100;
+    const json = options?.json || undefined;
     const domain = getDomainFromUrl(url);
-    const config = getConfigForDomain(domain);
-    const type = domain;
+    const { type, config } = getTypeAndConfig(domain, json);
 
     if (!PAGE_TYPE[type]) {
       PAGE_TYPE[type] = {
@@ -156,7 +191,7 @@ export const page = {
     }
 
     const promise = new Promise<Document>((resolve, reject) => {
-      const item = { url, resolve, reject, priority };
+    const item: QueueItem = { url, resolve, reject, priority, ...(json && { json }), ...(options?.headers && { headers: options.headers }) };
       PAGE_TYPE[type].queue.push(item);
       runQueue(type, config);
     });

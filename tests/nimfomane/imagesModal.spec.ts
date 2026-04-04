@@ -1,5 +1,6 @@
 import {expect, test} from "../helpers/fixture";
 import {utilsNimfomane} from "../helpers/utilsNimfomane";
+import {utils} from "../helpers/utils";
 
 test('Should show logo and close with button.', async ({page}) => {
   await utilsNimfomane.open(page);
@@ -67,19 +68,12 @@ test('Should skip images posted in non-escort sections.', async ({page}) => {
 
   let secondImageUrl: string | undefined;
 
-  await page.route(profileLink + 'content', async (route) => {
-    const response = await route.fetch();
-    const body = await response.text();
-    const cheerio = await import('cheerio');
-    const $ = cheerio.load(body);
+  await utils.modifyRouteJsonBody(page, profileLink + 'content**', 'rows', ($) => {
+    const imageItems = $('.ipsStreamItem').filter((_, el) => $(el).find('[data-background-src]').length > 0);
+    secondImageUrl = imageItems.eq(1).find('[data-background-src]').attr('data-background-src');
 
-    const items = $('.ipsStreamItem');
-    secondImageUrl = items.eq(1).find('[data-background-src]').attr('data-background-src');
-
-    items.eq(0).find('.ipsStreamItem_status a:last-child')
+    imageItems.eq(0).find('.ipsStreamItem_status a:last-child')
       .attr('href', 'https://nimfomane.com/forum/forum/999-non-escort-section/');
-
-    await route.fulfill({ response, body: $.html() });
   });
 
   await firstImage.click();

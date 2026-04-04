@@ -9,7 +9,7 @@ export const topicActions = {
     let url = lastPageUrl;
 
     do {
-      const pageData = await page.load(url, priority);
+      const pageData = await page.load(url, {priority});
 
       const commentContents = pageData.querySelectorAll<HTMLElement>('[data-role="commentContent"]');
       const reversedContents = Array.from(commentContents).reverse();
@@ -36,7 +36,7 @@ export const topicActions = {
     let url = lastPageUrl;
 
     do {
-      const pageData = await page.load(url, priority);
+      const pageData = await page.load(url, {priority});
 
       const allUsers = pageData.querySelectorAll<HTMLLinkElement>('.cAuthorPane_author a');
       const escortUsers = Array.from(allUsers).filter(elementHelpers.isUserLinkEscort);
@@ -68,7 +68,7 @@ export const topicActions = {
   },
 
   async determineTopPosterEscort(lastPageUrl: string, priority: number = 100): Promise<boolean | null> {
-    const pageData = await page.load(lastPageUrl, priority);
+    const pageData = await page.load(lastPageUrl, {priority});
 
     const topPostersSection = pageData.querySelector('.cTopicOverview__section--users');
     if (!topPostersSection) {
@@ -87,7 +87,7 @@ export const topicActions = {
       return true;
     }
 
-    const userPage = await page.load(url, priority);
+    const userPage = await page.load(url, {priority});
     if (elementHelpers.isProfilePageEscort(userPage)) {
       NimfomaneStorage.setEscortProp(user, 'profileLink', url.replace(/\?.*$/, ''));
       return true;
