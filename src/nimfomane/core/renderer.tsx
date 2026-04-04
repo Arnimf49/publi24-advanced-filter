@@ -1,7 +1,7 @@
 import * as ReactDOM from "react-dom/client";
 import React from "react";
 import {TopicImageRoot} from "../component/TopicImage/TopicImageRoot";
-import {ProfileImages} from "../component/ProfileImages/ProfileImages";
+import {ProfilePanel} from "../component/ProfilePanel/ProfilePanel";
 import {profileActions} from "./profileActions";
 import {NimfomaneStorage} from "./storage";
 import {PanelRoot} from "../component/Panel/PanelRoot";
@@ -24,13 +24,18 @@ export const renderer = {
     globalButtonsRoot.render(<GlobalButtonsRoot />);
   },
 
-  registerProfileImages(container: HTMLDivElement, user: string) {
+  registerProfilePanel(container: HTMLDivElement, user: string) {
     profileActions.determineEscort();
 
-    const buttonContainer = document.createElement('div');
-    const root = ReactDOM.createRoot(buttonContainer);
-    root.render(<ProfileImages user={user}/>);
-    container.appendChild(buttonContainer);
+    const hideReasonContainer = document.createElement('div');
+    hideReasonContainer.setAttribute('data-wwid', 'hide-reason-container');
+    container.appendChild(hideReasonContainer);
+    container.style.position = 'relative';
+
+    const panelContainer = document.createElement('div');
+    const root = ReactDOM.createRoot(panelContainer);
+    root.render(<ProfilePanel user={user} container={container}/>);
+    container.appendChild(panelContainer);
   },
 
   registerTopicItem(container: HTMLDivElement, id: string, index: number) {

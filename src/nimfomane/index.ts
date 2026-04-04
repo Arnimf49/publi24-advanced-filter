@@ -67,7 +67,7 @@ NimfomaneStorage.upgrade()
       const user = document.querySelector<HTMLElement>('.cProfileHeader_name h1')!.innerText.trim();
       const container = document.querySelector<HTMLDivElement>('[data-role="profileHeader"]')!;
 
-      renderer.registerProfileImages(container, user);
+      renderer.registerProfilePanel(container, user);
     }
 
     if (IS_TOPIC_PAGE) {

@@ -12,11 +12,13 @@ type PanelProps = {
   isFav?: boolean;
   onHideClick: () => void;
   onFavClick?: () => void;
+  onShowImages?: () => void;
+  fullWidth?: boolean;
 };
 
-export const Panel: React.FC<PanelProps> = ({ phone, visible, hiddenReason, isEscort, isFav, onHideClick, onFavClick }) => {
+export const Panel: React.FC<PanelProps> = ({ phone, visible, hiddenReason, isEscort, isFav, onHideClick, onFavClick, onShowImages, fullWidth }) => {
   return (
-    <div className={styles.panel}>
+    <div className={`${styles.panel} ${fullWidth ? styles.panelFullWidth : ''}`}>
       <div className={styles.buttons}>
         <HideButton
           visible={visible}
@@ -44,6 +46,15 @@ export const Panel: React.FC<PanelProps> = ({ phone, visible, hiddenReason, isEs
           className={styles.whatsapp}
           size={25}
         />}
+        {onShowImages && (
+          <button
+            className={styles.openPhotosButton}
+            onClick={onShowImages}
+            data-wwid="all-photos-button"
+          >
+            Deschide pozele
+          </button>
+        )}
       </div>
       {!visible && hiddenReason && (
         <span className={styles.hideReason} data-wwid="hide-reason">

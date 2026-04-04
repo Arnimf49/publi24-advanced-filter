@@ -9,9 +9,11 @@ type PanelRootProps = {
   escortUser?: string;
   container: HTMLElement;
   hideReasonLayout?: 'horizontal' | 'vertical';
+  onShowImages?: () => void;
+  fullWidth?: boolean;
 };
 
-export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container, hideReasonLayout = 'horizontal' }) => {
+export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container, hideReasonLayout = 'horizontal', onShowImages, fullWidth }) => {
   const [_, setRenderCycle] = useState(0);
   const [showHideReason, setShowHideReason] = useState(false);
 
@@ -139,6 +141,8 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container,
         isFav={isFav}
         onHideClick={onHideClick}
         onFavClick={onFavClick}
+        onShowImages={onShowImages}
+        fullWidth={fullWidth}
       />
       {showHideReason && ReactDOM.createPortal(
         <HideReasonRoot

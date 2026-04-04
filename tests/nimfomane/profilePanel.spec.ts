@@ -15,3 +15,16 @@ test('Should show all images button and open modal.', async ({page}) => {
   await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toHaveCount(0);
   await expect(page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').first()).toBeVisible();
 })
+
+test('Should render other panel elements.', async ({page}) => {
+  await utilsNimfomane.open(page);
+  const {user} = await utilsNimfomane.waitForFirstImage(page);
+  await utilsNimfomane.open(page, {url: await utilsNimfomane.getUserProfileLink(page, user)});
+
+  await page.waitForTimeout(500);
+
+  await expect(page.locator('[data-wwid="toggle-hidden"]')).toBeVisible();
+  await expect(page.locator('[data-wwid="fav-toggle"]')).toBeVisible();
+  await expect(page.locator('[data-wwid="whatsapp"]')).toBeVisible();
+  await expect(page.locator('[data-wwid="all-photos-button"]')).toBeVisible();
+})
