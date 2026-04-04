@@ -434,7 +434,7 @@ export const adActions = {
     const staleAds = ads.filter((ad) => adData.isStaleAnalyze(ad.getAttribute('data-articleid') as string));
 
     if (!adsOrder.length) {
-      nextPageArrow.click();
+      setTimeout(() => nextPageArrow.click(), 600);
     } else if (!WWStorage.isNextOnlyVisibleEnabled()) {
       adActions.scrollIntoView(adsOrder[0]);
       WWStorage.setFindNextVisibleAd(false);
@@ -478,19 +478,18 @@ export const adActions = {
       if (found) {
         WWStorage.setFindNextVisibleAd(false);
       } else {
-        nextPageArrow.click();
+        setTimeout(() => nextPageArrow.click(), 600);
       }
     }
   },
 
-  scrollIntoView(element: HTMLDivElement) {
+  scrollIntoView(element: HTMLDivElement, options: {smooth?: boolean} = {}) {
     const panel = element.querySelector<HTMLElement>('[data-wwid="control-panel"]');
-    if (panel) {
-      panel.scrollIntoView({behavior: 'instant', block: 'start'});
-      window.scrollBy({top: IS_MOBILE_VIEW ? -320 : -350, behavior: "instant"});
-    } else {
-      element.scrollIntoView({behavior: 'instant', block: 'start'});
-      window.scrollBy({top: IS_MOBILE_VIEW ? -100 : -130, behavior: "instant"});
-    }
+    const target = panel ?? element;
+    const offset = panel
+      ? (IS_MOBILE_VIEW ? -320 : -350)
+      : (IS_MOBILE_VIEW ? -100 : -130);
+    const top = target.getBoundingClientRect().top + window.scrollY + offset;
+    window.scrollTo({top, behavior: options?.smooth === undefined || options?.smooth === true ? 'smooth' : 'instant'});
   }
 }

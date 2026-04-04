@@ -20,7 +20,7 @@ export const iosUtils = {
           .pop();
 
         if (adElement) {
-          adActions.scrollIntoView(adElement);
+          adActions.scrollIntoView(adElement, {smooth: false});
         }
         if (attempts >= maxAttempts) {
           clearInterval(interval);
