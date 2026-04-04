@@ -127,12 +127,25 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
         {images.map((image, index) => (
           <div key={index} data-wwid={'escort-image'} className={classes.image_container}>
             <div className={classes.image_inner_container}>
-              <img
-                src={nimfomaneUtils.imageFullSize(nimfomaneUtils.normalizeCmsUrl(image.url))}
-                loading='lazy'
-                onClick={(e) => e.stopPropagation()}
-              />
-              <div className={classes.image_date}>{image.date}</div>
+              <div className={classes.image_wrapper}>
+                <img
+                  src={nimfomaneUtils.imageFullSize(nimfomaneUtils.normalizeCmsUrl(image.url))}
+                  loading='lazy'
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <div className={classes.image_overlay}>
+                  <div className={classes.image_date}>{image.date}</div>
+                  {image.topicUrl && (
+                    <a
+                      className={classes.image_topic}
+                      href={image.topicUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                    >topic &gt;</a>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         ))}

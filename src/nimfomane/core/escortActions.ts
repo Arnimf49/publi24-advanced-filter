@@ -6,6 +6,7 @@ import {cityService} from "./cityService";
 export interface Image {
   url: string;
   date: string;
+  topicUrl: string;
 }
 
 const extractPhoneFromElements = (elements: NodeListOf<HTMLElement> | HTMLElement[]): string | null => {
@@ -131,6 +132,7 @@ export const escortActions = {
       return [{
         url: el.getAttribute('data-background-src')!,
         date: el.closest('.ipsStreamItem_container')!.querySelector('time')!.innerText,
+        topicUrl: (streamItem?.querySelector<HTMLAnchorElement>('.ipsStreamItem_title a'))?.href ?? '',
       }];
     });
 

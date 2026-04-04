@@ -74,7 +74,11 @@ test('Should show all images modal when clicking the topic image.', async ({page
 
   await firstImage.click();
   await page.locator('[data-wwid="escort-images"]').isVisible();
-  await page.locator('[data-wwid="escort-images"] img').first().isVisible();
+  await expect(page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').first()).toBeVisible();
+
+  const topicLink = page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] a[href*="nimfomane.com/forum/topic/"]').first();
+  await expect(topicLink).toBeVisible();
+  await expect(topicLink).toHaveText('topic >');
 })
 
 test('Should show images after listing pagination navigation.', async ({page}) => {
