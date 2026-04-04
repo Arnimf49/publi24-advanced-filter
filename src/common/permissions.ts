@@ -23,27 +23,4 @@ export const permissions = {
       );
     });
   },
-
-  async requestDataCollectionPermissions(): Promise<boolean> {
-    const current = await this.getDataCollectionPermissions();
-
-    if (current.data_collection === undefined) {
-      return false;
-    }
-
-    return new Promise((resolve) => {
-      // @ts-ignore
-      browserApi.runtime.sendMessage(
-        { type: 'REQUEST_PERMISSIONS' },
-        (response: { granted: boolean }) => {
-          if (browserApi.runtime.lastError) {
-            console.error('Error requesting permissions:', browserApi.runtime.lastError);
-            resolve(false);
-          } else {
-            resolve(response.granted);
-          }
-        }
-      );
-    });
-  },
 };

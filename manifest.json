@@ -88,7 +88,6 @@
       "data_collection_permissions": {
         "required": ["none"],
         "optional": [
-          "websiteActivity",
           "technicalAndInteraction"
         ]
       },

@@ -148,14 +148,8 @@ async function acquirePermission() {
     // Data collection not available on Chrome.
     return true;
   }
-  if (
-    (
-      !permissionsData.data_collection.includes('websiteActivity')
-      || !permissionsData.data_collection.includes('technicalAndInteraction')
-    )
-    && !await permissions.requestDataCollectionPermissions()
-  ) {
-    console.warn('User does not consent to analytics.', permissionsData)
+  if (!permissionsData.data_collection.includes('technicalAndInteraction')) {
+    console.warn('User does not consent to analytics.', permissionsData);
     return false;
   }
   return true;

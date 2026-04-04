@@ -22,19 +22,5 @@ browserApi.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
-  if (message.type === 'REQUEST_PERMISSIONS') {
-    browserApi.permissions.request({
-      // @ts-ignore
-      data_collection: ['websiteActivity', 'technicalAndInteraction']
-    }).then((granted: boolean) => {
-      sendResponse({ granted });
-    }).catch((error: any) => {
-      console.error('Error requesting permissions:', error);
-      sendResponse({ granted: false });
-    });
-
-    return true;
-  }
-
   return false;
 });
