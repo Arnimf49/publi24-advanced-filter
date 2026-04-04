@@ -1,6 +1,7 @@
 import {NimfomaneStorage} from "./storage";
 import {page} from "../../common/page";
 import {utils} from "../../common/utils";
+import {cityService} from "./cityService";
 
 export interface Image {
   url: string;
@@ -120,11 +121,17 @@ export const escortActions = {
 
     const imageElements = pageData.querySelectorAll('.ipsStreamItem_snippet [data-background-src]');
 
-    const images = [...imageElements].map(el => {
-      return {
+    const images = [...imageElements].flatMap(el => {
+      const streamItem = el.closest('.ipsStreamItem');
+      const sectionLink = streamItem?.querySelector<HTMLAnchorElement>('.ipsStreamItem_status a:last-child');
+      if (sectionLink && !cityService.getCityFromForumUrl(sectionLink.href)) {
+        return [];
+      }
+
+      return [{
         url: el.getAttribute('data-background-src')!,
         date: el.closest('.ipsStreamItem_container')!.querySelector('time')!.innerText,
-      }
+      }];
     });
 
     if (pageNum === 0 && images.length > 0) {

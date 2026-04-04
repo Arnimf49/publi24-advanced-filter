@@ -32,7 +32,7 @@ test('Should load more images when scrolling.', async ({page}) => {
 
     const endMessage = page.locator('[data-wwid="escort-images"] [data-wwid="escort-images-end"]');
     const endMessageVisible = await endMessage.isVisible().catch(() => false);
-    
+
     if (endMessageVisible) {
       return;
     }
@@ -58,4 +58,36 @@ test('Should display error when images fail to load.', async ({page}) => {
 
   await expect(page.locator('[data-wwid="escort-images-error"]')).toBeVisible();
   await expect(page.locator('[data-wwid="escort-images-error"]')).toContainText('Failed to fetch. Code: 503');
+})
+
+test('Should skip images posted in non-escort sections.', async ({page}) => {
+  await utilsNimfomane.open(page);
+  const {firstImage, user} = await utilsNimfomane.waitForFirstImage(page);
+  const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
+
+  let secondImageUrl: string | undefined;
+
+  await page.route(profileLink + 'content', async (route) => {
+    const response = await route.fetch();
+    const body = await response.text();
+    const cheerio = await import('cheerio');
+    const $ = cheerio.load(body);
+
+    const items = $('.ipsStreamItem');
+    secondImageUrl = items.eq(1).find('[data-background-src]').attr('data-background-src');
+
+    items.eq(0).find('.ipsStreamItem_status a:last-child')
+      .attr('href', 'https://nimfomane.com/forum/forum/999-non-escort-section/');
+
+    await route.fulfill({ response, body: $.html() });
+  });
+
+  await firstImage.click();
+  await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toHaveCount(0, {timeout: 15000});
+  await expect(page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"]').first()).toBeVisible();
+
+  const firstShownSrc = await page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').first().getAttribute('src');
+
+  expect(secondImageUrl).toBeTruthy();
+  expect(firstShownSrc).toContain(secondImageUrl!.split('/').pop());
 })
