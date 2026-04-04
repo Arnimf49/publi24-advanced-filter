@@ -147,6 +147,7 @@ export const renderer = {
   renderGlobalButtons(): void {
     const element = document.createElement('div');
     element.setAttribute('data-ww', 'global-buttons');
+    element.classList.add('ww-global-buttons-root');
     const root = ReactDOM.createRoot(element);
     root.render(<GlobalButtonsRoot/>);
 
@@ -176,7 +177,7 @@ export const renderer = {
     }
 
     if (WWStorage.isFindNextVisibleAd()) {
-      adActions.findVisibleAd().catch(console.error);
+      return;
     }
 
     const list = document.querySelector('.article-list');

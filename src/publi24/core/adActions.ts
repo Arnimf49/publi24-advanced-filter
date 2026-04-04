@@ -421,7 +421,14 @@ export const adActions = {
       }
     };
   },
-  async findVisibleAd () {
+
+  async findVisibleAd (afterArticleId?: string | null): Promise<string | null> {
+    const wait = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+    const goToNextPage = (): Promise<never> => new Promise(() => {
+      WWStorage.setFindNextVisibleAd(true);
+      setTimeout(() => nextPageArrow.click(), 600);
+    });
+
     const paginationArrows = document.querySelectorAll<HTMLLinkElement>('.pagination .arrow');
     const nextPageArrow = paginationArrows[paginationArrows.length - 1].querySelector('a') as HTMLElement;
     const isVisible = (ad: HTMLDivElement) =>
@@ -430,30 +437,34 @@ export const adActions = {
 
     // @ts-ignore
     const ads: HTMLDivElement[] = [...document.querySelectorAll<HTMLDivElement>('[data-articleid]')];
-    const adsOrder = ads.filter((ad) => isVisible(ad));
+
+    let candidates = ads.filter((ad) => isVisible(ad));
+
+    if (afterArticleId) {
+      const idx = candidates.findIndex(ad => ad.getAttribute('data-articleid') === afterArticleId);
+      if (idx !== -1) candidates = candidates.slice(idx + 1);
+    }
+
     const staleAds = ads.filter((ad) => adData.isStaleAnalyze(ad.getAttribute('data-articleid') as string));
 
-    if (!adsOrder.length) {
-      setTimeout(() => nextPageArrow.click(), 600);
+    if (!candidates.length) {
+      return goToNextPage();
     } else if (!WWStorage.isNextOnlyVisibleEnabled()) {
-      adActions.scrollIntoView(adsOrder[0]);
+      adActions.scrollIntoView(candidates[0]);
       WWStorage.setFindNextVisibleAd(false);
+      await wait(400);
+      return candidates[0].getAttribute('data-articleid');
     } else {
-      let found = false;
-
-      for (const ad of adsOrder) {
+      for (const ad of candidates) {
         const articleId = ad.getAttribute('data-articleid') as string;
 
-        if (isVisible(ad)) {
-          adActions.scrollIntoView(ad);
-        } else {
-          continue;
-        }
+        adActions.scrollIntoView(ad);
 
         if (!staleAds.includes(ad)) {
           setTimeout(() => adActions.scrollIntoView(ad), 50);
-          found = true;
-          break;
+          await wait(400);
+          WWStorage.setFindNextVisibleAd(false);
+          return articleId;
         }
 
         const remainedVisible = await new Promise<boolean>((resolve) => {
@@ -469,27 +480,29 @@ export const adActions = {
         });
 
         if (remainedVisible) {
-          found = true;
           adActions.scrollIntoView(ad);
-          break;
+          await wait(400);
+          WWStorage.setFindNextVisibleAd(false);
+          return articleId;
         }
       }
 
-      if (found) {
-        WWStorage.setFindNextVisibleAd(false);
-      } else {
-        setTimeout(() => nextPageArrow.click(), 600);
-      }
+      return goToNextPage();
     }
   },
 
   scrollIntoView(element: HTMLDivElement, options: {smooth?: boolean} = {}) {
+    utils.debugLog('Scrolling to ad ' + element.getAttribute('data-articleid'));
+
     const panel = element.querySelector<HTMLElement>('[data-wwid="control-panel"]');
     const target = panel ?? element;
     const offset = panel
       ? (IS_MOBILE_VIEW ? -320 : -350)
       : (IS_MOBILE_VIEW ? -100 : -130);
     const top = target.getBoundingClientRect().top + window.scrollY + offset;
-    window.scrollTo({top, behavior: options?.smooth === undefined || options?.smooth === true ? 'smooth' : 'instant'});
+
+    // In tests somehow, or with Electron, it only works with this line.
+    window.scrollTo({ top: window.scrollY, behavior: 'instant' });
+    setTimeout(() => window.scrollTo({top, behavior: options?.smooth === undefined || options?.smooth === true ? 'smooth' : 'instant'}), 20);
   }
 }

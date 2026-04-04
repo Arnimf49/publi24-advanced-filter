@@ -8,9 +8,12 @@ import VersionHistoryModal from "./VersionHistoryModal/VersionHistoryModal";
 import {modalState} from "../../../common/modalState";
 import {versionHistory} from "../../data/versionHistory";
 import {renderer} from "../../core/renderer";
+import NextVisibleAdButton from "./NextVisibleAdButton/NextVisibleAdButton";
 
 type GlobalButtonsRootProps = {
 };
+
+const renderNextVisibleAd = WWStorage.isFindNextVisibleAd();
 
 const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
 }) => {
@@ -44,7 +47,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
   useEffect(() => {
     const currentVersion = versionHistory[0]?.version;
     const seenVersion = WWStorage.getVersionSeen();
-    
+
     if (!seenVersion) {
       WWStorage.setVersionSeen(currentVersion);
       setHasNewVersion(false);
@@ -86,6 +89,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
         currentVersion={currentVersion}
       />
 
+      {renderNextVisibleAd && <NextVisibleAdButton/>}
       {isFavsOpen &&
         <FavoritesModalRoot onClose={() => setFavsOpen(false)}/>}
       {isPhoneSearchOpen &&

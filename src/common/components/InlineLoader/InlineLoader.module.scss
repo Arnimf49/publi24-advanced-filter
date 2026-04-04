@@ -5,7 +5,13 @@
   display: inline-block;
   animation: spin 0.8s linear infinite;
   margin-right: 4px;
+  flex-shrink: 0;
 }
+
+.idle {
+  animation: none;
+}
+
 
 @keyframes spin {
   0% {
