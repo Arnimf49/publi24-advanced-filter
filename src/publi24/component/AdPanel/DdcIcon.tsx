@@ -3,8 +3,8 @@ import React from "react";
 export const DdcIcon = () => {
   return (
     <svg
-      width="26px"
-      height="26px"
+      width="28px"
+      height="28px"
       viewBox="0 0 14.011548 14.74277"
       version="1.1"
       id="svg5"
@@ -18,7 +18,7 @@ export const DdcIcon = () => {
           id="circle14093"
           style={{
             display: "inline",
-            fill: "#dc4411",
+            fill: "var(--ddc-ring-fill, #dc4411)",
             fillOpacity: 1,
             strokeWidth: 0.322488,
             stopColor: "#000000"
@@ -29,7 +29,7 @@ export const DdcIcon = () => {
           style={{
             fontWeight:"bold",
             fontSize:"10.5425px",
-            fill:"#1c2774",
+            fill:"var(--ddc-d-fill, #1c2774)",
             fillOpacity:1,
             strokeWidth:0.878543,
             stopColor:"#000000"
