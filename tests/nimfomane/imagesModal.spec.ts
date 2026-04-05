@@ -31,6 +31,8 @@ test('Should load more images when scrolling.', async ({page}) => {
       e.scrollBy(0, 10000);
     })
 
+    await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toHaveCount(0);
+
     const endMessage = page.locator('[data-wwid="escort-images"] [data-wwid="escort-images-end"]');
     const endMessageVisible = await endMessage.isVisible().catch(() => false);
 
@@ -76,6 +78,7 @@ test('Should skip images posted in non-escort sections.', async ({page}) => {
       .attr('href', 'https://nimfomane.com/forum/forum/999-non-escort-section/');
   });
 
+  await utilsNimfomane.throttleReload(page);
   await firstImage.click();
   await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toHaveCount(0, {timeout: 15000});
   await expect(page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"]').first()).toBeVisible();

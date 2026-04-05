@@ -177,7 +177,7 @@ test('Should show publi24 link overlay for non-escort topics.', async ({page, co
 
   await utils.modifyRouteBody(page, `https://nimfomane.com/forum/topic/${topicId}-**`, ($) => {
     const commentContent = $('[data-role="commentContent"]').last();
-    commentContent.append('<a href="https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850332.html">publi24 link</a>');
+    commentContent.html('<a href="https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850332.html">publi24 link</a>');
   });
 
   await utilsNimfomane.deleteTopicInfoStorage(page, topicId);
@@ -202,7 +202,7 @@ test('Should reload publi link after 10 days.', async ({page, context}) => {
   await utilsNimfomane.setTopicStorageProp(page, topicId, 'publiLinkDeterminationTime', Date.now() - (8.64e+7 * 11));
   await utils.modifyRouteBody(page, `https://nimfomane.com/forum/topic/${topicId}-**`, ($) => {
     const commentContent = $('[data-role="commentContent"]').first();
-    commentContent.append('<a href="https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850332.html">publi24 link</a>');
+    commentContent.html('<a href="https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850332.html">publi24 link</a>');
   });
   await utilsNimfomane.throttleReload(page);
   await page.waitForTimeout(5000);
