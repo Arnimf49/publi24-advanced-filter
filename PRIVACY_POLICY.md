@@ -13,15 +13,15 @@ The extension exclusively operates on the public information that is found on th
 
 ## Anonymous analytics
 
-The extension collects anonymous usage statistics **once** after 30 days of use to help improve the extension. 
-This one-time collection includes:
+The extension collects anonymous usage statistics:
 
-- Aggregated usage counts (phone searches, image searches, favorites) grouped by month.
+- Favorites and hidden count.
+- Phone search and image search total counts and grouped by month.
 - Enabled feature settings (focus mode, auto-hide, etc.).
 - Operating system and browser user agent.
 
 This data is:
 
-- Collected only once per user.
+- Collected daily.
 - Completely anonymous (no user identifiers or personal information).
 - Used solely for understanding feature usage to improve the extension.

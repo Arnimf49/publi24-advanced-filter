@@ -13,15 +13,15 @@ Extensia operează exclusiv pe baza informațiilor publice găsite pe site-urile
 
 ## Statistici anonime
 
-Extensia colectează statistici anonime de utilizare **o singură dată** după 30 de zile de utilizare pentru a ajuta 
-la îmbunătățirea extensiei. Această colectare unică include:
+Extensia colectează statistici anonime de utilizare:
 
-- Numărul agregat de utilizări (căutări telefon, căutări imagini, favorite) grupate pe luni.
+- Numărul de favorite si ascunderi.
+- Numărul total și grupate pe luni de căutări după telefon și căutări după poze.
 - Setările funcționalităților activate (focus mode, auto-hide, etc.).
 - Sistemul de operare și user agent-ul browser-ului.
 
 Aceste date sunt:
 
-- Colectate o singură dată per utilizator.
+- Colectate în fiecare zi.
 - Complet anonime (fără identificatori de utilizator sau informații personale).
 - Utilizate exclusiv pentru a înțelege modul de folosire a funcționalităților și pentru a îmbunătăți extensia.

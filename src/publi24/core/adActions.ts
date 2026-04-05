@@ -196,6 +196,7 @@ function applyAutoHiding(phoneNumber: string, id: string, contentData: AdContent
 
 async function searchPhoneResults(id: string, phoneNumber: string, item: HTMLElement, windowRef: Window | null): Promise<void> {
   WWMemoryStorage.setAdAnalyzeError(id, null);
+  WWStorage.incrementPhoneSearchClickCount();
 
   try {
     utils.throwInTestingIfConfigured();
@@ -363,6 +364,7 @@ export const adActions = {
       e.stopPropagation();
 
       WWMemoryStorage.setImageSearchError(id, null);
+      WWStorage.incrementImageSearchClickCount();
 
       if (this) (this as HTMLButtonElement).disabled = true;
 

@@ -1,4 +1,5 @@
 import {WWStorage} from "./storage";
+import {userId} from "../../common/userId";
 import {permissions} from "../../common/permissions";
 
 // @ts-ignore
@@ -10,39 +11,18 @@ if (typeof browser === "undefined" && typeof chrome !== "undefined") {
 const SBU_B64 = 'aHR0cHM6Ly9vcWp0eGxiY3R4bnJkZ2pudmdicC5zdXBhYmFzZS5jbw==';
 const SBK_B64 = 'c2JfcHVibGlzaGFibGVfX2NtdTdNSzhlcHl5MWJXa1N3TzBFZ193Wl9PaWJaMg==';
 
-
-
-function hasMonthOldData(): boolean {
-  const now = Date.now();
-  const oneMonthAgo = now - (30 * 24 * 60 * 60 * 1000);
-
-  const allTimestamps: number[] = [];
-
-  const allItems = WWStorage.exportData();
-  Object.entries(allItems).forEach(([key, value]) => {
-    const adMatch = key.match(/^ww2:([A-F0-9-]+)$/);
-    if (adMatch) {
-      try {
-        const adData = JSON.parse(value);
-        if (adData.phoneTime) allTimestamps.push(adData.phoneTime);
-        if (adData.imagesTime) allTimestamps.push(adData.imagesTime);
-      } catch (e) {
-        // Skip invalid data
-      }
-    }
-  });
-
-  return allTimestamps.some(timestamp => timestamp <= oneMonthAgo);
-}
-
 interface MonthCount {
   [month: string]: number;
 }
 
 interface AnalyticsData {
-  phone_search_count: MonthCount;
-  image_search_count: MonthCount;
+  id: string;
+  phone_search_count: number;
+  image_search_count: number;
+  phone_search_monthly: MonthCount;
+  image_search_monthly: MonthCount;
   favs_count: number;
+  hidden_count: number;
   settings_enabled: {
     focusMode: boolean;
     adDeduplication: boolean;
@@ -50,8 +30,9 @@ interface AnalyticsData {
     nextOnlyVisible: boolean;
     defaultManualHideReason: boolean;
     whatsappMessage: boolean;
+    manualPhoneSearch: boolean;
+    manualImageSearch: boolean;
   };
-  os: string;
   user_agent: string;
 }
 
@@ -73,13 +54,14 @@ function getLast6Months(): string[] {
 }
 
 function collectAnalyticsData(): AnalyticsData {
-  const phoneSearchCount: MonthCount = {};
-  const imageSearchCount: MonthCount = {};
+  const phoneSearchMonthly: MonthCount = {};
+  const imageSearchMonthly: MonthCount = {};
   const last6Months = getLast6Months();
+  let hiddenCount = 0;
 
   last6Months.forEach(month => {
-    phoneSearchCount[month] = 0;
-    imageSearchCount[month] = 0;
+    phoneSearchMonthly[month] = 0;
+    imageSearchMonthly[month] = 0;
   });
 
   const allItems = WWStorage.exportData();
@@ -92,19 +74,35 @@ function collectAnalyticsData(): AnalyticsData {
 
         if (adData.phoneTime) {
           const month = getMonthKey(adData.phoneTime);
-          if (phoneSearchCount.hasOwnProperty(month)) {
-            phoneSearchCount[month]++;
+          if (phoneSearchMonthly.hasOwnProperty(month)) {
+            phoneSearchMonthly[month]++;
           }
         }
 
         if (adData.imagesTime) {
           const month = getMonthKey(adData.imagesTime);
-          if (imageSearchCount.hasOwnProperty(month)) {
-            imageSearchCount[month]++;
+          if (imageSearchMonthly.hasOwnProperty(month)) {
+            imageSearchMonthly[month]++;
           }
+        }
+
+        if (adData.visibility === 0 || adData.visibility === false) {
+          hiddenCount++;
         }
       } catch (e) {
         console.error('Error parsing ad data for analytics:', e);
+      }
+    }
+
+    const phoneMatch = key.match(/^ww2:phone:(.+)$/);
+    if (phoneMatch) {
+      try {
+        const phoneData = JSON.parse(value);
+        if (phoneData.hidden === 1 || phoneData.hidden === true) {
+          hiddenCount++;
+        }
+      } catch (e) {
+        // Skip invalid data
       }
     }
   });
@@ -118,28 +116,21 @@ function collectAnalyticsData(): AnalyticsData {
     nextOnlyVisible: WWStorage.isNextOnlyVisibleEnabled(),
     defaultManualHideReason: WWStorage.isDefaultManualHideReasonEnabled(),
     whatsappMessage: WWStorage.isWhatsappMessageEnabled(),
+    manualPhoneSearch: WWStorage.isManualPhoneSearchEnabled(),
+    manualImageSearch: WWStorage.isManualImageSearchEnabled(),
   };
-
-  const userAgent = navigator.userAgent;
-  const os = getOS(userAgent);
 
   return {
-    phone_search_count: phoneSearchCount,
-    image_search_count: imageSearchCount,
+    id: userId.get()!,
+    phone_search_count: WWStorage.getAnalytics().phoneSearchCount,
+    image_search_count: WWStorage.getAnalytics().imageSearchCount,
+    phone_search_monthly: phoneSearchMonthly,
+    image_search_monthly: imageSearchMonthly,
     favs_count: favsCount,
+    hidden_count: hiddenCount,
     settings_enabled: settingsEnabled,
-    os,
-    user_agent: userAgent,
+    user_agent: navigator.userAgent,
   };
-}
-
-function getOS(userAgent: string): string {
-  if (userAgent.includes('Windows')) return 'Windows';
-  if (userAgent.includes('Mac OS X') || userAgent.includes('Macintosh')) return 'macOS';
-  if (userAgent.includes('Linux')) return 'Linux';
-  if (userAgent.includes('Android')) return 'Android';
-  if (userAgent.includes('iOS') || userAgent.includes('iPhone') || userAgent.includes('iPad')) return 'iOS';
-  return 'Unknown';
 }
 
 async function acquirePermission() {
@@ -156,10 +147,8 @@ async function acquirePermission() {
 }
 
 export async function sendAnalyticsEvent(): Promise<void> {
-  const sentVersion = WWStorage.getAnalyticsSentVersion();
-
-  if (sentVersion === 1) {
-    console.log('Analytics event already sent, skipping');
+  if (!userId.get()) {
+    console.log('Analytics user ID not set, skipping');
     return;
   }
 
@@ -169,50 +158,48 @@ export async function sendAnalyticsEvent(): Promise<void> {
 
   const now = Date.now();
   const oneDayAgo = now - (24 * 60 * 60 * 1000);
-  const lastChecked = WWStorage.getAnalyticsLastChecked();
+  const { lastChecked } = WWStorage.getAnalytics();
 
   if (lastChecked && lastChecked > oneDayAgo) {
-    console.log('Analytics already checked today, skipping');
-    return;
-  }
-
-  if (!hasMonthOldData()) {
-    console.log('No month-old data yet, updating check time');
-    WWStorage.setAnalyticsLastChecked(now);
+    console.log('Analytics already sent today, skipping');
     return;
   }
 
   const analyticsData = collectAnalyticsData();
 
   try {
-    const response = await fetch(`${atob(SBU_B64)}/rest/v1/analytics_v1`, {
+    const response = await fetch(`${atob(SBU_B64)}/rest/v1/analytics_v2`, {
       method: 'POST',
       headers: {
         'apikey': atob(SBK_B64),
         'Authorization': `Bearer ${atob(SBK_B64)}`,
         'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
+        'Prefer': 'resolution=merge-duplicates,return=minimal'
       },
       body: JSON.stringify({
+        id: analyticsData.id,
         phone_search_count: analyticsData.phone_search_count,
         image_search_count: analyticsData.image_search_count,
+        phone_search_monthly: analyticsData.phone_search_monthly,
+        image_search_monthly: analyticsData.image_search_monthly,
         favs_count: analyticsData.favs_count,
+        hidden_count: analyticsData.hidden_count,
         settings_enabled: analyticsData.settings_enabled,
-        os: analyticsData.os,
         user_agent: analyticsData.user_agent,
+        updated_at: new Date().toISOString(),
       }),
     });
 
     if (response.ok) {
       console.log('Analytics event sent successfully');
-      WWStorage.setAnalyticsSentVersion(1);
-      WWStorage.setAnalyticsLastChecked(now);
+      WWStorage.setAnalytics({ ...WWStorage.getAnalytics(), lastChecked: now });
     } else {
       console.error('Failed to send analytics event:', response.status);
-      WWStorage.setAnalyticsLastChecked(now);
+      WWStorage.setAnalytics({ ...WWStorage.getAnalytics(), lastChecked: now });
     }
   } catch (error) {
     console.error('Error sending analytics event:', error);
-    WWStorage.setAnalyticsLastChecked(now);
+    WWStorage.setAnalytics({ ...WWStorage.getAnalytics(), lastChecked: now });
   }
 }
+

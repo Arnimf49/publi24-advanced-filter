@@ -585,22 +585,28 @@ export const WWStorage = {
     return localStorage.getItem('ww:storage:version');
   },
 
-  getAnalyticsSentVersion(): number | null {
-    const value = localStorage.getItem('ww:analytics-sent-version');
-    return value ? parseInt(value, 10) : null;
+  getAnalytics(): { phoneSearchCount: number; imageSearchCount: number; lastChecked: number | null } {
+    try {
+      const raw = localStorage.getItem('ww:analytics');
+      if (raw) return JSON.parse(raw);
+    } catch (e) {
+      // fall through to default
+    }
+    return { phoneSearchCount: 0, imageSearchCount: 0, lastChecked: null };
   },
 
-  setAnalyticsSentVersion(version: number): void {
-    localStorage.setItem('ww:analytics-sent-version', String(version));
+  setAnalytics(data: { phoneSearchCount: number; imageSearchCount: number; lastChecked: number | null }): void {
+    localStorage.setItem('ww:analytics', JSON.stringify(data));
   },
 
-  getAnalyticsLastChecked(): number | null {
-    const value = localStorage.getItem('ww:analytics-last-checked');
-    return value ? parseInt(value, 10) : null;
+  incrementPhoneSearchClickCount(): void {
+    const analytics = WWStorage.getAnalytics();
+    WWStorage.setAnalytics({ ...analytics, phoneSearchCount: analytics.phoneSearchCount + 1 });
   },
 
-  setAnalyticsLastChecked(timestamp: number): void {
-    localStorage.setItem('ww:analytics-last-checked', String(timestamp));
+  incrementImageSearchClickCount(): void {
+    const analytics = WWStorage.getAnalytics();
+    WWStorage.setAnalytics({ ...analytics, imageSearchCount: analytics.imageSearchCount + 1 });
   },
 
   getVersionSeen(): string | null {
@@ -698,7 +704,7 @@ export const WWStorage = {
 
   async upgrade(): Promise<void> {
     const version = WWStorage.getVersion();
-    const currentVersion = 7;
+    const currentVersion = 8;
     const parsedVersion = version ? parseInt(version, 10) : currentVersion;
 
     type MigrationFunction = () => void;
@@ -910,6 +916,17 @@ export const WWStorage = {
         _WW_STORE_CACHE.item = {};
         _WW_STORE_CACHE.phone = {};
         console.log(`Migration v6 -> v7 complete: Removed null properties and converted booleans from ${cleanedCount} items`);
+      },
+
+      // --- MIGRATION from v7 to v8 ---
+      7: () => {
+        console.log("Running migration v7 -> v8");
+        const oldKeys = [
+          'ww:analytics-sent-version',
+          'ww:analytics-last-checked',
+        ];
+        oldKeys.forEach(key => localStorage.removeItem(key));
+        console.log("Migration v7 -> v8 complete: Removed legacy analytics keys");
       }
     };
 

@@ -6,6 +6,7 @@ import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../common/globals";
 import {misc} from "./core/misc";
 import {iosUtils} from "./core/iosUtils";
 import {sendAnalyticsEvent} from "./core/analytics";
+import {userId} from "../common/userId";
 import {modalState} from "../common/modalState";
 import {utils} from "../common/utils";
 
@@ -89,7 +90,7 @@ WWStorage.upgrade()
   .then(() => {
     console.log('Booting publi24-advanced-filter');
 
-    // @TODO: Remove once not needed.
+    userId.init().catch(console.error);
     sendAnalyticsEvent().catch(console.error);
 
     try {
