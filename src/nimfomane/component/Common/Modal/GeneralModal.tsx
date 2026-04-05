@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react';
 import CommonGeneralModal from '../../../../common/components/Modal/GeneralModal';
-import {misc} from '../../../core/misc';
 
 type GeneralModalProps = {
   children: ReactNode;
@@ -14,8 +13,7 @@ type GeneralModalProps = {
 
 const GeneralModal: React.FC<GeneralModalProps> =
 (props) => {
-  const color = misc.getPubliTheme() === 'dark' ? 'rgb(60 84 123)' : '#1177bb';
-  return <CommonGeneralModal {...props} color={color}/>;
+  return <CommonGeneralModal {...props} color="rgb(47, 73, 121)"/>;
 };
 
 export default GeneralModal;

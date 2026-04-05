@@ -3,6 +3,7 @@ import styles from './GlobalButtons.module.scss';
 import {StarIcon} from '../../../common/components/Icons/StarIcon';
 import {MenuIcon} from '../../../common/components/Icons/MenuIcon';
 import {HistoryIcon} from '../../../common/components/Icons/HistoryIcon';
+import {FeedbackIcon} from '../../../common/components/Icons/FeedbackIcon';
 import {P24faLogoLight} from '../../../common/components/Logo/P24faLogoLight';
 import {IS_MOBILE_VIEW} from '../../../common/globals';
 import {utils} from "../../../common/utils";
@@ -11,6 +12,7 @@ type GlobalButtonsProps = {
   favsCount: number | null;
   onFavsClick: MouseEventHandler;
   onVersionHistoryClick: MouseEventHandler;
+  onFeedbackClick: MouseEventHandler;
   onMenuClick: MouseEventHandler;
   isMenuOpen: boolean;
   onMenuClose: () => void;
@@ -23,6 +25,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
   favsCount,
   onFavsClick,
   onVersionHistoryClick,
+  onFeedbackClick,
   onMenuClick,
   isMenuOpen,
   onMenuClose,
@@ -110,6 +113,18 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
           >
             <HistoryIcon fill="currentColor"/>
             <span>Istoric verziuni</span>
+          </button>
+          <button
+            type="button"
+            className={styles.menuItem}
+            data-wwid="feedback-button"
+            onClick={(e) => {
+              onFeedbackClick(e);
+              onMenuClose();
+            }}
+          >
+            <FeedbackIcon fill="currentColor"/>
+            <span>Feedback</span>
           </button>
         </div>
       )}

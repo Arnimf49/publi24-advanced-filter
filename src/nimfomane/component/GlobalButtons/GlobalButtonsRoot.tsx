@@ -3,6 +3,7 @@ import GlobalButtons from './GlobalButtons';
 import {NimfomaneStorage} from '../../core/storage';
 import FavoritesModalRoot from './FavoritesModal/FavoritesModalRoot';
 import VersionHistoryModal from './VersionHistoryModal/VersionHistoryModal';
+import FeedbackModal from '../../../common/components/FeedbackModal/FeedbackModal';
 import {versionHistory} from '../../data/versionHistory';
 
 type GlobalButtonsRootProps = {};
@@ -10,6 +11,7 @@ type GlobalButtonsRootProps = {};
 const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
   const [isFavsOpen, setFavsOpen] = useState(false);
   const [isVersionHistoryOpen, setVersionHistoryOpen] = useState(false);
+  const [isFeedbackOpen, setFeedbackOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [favsCount, setFavsCount] = useState<number | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
@@ -37,6 +39,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
   }, []);
 
   const onFavsClick: MouseEventHandler = useCallback(() => setFavsOpen(true), []);
+  const onFeedbackClick: MouseEventHandler = useCallback(() => setFeedbackOpen(true), []);
   const onVersionHistoryClick: MouseEventHandler = useCallback(() => {
     setVersionHistoryOpen(true);
     const currentVersion = versionHistory[0]?.version;
@@ -53,6 +56,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
         favsCount={favsCount}
         onFavsClick={onFavsClick}
         onVersionHistoryClick={onVersionHistoryClick}
+        onFeedbackClick={onFeedbackClick}
         onMenuClick={onMenuClick}
         isMenuOpen={isMenuOpen}
         onMenuClose={onMenuClose}
@@ -65,6 +69,9 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
       }
       {isVersionHistoryOpen &&
         <VersionHistoryModal onClose={() => setVersionHistoryOpen(false)}/>
+      }
+      {isFeedbackOpen &&
+        <FeedbackModal onClose={() => setFeedbackOpen(false)} color="rgb(47, 73, 121)"/>
       }
     </>
   );

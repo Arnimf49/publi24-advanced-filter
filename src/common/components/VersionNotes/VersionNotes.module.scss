@@ -1,11 +1,11 @@
 .versionNotes {
   padding: 16px 0;
   margin-bottom: 14px;
-  border-bottom: 2px solid #7a8a99;
+  border-bottom: 2px solid var(--separator-color, #7a8a99);
   color: #222;
 
   :global(.dark) & {
-    border-color: #485e71;
+    border-color: var(--separator-color, #485e71);
     color: rgb(220, 220, 220);
   }
 

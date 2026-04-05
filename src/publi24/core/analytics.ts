@@ -1,15 +1,13 @@
 import {WWStorage} from "./storage";
 import {userId} from "../../common/userId";
 import {permissions} from "../../common/permissions";
+import {supabaseClient} from "../../common/supabase/supabaseClient";
 
 // @ts-ignore
 if (typeof browser === "undefined" && typeof chrome !== "undefined") {
   // @ts-ignore
   var browser = chrome;
 }
-
-const SBU_B64 = 'aHR0cHM6Ly9vcWp0eGxiY3R4bnJkZ2pudmdicC5zdXBhYmFzZS5jbw==';
-const SBK_B64 = 'c2JfcHVibGlzaGFibGVfX2NtdTdNSzhlcHl5MWJXa1N3TzBFZ193Wl9PaWJaMg==';
 
 interface MonthCount {
   [month: string]: number;
@@ -168,14 +166,9 @@ export async function sendAnalyticsEvent(): Promise<void> {
   const analyticsData = collectAnalyticsData();
 
   try {
-    const response = await fetch(`${atob(SBU_B64)}/rest/v1/analytics_v2`, {
+    const response = await supabaseClient.request('/rest/v1/analytics_v2', {
       method: 'POST',
-      headers: {
-        'apikey': atob(SBK_B64),
-        'Authorization': `Bearer ${atob(SBK_B64)}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates,return=minimal'
-      },
+      headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
       body: JSON.stringify({
         id: analyticsData.id,
         phone_search_count: analyticsData.phone_search_count,

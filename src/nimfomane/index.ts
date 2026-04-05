@@ -3,6 +3,7 @@ import {IS_MOBILE_VIEW, IS_PROMOTER} from "../common/globals";
 import {renderer} from "./core/renderer";
 import {elementHelpers} from "./core/elementHelpers";
 import {utils} from "../common/utils";
+import {userId} from "../common/userId";
 
 const IS_TOPIC_PAGE = window.location.pathname.match(/^\/forum\/topic\//);
 const IS_PROFILE_PAGE = window.location.pathname.match(/^\/forum\/profile\//);
@@ -33,6 +34,7 @@ const runWithObserver = (callback: () => any, changingContainerSelector: string)
 
 NimfomaneStorage.upgrade()
   .then(() => {
+    userId.init().catch(console.error);
     if (IS_PROMOTER) {
       return;
     }
