@@ -8,6 +8,19 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.1',
+    releaseDate: '7 aprilie 2026',
+    changeNew: [
+      'Buton whatsapp, favorit și ascundere pe pagina de profil a escortei.',
+      'Formular de \'Feedback\'.',
+    ],
+    changeImprove: [
+      'Modalul cu poze încarcă numai din secțiunile principale pozele.',
+      'Pozele au link către topic și replică în care au fost încărcate.',
+      'Pozele în modal se încarcă mult mai rapid.',
+    ],
+  },
+  {
     version: '3.0.2',
     releaseDate: '18 martie 2026',
     changeImprove: [

@@ -8,6 +8,22 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.1',
+    releaseDate: '7 aprilie 2026',
+    changeNew: [
+      'Formular de \'Feedback\'.',
+      'Analitică V2.',
+    ],
+    changeImprove: [
+      'Scroll lin la acțiunea \'următorul anunț vizibil\'.',
+      'Buton global când \'următorul anunț vizibil\' este activat.',
+      'Schimbări minore de stil.',
+    ],
+    changeFix: [
+      'Încadrare corecată la inspector-escorte.com la rezultate poze.'
+    ]
+  },
+  {
     version: '3.0.1',
     releaseDate: '16 martie 2026',
     changeFix: [
