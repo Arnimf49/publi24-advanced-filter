@@ -1,51 +1,31 @@
-import React, {useState, useRef, MouseEventHandler, useMemo} from 'react';
+import React, {useState, useRef, MouseEventHandler} from 'react';
 import Modal from '../../../../common/components/Modal/Modal';
 import ContentModal from '../../../../common/components/Modal/ContentModal';
 import styles from './FavoritesModal.module.scss';
 import {StarIcon} from '../../../../common/components/Icons/StarIcon';
 import {EscortCard} from './EscortCard';
-import {cityService} from '../../../core/cityService';
-import {NimfomaneStorage} from '../../../core/storage';
 
 type FavoritesModalProps = {
   onClose: () => void;
   onClearFavorites: () => void;
   favorites: string[];
+  inLocationEscorts: string[];
+  otherLocationEscorts: string[];
+  currentCity: string | null;
 };
 
 const FavoritesModal: React.FC<FavoritesModalProps> = ({
   onClose,
   onClearFavorites,
   favorites = [],
+  inLocationEscorts,
+  otherLocationEscorts,
+  currentCity,
 }) => {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const deleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const isEmpty = favorites.length === 0;
-
-  const currentCity = useMemo(() => cityService.getCurrentCity(), []);
-
-  const {inLocationEscorts, otherLocationEscorts} = useMemo(() => {
-    if (!currentCity) {
-      return {inLocationEscorts: favorites, otherLocationEscorts: []};
-    }
-
-    const inLocation: string[] = [];
-    const otherLocation: string[] = [];
-
-    favorites.forEach((user) => {
-      const escort = NimfomaneStorage.getEscort(user);
-      const escortCity = escort.profileStats?.currentCity?.name;
-
-      if (escortCity === currentCity) {
-        inLocation.push(user);
-      } else {
-        otherLocation.push(user);
-      }
-    });
-
-    return {inLocationEscorts: inLocation, otherLocationEscorts: otherLocation};
-  }, [favorites, currentCity]);
 
   const handleClearClick: MouseEventHandler = (event) => {
     event.stopPropagation();

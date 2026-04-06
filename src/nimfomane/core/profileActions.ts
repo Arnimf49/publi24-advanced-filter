@@ -2,10 +2,11 @@ import {elementHelpers} from "./elementHelpers";
 import {NimfomaneStorage, EscortItem} from "./storage";
 import {cityService} from "./cityService";
 import {page} from "../../common/page";
+import {jsonPage} from "./jsonPage";
 
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
-async function findCurrentCity(doc: Document): Promise<{name: string; topicUrl: string} | undefined> {
+function findCurrentCity(doc: Document): {name: string; topicUrl: string} | undefined {
   const streamItems = doc.querySelectorAll('.ipsStreamItem_status a:last-child');
   const cityLinks: Array<{url: string; city: string; topicUrl: string}> = [];
 
@@ -39,6 +40,17 @@ async function findCurrentCity(doc: Document): Promise<{name: string; topicUrl: 
   return undefined;
 }
 
+function shouldLoadProfileStats(user: string): boolean {
+  const escort = NimfomaneStorage.getEscort(user);
+
+  if (!escort.profileStatsTime) {
+    return true;
+  }
+
+  const age = Date.now() - escort.profileStatsTime;
+  return age > CACHE_DURATION;
+}
+
 export const profileActions = {
   determineEscort() {
     if (elementHelpers.isProfilePageEscort(document)) {
@@ -48,15 +60,14 @@ export const profileActions = {
   },
 
   async loadProfileStats(user: string, profileUrl: string, priority: number = 110): Promise<void> {
-    try {
-      const doc = await page.load(profileUrl, {priority});
+    const contentUrl = profileUrl.replace(/\/$/, '') + '/content/?all_activity=1&listResort=1';
 
+    const profilePromise = page.load(profileUrl, {priority}).then(doc => {
       const stats: EscortItem['profileStats'] = {};
 
       const profileStatsDiv = doc.querySelector('#elProfileStats');
       if (profileStatsDiv) {
         const postsItem = profileStatsDiv.querySelector<HTMLLIElement>('ul li:first-child');
-        console.log(postsItem!.innerText);
         stats.posts = parseInt(postsItem!.innerText.replace(/Posts|,/g, '').trim());
 
         const lastVisitedItem = profileStatsDiv.querySelector<HTMLLIElement>('ul li:nth-child(3) time');
@@ -68,27 +79,39 @@ export const profileActions = {
         stats.reputation = repScoreElement.textContent!.trim();
       }
 
-      const currentCity = await findCurrentCity(doc);
-      if (currentCity) {
-        stats.currentCity = currentCity;
-      }
+      const existing = NimfomaneStorage.getEscort(user).profileStats || {};
+      NimfomaneStorage.setEscortProp(user, 'profileStats', {...existing, ...stats});
+    }).catch(error => console.error(`Error loading profile page for ${user}:`, error));
 
-      NimfomaneStorage.setEscortProp(user, 'profileStats', stats);
-      NimfomaneStorage.setEscortProp(user, 'profileStatsTime', Date.now());
-    } catch (error) {
-      console.error(`Error loading profile stats for ${user}:`, error);
+    const contentPromise = jsonPage.load(contentUrl, {priority}).then(doc => {
+      const currentCity = findCurrentCity(doc);
+      if (currentCity) {
+        const existing = NimfomaneStorage.getEscort(user).profileStats || {};
+        NimfomaneStorage.setEscortProp(user, 'profileStats', {...existing, currentCity});
+      }
+    }).catch(error => console.error(`Error loading content page for ${user}:`, error));
+
+    await Promise.all([profilePromise, contentPromise]);
+    NimfomaneStorage.setEscortProp(user, 'profileStatsTime', Date.now());
+  },
+
+  async refreshFavoritesProfileStats() {
+    const favorites = NimfomaneStorage.getFavorites();
+    const toRefresh = favorites.filter(user => shouldLoadProfileStats(user));
+
+    for (let i = 0; i < toRefresh.length; i++) {
+      const user = toRefresh[i];
+      const escort = NimfomaneStorage.getEscort(user);
+      const profileUrl = escort.profileLink || `https://www.nimfomane.com/forum/profile/${encodeURIComponent(user)}/`;
+      await profileActions.loadProfileStats(user, profileUrl);
+      if (i < toRefresh.length - 1) {
+        await new Promise(r => setTimeout(r, 5000));
+      }
     }
   },
 
-  shouldLoadProfileStats(user: string): boolean {
-    const escort = NimfomaneStorage.getEscort(user);
-
-    if (!escort.profileStatsTime) {
-      return true;
-    }
-
-    const age = Date.now() - escort.profileStatsTime;
-    return age > CACHE_DURATION;
+  hasNeverLoadedProfileStats(user: string): boolean {
+    return !NimfomaneStorage.getEscort(user).profileStatsTime;
   },
 
   isProfileStatsStale(user: string): boolean {

@@ -2,13 +2,13 @@ import {expect, test} from "../helpers/fixture";
 import {utilsNimfomane} from "../helpers/utilsNimfomane";
 import {Page} from "playwright-core";
 
-async function expectFavoritesSectionHeaders(page: Page, visible: boolean, inLocationCount?: number, otherLocationsCount?: number) {
+async function expectFavoritesSectionHeaders(page: Page, visible: boolean, inLocationCount?: number, otherLocationsCount?: number, options?: {timeout?: number}) {
   if (visible) {
-    await expect(page.locator('[data-wwid="section-in-location"]')).toContainText(`În locație (${inLocationCount})`);
-    await expect(page.locator('[data-wwid="section-other-locations"]')).toContainText(`În alte locații (${otherLocationsCount})`);
+    await expect(page.locator('[data-wwid="section-in-location"]')).toContainText(`În locație (${inLocationCount})`, options);
+    await expect(page.locator('[data-wwid="section-other-locations"]')).toContainText(`În alte locații (${otherLocationsCount})`, options);
   } else {
-    await expect(page.locator('[data-wwid="section-in-location"]')).not.toBeVisible();
-    await expect(page.locator('[data-wwid="section-other-locations"]')).not.toBeVisible();
+    await expect(page.locator('[data-wwid="section-in-location"]')).not.toBeVisible(options);
+    await expect(page.locator('[data-wwid="section-other-locations"]')).not.toBeVisible(options);
   }
 }
 
@@ -25,7 +25,8 @@ test('Should display escort stats in favorites.', async ({ page }) => {
     posts: 1234,
     lastVisited: oneHourAgo,
     reputation: '567',
-    lastPostedSectionUrl: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'
+    lastPostedSectionUrl: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/',
+    delay: 2000,
   });
 
   await page.locator('[data-wwid="favs-button"]').click();
@@ -71,7 +72,8 @@ test('Should refresh escort stats after a time in favorites.', async ({ page }) 
     posts: 5678,
     lastVisited: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
     reputation: '567',
-    lastPostedSectionUrl: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'
+    lastPostedSectionUrl: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/',
+    delay: 5000,
   });
 
   await utilsNimfomane.throttleReload(page);
@@ -97,9 +99,11 @@ test('Should order favorites based on last visited time.', async ({ page }) => {
 
   await utilsNimfomane.interceptEscortStats(page, first.user, {
     lastVisited: twoHoursAgo,
+    lastPostedSectionUrl: 'https://nimfomane.com/forum/forum/21-escorte-timisoara/',
   });
   await utilsNimfomane.interceptEscortStats(page, second.user, {
     lastVisited: oneHourAgo,
+    lastPostedSectionUrl: 'https://nimfomane.com/forum/forum/21-escorte-timisoara/',
   });
 
   await page.locator('[data-wwid="favs-button"]').click();
@@ -111,9 +115,71 @@ test('Should order favorites based on last visited time.', async ({ page }) => {
   await page.locator('[data-wwid="favorites-modal"] [data-wwid="close"]').click();
   await page.locator('[data-wwid="favs-button"]').click();
 
+  await expect(escortCards.first().locator('[data-wwid="stat-last-visited"][data-wwlastvisited]:not([data-wwlastvisited=""])')).toBeVisible({timeout: 5000});
+
   const firstCardDate = await escortCards.first().locator('[data-wwid="stat-last-visited"]').getAttribute('data-wwlastvisited');
   const secondCardDate = await escortCards.last().locator('[data-wwid="stat-last-visited"]').getAttribute('data-wwlastvisited');
   expect(new Date(firstCardDate!).getTime()).toBeGreaterThan(new Date(secondCardDate!).getTime());
+});
+
+test('Should dynamically move escort to in-location section when city updates while modal is open.', async ({ page }) => {
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'});
+  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+
+  await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
+  await page.waitForTimeout(200);
+
+  await utilsNimfomane.setEscortStorageProp(page, user, 'profileStats', {
+    currentCity: {name: 'București', topicUrl: 'https://nimfomane.com/forum/forum/5-top-escorte-bucuresti/'},
+  });
+
+  await utilsNimfomane.interceptEscortStats(page, user, {
+    lastPostedSectionUrl: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/',
+    delay: 3000,
+  });
+
+  await page.locator('[data-wwid="favs-button"]').click();
+  await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
+  await expect(page.locator('[data-wwid="section-other-locations"]')).toBeVisible();
+  await expect(page.locator('[data-wwid="section-in-location"]')).not.toBeVisible();
+
+  await expect(page.locator('[data-wwid="section-in-location"]')).toBeVisible({timeout: 10000});
+  await expect(page.locator('[data-wwid="section-other-locations"]')).not.toBeVisible();
+});
+
+test('Should refresh favorites stats in background without opening the modal.', async ({ page }) => {
+  await utilsNimfomane.open(page);
+  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+
+  await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
+  await page.waitForTimeout(200);
+
+  await utilsNimfomane.setEscortStorageProp(page, user, 'profileStats', undefined);
+  await utilsNimfomane.setEscortStorageProp(page, user, 'profileStatsTime', undefined);
+
+  await utilsNimfomane.interceptEscortStats(page, user, {
+    posts: 9999,
+    lastVisited: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+    lastPostedSectionUrl: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/',
+  });
+
+  await utilsNimfomane.throttleReload(page);
+
+  await page.waitForFunction(
+    (user) => {
+      const escort = JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${user}`) || '{}');
+      return escort.profileStats?.posts === 9999;
+    },
+    user,
+    {timeout: 15000}
+  );
+
+  await page.locator('[data-wwid="favs-button"]').click();
+  await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
+
+  const escortCard = page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-card"]');
+  await expect(escortCard.locator('[data-wwid="stat-posts"] [data-wwid="inline-loader"]')).not.toBeVisible();
+  await expect(escortCard.locator('[data-wwid="stat-posts"]')).toContainText('9999');
 });
 
 test('Should display location titles in various conditions.', async ({ page }) => {
@@ -134,12 +200,8 @@ test('Should display location titles in various conditions.', async ({ page }) =
   await utilsNimfomane.goto(page, 'https://nimfomane.com/forum/forum/201-discutii-generale-cluj/');
   await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
-  await expect(page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-card"] [data-wwid="stat-location"] [data-wwid="inline-loader"]').last()).not.toBeVisible({timeout: 15000});
 
-  await page.locator('[data-wwid="favorites-modal"] [data-wwid="close"]').click();
-  await page.locator('[data-wwid="favs-button"]').click();
-  await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
-  await expectFavoritesSectionHeaders(page, true, 1, 2);
+  await expectFavoritesSectionHeaders(page, true, 1, 2, {timeout: 15000});
 
   await utilsNimfomane.goto(page, 'https://nimfomane.com/forum/forum/3-discutii-si-dezbateri-despre-piata-escortelor-din-romania/');
   await page.locator('[data-wwid="favs-button"]').click();

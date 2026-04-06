@@ -197,6 +197,7 @@ export const utilsNimfomane = {
       lastVisited?: string;
       reputation?: string;
       lastPostedSectionUrl?: string;
+      delay?: number;
     }
   ) {
     const cheerio = await import('cheerio');
@@ -221,18 +222,51 @@ export const utilsNimfomane = {
         $('.cProfileRepScore').text(stats.reputation);
       }
 
-      if (stats.lastPostedSectionUrl) {
-        $('.ipsStreamItem_status a:last-child').slice(0, 3).each(function() {
-          $(this).attr('href', stats.lastPostedSectionUrl);
-        });
-      }
-
       const modifiedBody = $.html();
+
+      if (stats.delay) {
+        await new Promise(r => setTimeout(r, stats.delay));
+      }
 
       await route.fulfill({
         response,
         body: modifiedBody,
       });
     });
+
+    if (stats.lastPostedSectionUrl !== undefined) {
+      await page.route(`${profileLink}content/**`, async (route) => {
+        const response = await route.fetch();
+        const json = await response.json();
+        const $ = cheerio.load(json.rows || '');
+        if (stats.delay) {
+          await new Promise(r => setTimeout(r, stats.delay));
+        }
+
+        const existingItems = $('.ipsStreamItem_status a:last-child');
+        if (existingItems.length >= 3) {
+          existingItems.slice(0, 3).each(function() {
+            $(this).attr('href', stats.lastPostedSectionUrl);
+          });
+        } else {
+          for (let i = 0; i < 3; i++) {
+            $('body').append(`
+              <div class="ipsStreamItem">
+                <div class="ipsStreamItem_title"><a href="https://nimfomane.com/forum/topic/1-test/">Topic</a></div>
+                <div class="ipsStreamItem_status"><a href="${stats.lastPostedSectionUrl}">section</a></div>
+              </div>
+            `);
+          }
+        }
+
+        json.rows = $.html();
+
+        await route.fulfill({
+          response,
+          body: JSON.stringify(json),
+          contentType: 'application/json',
+        });
+      });
+    }
   },
 };

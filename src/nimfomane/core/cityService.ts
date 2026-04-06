@@ -109,7 +109,8 @@ for (const [city, links] of Object.entries(CITY_TO_LINKS)) {
 
 export const cityService = {
   getCityFromForumUrl(url: string): string | null {
-    return LINK_TO_CITY[url] || null;
+    const normalized = url.replace(/\/page\/\d+\/?$/, '/').replace(/([^/])$/, '$1/');
+    return LINK_TO_CITY[normalized] || null;
   },
 
   getCurrentCity(): string | null {

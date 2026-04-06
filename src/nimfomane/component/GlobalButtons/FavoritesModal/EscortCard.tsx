@@ -47,12 +47,6 @@ export const EscortCard: React.FC<EscortCardProps> = ({user, index}) => {
 
   const profileUrl = escort.profileLink || `https://www.nimfomane.com/forum/profile/${encodeURIComponent(user)}/`;
 
-  useEffect(() => {
-    if (profileActions.shouldLoadProfileStats(user)) {
-      profileActions.loadProfileStats(user, profileUrl);
-    }
-  }, [user, profileUrl]);
-
   const isImageLoading = escort.optimizedProfileImage === undefined && !escortMemoryState.escortAnalysisError;
   const loadError = escortMemoryState.escortAnalysisError;
   const showImage = typeof escort.optimizedProfileImage === "string" && !hasImageError && !loadError;
@@ -60,9 +54,8 @@ export const EscortCard: React.FC<EscortCardProps> = ({user, index}) => {
   const showError = hasImageError || !!loadError;
 
   const profileStats = escort.profileStats;
-  const isStatsLoading = !profileStats;
+  const isStatsLoading = !escort.profileStatsTime;
   const isStatsStale = profileActions.isProfileStatsStale(user);
-
 
   return (
     <>

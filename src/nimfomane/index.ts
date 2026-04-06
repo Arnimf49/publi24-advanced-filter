@@ -4,6 +4,7 @@ import {renderer} from "./core/renderer";
 import {elementHelpers} from "./core/elementHelpers";
 import {utils} from "../common/utils";
 import {userId} from "../common/userId";
+import {profileActions} from "./core/profileActions";
 
 const IS_TOPIC_PAGE = window.location.pathname.match(/^\/forum\/topic\//);
 const IS_PROFILE_PAGE = window.location.pathname.match(/^\/forum\/profile\//);
@@ -61,6 +62,7 @@ NimfomaneStorage.upgrade()
     }
 
     renderer.renderGlobalButtons();
+    profileActions.refreshFavoritesProfileStats().catch(console.error);
 
     if (IS_LISTING_PAGE && IS_ESCORT_LISTING) {
       const registerItems = () => {
