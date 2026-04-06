@@ -7,12 +7,15 @@ import {userId} from "../common/userId";
 
 const IS_TOPIC_PAGE = window.location.pathname.match(/^\/forum\/topic\//);
 const IS_PROFILE_PAGE = window.location.pathname.match(/^\/forum\/profile\//);
-const IS_PROFILE_PAGE_ESCORT = IS_PROFILE_PAGE
-  && elementHelpers.isProfilePageEscort(document);
-const IS_LISTING_PAGE = !!document.querySelector('.ipsDataList.cForumTopicTable');
-const IS_ESCORT_LISTING =
-  document.querySelector<HTMLElement>('[data-role="breadcrumbList"] li:last-child')?.innerText.match(/escorte|masaj/i) &&
-  !document.querySelector<HTMLElement>('[data-role="breadcrumbList"] li:nth-child(2)')?.innerText.match(/nimfomane forum/i);
+
+const waitForSiteLoad = () => new Promise<void>(resolve => {
+  const interval = setInterval(() => {
+    if (document.body && document.getElementById('ipsLayout_footer')) {
+      clearInterval(interval);
+      resolve();
+    }
+  }, 5);
+});
 
 const runWithObserver = (callback: () => any, changingContainerSelector: string) => {
   const observer = new MutationObserver((mutationsList) => {
@@ -33,7 +36,15 @@ const runWithObserver = (callback: () => any, changingContainerSelector: string)
 }
 
 NimfomaneStorage.upgrade()
+  .then(waitForSiteLoad)
   .then(() => {
+    const IS_PROFILE_PAGE_ESCORT = IS_PROFILE_PAGE
+      && elementHelpers.isProfilePageEscort(document);
+    const IS_LISTING_PAGE = !!document.querySelector('.ipsDataList.cForumTopicTable');
+    const IS_ESCORT_LISTING =
+      document.querySelector<HTMLElement>('[data-role="breadcrumbList"] li:last-child')?.innerText.match(/escorte|masaj/i) &&
+      !document.querySelector<HTMLElement>('[data-role="breadcrumbList"] li:nth-child(2)')?.innerText.match(/nimfomane forum/i);
+
     userId.init().catch(console.error);
     if (IS_PROMOTER) {
       return;
