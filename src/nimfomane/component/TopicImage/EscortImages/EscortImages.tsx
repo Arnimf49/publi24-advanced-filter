@@ -13,7 +13,7 @@ import classes from './EscortImages.module.scss';
 import {CloseIcon} from "../../../../publi24/component/Common/Icons/CloseIcon";
 import {utils} from "../../../../common/utils";
 import {Loader} from "../../../../common/components/Loader/Loader";
-import ErrorDisplay from "../../ErrorDisplay/ErrorDisplay";
+import ErrorDisplay from "../../Common/ErrorDisplay/ErrorDisplay";
 import {IS_MOBILE_VIEW} from "../../../../common/globals";
 import {P24faLogoLight} from "../../../../common/components/Logo/P24faLogoLight";
 import {nimfomaneUtils} from "../../../core/nimfomaneUtils";
