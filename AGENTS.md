@@ -12,7 +12,7 @@ export const userId = {
 ```
 
 ## Verifying changes
-After making code changes, only run a TypeScript typecheck — do **not** run `npm run build`:
+Only run a TypeScript typecheck if TypeScript files were changed **and** you are unsure whether the change is type-correct. Do **not** run `npm run build`:
 ```
 npx tsc --noEmit
 ```

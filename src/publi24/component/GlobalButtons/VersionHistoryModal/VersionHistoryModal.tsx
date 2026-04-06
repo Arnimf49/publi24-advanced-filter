@@ -9,7 +9,7 @@ type VersionHistoryModalProps = {
 };
 
 const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({ onClose }) => {
-  const separatorColor = misc.getPubliTheme() === 'dark' ? 'rgb(60, 84, 123)' : '#1177bb';
+  const separatorColor = misc.getPubliTheme() === 'dark' ? 'rgb(60, 84, 123)' : '#555';
 
   return (
     <GeneralModal

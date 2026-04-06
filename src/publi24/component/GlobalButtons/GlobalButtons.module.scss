@@ -550,31 +550,31 @@
 @keyframes menuItemVersionPulse {
   0%, 100% {
     transform: scale(1);
-    background: rgba(0, 0, 0, 0.03);
+    background: rgb(234 234 243);
   }
   3.75% {
     transform: scale(1.05);
-    background: rgba(0, 0, 0, 0.09);
+    background: rgb(213 216 237);
   }
   7.5% {
     transform: scale(1);
-    background: rgba(0, 0, 0, 0.03);
+    background: rgb(234 234 243);
   }
   11.25% {
     transform: scale(1.05);
-    background: rgba(0, 0, 0, 0.09);
+    background: rgb(213 216 237);
   }
   15% {
     transform: scale(1);
-    background: rgba(0, 0, 0, 0.03);
+    background: rgb(234 234 243);
   }
   18.75% {
     transform: scale(1.05);
-    background: rgba(0, 0, 0, 0.09);
+    background: rgb(213 216 237);
   }
   22.5%, 97.5% {
     transform: scale(1);
-    background: rgba(0, 0, 0, 0.03);
+    background: rgb(234 234 243);
   }
 }
 
