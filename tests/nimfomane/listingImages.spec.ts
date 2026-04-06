@@ -171,6 +171,28 @@ test('Should show error icon when topic image fails to load.', async ({page}) =>
   await expect(page.locator(`[data-wwtopic="${id}"] [data-wwid="image-error-icon"]`)).toBeVisible();
 })
 
+test('Should show only loader, not error, when stale image fails but new images are being fetched.', async ({page}) => {
+  await utilsNimfomane.open(page);
+  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+
+  await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImage', 'https://nimfomane.com/broken-image-that-does-not-exist.jpg');
+  await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImageTime', Date.now());
+  await utilsNimfomane.throttleReload(page);
+
+  const imageContainer = page.locator(`[data-wwtopic="${id}"] [data-wwid="topic-image"]`);
+  await expect(imageContainer.locator('[data-wwid="image-error-icon"]')).toBeVisible();
+
+  await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImageTime', Date.now() - (8.64e+7 * 5));
+  await utilsNimfomane.throttleReload(page);
+
+  await expect(imageContainer.locator('[data-wwid="loader"]')).toBeVisible();
+  await expect(imageContainer.locator('[data-wwid="image-error-icon"]')).toHaveCount(0);
+
+  await expect(
+    imageContainer.locator('[data-wwid="topic-image-img"], [data-wwid="no-image-icon"], [data-wwid="image-error-icon"]')
+  ).toBeVisible({timeout: 15000});
+})
+
 test('Should show publi24 link overlay for non-escort topics.', async ({page, context}) => {
   await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/30-escorte-baia-mare/'});
   const topicId = '174418';
@@ -201,7 +223,7 @@ test('Should reload publi link after 10 days.', async ({page, context}) => {
 
   await utilsNimfomane.setTopicStorageProp(page, topicId, 'publiLinkDeterminationTime', Date.now() - (8.64e+7 * 11));
   await utils.modifyRouteBody(page, `https://nimfomane.com/forum/topic/${topicId}-**`, ($) => {
-    const commentContent = $('[data-role="commentContent"]').first();
+    const commentContent = $('[data-role="commentContent"]').last();
     commentContent.html('<a href="https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850332.html">publi24 link</a>');
   });
   await utilsNimfomane.throttleReload(page);

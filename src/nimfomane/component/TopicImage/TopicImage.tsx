@@ -52,7 +52,7 @@ export const TopicImage: FC<TopicImageProps> =
         </>
         : null}
       {url === null && !loadError && !publiLink && !isLoading ? <NoImageIcon/> : null}
-      {(hasError || loadError) ? <ImageErrorIcon/> : null}
+      {(hasError || loadError) && !isLoading ? <ImageErrorIcon/> : null}
       {publiLink && typeof publiLink === 'string' && (
         <div className={classes.publiLink} data-wwid="publi24-link">
           <span className={classes.publiText}>publi</span>
