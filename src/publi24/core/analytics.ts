@@ -145,6 +145,10 @@ async function acquirePermission() {
 }
 
 export async function sendAnalyticsEvent(): Promise<void> {
+  if (localStorage.getItem('_pw_init') === 'true') {
+    return;
+  }
+
   if (!userId.get()) {
     console.log('Analytics user ID not set, skipping');
     return;
