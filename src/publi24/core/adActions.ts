@@ -426,13 +426,25 @@ export const adActions = {
 
   async findVisibleAd (afterArticleId?: string | null): Promise<string | null> {
     const wait = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+
+    const getNextPageArrow = (): HTMLElement | null => {
+      const paginationArrows = document.querySelectorAll<HTMLLinkElement>('.pagination .arrow');
+      if (!paginationArrows.length) return null;
+      const lastArrowLink = paginationArrows[paginationArrows.length - 1].querySelector('a');
+      if (!lastArrowLink) return null;
+      const currentPageMatch = window.location.search.match(/[?&]pag=(\d+)/);
+      const currentPage = currentPageMatch ? parseInt(currentPageMatch[1], 10) : 1;
+      const arrowHref = lastArrowLink.getAttribute('href') || '';
+      const arrowPageMatch = arrowHref.match(/[?&]pag=(\d+)/);
+      const arrowPage = arrowPageMatch ? parseInt(arrowPageMatch[1], 10) : 1;
+      return arrowPage > currentPage ? lastArrowLink : null;
+    };
+
     const goToNextPage = (): Promise<never> => new Promise(() => {
       WWStorage.setFindNextVisibleAd(true);
-      setTimeout(() => nextPageArrow.click(), 600);
+      setTimeout(() => getNextPageArrow()!.click(), 600);
     });
 
-    const paginationArrows = document.querySelectorAll<HTMLLinkElement>('.pagination .arrow');
-    const nextPageArrow = paginationArrows[paginationArrows.length - 1].querySelector('a') as HTMLElement;
     const isVisible = (ad: HTMLDivElement) =>
       adData.getItemVisibility(ad.getAttribute('data-articleid') as string)
       && getComputedStyle(ad).display !== 'none';
@@ -450,6 +462,10 @@ export const adActions = {
     const staleAds = ads.filter((ad) => adData.isStaleAnalyze(ad.getAttribute('data-articleid') as string));
 
     if (!candidates.length) {
+      if (!getNextPageArrow()) {
+        WWStorage.setFindNextVisibleAd(false);
+        return null;
+      }
       return goToNextPage();
     } else if (!WWStorage.isNextOnlyVisibleEnabled()) {
       adActions.scrollIntoView(candidates[0]);
@@ -489,6 +505,10 @@ export const adActions = {
         }
       }
 
+      if (!getNextPageArrow()) {
+        WWStorage.setFindNextVisibleAd(false);
+        return null;
+      }
       return goToNextPage();
     }
   },

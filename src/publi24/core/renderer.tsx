@@ -169,7 +169,13 @@ export const renderer = {
 
   renderNextVisibleAdButton() {
     const paginationArrows = document.querySelectorAll<HTMLLinkElement>('.pagination .arrow');
-    const nextPageArrow = paginationArrows[paginationArrows.length - 1].querySelector('a');
+    const lastArrowLink = paginationArrows.length ? paginationArrows[paginationArrows.length - 1].querySelector('a') : null;
+    const currentPageMatch = window.location.search.match(/[?&]pag=(\d+)/);
+    const currentPage = currentPageMatch ? parseInt(currentPageMatch[1], 10) : 1;
+    const arrowHref = lastArrowLink?.getAttribute('href') || '';
+    const arrowPageMatch = arrowHref.match(/[?&]pag=(\d+)/);
+    const arrowPage = arrowPageMatch ? parseInt(arrowPageMatch[1], 10) : 1;
+    const nextPageArrow = lastArrowLink && arrowPage > currentPage ? lastArrowLink : null;
 
     if (!nextPageArrow) {
       console.warn('Failed to register next visible ad button. Missing next page arrow.')

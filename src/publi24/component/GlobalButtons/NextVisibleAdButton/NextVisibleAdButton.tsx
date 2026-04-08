@@ -5,6 +5,7 @@ import styles from './NextVisibleAdButton.module.scss';
 
 const NextVisibleAdButton: React.FC = () => {
   const [loading, setLoading] = useState(false);
+  const [noMore, setNoMore] = useState(false);
   const pendingRef = useRef(false);
   const lastFoundIdRef = useRef<string | null>(null);
 
@@ -12,9 +13,15 @@ const NextVisibleAdButton: React.FC = () => {
     if (pendingRef.current) return;
     pendingRef.current = true;
     setLoading(true);
+    setNoMore(false);
     try {
       const foundId = await adActions.findVisibleAd(lastFoundIdRef.current);
-      lastFoundIdRef.current = foundId;
+      if (foundId === null) {
+        setNoMore(true);
+        lastFoundIdRef.current = null;
+      } else {
+        lastFoundIdRef.current = foundId;
+      }
     }
     catch (e) {
       console.error(e);
@@ -34,16 +41,18 @@ const NextVisibleAdButton: React.FC = () => {
       type="button"
       className={styles.nextVisibleAdButton}
       data-wwid="next-visible-ad-global"
-      disabled={loading}
+      disabled={loading || noMore}
       onClick={run}
     >
-      <InlineLoader
-        size={15}
-        spinning={loading}
-        color="white"
-        trackColor="rgb(223 223 223 / 30%)"
-      />
-      Următorul &gt;
+      {!noMore && (
+        <InlineLoader
+          size={15}
+          spinning={loading}
+          color="white"
+          trackColor="rgb(223 223 223 / 30%)"
+        />
+      )}
+      {noMore ? 'Niciun anunț ✓' : 'Următorul >'}
     </button>
   );
 };
