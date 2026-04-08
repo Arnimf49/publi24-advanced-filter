@@ -1,7 +1,7 @@
 import React, {MouseEventHandler, useEffect, useRef, useState} from 'react';
 import styles from './GlobalButtons.module.scss';
 import {PhoneIcon} from "../Common/Icons/PhoneIcon";
-import {SettingsIcon} from "../Common/Icons/SettingsIcon";
+import {SettingsIcon} from "../../../common/components/Icons/SettingsIcon";
 import {StarIcon} from "../../../common/components/Icons/StarIcon";
 import {MenuIcon} from "../../../common/components/Icons/MenuIcon";
 import TutorialIcon from "../Common/Icons/TutorialIcon";

@@ -4,6 +4,7 @@ import {StarIcon} from '../../../common/components/Icons/StarIcon';
 import {MenuIcon} from '../../../common/components/Icons/MenuIcon';
 import {HistoryIcon} from '../../../common/components/Icons/HistoryIcon';
 import {FeedbackIcon} from '../../../common/components/Icons/FeedbackIcon';
+import {SettingsIcon} from '../../../common/components/Icons/SettingsIcon';
 import {P24faLogoLight} from '../../../common/components/Logo/P24faLogoLight';
 import {IS_MOBILE_VIEW} from '../../../common/globals';
 import {utils} from "../../../common/utils";
@@ -11,6 +12,7 @@ import {utils} from "../../../common/utils";
 type GlobalButtonsProps = {
   favsCount: number | null;
   onFavsClick: MouseEventHandler;
+  onSettingsClick: MouseEventHandler;
   onVersionHistoryClick: MouseEventHandler;
   onFeedbackClick: MouseEventHandler;
   onMenuClick: MouseEventHandler;
@@ -24,6 +26,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
 ({
   favsCount,
   onFavsClick,
+  onSettingsClick,
   onVersionHistoryClick,
   onFeedbackClick,
   onMenuClick,
@@ -125,6 +128,18 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
           >
             <FeedbackIcon fill="currentColor"/>
             <span>Feedback</span>
+          </button>
+          <button
+            type="button"
+            className={styles.menuItem}
+            data-wwid="settings-button"
+            onClick={(e) => {
+              onSettingsClick(e);
+              onMenuClose();
+            }}
+          >
+            <SettingsIcon fill="currentColor"/>
+            <span>Setări</span>
           </button>
         </div>
       )}

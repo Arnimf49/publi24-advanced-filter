@@ -9,6 +9,33 @@ import {analyzer} from "./analyzer";
 import {IS_MOBILE_VIEW} from "../../common/globals";
 import GlobalButtonsRoot from "../component/GlobalButtons/GlobalButtonsRoot";
 
+const focusModeHiddenIds = new Set<string>();
+
+function updateHiddenCountIndicator() {
+  const list = document.querySelector<HTMLElement>('.ipsDataList.cForumTopicTable');
+  if (!list) return;
+
+  const count = focusModeHiddenIds.size;
+  let indicator = list.querySelector<HTMLLIElement>('li[data-wwid="hidden-count-indicator"]');
+
+  if (count === 0) {
+    indicator?.remove();
+    return;
+  }
+
+  if (!indicator) {
+    indicator = document.createElement('li');
+    indicator.setAttribute('data-wwid', 'hidden-count-indicator');
+    indicator.style.textAlign = 'center';
+    indicator.style.padding = '20px';
+    indicator.style.color = '#999';
+    indicator.style.fontWeight = 'bold';
+    list.appendChild(indicator);
+  }
+
+  indicator.textContent = `${count} ${count === 1 ? 'topic ascuns' : 'topice ascunse'} de tot`;
+}
+
 export const renderer = {
   renderGlobalButtons() {
     const globalButtonsContainer = document.createElement('div');
@@ -51,6 +78,19 @@ export const renderer = {
     NimfomaneStorage.setTopicProp(id, 'url', url);
 
     container.setAttribute('data-wwtopic', id);
+
+    if (NimfomaneStorage.isFocusMode()) {
+      const topic = NimfomaneStorage.getTopic(id);
+      const escortUser = topic.isOfEscort ? topic.ownerUser : null;
+      const isHidden = escortUser
+        ? NimfomaneStorage.getEscort(escortUser).hidden
+        : topic.hidden;
+      if (isHidden) {
+        container.style.display = 'none';
+        focusModeHiddenIds.add(id);
+        updateHiddenCountIndicator();
+      }
+    }
 
     analyzer.analyzeTopic(container, id, priority).catch(console.error);
 

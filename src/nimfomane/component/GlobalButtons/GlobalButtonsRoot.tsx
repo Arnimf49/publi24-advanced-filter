@@ -4,6 +4,7 @@ import {NimfomaneStorage} from '../../core/storage';
 import FavoritesModalRoot from './FavoritesModal/FavoritesModalRoot';
 import VersionHistoryModal from './VersionHistoryModal/VersionHistoryModal';
 import FeedbackModal from '../../../common/components/FeedbackModal/FeedbackModal';
+import SettingsModalRoot from './SettingsModal/SettingsModalRoot';
 import {versionHistory} from '../../data/versionHistory';
 
 type GlobalButtonsRootProps = {};
@@ -12,6 +13,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
   const [isFavsOpen, setFavsOpen] = useState(false);
   const [isVersionHistoryOpen, setVersionHistoryOpen] = useState(false);
   const [isFeedbackOpen, setFeedbackOpen] = useState(false);
+  const [isSettingsOpen, setSettingsOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [favsCount, setFavsCount] = useState<number | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
@@ -40,6 +42,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
 
   const onFavsClick: MouseEventHandler = useCallback(() => setFavsOpen(true), []);
   const onFeedbackClick: MouseEventHandler = useCallback(() => setFeedbackOpen(true), []);
+  const onSettingsClick: MouseEventHandler = useCallback(() => setSettingsOpen(true), []);
   const onVersionHistoryClick: MouseEventHandler = useCallback(() => {
     setVersionHistoryOpen(true);
     const currentVersion = versionHistory[0]?.version;
@@ -55,6 +58,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
       <GlobalButtons
         favsCount={favsCount}
         onFavsClick={onFavsClick}
+        onSettingsClick={onSettingsClick}
         onVersionHistoryClick={onVersionHistoryClick}
         onFeedbackClick={onFeedbackClick}
         onMenuClick={onMenuClick}
@@ -72,6 +76,9 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
       }
       {isFeedbackOpen &&
         <FeedbackModal onClose={() => setFeedbackOpen(false)} color="rgb(47, 73, 121)"/>
+      }
+      {isSettingsOpen &&
+        <SettingsModalRoot onClose={() => setSettingsOpen(false)}/>
       }
     </>
   );

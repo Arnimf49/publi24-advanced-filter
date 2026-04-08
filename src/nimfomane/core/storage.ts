@@ -148,6 +148,14 @@ export const NimfomaneStorage = {
     CALLBACKS.favsChanged.forEach(callback => callback());
   },
 
+  isFocusMode(): boolean {
+    return localStorage.getItem('p24fa:nimfo:focus_mode') === 'true';
+  },
+
+  setFocusMode(enabled: boolean): void {
+    localStorage.setItem('p24fa:nimfo:focus_mode', enabled ? 'true' : 'false');
+  },
+
   getVersionSeen(): string | null {
     return localStorage.getItem('p24fa:nimfo:version-seen');
   },

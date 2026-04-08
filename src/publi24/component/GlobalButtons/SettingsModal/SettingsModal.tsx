@@ -2,7 +2,7 @@ import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
 import ContentModal from '../../../../common/components/Modal/ContentModal';
 import styles from './SettingsModal.module.scss';
 import {AutoHideCriterias} from "../../../core/storage";
-import {SettingsIcon} from "../../Common/Icons/SettingsIcon";
+import {SettingsIcon} from "../../../../common/components/Icons/SettingsIcon";
 import {misc} from "../../../core/misc";
 
 type SwitchProps = {
