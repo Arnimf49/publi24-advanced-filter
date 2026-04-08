@@ -64,17 +64,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, settings, onTogg
   >
     <SettingControl
       title="Mod focus"
-      description="Când este activat, topicurile ascunse anterior nu se vor mai afișa deloc pe pagina de listare. Util pentru a vedea numai ceea ce este nou sau încă neascuns."
+      description="Când este activat, topicele ascunse anterior nu se vor mai afișa deloc pe pagina de listare. Util pentru a vedea numai ceea ce este nou sau încă neascuns."
       isOn={settings.focusMode}
       onToggle={onToggleFocusMode}
       dataWwid="focus-mode-switch"
     />
 
-    <hr style={{ opacity: 0.2, marginTop: '10px', marginBottom: '15px' }} />
-
-    <p className={styles.footerText}>
-      Pentru probleme sau idei scrie la <b>arnimf49@gmail.com</b>
-    </p>
   </ContentModal>
 );
 

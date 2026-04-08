@@ -402,11 +402,6 @@ const SettingsModal: React.FC<SettingsModalProps> =
       <button onClick={handleExport} className={styles.button}>↑ export</button>
       <button onClick={onImport} className={styles.button}>↓ import</button>
 
-      <hr style={{ opacity: 0.2, marginTop: '25px', marginBottom: '15px' }} />
-
-      <p className={styles.footerText}>
-        Pentru probleme sau idei scrie la <b>arnimf49@gmail.com</b>
-      </p>
     </ContentModal>
   );
 };
