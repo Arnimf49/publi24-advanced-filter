@@ -2,12 +2,7 @@ import {WWStorage} from "./storage";
 import {userId} from "../../common/userId";
 import {permissions} from "../../common/permissions";
 import {supabaseClient} from "../../common/supabase/supabaseClient";
-
-// @ts-ignore
-if (typeof browser === "undefined" && typeof chrome !== "undefined") {
-  // @ts-ignore
-  var browser = chrome;
-}
+import {browserApi} from "../../common/globals";
 
 interface MonthCount {
   [month: string]: number;
@@ -32,6 +27,29 @@ interface AnalyticsData {
     manualImageSearch: boolean;
   };
   user_agent: string;
+  storage_size: number | null;
+  is_incognito: boolean | null;
+}
+
+function getStorageSizeKb(): number | null {
+  try {
+    let totalBytes = 0;
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i) || '';
+      totalBytes += key.length + (localStorage.getItem(key) || '').length;
+    }
+    return Math.round(totalBytes / 1024 * 10) / 10;
+  } catch {
+    return null;
+  }
+}
+
+function detectIncognito(): boolean | null {
+  try {
+    return browserApi.extension.inIncognitoContext ?? null;
+  } catch {
+    return null;
+  }
 }
 
 function getMonthKey(timestamp: number): string {
@@ -128,6 +146,8 @@ function collectAnalyticsData(): AnalyticsData {
     hidden_count: hiddenCount,
     settings_enabled: settingsEnabled,
     user_agent: navigator.userAgent,
+    storage_size: getStorageSizeKb(),
+    is_incognito: detectIncognito(),
   };
 }
 
@@ -183,6 +203,8 @@ export async function sendAnalyticsEvent(): Promise<void> {
         hidden_count: analyticsData.hidden_count,
         settings_enabled: analyticsData.settings_enabled,
         user_agent: analyticsData.user_agent,
+        storage_size: analyticsData.storage_size,
+        is_incognito: analyticsData.is_incognito,
         updated_at: new Date().toISOString(),
       }),
     });
