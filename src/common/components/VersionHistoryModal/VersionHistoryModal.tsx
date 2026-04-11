@@ -1,16 +1,21 @@
 import React from 'react';
-import GeneralModal from '../../Common/Modal/GeneralModal';
-import VersionNotes from '../../../../common/components/VersionNotes/VersionNotes';
-import { versionHistory } from '../../../data/versionHistory';
-import {misc} from '../../../core/misc';
+import GeneralModal from '../Modal/GeneralModal';
+import VersionNotes from '../VersionNotes/VersionNotes';
+
+type VersionData = {
+  version: string;
+  releaseDate: string;
+  changeNew?: string[];
+  changeImprove?: string[];
+  changeFix?: string[];
+};
 
 type VersionHistoryModalProps = {
   onClose: () => void;
+  versionHistory: VersionData[];
 };
 
-const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({ onClose }) => {
-  const separatorColor = misc.getPubliTheme() === 'dark' ? 'rgb(60, 84, 123)' : '#555';
-
+const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({ onClose, versionHistory }) => {
   return (
     <GeneralModal
       title="Istoric verziuni"
@@ -27,7 +32,6 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({ onClose }) =>
             changeNew={version.changeNew}
             changeImprove={version.changeImprove}
             changeFix={version.changeFix}
-            separatorColor={separatorColor}
           />
         ))}
       </>

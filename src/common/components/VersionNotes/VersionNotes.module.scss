@@ -6,7 +6,7 @@
 
   :global(.dark) & {
     border-color: var(--separator-color, #485e71);
-    color: rgb(220, 220, 220);
+    color: rgb(187 187 187);
   }
 
   &:last-child {
@@ -23,8 +23,12 @@
 
 .version {
   margin: 0;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 600;
+
+  :global(.isMobile) & {
+    font-size: 22px;
+  }
 }
 
 .releaseDate {

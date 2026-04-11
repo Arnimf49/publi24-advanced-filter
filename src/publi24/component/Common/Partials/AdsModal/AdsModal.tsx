@@ -1,5 +1,5 @@
 import React, {ChangeEventHandler, MouseEventHandler} from 'react';
-import GeneralModal from '../../../Common/Modal/GeneralModal';
+import GeneralModal from '../../../../../common/components/Modal/GeneralModal';
 import AdsList from '../AdList/AdsList';
 import styles from './AdsModal.module.scss';
 import {AdData} from "../../../../core/adData";
@@ -33,6 +33,7 @@ const AdsModal: React.FC<AdsModalProps> = ({
       onClose={close}
       dataWwid="ads-modal"
       onCleanup={onCleanup}
+      prose={false}
       headerActions={
         !hideReasonSelector && onHideAll
           ? <button

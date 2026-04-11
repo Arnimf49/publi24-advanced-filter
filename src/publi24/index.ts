@@ -94,6 +94,7 @@ WWStorage.upgrade()
     sendAnalyticsEvent().catch(console.error);
 
     try {
+      document.body.classList.add('publi24');
       document.body.classList.add(misc.getPubliTheme());
       Array.from(document.getElementsByClassName('theme-button')).forEach(child => {
         child.addEventListener('click', () => window.location.reload());

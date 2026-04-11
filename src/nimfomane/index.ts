@@ -53,6 +53,8 @@ NimfomaneStorage.upgrade()
 
     console.log('Booting publi24-advanced-filter');
 
+    document.body.classList.add('nimfomane');
+
     if (IS_MOBILE_VIEW) {
       document.body.classList.add('onMobile');
     }

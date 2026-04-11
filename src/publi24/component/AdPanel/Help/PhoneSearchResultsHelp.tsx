@@ -1,5 +1,5 @@
 import React from 'react';
-import GeneralModal from '../../Common/Modal/GeneralModal';
+import GeneralModal from '../../../../common/components/Modal/GeneralModal';
 import InfoIcon from '../../Common/Icons/InfoIcon';
 import {PhoneIcon} from '../../Common/Icons/PhoneIcon';
 import Code from '../../Common/Code/Code';

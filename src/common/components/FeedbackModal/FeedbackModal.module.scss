@@ -1,3 +1,15 @@
+:global(.publi24) {
+  --feedback-color: #1177bb;
+}
+
+:global(.publi24.dark) {
+  --feedback-color: rgb(60 84 123);
+}
+
+:global(.nimfomane) {
+  --feedback-color: rgb(47, 73, 121);
+}
+
 .body {
   display: flex;
   flex-direction: column;

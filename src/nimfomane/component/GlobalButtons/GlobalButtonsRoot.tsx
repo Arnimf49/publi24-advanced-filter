@@ -2,7 +2,7 @@ import React, {MouseEventHandler, useCallback, useEffect, useState} from 'react'
 import GlobalButtons from './GlobalButtons';
 import {NimfomaneStorage} from '../../core/storage';
 import FavoritesModalRoot from './FavoritesModal/FavoritesModalRoot';
-import VersionHistoryModal from './VersionHistoryModal/VersionHistoryModal';
+import VersionHistoryModal from '../../../common/components/VersionHistoryModal/VersionHistoryModal';
 import FeedbackModal from '../../../common/components/FeedbackModal/FeedbackModal';
 import SettingsModalRoot from './SettingsModal/SettingsModalRoot';
 import {versionHistory} from '../../data/versionHistory';
@@ -72,10 +72,10 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
         <FavoritesModalRoot onClose={() => setFavsOpen(false)}/>
       }
       {isVersionHistoryOpen &&
-        <VersionHistoryModal onClose={() => setVersionHistoryOpen(false)}/>
+        <VersionHistoryModal onClose={() => setVersionHistoryOpen(false)} versionHistory={versionHistory} />
       }
       {isFeedbackOpen &&
-        <FeedbackModal onClose={() => setFeedbackOpen(false)} color="rgb(47, 73, 121)"/>
+        <FeedbackModal onClose={() => setFeedbackOpen(false)} />
       }
       {isSettingsOpen &&
         <SettingsModalRoot onClose={() => setSettingsOpen(false)}/>

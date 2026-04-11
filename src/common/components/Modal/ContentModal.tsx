@@ -6,7 +6,7 @@ type ContentModalProps = {
   children: ReactNode;
   onClose: () => void;
   maxWidth?: number;
-  color: string;
+  color?: string;
   title: string | ReactNode;
   headerActions?: ReactNode;
 };
@@ -27,7 +27,7 @@ const ContentModal: React.FC<ContentModalProps> =
   return (
     <>
       <div className={styles.header} style={{maxWidth: `${maxWidth}px`}}>
-        <h2 className={styles.headerTitle} style={{background: color}}>
+        <h2 className={styles.headerTitle} style={color ? {background: color} : undefined}>
           {title}
         </h2>
         <div className={styles.headerActions}>
@@ -49,7 +49,7 @@ const ContentModal: React.FC<ContentModalProps> =
         style={{maxWidth: `${maxWidth}px`, borderColor: color}}
         onClick={handleContainerClick}
       >
-        <div className={styles.topBorder} style={{background: color}}></div>
+        <div className={styles.topBorder} style={color ? {background: color} : undefined}></div>
         <div className={styles.contentPadding}>
           {children}
         </div>

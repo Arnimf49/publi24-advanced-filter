@@ -51,6 +51,14 @@
     color: #bfbfbf;
   }
 
+  :global(.publi24.dark) & {
+    background: rgb(60 84 123);
+  }
+
+  :global(.nimfomane) & {
+    background: rgb(47, 73, 121);
+  }
+
   @media screen and (min-width: 1000px) {
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
@@ -114,6 +122,12 @@
     color: #bfbfbf;
     background: #1f1f1f;
   }
+  :global(.publi24.dark) & {
+    border-color: rgb(60 84 123);
+  }
+  :global(.nimfomane) & {
+    border-color: rgb(47, 73, 121);
+  }
 }
 
 .topBorder {
@@ -125,6 +139,13 @@
   top: 80px;
   z-index: 10;
   margin-top: -2px;
+
+  :global(.publi24.dark) & {
+    background: rgb(60 84 123);
+  }
+  :global(.nimfomane) & {
+    background: rgb(47, 73, 121);
+  }
 }
 
 .contentPadding {
@@ -140,4 +161,3 @@
     top: 70px;
   }
 }
-

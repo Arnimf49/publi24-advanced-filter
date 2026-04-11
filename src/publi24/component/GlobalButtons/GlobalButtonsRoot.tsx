@@ -4,13 +4,12 @@ import {WWStorage} from "../../core/storage";
 import FavoritesModalRoot from "./FavoritesModal/FavoritesModalRoot";
 import PhoneSearchModalRoot from "./PhoneSearchModal/PhoneSearchModalRoot";
 import SettingsModalRoot from "./SettingsModal/SettingsModalRoot";
-import VersionHistoryModal from "./VersionHistoryModal/VersionHistoryModal";
+import VersionHistoryModal from "../../../common/components/VersionHistoryModal/VersionHistoryModal";
 import FeedbackModal from "../../../common/components/FeedbackModal/FeedbackModal";
 import {modalState} from "../../../common/modalState";
 import {versionHistory} from "../../data/versionHistory";
 import {renderer} from "../../core/renderer";
 import NextVisibleAdButton from "./NextVisibleAdButton/NextVisibleAdButton";
-import {misc} from "../../core/misc";
 
 type GlobalButtonsRootProps = {
 };
@@ -102,12 +101,9 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
       {isSettingsOpen &&
         <SettingsModalRoot onClose={() => setSettingsOpen(false)}/>}
       {isVersionHistoryOpen &&
-        <VersionHistoryModal onClose={() => setVersionHistoryOpen(false)}/>}
+        <VersionHistoryModal onClose={() => setVersionHistoryOpen(false)} versionHistory={versionHistory} />}
       {isFeedbackOpen &&
-        <FeedbackModal
-          onClose={() => setFeedbackOpen(false)}
-          color={misc.getPubliTheme() === 'dark' ? 'rgb(60 84 123)' : '#1177bb'}
-        />}
+        <FeedbackModal onClose={() => setFeedbackOpen(false)} />}
     </>
   );
 };

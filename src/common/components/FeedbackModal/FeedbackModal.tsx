@@ -8,10 +8,9 @@ const MAX_CHARS = 700;
 
 type FeedbackModalProps = {
   onClose: () => void;
-  color?: string;
 };
 
-const FeedbackModal: React.FC<FeedbackModalProps> = ({ onClose, color = '#a78057' }) => {
+const FeedbackModal: React.FC<FeedbackModalProps> = ({ onClose }) => {
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +42,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ onClose, color = '#a78057
   };
 
   return (
-    <GeneralModal title="Feedback" onClose={onClose} maxWidth={600} dataWwid="feedback-modal" color={color}>
+    <GeneralModal title="Feedback" onClose={onClose} maxWidth={600} dataWwid="feedback-modal" prose={false}>
       <div className={styles.body}>
         <p className={styles.description}>
           Ai găsit un bug? Ai o idee de îmbunătățire sau o sugestie? Scrie aici.
@@ -66,7 +65,6 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ onClose, color = '#a78057
                   onKeyDown={handleKeyDown}
                   placeholder="Descrie bug-ul, îmbunătățirea sau ideea ta..."
                   disabled={isSending}
-                  style={{'--feedback-color': color} as React.CSSProperties}
                   autoFocus
                 />
                 <span className={`${styles.charCount} ${isOver ? styles.over : ''}`}>
@@ -84,7 +82,6 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ onClose, color = '#a78057
           <button
             type="button"
             className={styles.sendButton}
-            style={{'--feedback-color': color} as React.CSSProperties}
             onClick={handleSend}
             disabled={!canSend}
             title="Ctrl+Enter"
