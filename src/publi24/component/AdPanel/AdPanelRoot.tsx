@@ -1,7 +1,7 @@
 import React, {FC, MouseEventHandler, useCallback, useEffect, useState} from "react";
 import {adData} from "../../core/adData";
 import {WWStorage} from "../../core/storage";
-import {linksFilter} from "../../core/linksFilter";
+import {ImageResult, linksFilter} from "../../core/linksFilter";
 import {dateLib} from "../../core/dateLib";
 import AdPanel from "./AdPanel";
 import {adActions} from "../../core/adActions";
@@ -21,7 +21,7 @@ interface AdPanelRootProps {
 
 const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const [renderCycle, setRenderCycle] = useState(0);
-  const [{search, images}, setSearches] = useState<{search?: string[], images?: []}>({});
+  const [{search, images}, setSearches] = useState<{search?: string[], images?: ImageResult[]}>({});
   const [showHideReason, setShowHideReason] = useState(false);
   const [showImagesSlider, setShowImagesSlider] = useState(false);
   const [showDuplicates, setShowDuplicates] = useState(false);
@@ -202,6 +202,9 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         imageInvestigateStale={imageInvestigateStale}
         phoneSearchJustCompleted={phoneSearchJustCompleted}
         imageSearchJustCompleted={imageSearchJustCompleted}
+        analyzeImagesLoading={memoryState.analyzeImagesLoading}
+        isPhoneSearchLoading={memoryState.isPhoneSearchLoading}
+        isImageSearchLoading={memoryState.isImageSearchLoading}
         errors={errors}
         onVisibilityClick={onVisibilityClick}
         onFavClick={onFavClick}

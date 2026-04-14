@@ -31,10 +31,18 @@ function main() {
     return;
   }
 
-  domains.sort().forEach((domain, index) => {
+  domains.sort((a, b) => {
+    const da = typeof a === 'string' ? a : a.domain;
+    const db = typeof b === 'string' ? b : b.domain;
+    return da.localeCompare(db);
+  }).forEach((entry, index) => {
+    const domain = typeof entry === 'string' ? entry : entry.domain;
+    const siteNames = typeof entry === 'object' && entry.siteNames?.length
+      ? ` (${entry.siteNames.join(', ')})`
+      : '';
     const number = `${index + 1}.`.padStart(4);
     const clickableLink = createClickableLink(domain);
-    console.log(`\u001b[90m${number}\u001b[0m \u001b[91m${clickableLink}\u001b[0m`);
+    console.log(`\u001b[90m${number}\u001b[0m \u001b[91m${clickableLink}\u001b[0m\u001b[90m${siteNames}\u001b[0m`);
   });
 
   console.log(`\n\u001b[2mTotal: ${domains.length} domains\u001b[0m`);

@@ -3,6 +3,12 @@ import {utils} from "../../common/utils";
 import escortListingDomainsData from '../../../escort-listing-domains.json';
 import {dataCompression} from "./dataCompression";
 
+export interface EscortDomainEntry {
+  country: string;
+  domain: string;
+  siteNames: string[];
+}
+
 const BLACKLISTED_LINKS: string[] = [
   'https://meiwakucheck.com/',
   'https://www.jpnumber.com/',
@@ -52,28 +58,6 @@ const BLACKLISTED_LINKS: string[] = [
   'https://www.publi24.ro/cv?jobapplyid=',
 ];
 
-const SAFE_LAST_DOMAIN_PARTS: string[] = [
-  '.ro',
-  'nimfomane.com',
-  'ddcforum.com',
-  'escorte.pro',
-  'escortsromania.net',
-  'excorte.net',
-  'brailaescorte.com',
-  'sexyro.com',
-  'xlamma.com',
-  'escorte-cluj.com',
-  'escorte365.com',
-  'anunt.online',
-  'escort-romania.com',
-  'letgosex.com',
-  'sexy-escorte.com',
-  'escortero.net',
-  'escorteromania.info',
-  'escorterecomandate.com',
-  'inspector-escorte.com',
-];
-
 const PRIO_DOMAINS: string[] = [
   'publi24.ro',
   'www.publi24.ro',
@@ -81,7 +65,33 @@ const PRIO_DOMAINS: string[] = [
   'ddcforum.com',
 ];
 
-const ESCORT_LISTING_SITE_DOMAINS: Record<string, string[]> = escortListingDomainsData;
+const escortListingEntries: EscortDomainEntry[] = escortListingDomainsData as unknown as EscortDomainEntry[];
+const escortDomainToCountry = new Map<string, string>();
+const escortSiteNameToCountry = new Map<string, string>();
+const escortSiteNameToDomain = new Map<string, string>();
+const escortSiteNameCountries = new Map<string, Set<string>>();
+
+for (const entry of escortListingEntries) {
+  escortDomainToCountry.set(entry.domain, entry.country);
+  for (const sn of entry.siteNames) {
+    const key = sn.toLowerCase();
+    escortSiteNameToDomain.set(key, entry.domain);
+
+    if (!escortSiteNameCountries.has(key)) {
+      escortSiteNameCountries.set(key, new Set());
+    }
+    escortSiteNameCountries.get(key)!.add(entry.country);
+  }
+}
+
+for (const [key, countries] of escortSiteNameCountries) {
+  const resolvedCountry = countries.size > 1 ? 'general' : [...countries][0];
+  escortSiteNameToCountry.set(key, resolvedCountry);
+}
+
+// A raw image result: either an absolute URL string, or a [siteName, gotoPath] tuple
+// when the absolute URL could not be determined (Google Lens /goto redirect).
+export type ImageResult = string | [string, string];
 
 interface ProcessedLink {
   link: string;
@@ -91,6 +101,7 @@ interface ProcessedLink {
 }
 
 interface DomainInfo {
+  rawDomain: string;
   links: ProcessedLink[];
   isSafe: boolean;
   isEscortListing: boolean;
@@ -99,26 +110,38 @@ interface DomainInfo {
 
 interface ImageLinkDomainGroup {
   domain: string;
+  rawDomain: string;
   links: ProcessedLink[];
   isSafe: boolean;
   isEscortListing: boolean;
   flag: string | null;
 }
 
+function countryToFlag(cc: string): string {
+  return cc === 'general' ? '🌐' : utils.countryCodeToFlagEmoji(cc);
+}
+
 function getFlagForDomain(domain: string): string | null {
-  for (const [cc, domains] of Object.entries(ESCORT_LISTING_SITE_DOMAINS)) {
-    if (domains.some(d => domain === d || domain.endsWith('.' + d))) {
-      if (cc === 'general') {
-        return '🌐';
-      }
-      return utils.countryCodeToFlagEmoji(cc);
+  const cc = escortDomainToCountry.get(domain);
+  if (cc !== undefined) {
+    return countryToFlag(cc);
+  }
+
+  // subdomain check — e.g. sub.example.com against example.com
+  for (const [d, c] of escortDomainToCountry) {
+    if (domain.endsWith('.' + d)) {
+      return countryToFlag(c);
     }
   }
+
   return null;
 }
 
 export const linksFilter = {
-  isAdUrl(url: string) {
+  isAdUrl(url: ImageResult) {
+    if (Array.isArray(url)) {
+      return (url as [string, string])[0].toLowerCase() === 'publi24';
+    }
     return url.startsWith("https://www.publi24.ro/") && url.includes("/anunt/");
   },
 
@@ -196,104 +219,107 @@ export const linksFilter = {
     });
   },
 
-  processImageLinks(id: string, links: string[], itemUrl: string): ImageLinkDomainGroup[] {
+  processImageLinks(id: string, links: ImageResult[], itemUrl: string): ImageLinkDomainGroup[] {
     const domainMap: { [domain: string]: DomainInfo } = {};
     const duplicatesInOtherLoc: string[] = WWStorage.getAdDuplicatesInOtherLocation(id);
     const duplicatesNotOldInOtherLoc: string[] = WWStorage.getAdNotOldDuplicatesInOtherLocation(id);
     const deadLinks: string[] = WWStorage.getAdDeadLinks(id);
 
-    links
-      .filter((link: string): boolean => !linksFilter.isUrlSameAd(link, itemUrl))
-      .forEach((link: string) => {
-        try {
-          const urlObj = new URL(link);
-          const originalDomain = urlObj.hostname.replace(/^www\./, '');
+    function getPriority(l: ProcessedLink) {
+      if (l.isDead) return 4;
+      if (!l.isSafe && l.isSuspicious) return 2;
+      if (!l.isSafe) return 1;
+      if (l.isSuspicious) return 3;
+      return 4;
+    }
+
+    links.forEach((result: ImageResult) => {
+      try {
+        let link: string;
+        let rawDomain: string;
+        let compressedLink: string | null;
+        let escortListingFlag: string | null;
+
+        if (Array.isArray(result)) {
+          const [siteName, gotoPath] = result;
+          link = new URL(gotoPath, 'https://www.google.com').href;
+          rawDomain = escortSiteNameToDomain.get(siteName.toLowerCase()) ?? siteName;
+          compressedLink = null;
+          const cc = escortSiteNameToCountry.get(siteName.toLowerCase());
+          escortListingFlag = cc !== undefined ? countryToFlag(cc) : null;
+        } else {
+          if (linksFilter.isUrlSameAd(result, itemUrl)) {
+            return;
+          }
+          link = result;
+          rawDomain = new URL(link).hostname.replace(/^www\./, '');
           const isPubliLink = linksFilter.isAdUrl(link);
-          const compressedLink = isPubliLink ? dataCompression.compressAdLink(link) : link;
-
-          const isSafeLastDomain = SAFE_LAST_DOMAIN_PARTS.some(part =>
-            part.startsWith('.')
-              ? originalDomain.endsWith(part)
-              : originalDomain === part || originalDomain.endsWith('.' + part)
-          );
-
-          let isDomainSafe = false;
-          let isDomainSuspicious = false;
-          let isEscortListing = false;
-          let flag = null;
-          let displayDomain = originalDomain;
-
-          const escortListingFlag = getFlagForDomain(originalDomain);
-
-          if (isSafeLastDomain || escortListingFlag === '🇷🇴') {
-            isDomainSafe = !duplicatesInOtherLoc.includes(compressedLink);
-            isDomainSuspicious = duplicatesNotOldInOtherLoc.includes(compressedLink);
-            flag = '🇷🇴';
-            displayDomain = `🇷🇴  ${originalDomain}`;
-          } else if (escortListingFlag) {
-            isDomainSafe = false;
-            isDomainSuspicious = true;
-            isEscortListing = true;
-            flag = escortListingFlag;
-            displayDomain = `${escortListingFlag} ${originalDomain}`;
-          }
-
-          const linkObj: ProcessedLink = {
-            link,
-            isDead: deadLinks.includes(compressedLink),
-            isSafe: isDomainSafe,
-            isSuspicious: isDomainSuspicious,
-          };
-
-          if (!domainMap[displayDomain]) {
-            domainMap[displayDomain] = {
-              links: [linkObj],
-              isSafe: isSafeLastDomain,
-              isEscortListing,
-              flag
-            };
-          } else {
-            function getPriority(link: ProcessedLink) {
-              if (link.isDead) return 4;
-              if (!link.isSafe && link.isSuspicious) return 2;
-              if (!link.isSafe) return 1;
-              if (link.isSuspicious) return 3;
-              return 4;
-            }
-            const newPriority = getPriority(linkObj);
-            const insertIndex = domainMap[displayDomain].links.findIndex(existing => {
-              const existingPriority = getPriority(existing);
-              return newPriority < existingPriority;
-            });
-
-            if (insertIndex === -1) {
-              domainMap[displayDomain].links.push(linkObj);
-            } else {
-              domainMap[displayDomain].links.splice(insertIndex, 0, linkObj);
-            }
-          }
-        } catch (error: any) {
-          console.error(`Error processing link "${link}":`, error.message);
+          compressedLink = isPubliLink ? dataCompression.compressAdLink(link) : link;
+          escortListingFlag = getFlagForDomain(rawDomain);
         }
-      });
+        let isDomainSafe = false;
+        let isDomainSuspicious = false;
+        let isEscortListing = false;
+        let flag: string | null = null;
 
-    return Object.entries(domainMap)
-      .map(([domain, {links: domainLinks, isSafe, isEscortListing, flag}]: [string, DomainInfo]): ImageLinkDomainGroup => ({
-        domain,
-        links: domainLinks,
-        isSafe,
-        isEscortListing,
-        flag
-      }))
+        if (escortListingFlag === '🇷🇴') {
+          isDomainSafe = compressedLink ? !duplicatesInOtherLoc.includes(compressedLink) : true;
+          isDomainSuspicious = !!compressedLink && duplicatesNotOldInOtherLoc.includes(compressedLink);
+          flag = '🇷🇴';
+        } else if (escortListingFlag) {
+          isDomainSuspicious = true;
+          isEscortListing = true;
+          flag = escortListingFlag;
+        }
+
+        const linkObj: ProcessedLink = {
+          link,
+          isDead: !!compressedLink && deadLinks.includes(compressedLink),
+          isSafe: isDomainSafe,
+          isSuspicious: isDomainSuspicious,
+        };
+
+        if (!domainMap[rawDomain]) {
+          domainMap[rawDomain] = { rawDomain, links: [linkObj], isSafe: isDomainSafe, isEscortListing, flag };
+        } else {
+          const newPriority = getPriority(linkObj);
+          const insertIndex = domainMap[rawDomain].links.findIndex(existing => newPriority < getPriority(existing));
+          if (insertIndex === -1) {
+            domainMap[rawDomain].links.push(linkObj);
+          } else {
+            domainMap[rawDomain].links.splice(insertIndex, 0, linkObj);
+          }
+        }
+      } catch (error: any) {
+        console.error(`Error processing link "${result}":`, error.message);
+      }
+    });
+
+    return Object.values(domainMap)
+      .map(({rawDomain, links: domainLinks, isSafe, isEscortListing, flag}: DomainInfo): ImageLinkDomainGroup => {
+        const displayDomain = flag ? `${flag}  ${rawDomain}` : rawDomain;
+        return { domain: displayDomain, rawDomain, links: domainLinks, isSafe, isEscortListing, flag };
+      })
       .sort((groupA: ImageLinkDomainGroup, groupB: ImageLinkDomainGroup): number => {
-        const isPrioA = PRIO_DOMAINS.includes(groupA.domain);
-        const isPrioB = PRIO_DOMAINS.includes(groupB.domain);
+        const prioA = PRIO_DOMAINS.indexOf(groupA.rawDomain);
+        const prioB = PRIO_DOMAINS.indexOf(groupB.rawDomain);
+        if (prioA !== -1 && prioB !== -1) {
+          return prioA - prioB;
+        }
+        if (prioA !== -1) {
+          return -1;
+        }
+        if (prioB !== -1) {
+          return 1;
+        }
 
-        if (isPrioA && !isPrioB) return -1;
-        if (!isPrioA && isPrioB) return 1;
-        if (groupA.isSafe && !groupB.isSafe) return -1;
-        if (!groupA.isSafe && groupB.isSafe) return 1;
-        return groupA.domain.localeCompare(groupB.domain);
+        // Tier: safe=0, escort-listing=1, unknown=2
+        const tierA = groupA.isSafe ? 0 : groupA.isEscortListing ? 1 : 2;
+        const tierB = groupB.isSafe ? 0 : groupB.isEscortListing ? 1 : 2;
+        if (tierA !== tierB) {
+          return tierA - tierB;
+        }
+        return groupA.rawDomain.localeCompare(groupB.rawDomain);
       });
   },
 };

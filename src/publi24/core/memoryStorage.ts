@@ -2,6 +2,9 @@ export interface AdMemoryState {
   contentAnalyzeError: string | null;
   phoneSearchError: string | null;
   imageSearchError: string | null;
+  analyzeImagesLoading: boolean;
+  isPhoneSearchLoading: boolean;
+  isImageSearchLoading: boolean;
 }
 
 const _WW_MEMORY_STORE: Record<string, AdMemoryState> = {};
@@ -11,6 +14,9 @@ const getEmptyAdState = (): AdMemoryState => ({
   contentAnalyzeError: null,
   phoneSearchError: null,
   imageSearchError: null,
+  analyzeImagesLoading: false,
+  isPhoneSearchLoading: false,
+  isImageSearchLoading: false,
 });
 
 export const WWMemoryStorage = {
@@ -30,6 +36,24 @@ export const WWMemoryStorage = {
   setImageSearchError(id: string, error: string | null): void {
     const state = WWMemoryStorage.getAdState(id);
     state.imageSearchError = error;
+    WWMemoryStorage.triggerAdMemoryChanged(id);
+  },
+
+  setAnalyzeImagesLoading(id: string, loading: boolean): void {
+    const state = WWMemoryStorage.getAdState(id);
+    state.analyzeImagesLoading = loading;
+    WWMemoryStorage.triggerAdMemoryChanged(id);
+  },
+
+  setPhoneSearchLoading(id: string, loading: boolean): void {
+    const state = WWMemoryStorage.getAdState(id);
+    state.isPhoneSearchLoading = loading;
+    WWMemoryStorage.triggerAdMemoryChanged(id);
+  },
+
+  setImageSearchLoading(id: string, loading: boolean): void {
+    const state = WWMemoryStorage.getAdState(id);
+    state.isImageSearchLoading = loading;
     WWMemoryStorage.triggerAdMemoryChanged(id);
   },
 

@@ -67,7 +67,7 @@ export const utilsPubli = {
       await page.evaluate(() => localStorage.clear());
     }
 
-    await page.goto(`https://www.publi24.ro/anunturi/matrimoniale/escorte/${config.location || 'cluj/cluj-napoca/'}${config.page ? '/?pag=' + config.page : ''}`);
+    await page.goto(`https://www.publi24.ro/anunturi/matrimoniale/escorte/${config.location ?? 'cluj/cluj-napoca/'}${config.page ? '/?pag=' + config.page : ''}`);
     await page.waitForTimeout(700);
 
     utilsPubli.clearPopups(page);

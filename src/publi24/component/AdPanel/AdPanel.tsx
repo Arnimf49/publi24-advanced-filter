@@ -7,6 +7,7 @@ import {ImageIcon} from "../Common/Icons/ImageIcon";
 import {NimfomaneIcon} from "./NimfomaneIcon";
 import {DdcIcon} from "./DdcIcon";
 import {Loader} from "../../../common/components/Loader/Loader";
+import {InlineLoader} from "../../../common/components/InlineLoader/InlineLoader";
 import {misc} from "../../core/misc";
 import PhoneAndTagsRoot from "../Common/Partials/PhoneAndTags/PhoneAndTagsRoot";
 import ErrorDisplay from "../Common/ErrorDisplay/ErrorDisplay";
@@ -51,6 +52,9 @@ interface AdPanelProps {
   hasImagesInOtherLocation?: boolean;
   phoneSearchJustCompleted?: boolean;
   imageSearchJustCompleted?: boolean;
+  analyzeImagesLoading?: boolean;
+  isPhoneSearchLoading?: boolean;
+  isImageSearchLoading?: boolean;
   errors?: string[];
 
   onVisibilityClick?: MouseEventHandler;
@@ -86,6 +90,9 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     hasImagesInOtherLocation,
     phoneSearchJustCompleted,
     imageSearchJustCompleted,
+    analyzeImagesLoading,
+    isPhoneSearchLoading,
+    isImageSearchLoading,
     errors = [],
     onVisibilityClick,
     onFavClick,
@@ -106,6 +113,16 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
 
   const loading = !hasNoPhone && !phone && errors.length === 0;
   const hasPhone = !hasNoPhone && phone;
+
+  const isDark = misc.getPubliTheme() === 'dark';
+  const inlineLoader = (
+    <InlineLoader
+      size={16}
+      style={{ marginBottom: 5, marginRight: 5 }}
+      color={isDark ? '#bfbfbf' : 'rgb(55 55 55)'}
+      trackColor={isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}
+    />
+  );
 
   return (
     <div data-wwphone={phone} data-wwid="control-panel" data-wwhidden={visible ? 'false' : 'true'}>
@@ -255,7 +272,9 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                   )}
                 </h5>
                 <div data-wwid="search-results">
-                  {searchLinks === undefined ? (
+                  {isPhoneSearchLoading ? (
+                    inlineLoader
+                  ) : searchLinks === undefined ? (
                     phoneInvestigatedSinceDays ? (
                       <p className={`${styles.noResults} ${styles.missingResults}`}>date șterse, caută din nou</p>
                     ) : (
@@ -309,7 +328,9 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                 </h5>
                 <div data-wwid="image-results">
                   {imageSearchDomains === undefined ? (
-                    imageInvestigatedSinceDays ? (
+                    isImageSearchLoading ? (
+                      inlineLoader
+                    ) : imageInvestigatedSinceDays ? (
                       <p className={`${styles.noResults} ${styles.missingResults}`}>date șterse, caută din nou</p>
                     ) : (
                       <p className={`${styles.noResults} ${styles.noResultsYet}`}>nerulat</p>
@@ -327,7 +348,10 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                             </p>
                           )}
                           <div className={styles.imageResultsContainer}>
-                            {imageSearchDomains.map((domainData) => (
+                            {analyzeImagesLoading && inlineLoader}
+                            {imageSearchDomains
+                              .filter(d => !analyzeImagesLoading || d.domain.indexOf('publi24.ro') === -1)
+                              .map((domainData) => (
                               <React.Fragment key={domainData.domain}>
                                 {domainData.links.map((linkData, index) => (
                                   <a
@@ -336,6 +360,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                                     className={`${styles.imageResultLink} ${getImageLinkClassName(linkData)}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    style={index === domainData.links.length - 1 ? {marginRight: '10px'} : undefined}
                                   >
                                     {index === 0 ? (
                                       domainData.domain

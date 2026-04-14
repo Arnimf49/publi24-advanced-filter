@@ -5,9 +5,12 @@ import {IS_AD_PAGE} from "./globals";
 import {WWBrowserStorage} from "./browserStorage";
 import {AutoHideCriterias, WWStorage} from "./storage";
 import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../../common/globals";
+import {bgApi} from "../../common/background/bgApi";
 import {AUTO_HIDE_CRITERIA} from "./hideReasons";
 import {utils} from "../../common/utils";
 import {iosUtils} from "./iosUtils";
+import {ImageResult, linksFilter} from "./linksFilter";
+import {dataCompression} from "./dataCompression";
 import {WWMemoryStorage} from "./memoryStorage";
 
 export type AdContentTuple = [string, number | boolean];
@@ -210,8 +213,14 @@ async function searchPhoneResults(id: string, phoneNumber: string, item: HTMLEle
     const searchUrl = `https://www.google.com/search?q=${encodedSearch}`;
 
     if (windowRef) {
+      WWMemoryStorage.setPhoneSearchLoading(id, true);
+
       windowRef.location = searchUrl;
-      WWBrowserStorage.when(`ww:search_started_for`, null, () => WWStorage.setInvestigatedTime(id, Date.now()));
+
+      WWBrowserStorage.when(`ww:search_started_for`, null, () => {
+        WWMemoryStorage.setPhoneSearchLoading(id, false);
+        WWStorage.setInvestigatedTime(id, Date.now())
+      });
     }
 
     if ((IS_SAFARI_IOS || localStorage.getItem('_testing_ios') === '1') && windowRef) {
@@ -227,6 +236,36 @@ async function searchPhoneResults(id: string, phoneNumber: string, item: HTMLEle
     WWMemoryStorage.setAdAnalyzeError(id, "Eroare căutare rezultate telefon: " + utils.formatError(error));
     throw error;
   }
+}
+
+async function resolveGotoFinalUrls(id: string, imageLinks: ImageResult[]): Promise<ImageResult[]> {
+  const publi24GotoEntries = imageLinks
+    .map((entry, i) => ({ entry, i }))
+    .filter(({ entry }) => Array.isArray(entry) && (entry as [string, string])[0].toLowerCase() === 'publi24');
+
+  if (publi24GotoEntries.length === 0) {
+    return imageLinks;
+  }
+
+  const gotoPaths = publi24GotoEntries.map(({ entry }) => (entry as [string, string])[1]);
+  const locations = await bgApi.resolveGotoUrls(gotoPaths);
+
+  const result = [...imageLinks];
+  let changed = false;
+
+  publi24GotoEntries.forEach(({ i }, j) => {
+    const location = locations[j];
+    if (location) {
+      result[i] = location;
+      changed = true;
+    }
+  });
+
+  if (changed) {
+    await WWBrowserStorage.set(`ww:image_results:${id}`, result);
+  }
+
+  return changed ? result : imageLinks;
 }
 
 export const adActions = {
@@ -317,39 +356,58 @@ export const adActions = {
     WWStorage.clearAdDeadLinks(id);
     WWStorage.clearAdDuplicatesInOtherLocation(id);
 
-    const results: { [key: string]: string[] } = await WWBrowserStorage.get(`ww:image_results:${id}`);
-    const imageLinks: string[] = results[`ww:image_results:${id}`] || [];
-    const publi24AdLinks: string[] = imageLinks
-      .filter((link: string) => link.match(/^https:\/\/(www\.)?publi24\.ro\/.+\/anunt\/.+$/));
+    const results: { [key: string]: ImageResult[] } = await WWBrowserStorage.get(`ww:image_results:${id}`);
+    const rawImageLinks: ImageResult[] = results[`ww:image_results:${id}`] || [];
 
-    const currentAdLocation: string = adData.getItemLocation(item);
-    const pageResultForDate = await adData.loadInAdPage(item);
-    const currentAdDate: Date = adData.getPageDate(pageResultForDate as Document);
+    if (!rawImageLinks.some(linksFilter.isAdUrl)) {
+      return;
+    }
 
-    const pageResults = await Promise.all(publi24AdLinks.map((link: string) =>
-      adData.loadInAdPage(null, link).catch((e) => {
-        console.error(e);
-        return {error: true, code: e.code};
-      })
-    ));
+    try {
+      WWMemoryStorage.setAnalyzeImagesLoading(id, true);
+      const imageLinks: ImageResult[] = await resolveGotoFinalUrls(id, rawImageLinks);
 
-    pageResults.forEach((pageResult, index: number) => {
-      if (typeof pageResult === 'object' && pageResult !== null && (pageResult as any).error) {
-        if ((pageResult as any).code === 410 || (pageResult as any).code === 404) {
-          WWStorage.addAdDeadLink(id, publi24AdLinks[index]);
+      const publi24AdLinks: string[] = imageLinks.flatMap((item: ImageResult): string[] => {
+        if (typeof item === 'string' && linksFilter.isAdUrl(item)) return [item];
+        return [];
+      });
+
+      const currentAdLocation: string = adData.getItemLocation(item);
+      const pageResultForDate = await adData.loadInAdPage(item);
+      const currentAdDate: Date = adData.getPageDate(pageResultForDate as Document);
+
+      const pageResults = await Promise.all(publi24AdLinks.map((link: string) =>
+        adData.loadInAdPage(null, link).catch((e) => {
+          console.error(e);
+          return {error: true, code: e.code};
+        })
+      ));
+
+      pageResults.forEach((pageResult, index: number) => {
+        const compressedLink = dataCompression.compressAdLink(publi24AdLinks[index]);
+        if (typeof pageResult === 'object' && pageResult !== null && (pageResult as any).error) {
+          if ((pageResult as any).code === 410 || (pageResult as any).code === 404) {
+            WWStorage.addAdDeadLink(id, compressedLink);
+          }
+          return;
         }
-        return;
-      }
 
-      const page = pageResult as Document;
-      const location: string = adData.getItemLocation(page, true);
+        const page = pageResult as Document;
+        const location: string = adData.getItemLocation(page, true);
 
-      if (location !== currentAdLocation && !(location.includes('Sector') && currentAdLocation.includes('Sector'))) {
-        const pageDate: Date = adData.getPageDate(page);
-        const dateDiff: number = dateLib.dayDiff(pageDate, currentAdDate);
-        WWStorage.addAdDuplicateInOtherLocation(id, publi24AdLinks[index], dateDiff < 2);
-      }
-    });
+        if (location !== currentAdLocation && !(location.includes('Sector') && currentAdLocation.includes('Sector'))) {
+          const pageDate: Date = adData.getPageDate(page);
+          const dateDiff: number = dateLib.dayDiff(pageDate, currentAdDate);
+          WWStorage.addAdDuplicateInOtherLocation(id, compressedLink, dateDiff < 2);
+        }
+      });
+    }
+    catch (error) {
+      console.error('Error analyzing images for ad:', error);
+    }
+    finally {
+      WWMemoryStorage.setAnalyzeImagesLoading(id, false);
+    }
   },
 
   createInvestigateImgClickHandler(id: string, item: HTMLElement): (this: GlobalEventHandlers, e: MouseEvent) => Promise<void> {
@@ -364,6 +422,7 @@ export const adActions = {
       e.stopPropagation();
 
       WWMemoryStorage.setImageSearchError(id, null);
+      WWMemoryStorage.setImageSearchLoading(id, true);
       WWStorage.incrementImageSearchClickCount();
 
       if (this) (this as HTMLButtonElement).disabled = true;
@@ -375,6 +434,7 @@ export const adActions = {
         let imgs: string[] = await adData.acquireSliderImages(item);
 
         const done = (): void => {
+          WWMemoryStorage.setImageSearchLoading(id, false);
           WWStorage.setAdImagesInvestigatedTime(id, Date.now());
           adActions.analyzeFoundImages(id, item);
           if (this) (this as HTMLButtonElement).disabled = false;
@@ -418,6 +478,7 @@ export const adActions = {
         }, 300);
       } catch (error) {
         WWMemoryStorage.setImageSearchError(id, "Eroare la cautare rezultate imagine: " + utils.formatError(error));
+        WWMemoryStorage.setImageSearchLoading(id, false);
         if (this) (this as HTMLButtonElement).disabled = false;
         throw error;
       }

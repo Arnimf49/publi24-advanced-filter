@@ -27,46 +27,37 @@ function loadJSON(filepath, defaultValue = []) {
 export function cleanUnknownDomains() {
   console.log('🧹 Cleaning unknown domains...\n');
 
-  // Load all files
-  let unknownDomains = loadJSON(UNKNOWN_DOMAINS_FILE, []);
+  let unknownDomains = loadJSON(UNKNOWN_DOMAINS_FILE, {});
   const badDomains = loadJSON(BAD_DOMAINS_FILE, []);
-  const escortDomains = loadJSON(ESCORT_DOMAINS_FILE, {});
+  const escortDomains = loadJSON(ESCORT_DOMAINS_FILE, []);
 
-  const initialCount = unknownDomains.length;
+  const initialCount = Object.keys(unknownDomains).length;
   console.log(`📊 Initial count: ${initialCount} domains`);
 
-  // Remove duplicates and empty strings
-  const uniqueDomains = [...new Set(unknownDomains)].filter(d => d && d.trim());
-  const duplicatesRemoved = initialCount - uniqueDomains.length;
-  if (duplicatesRemoved > 0) {
-    console.log(`🔄 Removed ${duplicatesRemoved} duplicates/empty entries`);
-  }
-
-  // Get all escort listing domains
-  const allEscortDomains = Object.values(escortDomains).flat();
-  console.log(`📋 Found ${badDomains.length} bad domains`);
+  const allEscortDomains = escortDomains.map(e => e.domain);
+  const allBadDomains = badDomains;
+  console.log(`📋 Found ${allBadDomains.length} bad domains`);
   console.log(`📋 Found ${allEscortDomains.length} escort listing domains`);
 
-  // Filter out classified domains
-  const beforeFilterCount = uniqueDomains.length;
-  unknownDomains = uniqueDomains.filter(
-    domain => !badDomains.includes(domain) && !allEscortDomains.includes(domain)
-  );
-  const classifiedRemoved = beforeFilterCount - unknownDomains.length;
+  for (const domain of [...allBadDomains, ...allEscortDomains]) {
+    delete unknownDomains[domain];
+  }
 
+  const classifiedRemoved = initialCount - Object.keys(unknownDomains).length;
   if (classifiedRemoved > 0) {
     console.log(`✂️  Removed ${classifiedRemoved} already classified domains`);
   }
 
-  // Sort domains
-  unknownDomains.sort();
+  const sorted = Object.fromEntries(
+    Object.entries(unknownDomains).sort(([a], [b]) => a.localeCompare(b))
+  );
 
-  // Save cleaned file
-  writeFileSync(UNKNOWN_DOMAINS_FILE, JSON.stringify(unknownDomains, null, 2));
+  writeFileSync(UNKNOWN_DOMAINS_FILE, JSON.stringify(sorted, null, 2));
 
+  const finalCount = Object.keys(sorted).length;
   console.log(`\n✅ Cleanup complete!`);
-  console.log(`📊 Final count: ${unknownDomains.length} domains`);
-  console.log(`🗑️  Total removed: ${initialCount - unknownDomains.length} domains\n`);
+  console.log(`📊 Final count: ${finalCount} domains`);
+  console.log(`🗑️  Total removed: ${initialCount - finalCount} domains\n`);
 }
 
 // Run if called directly

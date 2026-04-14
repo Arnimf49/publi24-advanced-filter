@@ -98,5 +98,5 @@ export default [
 
   makeStyledSource('nimfomane', 'index.ts'),
 
-  makeSimpleSource('common', 'background.ts'),
+  makeSimpleSource('common', 'background/background.ts'),
 ];

@@ -15,6 +15,8 @@ const API_BASE = 'http://localhost:3001';
 
 function App() {
   const [domain, setDomain] = useState(null);
+  const [siteNames, setSiteNames] = useState([]);
+  const [source, setSource] = useState(null);
   const [remaining, setRemaining] = useState(0);
   const [countries, setCountries] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState('');
@@ -36,6 +38,8 @@ function App() {
         setRemaining(0);
       } else {
         setDomain(data.domain);
+        setSiteNames(data.siteNames || []);
+        setSource(data.source || null);
         setRemaining(data.remaining);
         setCountries(data.countries);
         setSelectedCountry(data.suggestedCountry || '');
@@ -158,6 +162,12 @@ function App() {
                 ) : 'Loading...'}
               </Typography>
 
+              {siteNames.length > 0 && (
+                <Typography variant="body2" color="text.secondary">
+                  Site names: {siteNames.join(', ')}
+                </Typography>
+              )}
+
               <Typography variant="body2" color="text.secondary">
                 Remaining: {remaining}
               </Typography>
@@ -202,6 +212,16 @@ function App() {
               >
                 {copiedPrompt ? '✓ Copied' : 'AI Prompt'}
               </Button>
+
+              {source && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => window.open(source, '_blank')}
+                >
+                  Open Source
+                </Button>
+              )}
             </Box>
           </Box>
         </Paper>
@@ -210,7 +230,7 @@ function App() {
       <Box className="bottom-section">
         {domain && (
           <iframe
-            src={`https://${domain}`}
+            src={source || `https://${domain}`}
             title="Domain Preview"
             className="domain-iframe"
             sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-storage-access-by-user-activation"

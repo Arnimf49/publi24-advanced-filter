@@ -2,6 +2,7 @@ import {WWBrowserStorage} from "./core/browserStorage";
 import {IS_MOBILE_VIEW} from "../common/globals";
 import {utils} from "../common/utils";
 import {addSearchLoader, addContinueButton, withRetry} from "./core/searchUI";
+import {ImageResult} from "./core/linksFilter";
 
 interface ImageSearchData {
   wwid: string;
@@ -60,6 +61,16 @@ function releaseStorageLock(): Promise<void> {
 }
 
 
+function deduplicateResults(results: ImageResult[]): ImageResult[] {
+  const seen = new Set<string>();
+  return results.filter(item => {
+    const key = JSON.stringify(item);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function getDesktopExactLink(): HTMLButtonElement | null {
   return document.body.querySelector<HTMLButtonElement>('[aria-describedby="reverse-image-search-button-tooltip"]');
 }
@@ -96,18 +107,77 @@ function hasNoResults(): boolean {
   );
 }
 
-function getDesktopResults(): string[] {
+function isPubli24Result(result: ImageResult): boolean {
+  if (Array.isArray(result)) {
+    return (result as [string, string])[0].toLowerCase() === 'publi24';
+  }
+  return result.includes('publi24.ro');
+}
+
+function isPubli24AdPageResult(anchor: HTMLAnchorElement): boolean {
+  const secondDiv = anchor.querySelector<HTMLElement>('.wyccme > div:nth-child(2)');
+  const spans = secondDiv?.querySelectorAll(':scope > span');
+
+  if ((spans?.length ?? 0) >= 3) {
+    return true;
+  }
+
+  if (spans?.length === 1) {
+    const match = spans[0].textContent?.trim().match(/(\d+)\s+x\s+(\d+)/);
+    if (match) {
+      return parseInt(match[1], 10) > 300 || parseInt(match[2], 10) > 550;
+    }
+  }
+
+  return false;
+}
+
+function filterPubli24AdPageResults(isMobile: boolean, results: ImageResult[]): ImageResult[] {
+  const selector = isMobile
+    ? '[id="rso"] [href][data-hveid]'
+    : 'li > a';
+  const anchors = Array.from(document.body.querySelectorAll<HTMLAnchorElement>(selector));
+
+  return results.filter(result => {
+    if (!isPubli24Result(result)) {
+      return true;
+    }
+
+    const url = getResultUrl(result);
+    const anchor = anchors.find(a => a.getAttribute('href') === url);
+    if (!anchor) {
+      return true;
+    }
+
+    return isPubli24AdPageResult(anchor);
+  });
+}
+
+function getDesktopResults(): ImageResult[] {
   const linkItems: NodeListOf<HTMLAnchorElement> = document.body.querySelectorAll<HTMLAnchorElement>('li > a');
   return Array.from(linkItems)
     .map((n) => n.getAttribute('href'))
     .filter((href): href is string => href !== null);
 }
 
-function getMobileResults(): string[] {
+function getMobileResults(): ImageResult[] {
   const linkItems: NodeListOf<HTMLAnchorElement> = document.body.querySelectorAll<HTMLAnchorElement>('[id="rso"] [href][data-hveid]');
   return Array.from(linkItems)
-    .map((n) => n.getAttribute('href'))
-    .filter((href): href is string => href !== null);
+    .map((n): ImageResult | null => {
+      const href = n.getAttribute('href');
+      if (href === null) return null;
+      if (href.startsWith('/goto')) {
+        const siteNameEl = n.querySelector('.wyccme div:last-child');
+        const siteName: string = siteNameEl?.textContent?.trim() ?? '';
+        return [siteName, href];
+      }
+      return href;
+    })
+    .filter((r): r is ImageResult => r !== null);
+}
+
+function getResultUrl(result: ImageResult): string {
+  return Array.isArray(result) ? result[1] : result;
 }
 
 function areLinksFullyLoaded(isMobile: boolean): boolean {
@@ -118,11 +188,14 @@ function areLinksFullyLoaded(isMobile: boolean): boolean {
     return false;
   }
 
-  return links.every(href => !href.startsWith('/'));
+  return links.every(result => {
+    const url = getResultUrl(result);
+    return !url.startsWith('/') || url.startsWith('/goto');
+  });
 }
 
-function waitForStableResults(isMobile: boolean, stabilityMs: number): Promise<string[]> {
-  return new Promise<string[]>(resolve => {
+function waitForStableResults(isMobile: boolean, stabilityMs: number): Promise<ImageResult[]> {
+  return new Promise<ImageResult[]>(resolve => {
     const getResults = isMobile ? getMobileResults : getDesktopResults;
     let lastResultsJson = '';
     let stableStartTime: number | null = null;
@@ -146,7 +219,7 @@ function waitForStableResults(isMobile: boolean, stabilityMs: number): Promise<s
   });
 }
 
-async function readImageLinks(isMobile: boolean, done: (results: string[]) => void): Promise<void> {
+async function readImageLinks(isMobile: boolean, done: (results: ImageResult[]) => void): Promise<void> {
   try {
     let exactButton = isMobile ? getMobileExactLink() : getDesktopExactLink();
 
@@ -186,7 +259,7 @@ async function readImageLinks(isMobile: boolean, done: (results: string[]) => vo
     }
 
     const results = await waitForStableResults(isMobile, 150);
-    done(results);
+    done(filterPubli24AdPageResults(isMobile, results));
   } catch (error) {
     console.error("Error reading image links:", error);
     done([]);
@@ -195,14 +268,13 @@ async function readImageLinks(isMobile: boolean, done: (results: string[]) => vo
 
 
 async function parseResults(wwid: string): Promise<void> {
-  const callback = (results: string[]): void => {
+  const callback = (results: ImageResult[]): void => {
     getStorageLock().then(() => {
       const imageResultsKey = `ww:image_results:${wwid}`;
 
       WWBrowserStorage.get(imageResultsKey).then((data: { [key: string]: any }) => {
-        let currentImageResults: string[] = (data[imageResultsKey] as string[] | undefined) || [];
-        let combinedData = [...currentImageResults, ...results];
-        combinedData = combinedData.filter((item, pos) => combinedData.indexOf(item) === pos);
+        let currentImageResults: ImageResult[] = (data[imageResultsKey] as ImageResult[] | undefined) || [];
+        let combinedData = deduplicateResults([...currentImageResults, ...results]);
 
         WWBrowserStorage.set(imageResultsKey, combinedData).then(() => {
           releaseStorageLock();

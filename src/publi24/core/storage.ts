@@ -1,6 +1,7 @@
 import {WWBrowserStorage} from "./browserStorage";
 import {IS_MOBILE_VIEW, IS_PROMOTER} from "../../common/globals";
 import {dataCompression} from "./dataCompression";
+import {ImageResult} from "./linksFilter";
 
 export interface AdUuid {
   id: string;
@@ -259,7 +260,7 @@ export const WWStorage = {
     return WWStorage.getAdProp(id, 'age');
   },
 
-  async getAdSearchResults(id: string): Promise<{search?: string[], images?: []}> {
+  async getAdSearchResults(id: string): Promise<{search?: string[], images?: ImageResult[]}> {
     return WWBrowserStorage.get([`ww:search_results:${id}`, `ww:image_results:${id}`])
       .then((results) => {
         return {search: results[`ww:search_results:${id}`], images: results[`ww:image_results:${id}`]};

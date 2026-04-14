@@ -10,7 +10,7 @@
     "storage"
   ],
   "background": {
-    "service_worker": "dist/common/background.js"
+    "service_worker": "dist/common/background/background.js"
   },
   "host_permissions": [
     "https://www.google.com/*",

@@ -1,4 +1,4 @@
-import React, {FC} from "react";
+import React, {CSSProperties, FC} from "react";
 import styles from "./InlineLoader.module.scss";
 
 interface InlineLoaderProps {
@@ -6,6 +6,7 @@ interface InlineLoaderProps {
   trackColor?: string;
   size?: number;
   spinning?: boolean;
+  style?: CSSProperties;
 }
 
 export const InlineLoader: FC<InlineLoaderProps> =
@@ -14,6 +15,7 @@ export const InlineLoader: FC<InlineLoaderProps> =
   trackColor,
   size = 12,
   spinning = true,
+  style,
 }) => {
   return (
     <div
@@ -24,7 +26,8 @@ export const InlineLoader: FC<InlineLoaderProps> =
         width: size,
         height: size,
         borderColor: trackColor ?? `rgba(0,0,0,0.1)`,
-        borderTopColor: spinning ? color : (trackColor ?? `rgba(0,0,0,0.1)`)
+        borderTopColor: spinning ? color : (trackColor ?? `rgba(0,0,0,0.1)`),
+        ...style,
       }}
     ></div>
   )
