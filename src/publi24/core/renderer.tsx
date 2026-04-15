@@ -39,6 +39,10 @@ function renderAdElement(item: HTMLElement, id: string, renderOptions?: RenderOp
   const container = (item.querySelector<HTMLElement>('.article-txt, .ww-inset') || item);
   container.appendChild(panelElement);
 
+  if (IS_MOBILE_VIEW) {
+    item.querySelector('.article-contact-actions')?.remove();
+  }
+
   const hideReasonContainer = document.createElement('div');
   hideReasonContainer.setAttribute('data-wwid', 'hide-reason-container');
   hideReasonContainer.onclick = (e) => e.stopPropagation();
