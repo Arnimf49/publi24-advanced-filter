@@ -11,7 +11,10 @@ const IS_PROFILE_PAGE = window.location.pathname.match(/^\/forum\/profile\//);
 
 const waitForSiteLoad = () => new Promise<void>(resolve => {
   const interval = setInterval(() => {
-    if (document.body && document.getElementById('ipsLayout_footer')) {
+    if (document.body && (
+      (!IS_MOBILE_VIEW && document.getElementById('ipsLayout_footer'))
+      || (IS_MOBILE_VIEW && document.querySelector('.focus-mobile-footer'))
+    )) {
       clearInterval(interval);
       resolve();
     }
@@ -63,7 +66,11 @@ NimfomaneStorage.upgrade()
       document.body.classList.add('isFirefox');
     }
 
-    renderer.renderGlobalButtons();
+    try {
+      renderer.renderGlobalButtons();
+    } catch (error) {
+      console.error('Failed to render global buttons:', error);
+    }
     profileActions.refreshFavoritesProfileStats().catch(console.error);
 
     if (IS_LISTING_PAGE && IS_ESCORT_LISTING) {
@@ -73,7 +80,11 @@ NimfomaneStorage.upgrade()
           const container = topicContainers[index];
           const id = container.getAttribute('data-rowid')!;
 
-          renderer.registerTopicItem(container, id, index);
+          try {
+            renderer.registerTopicItem(container, id, index);
+          } catch (error) {
+            console.error(`Failed to register topic item ${id}:`, error);
+          }
         }
       }
 
@@ -84,7 +95,11 @@ NimfomaneStorage.upgrade()
       const user = document.querySelector<HTMLElement>('.cProfileHeader_name h1')!.innerText.trim();
       const container = document.querySelector<HTMLDivElement>('[data-role="profileHeader"]')!;
 
-      renderer.registerProfilePanel(container, user);
+      try {
+        renderer.registerProfilePanel(container, user);
+      } catch (error) {
+        console.error('Failed to render profile panel:', error);
+      }
     }
 
     if (IS_TOPIC_PAGE) {
