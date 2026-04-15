@@ -518,6 +518,10 @@ export const adActions = {
     if (afterArticleId) {
       const idx = candidates.findIndex(ad => ad.getAttribute('data-articleid') === afterArticleId);
       if (idx !== -1) candidates = candidates.slice(idx + 1);
+
+        // If already scrolled past manually, skip.
+        const midpoint = window.innerHeight / 2;
+        candidates = candidates.filter(ad => ad.getBoundingClientRect().top > midpoint);
     }
 
     const staleAds = ads.filter((ad) => adData.isStaleAnalyze(ad.getAttribute('data-articleid') as string));
@@ -530,6 +534,9 @@ export const adActions = {
       return goToNextPage();
     } else if (!WWStorage.isNextOnlyVisibleEnabled()) {
       adActions.scrollIntoView(candidates[0]);
+      if (!afterArticleId) {
+        setTimeout(() => adActions.scrollIntoView(candidates[0]), 650);
+      }
       WWStorage.setFindNextVisibleAd(false);
       await wait(400);
       return candidates[0].getAttribute('data-articleid');
@@ -560,6 +567,9 @@ export const adActions = {
 
         if (remainedVisible) {
           adActions.scrollIntoView(ad);
+          if (!afterArticleId) {
+            setTimeout(() => adActions.scrollIntoView(ad), 850);
+          }
           await wait(400);
           WWStorage.setFindNextVisibleAd(false);
           return articleId;
