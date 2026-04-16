@@ -14,7 +14,7 @@
     "pw-run": "npx playwright test",
     "show-domains": "node misc/show-unknown-domains.js",
     "clean-unknown-domains": "node src-mapper/clean-unknown-domains.js",
-    "domain-mapper:server": "node src-mapper/server.js",
+    "domain-mapper:server": "tsx src-mapper/ai-classifier/index.ts",
     "domain-mapper:ui": "vite --config src-mapper/vite.config.js",
     "domain-mapper": "concurrently \"npm run domain-mapper:server\" \"npm run domain-mapper:ui\"",
     "postinstall": "sed -i 's/:visible//g' node_modules/recaptcha-solver/lib/index.js node_modules/recaptcha-solver/lib/index.mjs || true"
@@ -32,6 +32,9 @@
     "@rollup/plugin-replace": "^6.0.2",
     "@rollup/plugin-typescript": "^12.3.0",
     "@types/chrome": "^0.0.313",
+    "@types/cors": "^2.8.19",
+    "@types/diff": "^7.0.2",
+    "@types/express": "^5.0.6",
     "@types/firefox-webext-browser": "^120.0.4",
     "@types/node": "^22.14.0",
     "@types/react": "^18.3.0",
@@ -53,12 +56,15 @@
     "rollup": "^4.24.0",
     "rollup-plugin-postcss": "^4.0.2",
     "sass": "^1.86.3",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.3",
     "vite": "^7.2.4"
   },
   "dependencies": {
     "@splidejs/splide": "4.1.4",
+    "diff": "^9.0.0",
     "jimp": "0.22.10",
+    "openai": "^6.34.0",
     "qrcode": "1.3.4",
     "tesseract.js": "6.0.1"
   }
