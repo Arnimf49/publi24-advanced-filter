@@ -78,6 +78,11 @@ NimfomaneStorage.upgrade()
         const topicContainers = [...document.querySelectorAll<HTMLDivElement>('[data-rowid]')];
         for (let index = 0; index < topicContainers.length; index++) {
           const container = topicContainers[index];
+
+          if (container.hasAttribute('data-wwtopic')) {
+            continue;
+          }
+
           const id = container.getAttribute('data-rowid')!;
 
           try {
