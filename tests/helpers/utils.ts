@@ -109,7 +109,12 @@ const utils = {
 
   async waitForInnerTextNot(page: Page, selector: string, text: string, timeout?: number) {
     await page.waitForFunction(
-      ({selector, text}) => (document.querySelector(selector) as HTMLElement).innerText.trim() !== text,
+      ({selector, text}) => {
+        const el = document.querySelector(selector) as HTMLElement;
+        if (!el) return false;
+        if (el.querySelector('[data-wwid="inline-loader"]')) return false;
+        return el.innerText.trim() !== text;
+      },
       {selector, text},
       {timeout: timeout || 10000}
     );

@@ -536,9 +536,11 @@ export const adActions = {
       adActions.scrollIntoView(candidates[0]);
       if (!afterArticleId) {
         setTimeout(() => adActions.scrollIntoView(candidates[0]), 650);
+        await wait(1650);
+      } else {
+        await wait(800);
       }
       WWStorage.setFindNextVisibleAd(false);
-      await wait(400);
       return candidates[0].getAttribute('data-articleid');
     } else {
       for (const ad of candidates) {
@@ -548,7 +550,7 @@ export const adActions = {
 
         if (!staleAds.includes(ad)) {
           setTimeout(() => adActions.scrollIntoView(ad), 50);
-          await wait(400);
+          await wait(800);
           WWStorage.setFindNextVisibleAd(false);
           return articleId;
         }
@@ -569,8 +571,10 @@ export const adActions = {
           adActions.scrollIntoView(ad);
           if (!afterArticleId) {
             setTimeout(() => adActions.scrollIntoView(ad), 850);
+            await wait(1650);
+          } else {
+            await wait(800);
           }
-          await wait(400);
           WWStorage.setFindNextVisibleAd(false);
           return articleId;
         }

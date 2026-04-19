@@ -30,8 +30,6 @@ test('Should advance to next visible ad on each global button click.', async ({ 
   await page.locator('[data-wwid="next-visible-ad"]').click();
 
   const globalBtn = page.locator('[data-wwid="next-visible-ad-global"]');
-  await globalBtn.waitFor();
-  await globalBtn.isEnabled();
 
   const firstId = await page.evaluate(() => {
     const ads = [...document.querySelectorAll<HTMLElement>('[data-articleid]')];
@@ -47,7 +45,8 @@ test('Should advance to next visible ad on each global button click.', async ({ 
 
   await expect(page.locator(`[data-articleid="${firstId}"]`)).toBeInViewport({ratio: 0.8});
 
-  await expectFindNext(page, false);
+  await expectFindNext(page, true);
+  await globalBtn.isEnabled();
   await globalBtn.click();
   await globalBtn.isEnabled();
   await expectFindNext(page, false);
