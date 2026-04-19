@@ -11,21 +11,26 @@ export const iosUtils = {
     if (focusAdId) {
       localStorage.removeItem('ww:focus');
 
-      let attempts = 0;
-      const maxAttempts = 2000 / 200;
-      const interval = setInterval(() => {
-        attempts++;
-        const adElement =
-          Array.from(document.querySelectorAll<HTMLDivElement>(`[data-articleid="${focusAdId}"]`))
-          .pop();
+      const scrolledElements = new WeakSet<HTMLDivElement>();
+      const maxDuration = 10000;
+      const pollInterval = 200;
+      let elapsed = 0;
 
-        if (adElement) {
-          adActions.scrollIntoView(adElement, {smooth: false});
+      const interval = setInterval(() => {
+        elapsed += pollInterval;
+
+        const elements = Array.from(document.querySelectorAll<HTMLDivElement>(`[data-articleid="${focusAdId}"]`));
+        for (const el of elements) {
+          if (!scrolledElements.has(el)) {
+            scrolledElements.add(el);
+            adActions.scrollIntoView(el, {smooth: false});
+          }
         }
-        if (attempts >= maxAttempts) {
+
+        if (elapsed >= maxDuration) {
           clearInterval(interval);
         }
-      }, 200);
+      }, pollInterval);
     }
   }
 };

@@ -592,10 +592,21 @@ export const adActions = {
     const offset = panel
       ? (IS_MOBILE_VIEW ? -320 : -350)
       : (IS_MOBILE_VIEW ? -100 : -130);
-    const top = target.getBoundingClientRect().top + window.scrollY + offset;
+    const behavior = options?.smooth === false ? 'instant' : 'smooth';
 
-    // In tests somehow, or with Electron, it only works with this line.
-    window.scrollTo({ top: window.scrollY, behavior: 'instant' });
-    setTimeout(() => window.scrollTo({top, behavior: options?.smooth === undefined || options?.smooth === true ? 'smooth' : 'instant'}), 20);
+    const scrollParent = utils.getScrollParent(element);
+
+    if (scrollParent === window) {
+      const top = target.getBoundingClientRect().top + window.scrollY + offset;
+
+      // In tests somehow, or with Electron, it only works with this line.
+      window.scrollTo({ top: window.scrollY, behavior: 'instant' });
+      setTimeout(() => window.scrollTo({ top, behavior }), 20);
+    } else {
+      const scrollEl = scrollParent as HTMLElement;
+      const top = scrollEl.scrollTop + target.getBoundingClientRect().top - scrollEl.getBoundingClientRect().top + offset;
+
+      setTimeout(() => scrollEl.scrollTo({ top, behavior }), 20);
+    }
   }
 }
