@@ -814,7 +814,18 @@ export class BrowserSession {
       }
     })();
 
-    let { domSignals } = await readPageSnapshot(this.page, currentHost);
+    let domSignals: Awaited<ReturnType<typeof extraction.extractDomSignals>>;
+
+    try {
+      ({ domSignals } = await readPageSnapshot(this.page, currentHost));
+    } catch (error) {
+      if (error instanceof Error && /result is not a function/i.test(error.message)) {
+        await this.page.waitForTimeout(1_500);
+        ({ domSignals } = await readPageSnapshot(this.page, currentHost));
+      } else {
+        throw error;
+      }
+    }
 
     if (domSignals.structuredText.length < 100) {
       await this.page.waitForTimeout(1_000);

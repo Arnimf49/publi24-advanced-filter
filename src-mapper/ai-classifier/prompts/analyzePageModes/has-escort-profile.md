@@ -29,7 +29,7 @@ When `hasProfileRevealingButtons: true`, the main agent will call `get_actionabl
 
 ## If not found → `found: false`
 
-Provide up to 2 `nextBestPages` URLs or element hints where a profile is likely to be found.
+Provide up to 2 `profilePages` URLs or element hints where an individual escort profile is likely to be found. These must be profile-detail paths (e.g. /escorts/anna/, /profile/12345), NOT listing or category pages.
 
 → Call `set_has_escort_profile` with your verdict.
 

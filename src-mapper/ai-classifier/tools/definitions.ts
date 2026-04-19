@@ -70,12 +70,12 @@ export const definitions: ChatCompletionTool[] = [
     type: 'function',
     function: {
       name: 'open_element_href',
-      description: 'Navigate to a same-host http(s) URL. Provide either: (a) elementId — an actionable element whose href will be used, or (b) href — a URL or path returned directly from analyze_page findings (e.g. escortProfileUrls, nextBestPages). Never use on tel:, sms:, mailto:, WhatsApp, Telegram, javascript:, or other special-scheme contact actions.',
+      description: 'Navigate to a same-host http(s) URL. Provide either: (a) elementId — an actionable element whose href will be used, or (b) href — a URL or path returned directly from analyze_page findings (e.g. escortProfileUrls, profilePages, mightFindListOnPage). Never use on tel:, sms:, mailto:, WhatsApp, Telegram, javascript:, or other special-scheme contact actions.',
       parameters: {
         type: 'object',
         properties: {
           elementId: { type: 'string', description: 'ID of an actionable element that exposes a same-host href. Use when navigating via an element on the page.' },
-          href: { type: 'string', description: 'URL or path to navigate to directly. Use when a URL was returned by analyze_page (e.g. escortProfileUrls, nextBestPages).' },
+          href: { type: 'string', description: 'URL or path to navigate to directly. Use when a URL was returned by analyze_page (e.g. escortProfileUrls, profilePages, mightFindListOnPage).' },
           reason: { type: 'string' },
         },
         required: ['reason'],

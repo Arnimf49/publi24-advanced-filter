@@ -25,6 +25,9 @@ Immediately classify as definitely NOT escort (isDefinitelyNotEscortListing: tru
 - Adult video / porn tube site — identified by video thumbnails with duration/view counts, "Models"/"Pornstars"/"Studios" navigation, embedded video players
 - Cam platform or live-sex streaming site — "Live Sex", "Live Chat", webcam show navigation
 - Sex games, adult gaming, or interactive adult entertainment platforms
+- Phone sex / adult hotline services — "Cheap Phone Sex", "Call now for phone sex", "Adult chat lines"
+- Adult TV or premium adult content platforms — "Free Adult TV", "Live Adult Webcams", "Adult Channels"
+- Mixed adult entertainment portals combining webcams, phone sex, adult TV, or video chat — these are entertainment aggregators, not escort listings
 
 **IMPORTANT - What is NOT sufficient evidence for escort:**
 - A phone number alone is NOT escort evidence
@@ -36,6 +39,7 @@ Immediately classify as definitely NOT escort (isDefinitelyNotEscortListing: tru
 - Massage/spa with phone number is NOT escort unless explicit sexual/escort service language present
 - Links or navigation to "Sex Games", "Live Sex", "Cam", "Live Chat", "Porn", "Adult Videos", or similar non-escort adult content are NOT escort evidence — these indicate cam/gaming/video platforms, not escort listings
 - Generic "adult content" or sexual language in navigation/titles is NOT escort evidence on its own
+- "Phone Sex", "Adult Webcams", "Adult TV", "Live Cam Girls", "Adult Chat Lines" are NOT escort evidence — these are entertainment/media services, not in-person escort listings
 
 **Thin chat bait rule:**
 If the page is a thin homepage/landing page that mainly invites chat, messaging, signup, or private conversations WITHOUT exposing real substantive profile/detail pages on the same domain, classify as definitely NOT escort (isDefinitelyNotEscortListing: true, confidence >= 90).

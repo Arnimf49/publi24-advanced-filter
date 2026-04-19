@@ -16,6 +16,6 @@ Identify up to 2 individual profile URLs in `escortProfileUrls` for the main age
 
 ## If not found → `found: false`
 
-Provide up to 2 `nextBestPages` targets where a listing is likely to exist. Same-host only — no external links.
+Provide up to 2 `mightFindListOnPage` targets where a listing is likely to exist. Same-host only — no external links.
 
 → Call `set_has_escort_list` with your verdict.

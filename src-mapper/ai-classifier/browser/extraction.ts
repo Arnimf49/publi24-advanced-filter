@@ -267,6 +267,8 @@ const extractPhoneCandidatesFromText = (text: string): string[] => {
     .replace(/[\u00a0\u2007\u202f]/g, ' ')
     // Replace trailing punctuation that can border a phone number with spaces
     .replace(/[,;:!?]/g, ' ')
+    // Replace leading dashes/hyphens before digits so "-07404 619342" becomes " 07404 619342"
+    .replace(/(?<=\s|^)-(?=\d)/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
   if (!normalizedText) {

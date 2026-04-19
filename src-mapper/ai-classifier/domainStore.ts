@@ -290,7 +290,8 @@ const create = () => {
   const getSiblingBadDomains = (domain: string): string[] => {
     const root = getRegisteredDomain(domain);
 
-    return badDomains.filter((bad) => {
+    // Include already-classified bad siblings
+    const classified = badDomains.filter((bad) => {
       if (bad === domain) {
         return false;
       }
@@ -307,6 +308,28 @@ const create = () => {
 
       return !COUNTRY_SELECTOR_SUBDOMAINS.has(sub.toLowerCase());
     });
+
+    // Also include co-queued unknown domains sharing the same root — their presence
+    // under the same registered domain is itself a pattern signal even before classification.
+    const coQueued = Object.keys(unknownDomains).filter((unk) => {
+      if (unk === domain) {
+        return false;
+      }
+
+      const unkRoot = getRegisteredDomain(unk);
+      if (unkRoot !== root) {
+        return false;
+      }
+
+      const sub = getSubdomain(unk, root);
+      if (sub === null) {
+        return false;
+      }
+
+      return !COUNTRY_SELECTOR_SUBDOMAINS.has(sub.toLowerCase());
+    });
+
+    return [...classified, ...coQueued];
   };
 
   const getSiblingEscortDomains = (domain: string): EscortDomainEntry[] => {

@@ -51,14 +51,14 @@ const buildSiblingBadSection = (siblingBadDomains: string[]): string => {
   const isStrongPattern = siblingBadDomains.length >= STRONG_SIBLING_BAD_THRESHOLD;
 
   if (isStrongPattern) {
-    return `**Sibling Subdomain Signal — STRONG BAD PATTERN (${siblingBadDomains.length} known bad subdomains):**
-The following subdomains of the same root domain are already classified as BAD:
+    return `**Sibling Subdomain Signal — STRONG BAD PATTERN (${siblingBadDomains.length} sibling subdomains):**
+The following subdomains of the same root domain are classified as BAD or queued for review:
 ${siblingBadDomains.slice(0, 10).map((d) => `- ${d}`).join('\n')}${siblingBadDomains.length > 10 ? `\n- ... and ${siblingBadDomains.length - 10} more` : ''}
-IMPORTANT: This root domain has a well-established BAD pattern with ${siblingBadDomains.length} confirmed bad subdomains. Set siblingBadVerdict to "bad" unless the current page contains unmistakable real escort listing content (actual named profiles with descriptions, services, rates, and contact details). Thin pages, doorway pages, generic adult text, or ambiguous content should be classified "bad" given this strong pattern.`;
+IMPORTANT: This root domain has a well-established BAD pattern with ${siblingBadDomains.length} sibling subdomains. Set siblingBadVerdict to "bad" unless the current page contains unmistakable real escort listing content (actual named profiles with descriptions, services, rates, and contact details). Thin pages, doorway pages, generic adult text, or ambiguous content should be classified "bad" given this strong pattern.`;
   }
 
   return `**Sibling Subdomain Signal — BAD:**
-The following subdomains of the same root domain are already classified as BAD (not escort listings):
+The following subdomains of the same root domain are classified as BAD or share the same root domain pattern:
 ${siblingBadDomains.map((d) => `- ${d}`).join('\n')}
 These are distinct sub-sites under the same root — not country/locale selectors. Use the siblingBadVerdict field to indicate whether this site fits the same BAD pattern.`;
 };

@@ -963,6 +963,10 @@ export class MainAgent {
       return `[Homepage country selector analysis] The homepage has a country/region selector — this site covers multiple countries. Use country: "general" in your classification.`;
     }
 
+    if (countrySelect.detectedCountry) {
+      return `[Homepage country selector analysis] No country selector found. The page clearly serves a single country: "${countrySelect.detectedCountry}". Use this as the country in your classification unless stronger evidence contradicts it.`;
+    }
+
     return `[Homepage country selector analysis] No country selector found on the homepage.`;
   }
 

@@ -163,7 +163,28 @@ const isRealPhoneNumber = (phoneNumber: string): boolean => {
   const normalized = normalizePhoneNumber(phoneNumber);
   const digitsOnly = normalized.replace(/[^\d]/g, '');
 
-  return digitsOnly.length >= 7;
+  if (digitsOnly.length < 7) {
+    return false;
+  }
+
+  // Reject numbers with extremely low digit diversity (e.g. "0001100110").
+  // Real phone numbers use a variety of digits; repetitive patterns are fake.
+  const digitCounts: Record<string, number> = {};
+  for (const d of digitsOnly) {
+    digitCounts[d] = (digitCounts[d] ?? 0) + 1;
+  }
+
+  const maxFrequency = Math.max(...Object.values(digitCounts));
+  if (maxFrequency / digitsOnly.length > 0.6) {
+    return false;
+  }
+
+  const uniqueDigits = Object.keys(digitCounts).length;
+  if (uniqueDigits <= 2 && digitsOnly.length >= 7) {
+    return false;
+  }
+
+  return true;
 };
 
 const extractCountryFromDomain = (domain: string): string | null => {

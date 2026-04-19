@@ -253,11 +253,11 @@ const validateProposal = (
     if (
       (hasExplicitEscortEvidence(page) || ledger.escortEvidenceEstablished) &&
       reasoningMentionsContactGate(reasoning) &&
-      (ledger.contactGatedDetected || ledger.hasPhoneRevealAttempt || ledger.failedPhoneRevealAttempts > 0)
+      ledger.contactGatedDetected
     ) {
       return {
         ok: false,
-        reason: 'Review verdict rejected because escort evidence is established and the reasoning describes a contact gate (captcha, login wall, subscription, human-verification). A gated phone with escort evidence must be classify_as_escort with contactAccess="contact_gated", not review.',
+        reason: 'Review verdict rejected because escort evidence is established and a contact gate was confirmed by tooling (contactGatedDetected). A gated phone with escort evidence must be classify_as_escort with contactAccess="contact_gated", not review.',
       };
     }
 
@@ -308,6 +308,30 @@ const validateProposal = (
         ok: false,
         reason:
           'BAD verdict rejected because established escort evidence exists but no phone reveal was ever attempted. The absence of a visible phone is not proof the site is not an escort site — the phone may be gated or hidden. Use get_actionable_elements(mode: "reveal-phone-number"), attempt to click the returned element, then reassess.',
+      };
+    }
+
+    if (
+      ledger.escortEvidenceEstablished &&
+      verifiedPhoneNumbers.size === 0 &&
+      ledger.revealPhoneSearchAttempts > 0 &&
+      !ledger.contactGatedDetected
+    ) {
+      return {
+        ok: false,
+        reason:
+          'BAD verdict rejected because escort evidence is established and phone reveal was attempted but no contact mechanism was found (no phone, no gate, no messaging). A directory listing with real escort profiles but no actionable contact info should be classify_as_review, not BAD.',
+      };
+    }
+
+    if (
+      ledger.hasRedirectBaitAttempt &&
+      verifiedPhoneNumbers.size > 0
+    ) {
+      return {
+        ok: false,
+        reason:
+          'BAD verdict rejected because real phone numbers were already found before redirect bait was encountered. The site has real escort content even though some links redirect externally. Use classify_as_review instead.',
       };
     }
 
@@ -441,6 +465,13 @@ const validateProposal = (
       return {
         ok: false,
         reason: 'Escort verdict rejected because shared_venue_phone reasoning must explicitly explain that this is a venue-style club/house/brothel/laufhaus or agency operation using one shared phone.',
+      };
+    }
+
+    if (reusedVerifiedPhoneCount < 1) {
+      return {
+        ok: false,
+        reason: 'Escort verdict rejected because shared_venue_phone requires confirming the same phone number appears on at least 2 different profiles. Navigate to another escort profile on this site and verify the phone number there before submitting shared_venue_phone.',
       };
     }
 

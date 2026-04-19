@@ -94,7 +94,7 @@ Follow these phases in order. Only advance when the current phase is resolved.
 2. If not found yet, request targeted profile and listing detection on the current page.
 3. **Profile found** → phone information will be in the result. Proceed to Phase 3.
 4. **Listing found** → profile URLs will be in the result. Navigate to a profile page, then proceed to Phase 3.
-5. **Neither found** → follow navigation suggestions (`nextBestPages`) to find relevant pages.
+5. **Neither found** → follow navigation suggestions (`profilePages`, `mightFindListOnPage`) to find relevant pages.
 
 ## Phase 3 — Collect & Verify Phone Numbers
 
@@ -198,7 +198,7 @@ Tool parameters and descriptions are in the tool definitions. Key constraints:
   - Use `reveal-phone-number` when you can see a masked phone or a reveal button on a profile page.
   - Use `accept-verification` only to dismiss an age-gate or consent overlay blocking the whole page.
   - Use `get-in-contact` **when phone reveal has failed on 2 or more profiles** and no phone has been verified yet, and you are currently on an individual escort profile page. Do NOT use this on listing/directory pages. This mode finds contact-flow buttons (WhatsApp/Telegram links with embedded phones, "Contact me", "Book now", etc.) and helps detect: (a) messaging-app links where the phone is in the URL, (b) access gates (login wall, captcha, subscription) that appear after clicking, or (c) off-domain redirects that indicate redirect bait. After clicking an element from this mode, interpret the outcome as described in the mode instructions and deliver a verdict immediately — do not continue searching.
-- **Finding another profile or listing page** — Use `analyze_page` with `has-escort-list` and/or `has-escort-profile` modes on the current page, then navigate using `escortProfileUrls` or `nextBestPages` from the result. Do NOT use `get_actionable_elements` for this.
+- **Finding another profile or listing page** — Use `analyze_page` with `has-escort-list` and/or `has-escort-profile` modes on the current page, then navigate using `escortProfileUrls`, `profilePages`, or `mightFindListOnPage` from the result. Do NOT use `get_actionable_elements` for this.
 - **`get_actionable_elements` result — `shouldClickAllAtOnce`:**
   - If `shouldClickAllAtOnce: true` (always for `accept-verification`) → pass ALL returned element IDs in a single `click_element` call.
   - If `shouldClickAllAtOnce: false` (always for `reveal-phone-number`, `profile-revealing`) → click elements **one at a time**, observe with `describe-difference` after each, and only proceed to the next element if the previous click did not reveal contact info.

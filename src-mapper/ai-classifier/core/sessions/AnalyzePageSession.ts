@@ -34,15 +34,16 @@ export interface AnalyzePageResult {
     hasEscortProfile?: {
       found: boolean;
       hasProfileRevealingButtons: boolean;
-      nextBestPages: string[] | null;
+      profilePages: string[] | null;
     };
     hasEscortList?: {
       found: boolean;
       escortProfileUrls: string[] | null;
-      nextBestPages: string[] | null;
+      mightFindListOnPage: string[] | null;
     };
     hasCountrySelect?: {
       found: boolean;
+      detectedCountry: string | null;
       nextBestPages: string[] | null;
     };
     phoneSearchResult?: {
@@ -119,10 +120,10 @@ const ANALYZE_TOOLS: ChatCompletionTool[] = [
             type: 'boolean',
             description: 'True if the profile page has buttons/links that can reveal more profile details, navigate to a full profile, or open a contact/messaging flow — e.g. "View profile", "See full ad", "More details", "Contact", WhatsApp/Telegram links, or any CTA that leads to the escort\'s dedicated page or expands their contact info. False if the current page already shows the complete profile with no further reveal step needed.',
           },
-          nextBestPages: {
+          profilePages: {
             type: ['array', 'null'],
             items: { type: 'string' },
-            description: 'URLs or element IDs of pages likely to contain profiles. null if not applicable.',
+            description: 'URLs or paths of pages that look like individual escort profile pages (e.g. /escorts/anna/, /profile/12345). Must be profile-detail paths, NOT listing/category pages. null if not applicable.',
           },
           suggestedActions: {
             type: ['array', 'null'],
@@ -156,10 +157,10 @@ const ANALYZE_TOOLS: ChatCompletionTool[] = [
             items: { type: 'string' },
             description: 'URLs of individual escort profiles found on this page. null if not applicable.',
           },
-          nextBestPages: {
+          mightFindListOnPage: {
             type: ['array', 'null'],
             items: { type: 'string' },
-            description: 'URLs or element IDs of pages likely to contain lists. null if not applicable.',
+            description: 'URLs or paths of pages where an escort listing might exist (e.g. /escorts/, /girls/, /city-name/). null if not applicable.',
           },
           suggestedActions: {
             type: ['array', 'null'],
@@ -192,6 +193,10 @@ const ANALYZE_TOOLS: ChatCompletionTool[] = [
             type: ['array', 'null'],
             items: { type: 'string' },
             description: 'URLs or element IDs of pages likely to have country selectors. null if not applicable.',
+          },
+          detectedCountry: {
+            type: ['string', 'null'],
+            description: 'When found is false: if the page clearly serves a single country, provide the ISO 3166-1 alpha-2 country code (lowercase, e.g. "es", "ro", "de"). null if unclear or multi-country.',
           },
           suggestedActions: {
             type: ['array', 'null'],
@@ -563,7 +568,7 @@ export class AnalyzePageSession {
         data: {
           found: Boolean(args.found),
           hasProfileRevealingButtons: Boolean(args.hasProfileRevealingButtons),
-          nextBestPages: this.filterSameHostUrls(args.nextBestPages),
+          profilePages: this.filterSameHostUrls(args.profilePages),
         },
       });
       resultMessage = `Verdict recorded: ${args.found ? 'found' : 'not found'}`;
@@ -574,7 +579,7 @@ export class AnalyzePageSession {
         data: {
           found: Boolean(args.found),
           escortProfileUrls: this.filterSameHostUrls(args.escortProfileUrls),
-          nextBestPages: this.filterSameHostUrls(args.nextBestPages),
+          mightFindListOnPage: this.filterSameHostUrls(args.mightFindListOnPage),
         },
       });
       resultMessage = `Verdict recorded: ${args.found ? 'found' : 'not found'}`;
@@ -584,10 +589,11 @@ export class AnalyzePageSession {
         suggestedActions: (args.suggestedActions as string[] | null) ?? null,
         data: {
           found: Boolean(args.found),
+          detectedCountry: typeof args.detectedCountry === 'string' ? args.detectedCountry.toLowerCase() : null,
           nextBestPages: this.filterSameHostUrls(args.nextBestPages),
         },
       });
-      resultMessage = `Verdict recorded: ${args.found ? 'found' : 'not found'}`;
+      resultMessage = `Verdict recorded: ${args.found ? 'found' : 'not found'}${args.detectedCountry ? ` (detected country: ${args.detectedCountry})` : ''}`;
     } else if (name === 'set_phone_search_result') {
       this.findings.set('phoneSearchResult', {
         reason: String(args.reason),
