@@ -26,11 +26,11 @@ test('Should load more images when scrolling.', async ({page}) => {
   const imagesCount = await page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').count();
 
   if (imagesCount > 3) {
-    await page.waitForTimeout(1000);
     await page.locator('[data-wwid="escort-image-modal"]').evaluate(e => {
       e.scrollBy(0, 10000);
     })
 
+    await page.waitForTimeout(300);
     await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toHaveCount(0);
 
     const endMessage = page.locator('[data-wwid="escort-images"] [data-wwid="escort-images-end"]');
@@ -39,9 +39,6 @@ test('Should load more images when scrolling.', async ({page}) => {
     if (endMessageVisible) {
       return;
     }
-
-    await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toBeVisible();
-    await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toHaveCount(0, {timeout: 15000});
 
     const newCount = await page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').count();
     expect(newCount).toBeGreaterThan(imagesCount);

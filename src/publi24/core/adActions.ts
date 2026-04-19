@@ -589,8 +589,6 @@ export const adActions = {
   },
 
   scrollIntoView(element: HTMLDivElement, options: {smooth?: boolean} = {}) {
-    utils.debugLog('Scrolling to ad ' + element.getAttribute('data-articleid'));
-
     const panel = element.querySelector<HTMLElement>('[data-wwid="control-panel"]');
     const target = panel ?? element;
     const offset = panel
@@ -599,6 +597,10 @@ export const adActions = {
     const behavior = options?.smooth === false ? 'instant' : 'smooth';
 
     const scrollParent = utils.getScrollParent(element);
+
+    utils.debugLog('Scrolling to ad ' + element.getAttribute('data-articleid'), {
+      window: scrollParent === window,
+    });
 
     if (scrollParent === window) {
       const top = target.getBoundingClientRect().top + window.scrollY + offset;

@@ -4,7 +4,7 @@ import {InlineLoader} from '../../../../common/components/InlineLoader/InlineLoa
 import styles from './NextVisibleAdButton.module.scss';
 
 const NextVisibleAdButton: React.FC = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [noMore, setNoMore] = useState(false);
   const pendingRef = useRef(false);
   const lastFoundIdRef = useRef<string | null>(null);

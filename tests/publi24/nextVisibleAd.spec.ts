@@ -61,9 +61,10 @@ test('Should clear find-next flag after finding, restoring inline button on manu
   await page.locator('[data-wwid="next-visible-ad"]').waitFor();
   await page.locator('[data-wwid="next-visible-ad"]').click();
 
-  await page.locator('[data-wwid="next-visible-ad-global"]').waitFor();
-  await page.locator('[data-wwid="next-visible-ad-global"]').isEnabled();
+  await page.waitForTimeout(400);
 
+  await page.locator('[data-wwid="next-visible-ad-global"]').waitFor();
+  await expect(page.locator('[data-wwid="next-visible-ad-global"]')).toBeEnabled();
   await expectFindNext(page, false);
 
   await page.locator('.pagination .arrow').last().locator('a').click();

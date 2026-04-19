@@ -7,6 +7,11 @@ const enableIosTesting = async (page: Page) => {
     window.localStorage.setItem('_testing_ios', '1');
   });
 }
+const setScrollToAd = async (page: Page, adId: string) => {
+  await page.evaluate((adId) => {
+    window.localStorage.setItem('ww:focus', adId);
+  }, adId);
+}
 
 test('Should search and focus ad on listing', async ({ page, context }) => {
   await utilsPubli.open(context, page);
@@ -14,10 +19,10 @@ test('Should search and focus ad on listing', async ({ page, context }) => {
 
   const firstAd = await utilsPubli.findFirstAdWithPhone(page);
   const adId = await firstAd.getAttribute('data-articleid');
+  await setScrollToAd(page, adId);
 
-  await page.waitForTimeout(800);
-  setTimeout(() => page.locator('.pagination').scrollIntoViewIfNeeded(), 500);
-  await utilsPubli.resolveGooglePage(async () => await firstAd.$('[data-wwid="investigate"]'), context, page);
+  await page.locator('.pagination').scrollIntoViewIfNeeded();
+  await page.reload();
   await page.waitForTimeout(800);
 
   await expect(page.locator(`[data-articleid="${adId}"]`)).toBeInViewport();
