@@ -90,6 +90,10 @@ WWStorage.upgrade()
   .then(() => {
     console.log('Booting publi24-advanced-filter');
 
+    WWStorage.cleanupStale().catch((error) => {
+      console.error('Failed to cleanup stale storage:', error);
+    });
+
     userId.init().catch(console.error);
     sendAnalyticsEvent().catch(console.error);
 

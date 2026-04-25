@@ -75,6 +75,8 @@ const _WW_CALLBACKS = {
   settingsChanged: [] as Array<() => void>,
 };
 
+const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+
 
 
 function parseAdUuid(uuid: string): AdUuid {
@@ -87,6 +89,17 @@ function parseAdUuid(uuid: string): AdUuid {
 
 function serializeAdUuid(adUuid: AdUuid): string {
   return `${adUuid.id}|${dataCompression.compressAdLink(adUuid.url)}`;
+}
+
+function removeAdItem(id: string, phone?: string | null) {
+  const upperId = id.toUpperCase();
+
+  if (phone) {
+    WWStorage.removePhoneAd(phone, upperId);
+  }
+
+  localStorage.removeItem(`ww2:${upperId}`);
+  delete _WW_STORE_CACHE.item[upperId];
 }
 
 export const WWStorage = {
@@ -692,6 +705,32 @@ export const WWStorage = {
       }
     });
     return allItems;
+  },
+
+  async cleanupStale(): Promise<void> {
+    const threshold = Date.now() - ONE_YEAR_MS;
+    const allItems: Record<string, string> = { ...localStorage };
+    let removedCount = 0;
+
+    Object.entries(allItems).forEach(([key, value]) => {
+      if (!key.match(/^ww2:[^:]+$/)) {
+        return;
+      }
+
+      try {
+        const adItem: AdItem = JSON.parse(value);
+        if (!adItem.lastSeen || adItem.lastSeen < threshold) {
+          removeAdItem(key.replace(/^ww2:/, ''), adItem.phone);
+          removedCount++;
+        }
+      } catch (error) {
+        console.error(`Failed to inspect ad storage item ${key} during stale cleanup:`, error);
+      }
+    });
+
+    if (removedCount > 0) {
+      console.log(`Cleaned up ${removedCount} stale Publi24 ads from storage`);
+    }
   },
 
   async importData(data: Record<string, string>) {
