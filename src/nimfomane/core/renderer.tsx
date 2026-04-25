@@ -9,16 +9,15 @@ import {analyzer} from "./analyzer";
 import {IS_MOBILE_VIEW} from "../../common/globals";
 import GlobalButtonsRoot from "../component/GlobalButtons/GlobalButtonsRoot";
 
-const focusModeHiddenIds = new Set<string>();
+interface RegisterTopicItemsOptions {
+  applyFocusMode?: boolean;
+  isFromListing?: boolean;
+}
 
-function updateHiddenCountIndicator() {
-  const list = document.querySelector<HTMLElement>('.ipsDataList.cForumTopicTable');
-  if (!list) return;
-
-  const count = focusModeHiddenIds.size;
+function updateHiddenCountIndicator(list: HTMLElement, count: number) {
   let indicator = list.querySelector<HTMLLIElement>('li[data-wwid="hidden-count-indicator"]');
 
-  if (count === 0) {
+  if (!count) {
     indicator?.remove();
     return;
   }
@@ -34,6 +33,15 @@ function updateHiddenCountIndicator() {
   }
 
   indicator.textContent = `${count} ${count === 1 ? 'topic ascuns' : 'topice ascunse'} de tot`;
+}
+
+function getFocusModeTopicHiddenState(id: string) {
+  const topic = NimfomaneStorage.getTopic(id);
+  const escortUser = topic.isOfEscort ? topic.ownerUser : null;
+
+  return escortUser
+    ? !!NimfomaneStorage.getEscort(escortUser).hidden
+    : !!topic.hidden;
 }
 
 export const renderer = {
@@ -79,19 +87,6 @@ export const renderer = {
 
     container.setAttribute('data-wwtopic', id);
 
-    if (NimfomaneStorage.isFocusMode()) {
-      const topic = NimfomaneStorage.getTopic(id);
-      const escortUser = topic.isOfEscort ? topic.ownerUser : null;
-      const isHidden = escortUser
-        ? NimfomaneStorage.getEscort(escortUser).hidden
-        : topic.hidden;
-      if (isHidden) {
-        container.style.display = 'none';
-        focusModeHiddenIds.add(id);
-        updateHiddenCountIndicator();
-      }
-    }
-
     analyzer.analyzeTopic(container, id, priority).catch(console.error);
 
     const unmountImage = renderer.renderTopicImage(container, id);
@@ -110,6 +105,60 @@ export const renderer = {
     }, 2000);
 
     return cleanup;
+  },
+
+  registerTopicItems(
+    context: HTMLElement | Document,
+    {applyFocusMode = false, isFromListing = false}: RegisterTopicItemsOptions = {}
+  ): Array<() => void> {
+    const list = context.querySelector<HTMLElement>('.ipsDataList.cForumTopicTable');
+    const topicContainers = Array.from(context.querySelectorAll<HTMLDivElement>('[data-rowid]'));
+    let hiddenCount = 0;
+
+    const visibleTopicContainers = topicContainers.filter((container) => {
+      if (!applyFocusMode || !NimfomaneStorage.isFocusMode()) {
+        container.style.display = '';
+        return true;
+      }
+
+      const id = container.getAttribute('data-rowid');
+      if (!id) {
+        console.error('Topic container missing data-rowid', container);
+        return false;
+      }
+
+      if (getFocusModeTopicHiddenState(id)) {
+        container.style.display = 'none';
+        hiddenCount++;
+        return false;
+      }
+
+      container.style.display = '';
+      return true;
+    });
+
+    if (list && isFromListing) {
+      updateHiddenCountIndicator(list, hiddenCount);
+    }
+
+    return visibleTopicContainers.map((container, index) => {
+      if (container.hasAttribute('data-wwtopic')) {
+        return () => {};
+      }
+
+      const id = container.getAttribute('data-rowid');
+      if (!id) {
+        console.error('Topic container missing data-rowid', container);
+        return () => {};
+      }
+
+      try {
+        return renderer.registerTopicItem(container, id, index);
+      } catch (error) {
+        console.error(`Failed to register topic item ${id}:`, error);
+        return () => {};
+      }
+    });
   },
 
   renderTopicImage(container: HTMLDivElement, id: string): () => void {

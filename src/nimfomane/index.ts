@@ -39,6 +39,13 @@ const runWithObserver = (callback: () => any, changingContainerSelector: string)
   });
 }
 
+const initializeListingPage = () => {
+  renderer.registerTopicItems(document.body, {applyFocusMode: true, isFromListing: true});
+  runWithObserver(() => {
+    renderer.registerTopicItems(document.body, {applyFocusMode: true, isFromListing: true});
+  }, '.cForumTopicTable');
+}
+
 NimfomaneStorage.upgrade()
   .then(waitForSiteLoad)
   .then(() => {
@@ -74,26 +81,7 @@ NimfomaneStorage.upgrade()
     profileActions.refreshFavoritesProfileStats().catch(console.error);
 
     if (IS_LISTING_PAGE && IS_ESCORT_LISTING) {
-      const registerItems = () => {
-        const topicContainers = [...document.querySelectorAll<HTMLDivElement>('[data-rowid]')];
-        for (let index = 0; index < topicContainers.length; index++) {
-          const container = topicContainers[index];
-
-          if (container.hasAttribute('data-wwtopic')) {
-            continue;
-          }
-
-          const id = container.getAttribute('data-rowid')!;
-
-          try {
-            renderer.registerTopicItem(container, id, index);
-          } catch (error) {
-            console.error(`Failed to register topic item ${id}:`, error);
-          }
-        }
-      }
-
-      runWithObserver(registerItems, '.cForumTopicTable');
+      initializeListingPage();
     }
 
     if (IS_PROFILE_PAGE_ESCORT) {
