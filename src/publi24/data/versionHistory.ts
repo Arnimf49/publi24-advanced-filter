@@ -8,6 +8,23 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.2',
+    releaseDate: '20 aprilie 2026',
+    changeNew: [],
+    changeImprove: [
+      'Tratat finalul listei pentru \'următorul anunț vizibil\'.',
+      'Nu se mai face scroll sus la apăsare pe \'următorul\'.',
+      'Culegere alternativă a rezultatelor pe anumite dispozitive de pe Google Lens.',
+      'Spinner sub rezultate când se caută după poze sau telefon.',
+      'Filtrarea rezultatelor care duc la liste de Publi24.',
+      'Domenii străine noi clasificate pentru rezultatele după poze.',
+    ],
+    changeFix: [
+      'Stil pe modalul istoric de verziuni.',
+      'Ascuns elementele noi conflictuale de pe anunțurile premium, pe mobil.',
+    ]
+  },
+  {
     version: '3.1',
     releaseDate: '7 aprilie 2026',
     changeNew: [
