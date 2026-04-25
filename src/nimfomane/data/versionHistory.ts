@@ -8,6 +8,15 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.2.1',
+    releaseDate: '25 aprilie 2026',
+    changeNew: [],
+    changeImprove: [],
+    changeFix: [
+      'Număr topice ascunse incorect la navigare pe paginile de listare.',
+    ]
+  },
+  {
     version: '3.2',
     releaseDate: '20 aprilie 2026',
     changeNew: [
