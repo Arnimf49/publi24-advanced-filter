@@ -23,7 +23,7 @@ export const iosUtils = {
         for (const el of elements) {
           if (!scrolledElements.has(el)) {
             scrolledElements.add(el);
-            adActions.scrollIntoView(el, {smooth: false});
+            setTimeout(() => adActions.scrollIntoView(el, {smooth: false}), 200);
           }
         }
 

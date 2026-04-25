@@ -24,5 +24,4 @@ export const IS_SAFARI_IOS: boolean = [
 //   }
 //   document.body.appendChild(errorContainer);
 // }
-//
 // window.addEventListener('error', htmlLog, true);

@@ -1,18 +1,39 @@
+import {IS_SAFARI_IOS} from "./globals";
+
 const prevOpen: string[] = [];
 let currentModalState: ModalStateData | null = null;
 
 const MODAL_STATE_KEY = 'ww:modal-state';
+const MODAL_STATE_URL_KEY = 'ww:modal-state:url';
 
 interface ModalStateData {
   type: string;
   meta: Record<string, any>;
 }
 
-window.addEventListener('beforeunload', () => {
-  if (currentModalState) {
-    localStorage.setItem(MODAL_STATE_KEY, JSON.stringify(currentModalState));
+if (IS_SAFARI_IOS) {
+  window.addEventListener('pagehide', () => {
+    if (currentModalState) {
+      localStorage.setItem(MODAL_STATE_KEY, JSON.stringify(currentModalState));
+      localStorage.setItem(MODAL_STATE_URL_KEY, window.location.toString());
+    }
+  });
+
+  const state = localStorage.getItem(MODAL_STATE_KEY);
+  if (state && window.location.toString() !== localStorage.getItem(MODAL_STATE_URL_KEY)) {
+    localStorage.removeItem(MODAL_STATE_KEY);
+    localStorage.removeItem(MODAL_STATE_URL_KEY);
+  } else {
+    localStorage.removeItem(MODAL_STATE_URL_KEY);
   }
-});
+} else {
+  window.addEventListener('beforeunload', () => {
+    if (currentModalState) {
+      localStorage.setItem(MODAL_STATE_KEY, JSON.stringify(currentModalState));
+    }
+  });
+}
+
 
 export const modalState = {
   pushOpen(type: string, meta: Record<string, any> = {}): void {
