@@ -103,16 +103,21 @@ export const utils = {
       return date;
     }
 
-    const match = lower.match(/^([a-zăîâșț]+)\s+(\d{1,2})$/);
-    if (match) {
-      const [, monthStr, dayStr] = match;
-      if (!monthStr || !months[monthStr]) {
-        return null;
-      }
-      const month = months[monthStr] as number;
-      const day = parseInt(dayStr, 10);
+    const monthFirstMatch = lower.match(/^([a-zăîâșț]+)\s+(\d{1,2})$/);
+    if (monthFirstMatch) {
+      const [, monthStr, dayStr] = monthFirstMatch;
+      const month = months[monthStr];
       if (month !== undefined) {
-        return new Date(now.getFullYear(), month, day);
+        return new Date(now.getFullYear(), month, parseInt(dayStr, 10));
+      }
+    }
+
+    const dayFirstMatch = lower.match(/^(\d{1,2})\s+([a-zăîâșț]+)$/);
+    if (dayFirstMatch) {
+      const [, dayStr, monthStr] = dayFirstMatch;
+      const month = months[monthStr];
+      if (month !== undefined) {
+        return new Date(now.getFullYear(), month, parseInt(dayStr, 10));
       }
     }
 

@@ -1,6 +1,7 @@
 import {IS_AD_PAGE} from "./core/globals";
 import {WWStorage} from "./core/storage";
 import {renderer} from "./core/renderer";
+import {adActions} from "./core/adActions";
 import {favorites} from "./core/favorites";
 import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../common/globals";
 import {misc} from "./core/misc";
@@ -64,6 +65,7 @@ const initializeAdPage = async () => {
   item!.appendChild(container);
   item!.style.position = 'relative';
 
+  adActions.adSeen(item!, id.toUpperCase());
   renderer.registerAdItem(item!, id.toUpperCase());
 };
 

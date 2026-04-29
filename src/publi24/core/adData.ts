@@ -49,10 +49,27 @@ export const adData = {
 
   getItemDate(item: Element) {
     if (IS_AD_PAGE()) {
-      throw new Error('Not implemented: getItemDate for ad page');
+      const dateEl = IS_MOBILE_VIEW
+        ? document.querySelector<HTMLElement>('.valid-from')
+        : document.querySelector<HTMLElement>('.detail-info > div:last-child');
+      const dateText = dateEl?.textContent?.trim();
+      if (!dateText) {
+        return null;
+      }
+
+      const isoMatch = dateText.match(/\d+\/\d+\/\d+\s+\d+:\d+:\d+\s+(?:AM|PM)/);
+      if (isoMatch) {
+        const parsed = new Date(isoMatch[0]);
+        return isNaN(parsed.getTime()) ? null : parsed;
+      }
+
+      return null;
     } else {
-      const dateStr = item.querySelector<HTMLElement>('[class="article-date"]')!.innerText;
-      return utils.parseRomanianDate(dateStr);
+      const dateEl = item.querySelector<HTMLElement>('[class="article-date"]');
+      if (!dateEl) {
+        return null;
+      }
+      return utils.parseRomanianDate(dateEl.innerText);
     }
   },
 
