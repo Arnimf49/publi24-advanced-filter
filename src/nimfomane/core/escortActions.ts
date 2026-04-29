@@ -134,7 +134,7 @@ export const escortActions = {
       return [{
         url: el.getAttribute('data-background-src')!,
         date: el.closest('.ipsStreamItem_container')!.querySelector('time')!.innerText,
-        topicUrl: (streamItem?.querySelector<HTMLAnchorElement>('.ipsStreamItem_title a'))?.href ?? '',
+        topicUrl: (streamItem?.querySelector<HTMLAnchorElement>('.ipsStreamItem_title a[data-linktype="link"]'))?.href ?? '',
       }];
     });
 
