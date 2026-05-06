@@ -161,6 +161,7 @@ test('Should show "date șterse, caută din nou" when image search results are c
   await page.evaluate((id) => {
     localStorage.setItem(`ww2:${id}`, JSON.stringify({
       imagesTime: Date.now() - 60000,
+      lastSeen: Date.now() - 60000,
       phone: '0123456789'
     }));
   }, adId);
