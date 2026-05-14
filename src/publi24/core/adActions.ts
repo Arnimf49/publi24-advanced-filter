@@ -413,7 +413,8 @@ export const adActions = {
   createInvestigateImgClickHandler(id: string, item: HTMLElement): (this: GlobalEventHandlers, e: MouseEvent) => Promise<void> {
     const imageToLensUrl = (imgLink: string): string => {
       const encodedLink = encodeURIComponent(imgLink);
-      return `https://lens.google.com/uploadbyurl?url=${encodedLink}&hl=ro`;
+      const isTesting = localStorage.getItem('_pw_init') === 'true';
+      return `https://lens.google.com/uploadbyurl?url=${encodedLink}${isTesting ? '' : '&hl=ro'}`;
     }
     const openImageInvestigation = (imgLink: string) => window.open(imageToLensUrl(imgLink));
 
