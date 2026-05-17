@@ -4,7 +4,7 @@ import {dateLib} from "./dateLib";
 import {IS_AD_PAGE} from "./globals";
 import {WWBrowserStorage} from "./browserStorage";
 import {AutoHideCriterias, WWStorage} from "./storage";
-import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../../common/globals";
+import {IS_MOBILE_VIEW, IS_PROMOTER, IS_SAFARI_IOS} from "../../common/globals";
 import {bgApi} from "../../common/background/bgApi";
 import {AUTO_HIDE_CRITERIA} from "./hideReasons";
 import {utils} from "../../common/utils";
@@ -413,8 +413,9 @@ export const adActions = {
   createInvestigateImgClickHandler(id: string, item: HTMLElement): (this: GlobalEventHandlers, e: MouseEvent) => Promise<void> {
     const imageToLensUrl = (imgLink: string): string => {
       const encodedLink = encodeURIComponent(imgLink);
-      const isTesting = localStorage.getItem('_pw_init') === 'true';
-      return `https://lens.google.com/uploadbyurl?url=${encodedLink}${isTesting ? '' : '&hl=ro'}`;
+      const addLanguage = localStorage.getItem('_pw_init') !== 'true'
+        && !IS_PROMOTER;
+      return `https://lens.google.com/uploadbyurl?url=${encodedLink}${addLanguage ? '&hl=ro' : ''}`;
     }
     const openImageInvestigation = (imgLink: string) => window.open(imageToLensUrl(imgLink));
 
