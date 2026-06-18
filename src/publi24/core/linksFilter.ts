@@ -93,6 +93,10 @@ for (const [key, countries] of escortSiteNameCountries) {
 // when the absolute URL could not be determined (Google Lens /goto redirect).
 export type ImageResult = string | [string, string];
 
+// A raw search result: either an absolute URL string, or a [displayName, gotoPath] tuple
+// when Google renders a /goto redirect hiding the real destination URL.
+export type SearchResult = string | [string, string];
+
 interface ProcessedLink {
   link: string;
   isDead: boolean;
@@ -150,12 +154,20 @@ export const linksFilter = {
       url.replace(/.+\/([^.\/]+)\.html.*/, '$1') === adUrl.replace(/.+\/([^.\/]+)\.html.*/, '$1');
   },
 
-  filterLinks(links: string[], itemUrl: string): string[] {
-    return links.filter(
-      (l: string) =>
-        !BLACKLISTED_LINKS.some((b: string) => l.indexOf(b) === 0)
-        && !linksFilter.isUrlSameAd(l, itemUrl)
-    );
+  filterLinks(links: SearchResult[], itemUrl: string): SearchResult[] {
+    return links.filter((l: SearchResult) => {
+      if (Array.isArray(l)) {
+        const name = l[0];
+        return !BLACKLISTED_LINKS.some(
+          (b: string) => name.startsWith(b
+            .replace(/^https?:\/\//, '')
+            .replace(/\/$/, '')
+          )
+        );
+      }
+      return !BLACKLISTED_LINKS.some((b: string) => l.indexOf(b) === 0)
+        && !linksFilter.isUrlSameAd(l, itemUrl);
+    });
   },
 
   getImageResultsStatus(imageSearchDomains: ImageLinkDomainGroup[] | undefined, isStale?: boolean): 'green' | 'yellow' | 'red' | null {
@@ -197,16 +209,18 @@ export const linksFilter = {
     return 'green';
   },
 
-  sortLinks(links: string[]): string[] {
-    return links.sort((l1: string, l2: string): number => {
-      const d1: number = PRIO_DOMAINS.findIndex((d: string) => l1.includes('//' + d));
-      const d2: number = PRIO_DOMAINS.findIndex((d: string) => l2.includes('//' + d));
+  sortLinks(links: SearchResult[]): SearchResult[] {
+    return links.sort((l1: SearchResult, l2: SearchResult): number => {
+      const u1 = Array.isArray(l1) ? l1[0] : l1;
+      const u2 = Array.isArray(l2) ? l2[0] : l2;
+      const d1: number = PRIO_DOMAINS.findIndex((d: string) => u1.includes('//' + d) || u1.startsWith(d + '/') || u1.startsWith(d + ' '));
+      const d2: number = PRIO_DOMAINS.findIndex((d: string) => u2.includes('//' + d) || u2.startsWith(d + '/') || u2.startsWith(d + ' '));
 
       if (d1 !== -1 && d2 !== -1) {
         if (d1 !== d2) {
           return d1 - d2;
         }
-        return l1.localeCompare(l2);
+        return u1.localeCompare(u2);
       }
       if (d2 !== -1) {
         return 1;
@@ -215,7 +229,7 @@ export const linksFilter = {
         return -1;
       }
 
-      return l1.localeCompare(l2);
+      return u1.localeCompare(u2);
     });
   },
 

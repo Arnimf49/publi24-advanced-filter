@@ -1,7 +1,7 @@
 import React, {FC, MouseEventHandler, useCallback, useEffect, useState} from "react";
 import {adData} from "../../core/adData";
 import {WWStorage} from "../../core/storage";
-import {ImageResult, linksFilter} from "../../core/linksFilter";
+import {ImageResult, SearchResult, linksFilter} from "../../core/linksFilter";
 import {dateLib} from "../../core/dateLib";
 import AdPanel from "./AdPanel";
 import {adActions} from "../../core/adActions";
@@ -21,7 +21,7 @@ interface AdPanelRootProps {
 
 const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const [renderCycle, setRenderCycle] = useState(0);
-  const [{search, images}, setSearches] = useState<{search?: string[], images?: ImageResult[]}>({});
+  const [{search, images}, setSearches] = useState<{search?: SearchResult[], images?: ImageResult[]}>({});
   const [showHideReason, setShowHideReason] = useState(false);
   const [showImagesSlider, setShowImagesSlider] = useState(false);
   const [showDuplicates, setShowDuplicates] = useState(false);
@@ -36,8 +36,16 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const phone = WWStorage.getAdPhone(id) || '';
 
   const filteredSearchLinks = linksFilter.sortLinks(linksFilter.filterLinks(search || [], itemUrl));
-  const nimfomaneLink = filteredSearchLinks.find(l => l.indexOf('https://nimfomane.com/forum/topic/') === 0);
-  const ddcLink = filteredSearchLinks.find(l => l.indexOf('https://ddcforum.com/index.php?/forums/topic/') === 0);
+  const nimfomaneLink = filteredSearchLinks.reduce<string | undefined>((found, l) => {
+    if (found) return found;
+    if (!Array.isArray(l)) return l.indexOf('https://nimfomane.com/forum/topic/') === 0 ? l : undefined;
+    return l[0].startsWith('nimfomane.com ') ? new URL(l[1], 'https://www.google.com').href : undefined;
+  }, undefined);
+  const ddcLink = filteredSearchLinks.reduce<string | undefined>((found, l) => {
+    if (found) return found;
+    if (!Array.isArray(l)) return l.indexOf('https://ddcforum.com/index.php?/forums/topic/') === 0 ? l : undefined;
+    return l[0].startsWith('ddcforum.com ') ? new URL(l[1], 'https://www.google.com').href : undefined;
+  }, undefined);
   const imageSearchDomains = images ? linksFilter.processImageLinks(id, images, itemUrl) : undefined;
 
   const phoneTime = WWStorage.getInvestigatedTime(id);

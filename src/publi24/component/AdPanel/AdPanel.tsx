@@ -14,6 +14,7 @@ import ErrorDisplay from "../Common/ErrorDisplay/ErrorDisplay";
 import InfoIcon from "../Common/Icons/InfoIcon";
 import PhoneSearchResultsHelp from "./Help/PhoneSearchResultsHelp";
 import ImageSearchResultsHelp from "./Help/ImageSearchResultsHelp";
+import {SearchResult} from "../../core/linksFilter";
 
 interface ImageLink {
   link: string;
@@ -43,8 +44,8 @@ interface AdPanelProps {
   numberOfAdsWithSamePhone?: number | string;
   phoneInvestigatedSinceDays?: string | null;
   phoneInvestigateStale?: boolean;
-  searchLinks?: string[];
-  filteredSearchLinks?: string[];
+  searchLinks?: SearchResult[];
+  filteredSearchLinks?: SearchResult[];
   imageInvestigatedSinceDays?: string | null;
   imageInvestigateStale?: boolean;
   imageSearchDomains?: ImageSearchDomain[];
@@ -286,17 +287,26 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                         <p className={`${styles.noResults} ${styles.noResultsFound}`}>nu au fost găsite linkuri
                           relevante</p>
                       ) : (
-                        filteredSearchLinks.map((link, index) => (
-                          <div key={index} className={styles.searchResultLinkContainer}>
-                            <a
-                              href={link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              {link.replace(/^https?:\/\/(www\.)?|^www\./, '')}
-                            </a>
-                          </div>
-                        ))
+                        filteredSearchLinks.map((link, index) => {
+                            const isGoto = Array.isArray(link);
+                            const href = isGoto
+                              ? new URL(link[1], 'https://www.google.com').href
+                              : link;
+                            const display = isGoto
+                              ? link[0]
+                              : link.replace(/^https?:\/\/(www\.)?|^www\./, '');
+                            return (
+                              <div key={index} className={styles.searchResultLinkContainer}>
+                                <a
+                                  href={href}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  {display}
+                                </a>
+                              </div>
+                            );
+                          })
                       )}
                     </>
                   )}

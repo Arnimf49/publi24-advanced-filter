@@ -1,6 +1,7 @@
 import {WWBrowserStorage} from "./core/browserStorage";
 import {addSearchLoader, addContinueButton, withRetry} from "./core/searchUI";
 import {IS_MOBILE_VIEW} from "../common/globals";
+import {SearchResult} from "./core/linksFilter";
 
 let isManual: boolean = false;
 
@@ -12,6 +13,15 @@ const topOffset = IS_MOBILE_VIEW ? 50 : 20;
 function getResults() {
   return document.body.querySelectorAll<HTMLAnchorElement>('#rso a[data-ved]') ??
     document.body.querySelectorAll<Element>('[eid] [jsaction][jscontroller] > [href]');
+}
+
+function buildGotoResultName(anchor: HTMLAnchorElement): string {
+  const heading = anchor.querySelector<HTMLElement>('h1, h2, h3, h4, h5');
+  const headingText = heading?.textContent?.trim() ?? '';
+  const fullText = anchor.textContent ?? '';
+  const domainMatch = fullText.match(/https?:\/\/([^\s/]+)/);
+  const domainPrefix = domainMatch ? domainMatch[1] : '';
+  return domainPrefix ? `${domainPrefix} ${headingText}`.trim() : headingText;
 }
 
 function extractResultLinks(wwid: string) {
@@ -31,13 +41,31 @@ function extractResultLinks(wwid: string) {
     const results: NodeListOf<Element> = getResults();
     WWBrowserStorage.get(storageKey)
       .then((data) => {
-        const currentUrls: string[] = data[storageKey] || [];
+        const currentUrls: SearchResult[] = data[storageKey] || [];
 
-        const resultUrls: string[] = Array.from(results)
-          .map((n: Element) => (n as HTMLAnchorElement).getAttribute('href'))
-          .filter((href: string | null): href is string => href !== null);
+        const resultUrls: SearchResult[] = Array.from(results)
+          .map((n: Element): SearchResult | null => {
+            const anchor = n as HTMLAnchorElement;
+            const href = anchor.getAttribute('href');
+            if (href === null) {
+              return null;
+            }
+            if (href.startsWith('goto')) {
+              return [buildGotoResultName(anchor), href];
+            }
+            return href;
+          })
+          .filter((r): r is SearchResult => r !== null);
 
-        const finalUrls: string[] = [...new Set([...resultUrls, ...currentUrls])];
+        const seen = new Set<string>();
+        const finalUrls: SearchResult[] = [...resultUrls, ...currentUrls].filter((r) => {
+          const key = JSON.stringify(r);
+          if (seen.has(key)) {
+            return false;
+          }
+          seen.add(key);
+          return true;
+        });
 
         return WWBrowserStorage.set(storageKey, finalUrls);
       })
