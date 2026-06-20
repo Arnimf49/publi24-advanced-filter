@@ -9,4 +9,13 @@ export const bgApi = {
       )
     );
   },
+
+  backgroundFetch(url: string): Promise<{ ok: boolean; data?: unknown }> {
+    return new Promise(resolve =>
+      // @ts-ignore
+      browserApi.runtime.sendMessage({ type: 'BACKGROUND_FETCH', url }, (response: { ok: boolean; data?: unknown }) =>
+        resolve(response)
+      )
+    );
+  },
 };

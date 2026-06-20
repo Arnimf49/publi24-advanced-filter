@@ -9,11 +9,13 @@ import {modalState} from "../../../../../common/modalState";
 type AdsModalRootProps = {
   close: () => void;
   phone: string;
+  source?: 'inspector-escorte';
 };
 
 const AdsModalRoot: React.FC<AdsModalRootProps> = ({
   close,
   phone,
+  source,
 }) => {
   const [adsData, setAdsData] = useState<null | AdData[]>(null);
   const [removedNow, setRemovedNow] = useState(0);
@@ -32,14 +34,23 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
   }, [])
 
   useEffect(() => {
-    const duplicateUuids = WWStorage.getPhoneAds(phone);
-    adData.loadInAdsData(
-      duplicateUuids,
-      (uuid: string) => {
+    const load = async () => {
+      const clean = (uuid: string) => {
         WWStorage.removePhoneAd(phone, uuid);
         setRemovedNow((n) => n + 1);
+      };
+
+      if (source === 'inspector-escorte') {
+        const items = await adData.loadInInspectorEscorteAdsData(phone, clean);
+        setAdsData(items);
+        return;
       }
-    ).then(setAdsData);
+
+      const duplicateUuids = WWStorage.getPhoneAds(phone);
+      adData.loadInAdsData(duplicateUuids, clean).then(setAdsData);
+    };
+
+    load();
   }, []);
 
   const cleanupUrl = () => {
@@ -61,6 +72,7 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
       close={close}
       onHideAll={onHideAll}
       onCleanup={cleanupUrl}
+      source={source}
       hideReasonSelector={showHideReason
         && <HideReasonRoot
           phone={phone}

@@ -5,6 +5,7 @@ import { WWStorage, AdUuid } from '../../../core/storage';
 import {AdData, adData} from '../../../core/adData';
 import {PhoneIcon} from "../../Common/Icons/PhoneIcon";
 import {misc} from "../../../core/misc";
+import {inspectorEscorteApi} from '../../../core/inspectorEscorteApi';
 
 type PhoneSearchRootProps = {
   onClose: () => void;
@@ -17,12 +18,11 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
   const [searchedPhone, setSearchedPhone] = useState<string | null>(null);
   const [associatedUuids, setAssociatedUuids] = useState<AdUuid[]>([]);
   const [showHideReason, setShowHideReason] = useState<boolean>(false);
+  const [source, setSource] = useState<'inspector-escorte' | undefined>(undefined);
 
   const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const performSearch = useCallback(async (phoneToSearch: string) => {
-    setSearchedPhone(phoneToSearch);
-
+  const performLocalSearch = useCallback(async (phoneToSearch: string) => {
     const uuids = WWStorage.getPhoneAds(phoneToSearch) || [];
     setAssociatedUuids(uuids);
 
@@ -37,11 +37,39 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
     }
   }, []);
 
+  const performSearch = useCallback(async (phoneToSearch: string) => {
+    setSearchedPhone(phoneToSearch);
+
+    try {
+      const enabled = await inspectorEscorteApi.isEnabledAndAvailable();
+
+      if (enabled) {
+        const items = await adData.loadInInspectorEscorteAdsData(phoneToSearch);
+        setSource('inspector-escorte');
+
+        const uuids = WWStorage.getPhoneAds(phoneToSearch) || [];
+        setAssociatedUuids(uuids);
+        setResultsData(items);
+
+        return;
+      }
+
+      setSource(undefined);
+      await performLocalSearch(phoneToSearch);
+    } catch (error) {
+      console.error('Failed to search phone ads.', error);
+      setSource(undefined);
+      setAssociatedUuids([]);
+      setResultsData([]);
+    }
+  }, [performLocalSearch]);
+
   const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = event.target.value;
     setResultsData(null);
     setSearchedPhone(null);
     setAssociatedUuids([]);
+    setSource(undefined);
 
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
@@ -50,6 +78,7 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
     if (rawValue.trim()) {
       debounceTimeoutRef.current = setTimeout(() => {
         const cleanedPhone = rawValue.replace(/^\+?40/, '0').replace(/\s+/g, '');
+
         if (cleanedPhone) {
           performSearch(cleanedPhone);
         } else {
@@ -79,6 +108,7 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
 
   return (
     <AdsModal
+      {...({ source, sourcePhone: source === 'inspector-escorte' ? searchedPhone : undefined } as any)}
       close={onClose}
       adsData={resultsData}
       title={<><PhoneIcon fill={misc.getPubliTheme() === 'dark' ? '#bfbfbf' : '#fff'}/> Anunțuri</>}

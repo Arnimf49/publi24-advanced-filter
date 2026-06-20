@@ -79,7 +79,20 @@ input[type="text"].phoneInput {
   font-style: italic;
   font-size: 0.85rem;
   opacity: 0.8;
+  align-self: center;
 }
 
 .contentContainer {
+}
+
+.sourceBanner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  img {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+  }
 }

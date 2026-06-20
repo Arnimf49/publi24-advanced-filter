@@ -14,7 +14,8 @@
   },
   "host_permissions": [
     "https://www.google.com/*",
-    "https://lens.google.com/*"
+    "https://lens.google.com/*",
+    "https://api.inspector-escorte.com/*"
   ],
   "web_accessible_resources": [
     {

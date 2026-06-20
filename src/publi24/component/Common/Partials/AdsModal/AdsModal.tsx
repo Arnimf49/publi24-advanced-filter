@@ -14,6 +14,8 @@ type AdsModalProps = {
   adsData: AdData[] | null;
   hideReasonSelector?: React.ReactNode;
   onCleanup?: () => void;
+  source?: 'inspector-escorte';
+  sourcePhone?: string;
 };
 
 const AdsModal: React.FC<AdsModalProps> = ({
@@ -26,6 +28,8 @@ const AdsModal: React.FC<AdsModalProps> = ({
   adsData,
   hideReasonSelector,
   onCleanup,
+  source,
+  sourcePhone,
 }) => {
   return (
     <GeneralModal
@@ -67,7 +71,12 @@ const AdsModal: React.FC<AdsModalProps> = ({
           </span>
         ) : null}
         <span className={styles.infoText}>
-          Pot sa fie mai multe care încă nu au fost analizate.
+          {source === 'inspector-escorte' ? (
+            <span className={styles.sourceBanner} data-wwid="source-banner">
+              <img src="https://inspector-escorte.com/static/favicon-96x96.png" alt="" />
+              Sursa duplicatelor: <a href={`https://inspector-escorte.com/phone/${sourcePhone || phone}`} target="_blank" rel="noreferrer">inspector-escorte.com</a>
+            </span>
+          ) : 'Pot sa fie mai multe care încă nu au fost analizate.'}
         </span>
       </p>
 

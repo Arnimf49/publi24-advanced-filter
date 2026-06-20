@@ -17,8 +17,8 @@ export interface LoadOptions {
 
 const DEFAULT_CONFIG: TypeConfig = {
   throttleAfter: 20,
-  cooldown: 10000,
-  delayBetween: 0,
+  cooldown: 11000,
+  delayBetween: 150,
 };
 
 const CONFIG_OVERRIDES: Record<string, TypeConfig> = {

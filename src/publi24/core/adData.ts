@@ -2,6 +2,7 @@ import {dateLib} from "./dateLib";
 import {misc} from "./misc";
 import {IS_AD_PAGE} from "./globals";
 import {AdUuid, WWStorage} from "./storage";
+import {inspectorEscorteApi, InspectorAd} from "./inspectorEscorteApi";
 import {IS_MOBILE_VIEW} from "../../common/globals";
 import {BrowserError, page} from "../../common/page";
 import {utils} from "../../common/utils";
@@ -26,6 +27,41 @@ export interface FavoritesData {
   inLocation: AdData[];
   notInLocation: AdData[];
   noAds: string[];
+}
+
+const NOT_FOUND = Symbol('not_found');
+
+async function loadInspectorEscorteAd(phone: string, ad: InspectorAd): Promise<AdUuid | typeof NOT_FOUND | null> {
+  const publi24Url = ad.urls.publi24
+    // Ensure caching works and we don't double load the page.
+    .replace('/-/', '/titlu-sters/');
+
+  let itemPage: Document;
+
+  try {
+    itemPage = await adData.loadInAdPage(publi24Url);
+  } catch (e) {
+    const error = e as BrowserError;
+    if (error.code && error.code >= 400 && error.code <= 499 && error.code !== 429) {
+      return NOT_FOUND;
+    }
+
+    console.error(`Failed loading Inspector Escorte ad page for ${publi24Url}:`, e);
+    return null;
+  }
+
+  const idElement = itemPage.querySelector<HTMLElement>('[data-url^="/DetailAd/IncrementViewHit"]');
+  if (!idElement) {
+    return null;
+  }
+
+  const id = idElement.getAttribute('data-url')!.replace(/^.*?adid=([^&]+)&.*$/, '$1').toUpperCase();
+
+  WWStorage.setAdPhone(id, phone);
+  WWStorage.addPhoneAd(phone, id, publi24Url);
+  WWStorage.setSeenTime(id, new Date(ad.created_at).getTime());
+
+  return {id, url: publi24Url};
 }
 
 export const adData = {
@@ -219,10 +255,14 @@ export const adData = {
         itemPage = await adData.loadInAdPage(url);
       } catch (e) {
         const error = e as BrowserError;
-        if (error.code !== 429 && clean) {
-          clean(id);
+        if ((error.code === 404 || error.code === 410)) {
+          if (clean) {
+            clean(id);
+          }
+          console.warn(`Ad page not found ${id}:`, e);
+        } else {
+          console.error(`Failed loading ad data for ${id}:`, e);
         }
-        console.error(`Failed loading ad data for ${id}:`, e);
         return null;
       }
 
@@ -240,8 +280,6 @@ export const adData = {
             console.error(`Failed to generate QR code for ${phone}:`, qrError);
           }
         }
-
-
 
         return {
           IS_MOBILE_VIEW,
@@ -269,6 +307,25 @@ export const adData = {
     return resolvedItemData
       .filter((f): f is AdData => f !== null)
       .sort((a, b) => b.timestamp - a.timestamp);
+  },
+
+  async loadInInspectorEscorteAdsData(phone: string, clean?: (failedId: string) => void): Promise<AdData[]> {
+    const ads = await inspectorEscorteApi.fetchAds(phone);
+
+    if (ads && ads.length > 0) {
+      const results = await Promise.all(ads.map((ad) => loadInspectorEscorteAd(phone, ad)));
+
+      if (clean) {
+        const notFoundCount = results.filter((r) => r === NOT_FOUND).length;
+        for (let i = 0; i < notFoundCount; i++) {
+          clean('');
+        }
+      }
+    }
+
+    const adUuids = WWStorage.getPhoneAds(phone);
+
+    return adData.loadInAdsData(adUuids, clean);
   },
 
   async acquireEncryptedPhoneNumber(item: Element): Promise<string | undefined> {

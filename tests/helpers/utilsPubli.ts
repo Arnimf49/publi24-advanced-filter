@@ -38,7 +38,14 @@ export const utilsPubli = {
   async open(
     context: BrowserContext,
     page: Page,
-    config: {infoShown?: string, location?: string, page?: number, loadStorage?: boolean, clearStorage?: boolean} = {}
+    config: {
+      infoShown?: string,
+      location?: string,
+      page?: number,
+      loadStorage?: boolean,
+      clearStorage?: boolean,
+      inspectorEscorte?: boolean,
+    } = {}
   ) {
     const localStorageData = config.loadStorage === undefined || config.loadStorage === true
       ? JSON.parse(fs.readFileSync(STORAGE_JSON, 'utf-8'))
@@ -59,6 +66,7 @@ export const utilsPubli = {
 
       window.localStorage.setItem('ww:info-shown', config.infoShown || 'true');
       window.localStorage.setItem('ww:manual-image-search-enabled', 'false');
+      window.localStorage.setItem('_pw_disable_inspector_escorte_integration', config.inspectorEscorte === true ? 'false' : 'true');
       window.localStorage.setItem('_pw_init', 'true');
     }, {config, localStorageData})
 

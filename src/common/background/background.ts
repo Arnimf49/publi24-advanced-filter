@@ -35,6 +35,24 @@ browserApi.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
+  if (message.type === 'BACKGROUND_FETCH') {
+    fetch(message.url as string)
+      .then(async (res) => {
+        if (!res.ok) {
+          sendResponse({ ok: false });
+          return;
+        }
+        const data = await res.json();
+        sendResponse({ ok: true, data });
+      })
+      .catch((error) => {
+        console.error('BACKGROUND_FETCH error:', error);
+        sendResponse({ ok: false });
+      });
+
+    return true;
+  }
+
   if (message.type === 'RESOLVE_GOTO_URLS') {
     const urls = (message.gotoPaths as string[])
       .map(p => new URL(p, 'https://www.google.com').href);

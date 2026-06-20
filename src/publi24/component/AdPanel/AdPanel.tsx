@@ -42,6 +42,7 @@ interface AdPanelProps {
   showDuplicates: boolean;
   hasDuplicateAdsWithSamePhone: boolean;
   numberOfAdsWithSamePhone?: number | string;
+  duplicatesSource?: 'inspector-escorte' | 'local';
   phoneInvestigatedSinceDays?: string | null;
   phoneInvestigateStale?: boolean;
   searchLinks?: SearchResult[];
@@ -80,6 +81,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     showDuplicates,
     hasDuplicateAdsWithSamePhone,
     numberOfAdsWithSamePhone,
+    duplicatesSource,
     phoneInvestigatedSinceDays,
     phoneInvestigateStale,
     searchLinks,
@@ -245,6 +247,9 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                 data-wwid="duplicates-container"
                 onClick={onViewDuplicatesClick}
               >
+                {duplicatesSource === 'inspector-escorte' && (
+                  <img src="https://inspector-escorte.com/static/favicon-96x96.png" className={styles.inspectorEscorteFavicon} alt="" />
+                )}
                 <span data-wwid="duplicates-count">{numberOfAdsWithSamePhone}</span>&nbsp;<span data-wwid="duplicates" onClick={onViewDuplicatesClick}>anunțuri</span>
               </button>
             )}
