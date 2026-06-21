@@ -18,7 +18,7 @@ const favorites = {
       let newestUuid: AdUuid | undefined;
 
       for (let uuid of phoneAds) {
-        const data = await adData.loadInAdsData([uuid], (id) => {
+        const {ads: data} = await adData.loadInAdsData([uuid], (id) => {
           WWStorage.removePhoneAd(phone, id);
         });
         await new Promise(r => setTimeout(r, 2500));

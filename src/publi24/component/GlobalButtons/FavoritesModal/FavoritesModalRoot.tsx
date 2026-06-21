@@ -51,7 +51,7 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
   }, []);
 
   if (favoritesData === null) {
-    return <GlobalLoader message={'La 20+ de favorite durează mai mult să încarce favoritele, din cauza limitarilor de la Publi24.'} />;
+    return <GlobalLoader message={'La 15+ de favorite durează mai mult să încarce favoritele, din cauza limitarilor de la Publi24.'} />;
   }
 
   return (

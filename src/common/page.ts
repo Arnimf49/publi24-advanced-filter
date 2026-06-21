@@ -43,6 +43,18 @@ interface QueueItem {
   headers?: Record<string, string>;
 }
 
+const HTTP_STATUS_TEXT: Record<number, string> = {
+  400: 'Bad Request',
+  401: 'Unauthorized',
+  403: 'Forbidden',
+  404: 'Not Found',
+  429: 'Too Many Requests',
+  500: 'Internal Server Error',
+  502: 'Bad Gateway',
+  503: 'Service Unavailable',
+  504: 'Gateway Timeout',
+};
+
 const PAGE_TYPE: Record<string, {
   CACHE: Record<string, Error | Document>;
   queue: QueueItem[];
@@ -114,7 +126,8 @@ async function executeRequest(type: string, item: QueueItem) {
     const pageResponse = await fetch(item.url, { headers });
 
     if (!pageResponse.ok) {
-      const error = new Error(`Failed to load ${item.url}`) as BrowserError;
+      const statusText = pageResponse.statusText || HTTP_STATUS_TEXT[pageResponse.status] || 'Unknown';
+      const error = new Error(`Failed to load ${item.url}: ${pageResponse.status} ${statusText}`) as BrowserError;
       error.code = pageResponse.status;
       if (pageResponse.status >= 400 && pageResponse.status < 500 && pageResponse.status !== 429) {
         PAGE_TYPE[type].CACHE[item.url] = error;

@@ -368,6 +368,22 @@ export const utilsPubli = {
     }, phone);
   },
 
+  async findAdWithoutDuplicates(page: Page) {
+    return await utilsPubli.findAdWithCondition(page, async () => {
+      for (let article of await page.$$('[data-articleid]')) {
+        if (await article.$('[data-wwid="duplicates-container"]')) {
+          continue;
+        }
+        const phone = await article.$('[data-wwid="phone-number"]');
+        if (phone && await phone.isVisible()) {
+          await article.scrollIntoViewIfNeeded();
+          return article;
+        }
+      }
+      return null;
+    });
+  },
+
   async blockAllAdLoadsExceptPhone(page: Page, phone: string): Promise<void> {
     const phoneAdUrlIds = (await utilsPubli.getPhoneAds(page, phone))
       .map(item => item.split('|')[1].split('/').pop());

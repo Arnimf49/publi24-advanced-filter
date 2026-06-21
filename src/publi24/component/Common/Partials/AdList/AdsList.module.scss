@@ -230,3 +230,13 @@
   text-align: center;
   color: #666;
 }
+
+.sectionSeparator {
+  border: none;
+  border-top: 2px dashed #c0c0c0;
+  margin: 4px 0 20px;
+
+  :global(.dark) & {
+    border-top-color: #444;
+  }
+}

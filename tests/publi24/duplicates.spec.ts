@@ -115,3 +115,70 @@ test('Should re-open ads on reload when opened from favorites', async ({ page, c
   await page.reload();
   await expect(page.locator('[data-wwid="ads-modal"]')).toBeVisible();
 })
+
+test('Should paginate duplicate ads correctly.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  const ad: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
+  const phone = await (await ad.$('[data-wwid="phone-number"]')).innerText();
+  const adUrl = await (await ad.$('.article-title a')).evaluate((el: HTMLAnchorElement) => el.href);
+
+  const existingEntries = await utilsPubli.getPhoneAds(page, phone);
+  const n = existingEntries.length;
+
+  const adId = await ad.getAttribute('data-articleid');
+  const baseUrl = existingEntries.find((e: string) => !e.startsWith(`${adId}|`))?.split('|')[1] ?? existingEntries[0].split('|')[1];
+
+  const noDupAd = await utilsPubli.findAdWithoutDuplicates(page);
+  const noDupPhone = await (await noDupAd.$('[data-wwid="phone-number"]')).innerText();
+  const noDupUrl = (await utilsPubli.getPhoneAds(page, noDupPhone))[0].split('|')[1];
+
+  await page.evaluate(({phoneNum, base, noDup, existing, firstBatch, secondBatch}) => {
+    const phoneKey = `ww2:phone:${phoneNum}`;
+    const phoneData = JSON.parse(localStorage.getItem(phoneKey) || '{}');
+    const ads = existing.slice();
+
+    for (let i = 0; i < firstBatch + secondBatch; i++) {
+      const id = `FAKE${i}`;
+      ads.push(`${id}|${i < firstBatch ? base : noDup}`);
+      localStorage.setItem(`ww2:${id}`, JSON.stringify({phone: phoneNum, lastSeen: Date.now()}));
+    }
+
+    phoneData.ads = ads;
+    localStorage.setItem(phoneKey, JSON.stringify(phoneData));
+  }, {phoneNum: phone, base: baseUrl, noDup: noDupUrl, existing: existingEntries, firstBatch: 15 - n, secondBatch: 5});
+
+  expect((await utilsPubli.getPhoneAds(page, phone)).length).toBe(20);
+
+  await page.goto(adUrl);
+  await page.waitForTimeout(1500);
+
+  await page.locator('[data-wwid="duplicates"]').click();
+  await page.waitForTimeout(200);
+
+  const modal = page.locator('[data-wwid="ads-modal"]');
+  await expect(modal).toBeVisible();
+
+  await expect(modal.locator('[data-articleid]')).toHaveCount(15, { timeout: 60000 });
+
+  const loadMoreButton = modal.locator('[data-wwid="load-more"]');
+  await expect(loadMoreButton).toBeVisible();
+  await expect(loadMoreButton).toHaveText('încarcă mai multe (+5)');
+  await expect(modal.locator('[data-wwid="count"]')).toHaveText('20');
+
+  await modal.evaluate((el: HTMLElement) => { el.scrollTop = el.scrollHeight; });
+  await expect(modal.locator('[data-wwid="results-count"]')).toBeVisible();
+
+  await Promise.all([
+    expect(loadMoreButton).toHaveText('Se încarcă...'),
+    expect(loadMoreButton).toBeDisabled(),
+    loadMoreButton.click(),
+  ]);
+
+  await expect(loadMoreButton).not.toBeVisible({ timeout: 60000 });
+
+  await expect(modal.locator('[data-articleid]').nth(14)).toBeVisible();
+
+  await expect(modal.locator('[data-articleid]')).toHaveCount(20);
+  await expect(modal.locator('[data-wwid="count"]')).toHaveText('20');
+})

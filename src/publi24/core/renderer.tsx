@@ -16,6 +16,8 @@ interface RenderOptions {
 }
 
 function renderAdElement(item: HTMLElement, id: string, renderOptions?: RenderOptions): () => void {
+  item.setAttribute('data-ww-registered', '1');
+
   if (!IS_AD_PAGE() && item.hasAttribute('onclick')) {
     const txtWrap = item.querySelector<HTMLElement>('.article-txt-wrap');
     if (txtWrap) {
@@ -91,7 +93,7 @@ export const renderer = {
     isFromListing = false,
     renderOptions
   }: RegisterAdsOptions = {}): Array<() => void> {
-    let itemsNodeList = context.querySelectorAll<HTMLElement>('[data-articleid]');
+    let itemsNodeList = context.querySelectorAll<HTMLElement>('[data-articleid]:not([data-ww-registered])');
     let items = Array.from(itemsNodeList);
     let hiddenCount = 0;
 

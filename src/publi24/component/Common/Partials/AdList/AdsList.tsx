@@ -8,6 +8,7 @@ type AdsListProps = {
   adsData: AdData[];
   emptyText?: string;
   showDuplicates?: boolean;
+  sectionBreaks?: number[];
 };
 
 const CalendarIcon = ({ isHighlighted }: { isHighlighted?: boolean }) => (
@@ -37,6 +38,7 @@ const AdsList: React.FC<AdsListProps> = ({
   adsData,
   emptyText = 'Niciun anunț găsit pentru acest număr.',
   showDuplicates = false,
+  sectionBreaks = [],
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -48,7 +50,7 @@ const AdsList: React.FC<AdsListProps> = ({
     if (ref.current) {
       renderer.registerAdsInContext(ref.current, {renderOptions: {showDuplicates}});
     }
-  }, [showDuplicates]);
+  }, [adsData, showDuplicates]);
 
   if (!adsData || adsData.length === 0) {
     return <p className={styles.emptyMessage}>{emptyText}</p>;
@@ -57,12 +59,15 @@ const AdsList: React.FC<AdsListProps> = ({
   return (
     <div ref={ref}>
       {adsData.map((item, index) => (
-        <div
-          key={item.id}
-          className={`${styles.articleItem} article-item`}
-          data-articleid={item.id}
-          onClick={() => handleItemClick(item.url)}
-        >
+        <React.Fragment key={item.id}>
+          {sectionBreaks.includes(index) && (
+            <hr className={styles.sectionSeparator} />
+          )}
+          <div
+            className={`${styles.articleItem} article-item`}
+            data-articleid={item.id}
+            onClick={() => handleItemClick(item.url)}
+          >
           <div className={`${styles.articleIndex} ww-article-index`}>
             <span className={styles.indexText}>
               <span className={styles.hash}>#</span>{index + 1}
@@ -134,7 +139,8 @@ const AdsList: React.FC<AdsListProps> = ({
               </div>
             </div>
           </div>
-        </div>
+          </div>
+        </React.Fragment>
       ))}
     </div>
   );

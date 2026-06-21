@@ -23,6 +23,11 @@ export interface AdData {
   isLocationDifferent: boolean;
 }
 
+export interface AdLoadResult {
+  ads: AdData[];
+  errors: string[];
+}
+
 export interface FavoritesData {
   inLocation: AdData[];
   notInLocation: AdData[];
@@ -233,7 +238,7 @@ export const adData = {
     return page.load(url);
   },
 
-  async loadInAdsData(adUuids: AdUuid[], clean?: (failedId: string) => void): Promise<AdData[]> {
+  async loadInAdsData(adUuids: AdUuid[], clean?: (failedId: string) => void): Promise<AdLoadResult> {
     let locationParts: string[] = [];
     if (!IS_AD_PAGE()) {
       const countyInput = document.querySelector<HTMLInputElement>('[data-faceted="county_name"]');
@@ -246,6 +251,8 @@ export const adData = {
         locationParts.push(locationInput.value.toLocaleLowerCase());
       }
     }
+
+    const errors: string[] = [];
 
     const itemDataPromises = adUuids.map(async (adUuid): Promise<AdData | null> => {
       const {id, url} = adUuid;
@@ -261,6 +268,7 @@ export const adData = {
           }
           console.warn(`Ad page not found ${id}:`, e);
         } else {
+          errors.push(`Eroare la încărcarea anunțului ${id}: ${error.message || error.code || 'eroare necunoscută'}`);
           console.error(`Failed loading ad data for ${id}:`, e);
         }
         return null;
@@ -304,28 +312,33 @@ export const adData = {
 
     const resolvedItemData = await Promise.all(itemDataPromises);
 
-    return resolvedItemData
+    const ads = resolvedItemData
       .filter((f): f is AdData => f !== null)
       .sort((a, b) => b.timestamp - a.timestamp);
+
+    return {ads, errors};
   },
 
-  async loadInInspectorEscorteAdsData(phone: string, clean?: (failedId: string) => void): Promise<AdData[]> {
-    const ads = await inspectorEscorteApi.fetchAds(phone);
+  async fetchInspectorEscorteAds(phone: string): Promise<InspectorAd[]> {
+    return (await inspectorEscorteApi.fetchAds(phone)) ?? [];
+  },
 
-    if (ads && ads.length > 0) {
-      const results = await Promise.all(ads.map((ad) => loadInspectorEscorteAd(phone, ad)));
+  async loadInInspectorAdsData(
+    inspectorAds: InspectorAd[],
+    phone: string,
+    clean?: (failedId: string) => void,
+  ): Promise<AdLoadResult> {
+    const results = await Promise.all(inspectorAds.map((ad) => loadInspectorEscorteAd(phone, ad)));
 
-      if (clean) {
-        const notFoundCount = results.filter((r) => r === NOT_FOUND).length;
-        for (let i = 0; i < notFoundCount; i++) {
-          clean('');
-        }
+    if (clean) {
+      const notFoundCount = results.filter((r) => r === NOT_FOUND).length;
+      for (let i = 0; i < notFoundCount; i++) {
+        clean('');
       }
     }
 
-    const adUuids = WWStorage.getPhoneAds(phone);
-
-    return adData.loadInAdsData(adUuids, clean);
+    const resolvedUuids = results.filter((r): r is AdUuid => r !== null && r !== NOT_FOUND);
+    return adData.loadInAdsData(resolvedUuids, clean);
   },
 
   async acquireEncryptedPhoneNumber(item: Element): Promise<string | undefined> {
@@ -385,11 +398,11 @@ export const adData = {
       (failedUuid) => WWStorage.removePhoneAd(phone, failedUuid)
     );
 
-    if (!itemDataArray || itemDataArray.length === 0) {
+    if (!itemDataArray.ads || itemDataArray.ads.length === 0) {
       return adData.loadInFirstAvailableAd(uuids, phone);
     }
 
-    return itemDataArray[0];
+    return itemDataArray.ads[0];
   },
 
   async loadFavoritesData(): Promise<FavoritesData> {
