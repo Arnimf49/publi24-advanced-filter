@@ -29,7 +29,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 
   :global(.onMobile) & {
-    padding: 30px 20px;
+    padding: 20px;
     max-width: 90%;
   }
 }
@@ -55,6 +55,80 @@
 
   :global(.onMobile) & {
     font-size: 16px;
+  }
+}
+
+.warningBox {
+  background: #fff3cd;
+  border: 1px solid #ffecb5;
+  border-radius: 6px;
+  padding: 16px;
+  margin-top: 20px;
+  text-align: left;
+
+  :global(.onMobile) & {
+    padding: 10px;
+    margin-top: 14px;
+  }
+}
+
+.warningText {
+  color: #664d03;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0 0 12px;
+
+  :global(.onMobile) & {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.daButton {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 26px;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #5a6268;
+  }
+
+  :global(.onMobile) & {
+    padding: 7px 22px;
+    font-size: 14px;
+  }
+}
+
+.nuButton {
+  background: #1177bb;
+  color: white;
+  border: none;
+  padding: 8px 26px;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #0d5a8e;
+  }
+
+  :global(.onMobile) & {
+    padding: 7px 22px;
+    font-size: 14px;
   }
 }
 

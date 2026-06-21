@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import styles from './TutorialOverlay.module.scss';
-import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../../../common/globals";
+import {IS_MOBILE_VIEW, IS_SAFARI_IOS, browserApi} from "../../../common/globals";
 import {P24faLogoLight} from "../../../common/components/Logo/P24faLogoLight";
 
 export type CutoutRect = {
@@ -111,10 +111,21 @@ const getBoundingRect = (selector: string): CutoutRect | null => {
   };
 };
 
+const detectIncognito = (): boolean => {
+  try {
+    return browserApi.extension?.inIncognitoContext ?? false;
+  } catch {
+    return false;
+  }
+};
+
 const TutorialOverlay: React.FC<TutorialOverlayProps> = ({ firstAd, onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [incognitoAccepted, setIncognitoAccepted] = useState(false);
   const steps = getTutorialSteps();
   const step = steps[currentStep];
+  const isIncognito = detectIncognito();
+  const showIncognitoWarning = currentStep === 0 && isIncognito && !incognitoAccepted;
 
   useEffect(() => {
     const scrollToAd = () => {
@@ -261,13 +272,41 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({ firstAd, onComplete }
         className={styles.overlay}
         data-wwid="info-container"
         style={IS_SAFARI_IOS ? { WebkitClipPath: `url(#${clipPathId})`, clipPath: `url(#${clipPathId})` } : { mask: `url(#${maskId})` }}
-        onClick={handleNext}
+        onClick={showIncognitoWarning ? onComplete : handleNext}
       >
         {step.type === 'welcome' && (
           <div className={styles.welcomeContainer}>
             <div className={styles.welcomeContent}>
               <P24faLogoLight className={styles.logo} />
               <p className={styles.welcomeText}>{step.text}</p>
+              {showIncognitoWarning && (
+                <div className={styles.warningBox}>
+                  <p className={styles.warningText}>
+                    Ești în mod incognito. Majoritatea funcționalităților benefice nu vor funcționa. Vrei să vezi tutorial?
+                  </p>
+                  <div className={styles.buttonRow}>
+                    <button
+                      className={styles.daButton}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIncognitoAccepted(true);
+                        handleNext();
+                      }}
+                    >
+                      Da
+                    </button>
+                    <button
+                      className={styles.nuButton}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onComplete();
+                      }}
+                    >
+                      Nu
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -306,16 +345,18 @@ const TutorialOverlay: React.FC<TutorialOverlayProps> = ({ firstAd, onComplete }
           </>
         )}
 
-        <button
-          className={`${styles.nextButton} ${step.nextButtonPosition === 'top-right' ? styles.topRight : styles.bottomRight}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleNext();
-          }}
-          data-wwid={`tooltip-${currentStep}`}
-        >
-          {currentStep < steps.length - 1 ? 'Următorul' : 'Gata'}
-        </button>
+        {!showIncognitoWarning && (
+          <button
+            className={`${styles.nextButton} ${step.nextButtonPosition === 'top-right' ? styles.topRight : styles.bottomRight}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNext();
+            }}
+            data-wwid={`tooltip-${currentStep}`}
+          >
+            {currentStep < steps.length - 1 ? 'Următorul' : 'Gata'}
+          </button>
+        )}
       </div>
     </>
   );
