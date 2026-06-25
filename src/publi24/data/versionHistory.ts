@@ -8,6 +8,15 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.3.1',
+    releaseDate: '25 aprilie 2026',
+    changeNew: [],
+    changeImprove: [],
+    changeFix: [
+      'Integrare inspector-escorte.com pe Firefox.'
+    ]
+  },
+  {
     version: '3.3',
     releaseDate: '22 aprilie 2026',
     changeNew: [

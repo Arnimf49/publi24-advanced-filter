@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+rm ./dist/ -r
+
 echo "Building with rollup..."
 rollup -c
 
@@ -16,7 +18,7 @@ echo "Created: $CHROME_ZIP"
 
 echo "Modifying manifest for Firefox..."
 cp manifest.json manifest.json.bk
-jq '.background = {scripts: ["dist/common/background.js"]}' manifest.json > manifest.json.tmp
+jq '.background = {scripts: ["dist/common/background/background.js"]}' manifest.json > manifest.json.tmp
 mv manifest.json.tmp manifest.json
 
 echo "Building Firefox version..."
