@@ -1,4 +1,4 @@
-import React, {ChangeEventHandler, MouseEventHandler, useEffect, useState} from 'react';
+import React, {ChangeEventHandler, useEffect, useState} from 'react';
 import GeneralModal from '../../../../../common/components/Modal/GeneralModal';
 import AdsList from '../AdList/AdsList';
 import styles from './AdsModal.module.scss';
@@ -8,12 +8,10 @@ import ErrorDisplay from "../../ErrorDisplay/ErrorDisplay";
 type AdsModalProps = {
   close: () => void;
   title?: string | React.ReactNode;
-  onHideAll?: MouseEventHandler;
   onInputChange?: ChangeEventHandler;
   phone?: string;
   removed?: number;
   adsData: AdData[] | null;
-  hideReasonSelector?: React.ReactNode;
   onCleanup?: () => void;
   source?: 'inspector-escorte';
   sourcePhone?: string;
@@ -57,12 +55,10 @@ const useLoadingDots = (isLoading: boolean | undefined) => {
 const AdsModal: React.FC<AdsModalProps> = ({
   close,
   title = "Anunțuri",
-  onHideAll,
   phone,
   onInputChange,
   removed,
   adsData,
-  hideReasonSelector,
   onCleanup,
   source,
   sourcePhone,
@@ -90,18 +86,6 @@ const AdsModal: React.FC<AdsModalProps> = ({
       dataWwid="ads-modal"
       onCleanup={onCleanup}
       prose={false}
-      headerActions={
-        !hideReasonSelector && onHideAll
-          ? <button
-              type="button"
-              className={styles.hideAllButton}
-              onClick={onHideAll}
-              data-wwid="hide-all"
-            >
-              <b>ascunde toate</b>
-            </button>
-          : undefined
-      }
     >
       <input
         type="text"
@@ -155,8 +139,6 @@ const AdsModal: React.FC<AdsModalProps> = ({
           </div>
         )}
       </div>
-
-      {hideReasonSelector}
     </GeneralModal>
   );
 };

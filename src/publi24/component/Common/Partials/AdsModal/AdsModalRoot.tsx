@@ -1,8 +1,7 @@
-import React, {MouseEventHandler, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {adData, AdData} from "../../../../core/adData";
 import AdsModal from "./AdsModal";
 import {AdUuid, WWStorage} from "../../../../core/storage";
-import HideReasonRoot from "../HideReason/HideReasonRoot";
 import GlobalLoader from "../../GlobalLoader/GlobalLoader";
 import {modalState} from "../../../../../common/modalState";
 import {InspectorAd} from "../../../../core/inspectorEscorteApi";
@@ -22,7 +21,6 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
 }) => {
   const [listState, setListState] = useState<{ads: AdData[], breaks: number[], errors: string[]} | null>(null);
   const [removedNow, setRemovedNow] = useState(0);
-  const [showHideReason, setShowHideReason] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const pendingUuidsRef = useRef<AdUuid[]>([]);
   const pendingInspectorAdsRef = useRef<InspectorAd[]>([]);
@@ -67,18 +65,6 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
       setIsLoadingMore(false);
     }
   }, [phone, clean]);
-
-  const onHideAll: MouseEventHandler = useCallback((e) => {
-    e.stopPropagation();
-
-    const duplicateUuids = WWStorage.getPhoneAds(phone);
-    duplicateUuids.forEach((adUuid) => {
-      WWStorage.setAdVisibility(adUuid.id, false);
-    });
-    WWStorage.setPhoneHidden(phone);
-
-    setShowHideReason(true);
-  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -134,7 +120,6 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
       errors={listState.errors}
       removed={removedNow}
       close={close}
-      onHideAll={onHideAll}
       onCleanup={cleanupUrl}
       source={source}
       totalCount={totalCountRef.current}
@@ -142,11 +127,6 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
       isLoadingMore={isLoadingMore}
       onLoadMore={loadNextPage}
       sectionBreaks={listState.breaks}
-      hideReasonSelector={showHideReason
-        && <HideReasonRoot
-          phone={phone}
-          onReason={close}
-        />}
     />
   );
 };

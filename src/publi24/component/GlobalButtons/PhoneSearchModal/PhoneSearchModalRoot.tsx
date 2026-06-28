@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import AdsModal from '../../Common/Partials/AdsModal/AdsModal';
-import HideReasonRoot from '../../Common/Partials/HideReason/HideReasonRoot';
 import { WWStorage, AdUuid } from '../../../core/storage';
 import {AdData, adData} from '../../../core/adData';
 import {PhoneIcon} from "../../Common/Icons/PhoneIcon";
@@ -18,8 +17,6 @@ const DEBOUNCE_DELAY = 1500;
 const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
   const [listState, setListState] = useState<{ads: AdData[], breaks: number[], errors: string[]} | null>(null);
   const [searchedPhone, setSearchedPhone] = useState<string | null>(null);
-  const [associatedUuids, setAssociatedUuids] = useState<AdUuid[]>([]);
-  const [showHideReason, setShowHideReason] = useState<boolean>(false);
   const [source, setSource] = useState<'inspector-escorte' | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -68,8 +65,6 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
     setIsLoading(true);
     try {
       const uuids = WWStorage.getPhoneAds(phoneToSearch) || [];
-      setAssociatedUuids(uuids);
-
       totalCountRef.current = uuids.length;
       pendingUuidsRef.current = uuids.slice(PAGE_SIZE);
       const firstBatch = uuids.slice(0, PAGE_SIZE);
@@ -99,9 +94,6 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
         const allInspectorAds = await adData.fetchInspectorEscorteAds(phoneToSearch);
         setSource('inspector-escorte');
 
-        const uuids = WWStorage.getPhoneAds(phoneToSearch) || [];
-        setAssociatedUuids(uuids);
-
         totalCountRef.current = allInspectorAds.length;
         pendingInspectorAdsRef.current = allInspectorAds.slice(PAGE_SIZE);
         const firstBatch = allInspectorAds.slice(0, PAGE_SIZE);
@@ -116,7 +108,6 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
     } catch (error) {
       console.error('Failed to search phone ads.', error);
       setSource(undefined);
-      setAssociatedUuids([]);
       setListState({ads: [], breaks: [], errors: []});
     } finally {
       setIsLoading(false);
@@ -127,7 +118,6 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
     const rawValue = event.target.value;
     setListState(null);
     setSearchedPhone(null);
-    setAssociatedUuids([]);
     setSource(undefined);
     pendingUuidsRef.current = [];
     pendingInspectorAdsRef.current = [];
@@ -149,16 +139,6 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
       }, DEBOUNCE_DELAY);
     }
   }, [performSearch]);
-
-  const triggerHideActions = useCallback(() => {
-    if (associatedUuids.length && searchedPhone) {
-      associatedUuids.forEach((adUuid) => {
-        WWStorage.setAdVisibility(adUuid.id, false);
-      });
-      WWStorage.setPhoneHidden(searchedPhone);
-      setShowHideReason(true);
-    }
-  }, [associatedUuids, searchedPhone, onClose]);
 
   useEffect(() => {
     return () => {
@@ -183,7 +163,6 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
       adsData={listState?.ads ?? null}
       errors={listState?.errors}
       title={<><PhoneIcon fill={misc.getPubliTheme() === 'dark' ? '#bfbfbf' : '#fff'}/> Anunțuri</>}
-      onHideAll={listState?.ads?.length ? triggerHideActions : undefined}
       onInputChange={handleInputChange}
       totalCount={totalCountRef.current || undefined}
       hasMore={pendingUuidsRef.current.length > 0 || pendingInspectorAdsRef.current.length > 0}
@@ -191,12 +170,6 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
       isLoading={isLoading}
       onLoadMore={loadNextPage}
       sectionBreaks={listState?.breaks}
-      hideReasonSelector={showHideReason && searchedPhone
-        && <HideReasonRoot
-          phone={searchedPhone}
-          onReason={onClose}
-        />
-      }
     />
   );
 };
