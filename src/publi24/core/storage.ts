@@ -102,6 +102,15 @@ function removeAdItem(id: string, phone?: string | null) {
   delete _WW_STORE_CACHE.item[upperId];
 }
 
+function removePhoneItem(phone: string) {
+  if (!phone) {
+    return;
+  }
+
+  localStorage.removeItem(`ww2:phone:${phone}`);
+  delete _WW_STORE_CACHE.phone[phone];
+}
+
 export const WWStorage = {
 
   getAdItem(id: string): AdItem {
@@ -155,13 +164,13 @@ export const WWStorage = {
     return value !== false && value !== 0;
   },
 
-  setAdPhone(id: string, phone: string): void {
+  setAdPhone(id: string, phone: string, firstSeenAt?: number): void {
     WWStorage.setAdProp(id, 'phone', phone);
     WWStorage.delAdProp(id, 'noPhone');
 
     const firstSeen = WWStorage.getPhoneProp<number>(phone, 'firstSeen');
     if (!firstSeen) {
-      WWStorage.setPhoneProp(phone, 'firstSeen', Date.now());
+      WWStorage.setPhoneProp(phone, 'firstSeen', firstSeenAt ?? Date.now());
     }
   },
 
@@ -711,6 +720,7 @@ export const WWStorage = {
     const threshold = Date.now() - ONE_YEAR_MS;
     const allItems: Record<string, string> = { ...localStorage };
     let removedCount = 0;
+    const phonesToCheck = new Set<string>();
 
     Object.entries(allItems).forEach(([key, value]) => {
       if (!key.match(/^ww2:[^:]+$/)) {
@@ -720,8 +730,16 @@ export const WWStorage = {
       try {
         const adItem: AdItem = JSON.parse(value);
         if (!adItem.lastSeen || adItem.lastSeen < threshold) {
-          removeAdItem(key.replace(/^ww2:/, ''), adItem.phone);
+          const phone = adItem.phone;
+          const adId = key.replace(/^ww2:/, '');
+          removeAdItem(adId, phone);
+          // removeAdItem uppercases the id, but legacy keys may be lowercase. Ensure the exact key is deleted too.
+          localStorage.removeItem(key);
+          delete _WW_STORE_CACHE.item[adId.toUpperCase()];
           removedCount++;
+          if (phone) {
+            phonesToCheck.add(phone);
+          }
         }
       } catch (error) {
         console.error(`Failed to inspect ad storage item ${key} during stale cleanup:`, error);
@@ -730,6 +748,18 @@ export const WWStorage = {
 
     if (removedCount > 0) {
       console.log(`Cleaned up ${removedCount} stale Publi24 ads from storage`);
+    }
+
+    let orphanedPhonesRemoved = 0;
+    phonesToCheck.forEach(phone => {
+      if (WWStorage.getPhoneAds(phone).length === 0) {
+        removePhoneItem(phone);
+        orphanedPhonesRemoved++;
+      }
+    });
+
+    if (orphanedPhonesRemoved > 0) {
+      console.log(`Cleaned up ${orphanedPhonesRemoved} orphaned Publi24 phones from storage`);
     }
   },
 
@@ -744,7 +774,7 @@ export const WWStorage = {
 
   async upgrade(): Promise<void> {
     const version = WWStorage.getVersion();
-    const currentVersion = 8;
+    const currentVersion = 9;
     const parsedVersion = version ? parseInt(version, 10) : currentVersion;
 
     type MigrationFunction = () => void;
@@ -967,6 +997,32 @@ export const WWStorage = {
         ];
         oldKeys.forEach(key => localStorage.removeItem(key));
         console.log("Migration v7 -> v8 complete: Removed legacy analytics keys");
+      },
+
+      // --- MIGRATION from v8 to v9 ---
+      8: () => {
+        console.log("Running migration v8 -> v9");
+        const allItems: Record<string, string> = { ...localStorage };
+        let removedCount = 0;
+
+        Object.entries(allItems).forEach(([key, value]) => {
+          if (!key.match(/^ww2:phone:(.+)$/)) {
+            return;
+          }
+          try {
+            const phoneItem: PhoneItem = JSON.parse(value);
+            if (!phoneItem.ads || !Array.isArray(phoneItem.ads) || phoneItem.ads.length === 0) {
+              const phone = key.replace(/^ww2:phone:/, '');
+              removePhoneItem(phone);
+              removedCount++;
+            }
+          } catch (e) {
+            console.error(`Migration v8 error processing key ${key}:`, e);
+          }
+        });
+
+        _WW_STORE_CACHE.phone = {};
+        console.log(`Migration v8 -> v9 complete: Removed ${removedCount} orphaned phone items with no ads`);
       }
     };
 

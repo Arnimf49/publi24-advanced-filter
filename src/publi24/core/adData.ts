@@ -62,9 +62,9 @@ async function loadInspectorEscorteAd(phone: string, ad: InspectorAd): Promise<A
 
   const id = idElement.getAttribute('data-url')!.replace(/^.*?adid=([^&]+)&.*$/, '$1').toUpperCase();
 
-  WWStorage.setAdPhone(id, phone);
+  WWStorage.setAdPhone(id, phone, new Date(ad.created_at).getTime());
   WWStorage.addPhoneAd(phone, id, publi24Url);
-  WWStorage.setSeenTime(id, new Date(ad.created_at).getTime());
+  WWStorage.setSeenTime(id, Date.now());
 
   return {id, url: publi24Url};
 }
