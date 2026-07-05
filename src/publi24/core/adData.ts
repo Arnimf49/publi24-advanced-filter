@@ -337,8 +337,17 @@ export const adData = {
       }
     }
 
+    const inspectorErrors: string[] = [];
+    for (let i = 0; i < results.length; i++) {
+      if (results[i] === null) {
+        const url = inspectorAds[i].urls.publi24.replace('/-/', '/titlu-sters/');
+        inspectorErrors.push(`Eroare la încărcarea anunțului de la inspector-escorte: ${url}`);
+      }
+    }
+
     const resolvedUuids = results.filter((r): r is AdUuid => r !== null && r !== NOT_FOUND);
-    return adData.loadInAdsData(resolvedUuids, clean);
+    const {ads, errors} = await adData.loadInAdsData(resolvedUuids, clean);
+    return {ads, errors: [...inspectorErrors, ...errors]};
   },
 
   async acquireEncryptedPhoneNumber(item: Element): Promise<string | undefined> {

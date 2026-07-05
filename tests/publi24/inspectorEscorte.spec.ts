@@ -110,3 +110,68 @@ test('Should paginate inspector escorte ads correctly.', async ({ page, context 
   await expect(modal.locator('[data-articleid]')).toHaveCount(20);
   await expect(modal.locator('[data-wwid="count"]')).toHaveText('20');
 });
+
+test('Should show error display when inspector-escorte ad fails to load', async ({ page, context }) => {
+  await utilsPubli.open(context, page, {inspectorEscorte: true});
+
+  const ad = await utilsPubli.findAdWithDuplicates(page);
+  const adUrl = await (await ad.$('.article-title a')).evaluate((el: HTMLAnchorElement) => el.href);
+
+  let inspectorAdUrls: string[] = [];
+
+  await context.route('https://api.inspector-escorte.com/v1/ads*', async (route) => {
+    const response = await route.fetch();
+    const body = await response.text();
+    const json = JSON.parse(body);
+
+    if (json.data && Array.isArray(json.data)) {
+      inspectorAdUrls = json.data.map((ad: any) => ad.urls?.publi24).filter(Boolean);
+    }
+
+    await route.fulfill({
+      response,
+      body,
+    });
+  });
+
+  await (await ad.$('[data-wwid="duplicates"]')).click();
+
+  const modal = page.locator('[data-wwid="ads-modal"]');
+  await expect(modal).toBeVisible();
+  await expect(modal.locator('[data-articleid]').first()).toBeVisible({ timeout: 60000 });
+
+  const normalizeUrl = (url: string) => url.replace(/\/anunt\/[^/]+\//, '/anunt/-/');
+  const currentAdNormalized = normalizeUrl(adUrl);
+  const otherUrls = inspectorAdUrls.filter(url => normalizeUrl(url) !== currentAdNormalized);
+
+  if (otherUrls.length === 0) {
+    throw new Error('No other inspector escorte ads found to mock error for');
+  }
+
+  await context.unroute('https://api.inspector-escorte.com/v1/ads*');
+
+  const mockedUrl = otherUrls.find(u => u.split('/').pop() !== adUrl.split('/').pop());
+  const mockedUrlTitluSter = mockedUrl.replace(/\/anunt\/[^/]+\//, '/anunt/titlu-sters/');
+
+  await context.route(mockedUrlTitluSter, (route) => {
+    return route.fulfill({ status: 500, body: 'Internal Server Error', contentType: 'text/plain' });
+  });
+
+  await modal.locator('[data-wwid="close"]').click();
+  await expect(modal).not.toBeVisible();
+
+  await page.goto(adUrl);
+  await page.waitForTimeout(1500);
+
+  const adAfterReload = await utilsPubli.findAdWithDuplicates(page);
+  await adAfterReload.waitForSelector('[data-wwid="duplicates-container"] img[src*="inspector-escorte"]');
+  await (await adAfterReload.$('[data-wwid="duplicates"]')).click();
+
+  await expect(modal).toBeVisible();
+  await expect(modal.locator('[data-articleid]').first()).toBeVisible({ timeout: 60000 });
+
+  const errorDisplay = modal.locator('[data-wwid="load-error"]');
+  await expect(errorDisplay).toBeVisible();
+  await expect(errorDisplay).toContainText('Eroare la încărcarea anunțului de la inspector-escorte');
+  await expect(errorDisplay).toContainText(mockedUrlTitluSter);
+});
