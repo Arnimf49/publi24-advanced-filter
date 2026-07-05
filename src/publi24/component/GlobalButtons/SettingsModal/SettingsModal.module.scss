@@ -232,6 +232,16 @@
   }
 }
 
+.storageInfo {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 10px;
+
+  :global(.dark) & {
+    color: #b9b9b9;
+  }
+}
+
 .importMessage {
   margin-bottom: 8px;
   font-size: 14px;

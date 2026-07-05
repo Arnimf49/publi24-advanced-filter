@@ -3,6 +3,26 @@ import {AutoHideCriterias, WWStorage} from '../../../core/storage';
 import SettingsModal, {SettingsData} from "./SettingsModal";
 import React, {useCallback, useEffect, useState} from "react";
 
+const MAX_STORAGE_BYTES = 5 * 1024 * 1024;
+
+function getStoragePercentRemaining(): number {
+  try {
+    let totalBytes = 0;
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i) || '';
+      if (key.match(/^ww2?:/)) {
+        totalBytes += key.length + (localStorage.getItem(key) || '').length;
+      }
+    }
+    const percentUsed = (totalBytes / MAX_STORAGE_BYTES) * 100;
+    const percentRemaining = Math.max(0, 100 - percentUsed);
+    return Math.round(percentRemaining);
+  } catch (err) {
+    console.error('Failed to calculate storage size:', err);
+    return 0;
+  }
+}
+
 type SettingsModalRootProps = {
   onClose: () => void;
 };
@@ -201,6 +221,7 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
         onCriteriaValueChange={handleCriteriaValueChange}
         handleExport={handleExport}
         handleImport={handleImport}
+        storagePercentRemaining={getStoragePercentRemaining()}
       />
     </Modal>
   );

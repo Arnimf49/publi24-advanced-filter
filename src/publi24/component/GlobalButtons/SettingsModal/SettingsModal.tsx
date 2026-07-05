@@ -107,6 +107,7 @@ type SettingsModalProps = {
   onCriteriaValueChange: (criteriaKey: keyof AutoHideCriterias, value: number) => void;
   handleExport: () => void;
   handleImport: () => Promise<void>;
+  storagePercentRemaining: number;
 };
 
 const SettingsModal: React.FC<SettingsModalProps> =
@@ -127,6 +128,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
   onCriteriaValueChange,
   handleExport,
   handleImport,
+  storagePercentRemaining,
 }) => {
   const [importMessage, setImportMessage] = useState<[string, string]|null>(null);
 
@@ -398,6 +400,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
       <hr style={{ opacity: 0.2, marginTop: '25px', marginBottom: '20px' }} />
 
       <h2 className={styles.header}>Transfer date</h2>
+      <p className={styles.storageInfo}>Spatiu de stocare: <b>{100 - storagePercentRemaining}%</b> folosit.</p>
       {importMessage && <p className={misc.cx(importMessage[0], styles.importMessage)}>{importMessage[1]}</p>}
       <button onClick={handleExport} className={styles.button}>↑ export</button>
       <button onClick={onImport} className={styles.button}>↓ import</button>
