@@ -8,6 +8,20 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.4',
+    releaseDate: '6 iulie 2026',
+    changeNew: [
+      'Afiș procent spațiu de stocare folosit, în setări.',
+    ],
+    changeImprove: [
+      'Scos acțiunea \'ascunde toate\' din modalul de duplicate.',
+      'Curățare automată date vechi îmbunătățită.',
+    ],
+    changeFix: [
+      'Erori la încărcarea anunțurilor duplicate nu se arătau când sursa era inspector.'
+    ]
+  },
+  {
     version: '3.3.1',
     releaseDate: '25 aprilie 2026',
     changeNew: [],
