@@ -1,9 +1,9 @@
-import {ElementHandle, Page} from "playwright-core";
 import {BrowserContext} from "@playwright/test";
 import fs from "node:fs";
-import {expect} from "playwright/test";
+import {expect} from "./fixture";
 import {COOKIES_JSON, STORAGE_JSON, utils} from "./utils";
 import {solve} from "recaptcha-solver";
+import {ElementHandle, Page} from "playwright-core";
 
 export const utilsPubli = {
   clearPopups(page: Page) {

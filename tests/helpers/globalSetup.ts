@@ -1,4 +1,4 @@
-import {PUBLI24_COOKIES_JSON, PUBLI24_STORAGE_JSON, NIMFOMANE_STORAGE_JSON, utils} from "./utils";
+import {PUBLI24_COOKIES_JSON, PUBLI24_STORAGE_JSON, NIMFOMANE_STORAGE_JSON, utils, COOKIES_JSON} from "./utils";
 import fs from "node:fs";
 import path from "node:path";
 import {utilsPubli} from "./utilsPubli";
@@ -25,11 +25,21 @@ async function setupPubli24() {
   const context = await utils.makeContext();
   const page = await context.newPage();
 
+  if (fs.existsSync(COOKIES_JSON)) {
+    await context.addCookies(JSON.parse(fs.readFileSync(COOKIES_JSON).toString()));
+  }
+
   await utilsPubli.open(context, page, {loadStorage: false});
   utilsPubli.clearPopups(page);
   const article = await utilsPubli.findAdWithDuplicates(page, true);
 
-  await utilsPubli.resolveGooglePage(await article.waitForSelector('[data-wwid="investigate_img"]'), context, page);
+  if (!process.env.MANUAL_PRIME) {
+    await utilsPubli.resolveGooglePage(await article.waitForSelector('[data-wwid="investigate_img"]'), context, page);
+  } else {
+    // manual
+    await article.waitForSelector('[data-wwid="investigate_img"]');
+    await page.pause();
+  }
 
   const localStorageData = await utils.getLocalStorageData(page);
 
@@ -60,7 +70,7 @@ async function setupNimfomane() {
   const page = await context.newPage();
 
   await utilsNimfomane.open(page, {loadStorage: false});
-  await utilsNimfomane.waitForFirstImage(page);
+  await utilsNimfomane.waitForNthImage(page);
 
   const localStorageData = await utils.getLocalStorageData(page);
 

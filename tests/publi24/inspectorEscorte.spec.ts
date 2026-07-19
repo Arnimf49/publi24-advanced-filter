@@ -112,11 +112,6 @@ test('Should paginate inspector escorte ads correctly.', async ({ page, context 
 });
 
 test('Should show error display when inspector-escorte ad fails to load', async ({ page, context }) => {
-  await utilsPubli.open(context, page, {inspectorEscorte: true});
-
-  const ad = await utilsPubli.findAdWithDuplicates(page);
-  const adUrl = await (await ad.$('.article-title a')).evaluate((el: HTMLAnchorElement) => el.href);
-
   let inspectorAdUrls: string[] = [];
 
   await context.route('https://api.inspector-escorte.com/v1/ads*', async (route) => {
@@ -133,6 +128,11 @@ test('Should show error display when inspector-escorte ad fails to load', async 
       body,
     });
   });
+
+  await utilsPubli.open(context, page, {inspectorEscorte: true});
+
+  const ad = await utilsPubli.findAdWithDuplicates(page);
+  const adUrl = await (await ad.$('.article-title a')).evaluate((el: HTMLAnchorElement) => el.href);
 
   await (await ad.$('[data-wwid="duplicates"]')).click();
 

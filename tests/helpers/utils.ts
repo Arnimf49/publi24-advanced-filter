@@ -56,8 +56,8 @@ const utils = {
       locales: ['en-US']
     }).getFingerprint({
       devices: ['desktop'],
-      operatingSystems: ['linux'],
-      browserListQuery: 'last 10 Chrome versions'
+      operatingSystems: ['windows'],
+      browserListQuery: 'last 5 Chrome versions'
     });
 
     const proxyServers = getProxyServers();

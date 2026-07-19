@@ -1,9 +1,10 @@
-import {expect, Page} from "playwright/test";
+import {expect} from "../helpers/fixture";
 import {test} from "../helpers/fixture";
 import {utilsNimfomane} from "../helpers/utilsNimfomane";
+import {Page} from "playwright-core";
 
 async function findTopicWithPhone(page: Page) {
-  const {id} = await utilsNimfomane.waitForFirstImage(page);
+  const {id} = await utilsNimfomane.waitForNthImage(page);
   const topic = page.locator(`[data-wwtopic="${id}"]`);
 
   await topic.locator('[data-wwid="topic-image"]').scrollIntoViewIfNeeded();
@@ -72,7 +73,7 @@ test('Should reason hiding topic.', async ({page}) => {
 
 test('Should hide publi topic.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {id: topicId} = await utilsNimfomane.waitForFirstImage(page);
+  const {id: topicId} = await utilsNimfomane.waitForNthImage(page);
 
   await utilsNimfomane.setTopicStorageProp(page, topicId, 'isOfEscort', false);
   await utilsNimfomane.setTopicStorageProp(page, topicId, 'escortDeterminationTime', Date.now());

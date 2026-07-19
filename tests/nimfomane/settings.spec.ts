@@ -40,7 +40,7 @@ test('Should open settings modal from menu.', async ({page}) => {
 test('Should toggle focus mode and hide previously hidden topics.', async ({page}) => {
   await utilsNimfomane.open(page);
 
-  const {id: topicId, user} = await utilsNimfomane.waitForFirstImage(page);
+  const {id: topicId, user} = await utilsNimfomane.waitForNthImage(page);
   const topic = page.locator(`[data-wwtopic="${topicId}"]`);
 
   await topic.locator('[data-wwid="toggle-hidden"]').click();
@@ -68,7 +68,7 @@ test('Should toggle focus mode and hide previously hidden topics.', async ({page
 test('Should show hidden count indicator when focus mode is active.', async ({page}) => {
   await utilsNimfomane.open(page);
 
-  const {id: topicId} = await utilsNimfomane.waitForFirstImage(page);
+  const {id: topicId} = await utilsNimfomane.waitForNthImage(page);
   const topic = page.locator(`[data-wwtopic="${topicId}"]`);
 
   await topic.locator('[data-wwid="toggle-hidden"]').click();

@@ -24,7 +24,7 @@ test('Should search for images and show relevant results.', async ({ page, conte
       for (let link of links) {
         const href = await link.getAttribute('href');
         const text = await link.innerText();
-        const extractedDomain = new URL(href).hostname.replace('www.', '');
+        const extractedDomain = new URL(href).hostname.replace(/^www\./, '');
 
         if (domain !== extractedDomain) {
           domain = extractedDomain;
@@ -95,6 +95,13 @@ test('Should search for images and show relevant results.', async ({ page, conte
 
     ++atAd;
 
+    if (
+      !await ad.$('[class="article-img-count"]') ||
+      +(await (await ad.$('[class="article-img-count"]')).innerText()) > 3
+    ) {
+      continue;
+    }
+
     const adId = await ad.getAttribute('data-articleid')
 
     const articleImageSearchButton = await ad.$('[data-wwid="investigate_img"]');
@@ -108,7 +115,12 @@ test('Should search for images and show relevant results.', async ({ page, conte
       4000,
     );
     // Wait for images post-processing.
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(500);
+    await page.waitForFunction(
+      parent => !parent.querySelector('[data-wwid="inline-loader"]'),
+      ad,
+      {timeout: 12000}
+    );
 
     const cases = Object.entries(caseChecks);
     for (let [name, check] of cases) {

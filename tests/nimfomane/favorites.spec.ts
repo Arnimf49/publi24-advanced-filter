@@ -3,7 +3,7 @@ import {utilsNimfomane} from "../helpers/utilsNimfomane";
 
 test('Should add and remove from favorites.', async ({ page }) => {
   await utilsNimfomane.open(page);
-  const {id} = await utilsNimfomane.waitForFirstImage(page);
+  const {id} = await utilsNimfomane.waitForNthImage(page);
 
   await expect(page.locator('[data-wwid="favs-button"]')).toContainText('0');
   await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
@@ -25,7 +25,7 @@ test('Should add and remove from favorites.', async ({ page }) => {
 
 test('Should display favorites in a modal.', async ({ page }) => {
   await utilsNimfomane.open(page);
-  const firstTopic = await utilsNimfomane.waitForFirstImage(page);
+  const firstTopic = await utilsNimfomane.waitForNthImage(page);
   const profileLink = await utilsNimfomane.getUserProfileLink(page, firstTopic.user);
 
   await page.locator(`[data-wwtopic="${firstTopic.id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
@@ -47,7 +47,7 @@ test('Should display favorites in a modal.', async ({ page }) => {
 test('Should be able to do panel actions from favorites modal.', async ({ page }) => {
   await utilsNimfomane.open(page);
 
-  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
   const phone = await utilsNimfomane.getEscortStorageProp(page, user, 'phone');
 
   await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
@@ -62,7 +62,9 @@ test('Should be able to do panel actions from favorites modal.', async ({ page }
 
   const escortCard = page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-card"]');
   await escortCard.locator('[data-wwid="toggle-hidden"]').click();
+  await page.waitForTimeout(100);
   await page.locator('[data-wwid="reason"]').filter({hasText: 'alta'}).click();
+  await page.waitForTimeout(100);
   await page.locator('[data-wwid="subcategory"]').last().click();
   await page.waitForTimeout(100);
   const firstChild = escortCard.locator('> *:not([data-wwid="hide-reason-container"])').first();
@@ -77,7 +79,7 @@ test('Should be able to do panel actions from favorites modal.', async ({ page }
 
 test('Should load image when opening favorites after storage cleared.', async ({ page }) => {
   await utilsNimfomane.open(page);
-  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
 
   await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
   await page.waitForTimeout(200);
@@ -101,7 +103,7 @@ test('Should load image when opening favorites after storage cleared.', async ({
 
 test('Should display no image or error icon if the case.', async ({ page }) => {
   await utilsNimfomane.open(page);
-  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
 
   await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
   await page.waitForTimeout(200);

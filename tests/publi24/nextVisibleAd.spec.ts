@@ -1,6 +1,6 @@
 import {test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
-import {expect} from "playwright/test";
+import {expect} from "../helpers/fixture";
 import {Locator} from "@playwright/test";
 import {Page} from "playwright-core";
 

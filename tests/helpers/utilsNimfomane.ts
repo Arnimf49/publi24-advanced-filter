@@ -1,7 +1,7 @@
 import {Page} from "playwright-core";
 import fs from "node:fs";
 import {NIMFOMANE_STORAGE_JSON} from "./utils";
-import {expect} from "playwright/test";
+import {expect} from "./fixture";
 import {EscortItem, TopicItem} from "../../src/nimfomane/core/storage";
 
 let atLoad = 0;
@@ -76,14 +76,15 @@ export const utilsNimfomane = {
     utilsNimfomane.clearPopups(page);
   },
 
-  async waitForFirstImage(page: Page, wait: number = 1000) {
+  async waitForNthImage(page: Page, nth: number = 0) {
     for (let i = 0; i < 6; i++) {
       let index = 10;
+      let matchCount = 0;
       while (index >= 0) {
         const parentHandle = page.locator('[data-wwtopic]').nth(index--)
         const firstImage = parentHandle.locator('[data-wwid="topic-image-img"]');
 
-        if (await firstImage.isVisible()) {
+        if (await firstImage.isVisible() && nth == matchCount) {
           const src = await firstImage.getAttribute('src');
           const user = await parentHandle.locator('[data-wwid="topic-image"]')
             .getAttribute('data-wwuser');
@@ -91,9 +92,12 @@ export const utilsNimfomane = {
 
           return {firstImage, src, user, id};
         }
+        if (await firstImage.isVisible()) {
+          ++matchCount;
+        }
       }
 
-      await page.waitForTimeout(wait);
+      await page.waitForTimeout(1000);
     }
 
     throw new Error('Failed to find first image in time');
@@ -235,7 +239,7 @@ export const utilsNimfomane = {
     });
 
     if (stats.lastPostedSectionUrl !== undefined) {
-      await page.route(`${profileLink}content/**`, async (route) => {
+      await page.route(`${profileLink}content/?all_activity**`, async (route) => {
         const response = await route.fetch();
         const json = await response.json();
         const $ = cheerio.load(json.rows || '');

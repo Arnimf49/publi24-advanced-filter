@@ -14,7 +14,7 @@ async function expectFavoritesSectionHeaders(page: Page, visible: boolean, inLoc
 
 test('Should display escort stats in favorites.', async ({ page }) => {
   await utilsNimfomane.open(page);
-  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
 
   await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
   await page.waitForTimeout(200);
@@ -39,6 +39,8 @@ test('Should display escort stats in favorites.', async ({ page }) => {
   await expect(escortCard.locator('[data-wwid="stat-posts"] [data-wwid="inline-loader"]')).toBeVisible();
   await expect(escortCard.locator('[data-wwid="stat-reputation"] [data-wwid="inline-loader"]')).toBeVisible();
 
+  await expect(escortCard.locator('[data-wwid="inline-loader"]')).toHaveCount(0, {timeout: 15000});
+
   await expect(escortCard.locator('[data-wwid="stat-location"] a')).toContainText('Cluj', {timeout: 10000});
   await expect(escortCard.locator('[data-wwid="stat-location"] a')).toHaveAttribute('href');
   await expect(escortCard.locator('[data-wwid="stat-last-visited"]')).toContainText('de 1 oră');
@@ -48,7 +50,7 @@ test('Should display escort stats in favorites.', async ({ page }) => {
 
 test('Should refresh escort stats after a time in favorites.', async ({ page }) => {
   await utilsNimfomane.open(page);
-  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
 
   await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
   await page.waitForTimeout(200);
@@ -124,7 +126,7 @@ test('Should order favorites based on last visited time.', async ({ page }) => {
 
 test('Should dynamically move escort to in-location section when city updates while modal is open.', async ({ page }) => {
   await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'});
-  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
 
   await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
   await page.waitForTimeout(200);
@@ -149,7 +151,7 @@ test('Should dynamically move escort to in-location section when city updates wh
 
 test('Should refresh favorites stats in background without opening the modal.', async ({ page }) => {
   await utilsNimfomane.open(page);
-  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
 
   await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
   await page.waitForTimeout(200);

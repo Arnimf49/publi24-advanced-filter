@@ -50,6 +50,10 @@ export const EscortImages: FC<EscortImagesProps> = ({ user, onClose }) => {
       while (loadedLength < 5) {
         const newImages = await escortActions.loadImages(user, currentPage, 200);
 
+        if (loadedLength === 0 && newImages && newImages.length > 0) {
+          escortActions.updatePreviewImage(user, newImages[0].url);
+        }
+
         if (newImages === null) {
           setEnded(true);
           break;

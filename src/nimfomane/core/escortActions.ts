@@ -138,10 +138,6 @@ export const escortActions = {
       }];
     });
 
-    if (pageNum === 0 && images.length > 0) {
-      escortActions.updatePreviewImage(user, images[0].url);
-    }
-
     return images;
   }
 }

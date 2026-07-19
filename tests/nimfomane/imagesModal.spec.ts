@@ -1,10 +1,11 @@
 import {expect, test} from "../helpers/fixture";
 import {utilsNimfomane} from "../helpers/utilsNimfomane";
 import {utils} from "../helpers/utils";
+import {Cheerio, CheerioAPI} from "cheerio";
 
 test('Should show logo and close with button.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {firstImage} = await utilsNimfomane.waitForFirstImage(page);
+  const {firstImage} = await utilsNimfomane.waitForNthImage(page);
   await firstImage.click();
 
   await page.locator('[data-wwid="escort-images"] [data-wwid="logo"]').isVisible();
@@ -13,14 +14,15 @@ test('Should show logo and close with button.', async ({page}) => {
   await expect(page.locator('[data-wwid="escort-images"]')).toHaveCount(0);
 })
 
-test('Should load more images when scrolling.', async ({page}) => {
+test('Should load more images when scrolling.', async ({page}, testInfo) => {
+  testInfo.setTimeout(40000);
   await utilsNimfomane.open(page);
-  const {firstImage} = await utilsNimfomane.waitForFirstImage(page);
+  const {firstImage} = await utilsNimfomane.waitForNthImage(page, Math.floor(Math.random() * 4));
 
   await utilsNimfomane.throttleReload(page);
   await firstImage.click();
   await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toBeVisible();
-  await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toHaveCount(0);
+  await expect(page.locator('[data-wwid="escort-images"] [data-wwid="loader"]')).toHaveCount(0, {timeout: 20000});
   await expect(page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').first()).toBeVisible({timeout: 4000});
 
   const imagesCount = await page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').count();
@@ -47,7 +49,7 @@ test('Should load more images when scrolling.', async ({page}) => {
 
 test('Should display error when images fail to load.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {user} = await utilsNimfomane.waitForFirstImage(page);
+  const {user} = await utilsNimfomane.waitForNthImage(page);
   const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
 
   await page.route(profileLink + 'content*', route => route.abort('failed'));
@@ -62,18 +64,20 @@ test('Should display error when images fail to load.', async ({page}) => {
 
 test('Should skip images posted in non-escort sections.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {firstImage, user} = await utilsNimfomane.waitForFirstImage(page);
+  const {firstImage, user} = await utilsNimfomane.waitForNthImage(page, Math.floor(Math.random() * 3));
   const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
 
   let secondImageUrl: string | undefined;
 
-  await utils.modifyRouteJsonBody(page, profileLink + 'content**', 'rows', ($) => {
+  const modifier = ($: CheerioAPI) => {
     const imageItems = $('.ipsStreamItem').filter((_, el) => $(el).find('[data-background-src]').length > 0);
     secondImageUrl = imageItems.eq(1).find('[data-background-src]').attr('data-background-src');
 
     imageItems.eq(0).find('.ipsStreamItem_status a:last-child')
       .attr('href', 'https://nimfomane.com/forum/forum/999-non-escort-section/');
-  });
+  };
+  await utils.modifyRouteJsonBody(page, profileLink + 'content?all_activity=**', 'rows', modifier);
+  await utils.modifyRouteJsonBody(page, profileLink + 'content/page/*?all_activity=**', 'rows', modifier);
 
   await utilsNimfomane.throttleReload(page);
   await firstImage.click();

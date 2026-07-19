@@ -1,5 +1,5 @@
 import {utils} from "../helpers/utils";
-import {expect} from "playwright/test";
+import {expect} from "../helpers/fixture";
 import {test} from "../helpers/fixture";
 import {CheerioAPI} from "cheerio";
 import {utilsNimfomane} from "../helpers/utilsNimfomane";
@@ -19,7 +19,7 @@ async function clickExpectOpens(context: BrowserContext, page: Page, selector: s
 
 test('Should show first image as topic image.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {src, user} = await utilsNimfomane.waitForFirstImage(page);
+  const {src, user} = await utilsNimfomane.waitForNthImage(page);
   const profileUrl = await utilsNimfomane.getUserProfileLink(page, user);
 
   await utilsNimfomane.goto(page, profileUrl + 'content');
@@ -50,7 +50,7 @@ test('Should show loader in photo initially.', async ({page}) => {
 
 test('Should show no image icon when no photos found.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {user} = await utilsNimfomane.waitForFirstImage(page);
+  const {user} = await utilsNimfomane.waitForNthImage(page);
   const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
 
   const removeImages = ($: CheerioAPI) => $('[data-background-src]').remove();
@@ -69,7 +69,7 @@ test('Should show no image icon when topic not of escort.', async ({page}) => {
 
 test('Should show all images modal when clicking the topic image.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {firstImage} = await utilsNimfomane.waitForFirstImage(page);
+  const {firstImage} = await utilsNimfomane.waitForNthImage(page);
 
   await firstImage.click();
   await page.locator('[data-wwid="escort-images"]').isVisible();
@@ -108,7 +108,7 @@ test('Should not show images on non escort or massage listings.', async ({page})
 
 test('Should reload topic escort after 6 days.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {id} = await utilsNimfomane.waitForFirstImage(page);
+  const {id} = await utilsNimfomane.waitForNthImage(page);
 
   await utilsNimfomane.setTopicStorageProp(page, id, 'isOfEscort', false);
   await utilsNimfomane.setTopicStorageProp(page, id, 'escortDeterminationTime', Date.now() - (8.64e+7 * 6 - 2000));
@@ -123,7 +123,7 @@ test('Should reload topic escort after 6 days.', async ({page}) => {
 
 test('Should recalculate main topic image after 4 days.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
 
   await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImage', false);
   await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImageTime', Date.now() - (8.64e+7 * 4 - 2000));
@@ -137,8 +137,9 @@ test('Should recalculate main topic image after 4 days.', async ({page}) => {
 
 test('Should update preview image on listing when opening escort images modal.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
   const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
+  await page.locator(`[data-wwtopic="${id}"]`).scrollIntoViewIfNeeded();
 
   await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImage', null);
   await utilsNimfomane.throttleReload(page);
@@ -150,16 +151,18 @@ test('Should update preview image on listing when opening escort images modal.',
 
   await page.locator('[data-wwid="all-photos-button"]').click();
   await expect(page.locator('[data-wwid="escort-images"] [data-wwid="escort-image"] img').first()).toBeVisible();
+  await page.waitForTimeout(1000);
   await page.locator('[data-wwid="escort-images"] [data-wwid="close"]').click();
   await expect(page.locator('[data-wwid="escort-images"]')).toHaveCount(0);
 
   await utilsNimfomane.open(page);
+  await page.locator(`[data-wwtopic="${id}"]`).scrollIntoViewIfNeeded();
   await expect(page.locator(`[data-wwtopic="${id}"] [data-wwid="topic-image"] [data-wwid="topic-image-img"]`)).toBeVisible();
 })
 
 test('Should show error icon when topic image fails to load.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
   const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
 
   await page.route(profileLink + 'content**', route => route.abort());
@@ -173,7 +176,7 @@ test('Should show error icon when topic image fails to load.', async ({page}) =>
 
 test('Should show only loader, not error, when stale image fails but new images are being fetched.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {user, id} = await utilsNimfomane.waitForFirstImage(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
 
   await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImage', 'https://nimfomane.com/broken-image-that-does-not-exist.jpg');
   await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImageTime', Date.now());
@@ -235,7 +238,7 @@ test('Should reload publi link after 10 days.', async ({page, context}) => {
 
 test('Should switch to escort type after 10 days if topic becomes escort.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {id: topicId} = await utilsNimfomane.waitForFirstImage(page);
+  const {id: topicId} = await utilsNimfomane.waitForNthImage(page);
 
   await utilsNimfomane.setTopicStorageProp(page, topicId, 'isOfEscort', false);
   await utilsNimfomane.setTopicStorageProp(page, topicId, 'publiLink', 'https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/rm/i73f7836f8387058e49hdh7037850330.html');

@@ -3,7 +3,7 @@ import {utilsNimfomane} from "../helpers/utilsNimfomane";
 
 test('Should show all images button and open modal.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {user} = await utilsNimfomane.waitForFirstImage(page);
+  const {user} = await utilsNimfomane.waitForNthImage(page, Math.floor(Math.random() * 3));
   await utilsNimfomane.open(page, {url: await utilsNimfomane.getUserProfileLink(page, user)});
 
   await page.waitForTimeout(500);
@@ -18,7 +18,7 @@ test('Should show all images button and open modal.', async ({page}) => {
 
 test('Should render other panel elements.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {user} = await utilsNimfomane.waitForFirstImage(page);
+  const {user} = await utilsNimfomane.waitForNthImage(page, Math.floor(Math.random() * 3));
   await utilsNimfomane.open(page, {url: await utilsNimfomane.getUserProfileLink(page, user)});
 
   await page.waitForTimeout(500);

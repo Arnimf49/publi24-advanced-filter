@@ -1,5 +1,5 @@
 import {utils} from "../helpers/utils";
-import {expect, Page} from "playwright/test";
+import {expect, Page} from "../helpers/fixture";
 import {test} from "../helpers/fixture";
 import {utilsNimfomane} from "../helpers/utilsNimfomane";
 
@@ -36,7 +36,7 @@ async function findTopicWithPhoneInTitle(page: Page) {
 }
 
 async function setupEscortTopicWithoutPhoneInTitle(page: Page) {
-  const {user} = await utilsNimfomane.waitForFirstImage(page);
+  const {user} = await utilsNimfomane.waitForNthImage(page);
   const profileLink = (await utilsNimfomane.getUserProfileLink(page, user)).replace(/\/$/, '');
 
   const topicId = '174418';

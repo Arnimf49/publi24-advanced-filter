@@ -1,6 +1,6 @@
 import {test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
-import {expect} from "playwright/test";
+import {expect} from "../helpers/fixture";
 
 test('Should hide without a reason.', async ({ page, context }) => {
   await utilsPubli.open(context, page);

@@ -1,6 +1,6 @@
 import {test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
-import {expect} from "playwright/test";
+import {expect} from "../helpers/fixture";
 
 test('Should select default manual hide reason when enabled', async ({ page, context }) => {
   await utilsPubli.open(context, page);
