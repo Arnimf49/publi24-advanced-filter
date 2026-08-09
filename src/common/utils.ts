@@ -1,3 +1,5 @@
+const MAX_LOCAL_STORAGE_BYTES = 5 * 1024 * 1024;
+
 export const utils = {
   getStorageSizeKb(): number | null {
     try {
@@ -12,6 +14,16 @@ export const utils = {
       console.error('Failed to calculate local storage size:', error);
       return null;
     }
+  },
+
+  getStorageUsagePercent(): number | null {
+    const storageSizeKb = utils.getStorageSizeKb();
+
+    if (storageSizeKb === null) {
+      return null;
+    }
+
+    return storageSizeKb * 1024 / MAX_LOCAL_STORAGE_BYTES * 100;
   },
 
   debugLog(message: string | number, data?: any) {

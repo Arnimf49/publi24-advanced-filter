@@ -102,14 +102,10 @@ const shouldCleanupStaleStorage = async (): Promise<boolean> => {
   }
 
   try {
-    const localStorageSizeKb = utils.getStorageSizeKb();
-    const estimate = await navigator.storage?.estimate?.();
-    return localStorageSizeKb !== null
-      && estimate?.quota !== undefined
-      && estimate.quota > 0
-      && localStorageSizeKb * 1024 / estimate.quota > 0.8;
+    const storageUsagePercent = utils.getStorageUsagePercent();
+    return storageUsagePercent !== null && storageUsagePercent > 80;
   } catch (error) {
-    console.error('Failed to estimate storage usage:', error);
+    console.error('Failed to check storage usage:', error);
     return false;
   }
 };
