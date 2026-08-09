@@ -84,7 +84,7 @@ test('Should paginate inspector escorte ads correctly.', async ({ page, context 
 
   const sourceBanner = modal.locator('[data-wwid="source-banner"]');
   await expect(sourceBanner).toBeVisible();
-  await expect(sourceBanner).toContainText('Sursa duplicatelor: inspector-escorte.com');
+  await expect(sourceBanner).toContainText('Sursă: inspector-escorte.com');
   await expect(sourceBanner.locator('a')).toHaveAttribute('href', `https://inspector-escorte.com/phone/${phone}`);
 
   await expect(modal.locator('[data-articleid]')).toHaveCount(15, { timeout: 60000 });
@@ -174,4 +174,64 @@ test('Should show error display when inspector-escorte ad fails to load', async 
   await expect(errorDisplay).toBeVisible();
   await expect(errorDisplay).toContainText('Eroare la încărcarea anunțului de la inspector-escorte');
   await expect(errorDisplay).toContainText(mockedUrlTitluSter);
+});
+
+test('Should merge unique local duplicates into inspector escorte results', async ({ page, context }) => {
+  await utilsPubli.open(context, page, {inspectorEscorte: true});
+
+  const ad: ElementHandle = await utilsPubli.findAdWithDuplicates(page);
+  const adId = (await ad.getAttribute('data-articleid'))!;
+  const phone = await (await ad.$('[data-wwid="phone-number"]')).innerText();
+  const adUrl = await (await ad.$('.article-title a')).evaluate((el: HTMLAnchorElement) => el.href);
+  const localOnlyAd = await utilsPubli.findAdWithoutDuplicates(page);
+  const localOnlyAdId = (await localOnlyAd.getAttribute('data-articleid'))!;
+  const localOnlyAdUrl = await (await localOnlyAd.$('.article-title a')).evaluate((el: HTMLAnchorElement) => el.href);
+  const existingEntries = await utilsPubli.getPhoneAds(page, phone);
+  const localOnly = existingEntries.filter((entry) => !entry.startsWith(`${adId}|`)).slice(0, 2);
+  const localEntries = [`${adId}|${adUrl}`, ...localOnly, `${localOnlyAdId}|${localOnlyAdUrl}`];
+  await utilsPubli.setPhoneStorageProp(page, phone, 'ads', localEntries);
+  const expectedCount = 1 + new Set(localEntries.slice(1).map((entry) => entry.split('|')[0])).size;
+
+  await context.route('https://api.inspector-escorte.com/v1/ads*', (route) => {
+    const requestUrl = route.request().url();
+    if (requestUrl.includes('phone=test')) {
+      return route.fulfill({status: 200, body: JSON.stringify({data: []}), contentType: 'application/json'});
+    }
+
+    return route.fulfill({
+      status: 200,
+      body: JSON.stringify({
+        data: [{
+          id: 'inspector-match',
+          title: 'Inspector match',
+          description: 'desc',
+          phone,
+          views: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          geolocation: '',
+          images: [],
+          urls: {'inspector-escorte': 'https://inspector-escorte.com/ad/match', publi24: adUrl},
+        }],
+      }),
+      contentType: 'application/json',
+    });
+  });
+
+  await page.goto(adUrl);
+
+  const adAfterReload = page.locator(`[data-articleid="${adId}"]`);
+  await adAfterReload.locator('[data-wwid="duplicates-container"] img[src*="inspector-escorte"]').waitFor();
+  await expect(adAfterReload.locator('[data-wwid="duplicates-count"]')).toHaveText(String(expectedCount));
+  await adAfterReload.locator('[data-wwid="duplicates"]').click();
+
+  const modal = page.locator('[data-wwid="ads-modal"]');
+  await expect(modal).toBeVisible();
+  await expect(modal.locator('[data-articleid]')).toHaveCount(1);
+
+  await modal.locator('[data-wwid="load-more"]').click();
+  await expect(modal.locator('[data-articleid]')).toHaveCount(expectedCount);
+  await expect(modal.locator('[data-wwid="count"]')).toHaveText(String(expectedCount));
+  await expect(modal.locator(`[data-articleid="${adId}"]`)).toHaveCount(1);
+  await expect(modal.locator(`[data-articleid="${localOnlyAdId}"]`)).toHaveCount(1);
 });

@@ -10,7 +10,7 @@ import HideReasonRoot from "../Common/Partials/HideReason/HideReasonRoot";
 import ImageSlider from "./ImagesSlider/ImagesSlider";
 import AdsModalRoot from "../Common/Partials/AdsModal/AdsModalRoot";
 import {WWMemoryStorage} from "../../core/memoryStorage";
-import {inspectorEscorteApi} from "../../core/inspectorEscorteApi";
+import {inspectorEscorteApi, InspectorAd} from "../../core/inspectorEscorteApi";
 
 interface AdPanelRootProps {
   id: string;
@@ -33,7 +33,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const [prevPhoneTime, setPrevPhoneTime] = useState<number | null | 'unset'>('unset');
   const [prevImageTime, setPrevImageTime] = useState<number | null | 'unset'>('unset');
   const [duplicatesSource, setDuplicatesSource] = useState<'inspector-escorte' | 'local'>('local');
-  const [inspectorAdsCount, setInspectorAdsCount] = useState<number | null>(null);
+  const [inspectorAds, setInspectorAds] = useState<InspectorAd[]>([]);
 
   const itemUrl = adData.getItemUrl(item);
   const phone = WWStorage.getAdPhone(id) || '';
@@ -80,13 +80,12 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
     hideReason = hideReason.replace('automat:', '');
   }
 
-  const localAdsCount = WWStorage.getPhoneAds(phone).length;
-  const numberOfAdsWithSamePhone = duplicatesSource === 'inspector-escorte' && inspectorAdsCount !== null
-    ? inspectorAdsCount
-    : localAdsCount;
-  const hasDuplicateAdsWithSamePhone = duplicatesSource === 'inspector-escorte' && inspectorAdsCount !== null
-    ? inspectorAdsCount > 1
-    : localAdsCount > 1;
+  const localAds = WWStorage.getPhoneAds(phone);
+  const mergedDuplicateSources = inspectorEscorteApi.mergeDuplicateSources(inspectorAds, localAds);
+  const numberOfAdsWithSamePhone = duplicatesSource === 'inspector-escorte'
+    ? mergedDuplicateSources.inspectorAds.length + mergedDuplicateSources.localOnlyAds.length
+    : localAds.length;
+  const hasDuplicateAdsWithSamePhone = numberOfAdsWithSamePhone > 1;
 
   useEffect(() => {
     const image = item.querySelector<HTMLAnchorElement>('.art-img a');
@@ -164,7 +163,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
       try {
         if (!cancelled) {
           setDuplicatesSource('local');
-          setInspectorAdsCount(null);
+          setInspectorAds([]);
         }
 
         const enabled = await inspectorEscorteApi.isEnabledAndAvailable();
@@ -172,7 +171,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         if (!enabled) {
           if (!cancelled) {
             setDuplicatesSource('local');
-            setInspectorAdsCount(null);
+            setInspectorAds([]);
           }
 
           return;
@@ -183,7 +182,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         if (!ads || ads.length === 0) {
           if (!cancelled) {
             setDuplicatesSource('local');
-            setInspectorAdsCount(null);
+            setInspectorAds([]);
           }
 
           return;
@@ -191,14 +190,14 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
 
         if (!cancelled) {
           setDuplicatesSource('inspector-escorte');
-          setInspectorAdsCount(ads.length);
+          setInspectorAds(ads);
         }
       } catch (error) {
         console.error('Failed to load inspector escorte duplicates.', error);
 
         if (!cancelled) {
           setDuplicatesSource('local');
-          setInspectorAdsCount(null);
+          setInspectorAds([]);
         }
       }
     };
@@ -318,7 +317,8 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
 
       {showDuplicates
         && <AdsModalRoot
-          {...({ source: duplicatesSource === 'inspector-escorte' ? 'inspector-escorte' : undefined } as any)}
+          source={duplicatesSource === 'inspector-escorte' ? 'inspector-escorte' : undefined}
+          inspectorAds={inspectorAds}
           phone={phone}
           close={() => setShowDuplicates(false)}
         />}

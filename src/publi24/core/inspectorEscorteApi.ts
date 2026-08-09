@@ -1,4 +1,6 @@
 import {bgApi} from '../../common/background/bgApi';
+import {AdUuid} from './storage';
+import {dataCompression} from './dataCompression';
 
 export interface InspectorAd {
   id: string;
@@ -29,6 +31,10 @@ function refillTokens(): void {
 
   tokens = Math.min(RATE_LIMIT, tokens + elapsedSeconds * RATE_LIMIT);
   lastRefill = now;
+}
+
+function getPubli24AdKey(url: string): string {
+  return dataCompression.compressAdLink(url).replace(/\/+$/, '').toLowerCase();
 }
 
 async function waitForToken(): Promise<void> {
@@ -80,5 +86,25 @@ export const inspectorEscorteApi = {
       console.error('fetchAds error:', error);
       return null;
     }
+  },
+
+  mergeDuplicateSources(inspectorAds: InspectorAd[], localAds: AdUuid[]): {inspectorAds: InspectorAd[]; localOnlyAds: AdUuid[]} {
+    const inspectorKeys = new Set(inspectorAds.map((ad) => getPubli24AdKey(ad.urls.publi24)));
+
+    const localKeys = new Set<string>();
+    const localOnlyAds = localAds.filter((ad) => {
+      const key = getPubli24AdKey(ad.url);
+      if (inspectorKeys.has(key) || localKeys.has(key)) {
+        return false;
+      }
+
+      localKeys.add(key);
+      return true;
+    });
+
+    return {
+      inspectorAds,
+      localOnlyAds,
+    };
   },
 };

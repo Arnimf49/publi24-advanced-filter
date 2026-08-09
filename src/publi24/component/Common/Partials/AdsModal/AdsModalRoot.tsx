@@ -4,7 +4,7 @@ import AdsModal from "./AdsModal";
 import {AdUuid, WWStorage} from "../../../../core/storage";
 import GlobalLoader from "../../GlobalLoader/GlobalLoader";
 import {modalState} from "../../../../../common/modalState";
-import {InspectorAd} from "../../../../core/inspectorEscorteApi";
+import {inspectorEscorteApi, InspectorAd} from "../../../../core/inspectorEscorteApi";
 
 const PAGE_SIZE = 15;
 
@@ -12,12 +12,14 @@ type AdsModalRootProps = {
   close: () => void;
   phone: string;
   source?: 'inspector-escorte';
+  inspectorAds?: InspectorAd[];
 };
 
 const AdsModalRoot: React.FC<AdsModalRootProps> = ({
   close,
   phone,
   source,
+  inspectorAds,
 }) => {
   const [listState, setListState] = useState<{ads: AdData[], breaks: number[], errors: string[]} | null>(null);
   const [removedNow, setRemovedNow] = useState(0);
@@ -68,22 +70,25 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
 
   useEffect(() => {
     const load = async () => {
+      const localAds = WWStorage.getPhoneAds(phone);
+
       if (source === 'inspector-escorte') {
-        const allInspectorAds = await adData.fetchInspectorEscorteAds(phone);
+        const allInspectorAds = inspectorAds ?? await adData.fetchInspectorEscorteAds(phone);
+        const mergedSources = inspectorEscorteApi.mergeDuplicateSources(allInspectorAds, localAds);
 
-        totalCountRef.current = allInspectorAds.length;
-        pendingInspectorAdsRef.current = allInspectorAds.slice(PAGE_SIZE);
+        totalCountRef.current = mergedSources.inspectorAds.length + mergedSources.localOnlyAds.length;
+        pendingInspectorAdsRef.current = mergedSources.inspectorAds.slice(PAGE_SIZE);
+        pendingUuidsRef.current = mergedSources.localOnlyAds;
 
-        const firstBatch = allInspectorAds.slice(0, PAGE_SIZE);
+        const firstBatch = mergedSources.inspectorAds.slice(0, PAGE_SIZE);
         const {ads: items, errors} = await adData.loadInInspectorAdsData(firstBatch, phone, clean);
         setListState({ads: items, breaks: [], errors});
       } else {
-        const allUuids = WWStorage.getPhoneAds(phone);
+        pendingInspectorAdsRef.current = [];
+        pendingUuidsRef.current = localAds.slice(PAGE_SIZE);
 
-        totalCountRef.current = allUuids.length;
-        pendingUuidsRef.current = allUuids.slice(PAGE_SIZE);
-
-        const firstBatch = allUuids.slice(0, PAGE_SIZE);
+        totalCountRef.current = localAds.length;
+        const firstBatch = localAds.slice(0, PAGE_SIZE);
         const {ads: items, errors} = await adData.loadInAdsData(firstBatch, clean);
         setListState({ads: items, breaks: [], errors});
       }
