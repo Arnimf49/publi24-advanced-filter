@@ -75,10 +75,6 @@ const _WW_CALLBACKS = {
   settingsChanged: [] as Array<() => void>,
 };
 
-const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
-
-
-
 function parseAdUuid(uuid: string): AdUuid {
   const parts = uuid.split('|');
   return {
@@ -716,8 +712,10 @@ export const WWStorage = {
     return allItems;
   },
 
-  async cleanupStale(): Promise<void> {
-    const threshold = Date.now() - ONE_YEAR_MS;
+  async cleanupStale(retentionMonths: number = 12): Promise<void> {
+    const thresholdDate = new Date();
+    thresholdDate.setMonth(thresholdDate.getMonth() - retentionMonths);
+    const threshold = thresholdDate.getTime();
     const allItems: Record<string, string> = { ...localStorage };
     let removedCount = 0;
 

@@ -131,3 +131,53 @@ test('Should keep favorited phone in favorites list even when orphaned.', async 
   expect(storageState.phoneItem).toBeNull();
   expect(storageState.favorites).toContain('0700000003');
 });
+
+test('Should remove an oversized ad during the one-month retention pass.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  await page.evaluate(() => {
+    const oneAndHalfMonthsAgo = Date.now() - 45 * 24 * 60 * 60 * 1000;
+    localStorage.setItem('ww2:OVERSIZED_RECENT_AD', JSON.stringify({
+      phone: '0700000005',
+      lastSeen: oneAndHalfMonthsAgo,
+      payload: 'x'.repeat(4_300_000),
+    }));
+  });
+
+  await page.reload();
+  await page.waitForTimeout(700);
+
+  const adItem = await page.evaluate(() => localStorage.getItem('ww2:OVERSIZED_RECENT_AD'));
+  expect(adItem).toBeNull();
+});
+
+test('Should stop cleanup after removing an oversized seven-month-old ad.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  await page.evaluate(() => {
+    const sevenMonthsAgo = Date.now() - 210 * 24 * 60 * 60 * 1000;
+    const fiveMonthsAgo = Date.now() - 150 * 24 * 60 * 60 * 1000;
+    localStorage.setItem('ww2:OVERSIZED_SEVEN_MONTH_AD', JSON.stringify({
+      phone: '0700000006',
+      lastSeen: sevenMonthsAgo,
+      payload: 'x'.repeat(4_300_000),
+    }));
+    localStorage.setItem('ww2:FIVE_MONTH_AD', JSON.stringify({
+      phone: '0700000007',
+      lastSeen: fiveMonthsAgo,
+    }));
+  });
+
+  await page.reload();
+  await page.waitForTimeout(700);
+
+  const storageState = await page.evaluate(() => {
+    return {
+      sevenMonthAd: localStorage.getItem('ww2:OVERSIZED_SEVEN_MONTH_AD'),
+      fiveMonthAd: localStorage.getItem('ww2:FIVE_MONTH_AD'),
+    };
+  });
+
+  expect(storageState.sevenMonthAd).toBeNull();
+  expect(storageState.fiveMonthAd).not.toBeNull();
+});

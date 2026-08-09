@@ -10,6 +10,7 @@ import {sendAnalyticsEvent} from "./core/analytics";
 import {userId} from "../common/userId";
 import {modalState} from "../common/modalState";
 import {utils} from "../common/utils";
+import {storageCleanup} from "./core/storageCleanup";
 
 const waitForSiteLoad = () => new Promise<void>(resolve => {
   const start = Date.now();
@@ -92,33 +93,15 @@ const initializeListingPage = async () => {
   iosUtils.focusListingAdIfNeeded();
 };
 
-const shouldCleanupStaleStorage = async (): Promise<boolean> => {
-  if (localStorage.getItem('_pw_init') === 'true') {
-    return true;
-  }
-
-  if (Math.random() < 0.00001) {
-    return true;
-  }
-
-  try {
-    const storageUsagePercent = utils.getStorageUsagePercent();
-    return storageUsagePercent !== null && storageUsagePercent > 80;
-  } catch (error) {
-    console.error('Failed to check storage usage:', error);
-    return false;
-  }
-};
-
 WWStorage.upgrade()
   .then(waitForSiteLoad)
   .then(() => {
     console.log('Booting publi24-advanced-filter');
 
-    shouldCleanupStaleStorage()
+    storageCleanup.shouldRun()
       .then(async (shouldCleanup) => {
         if (shouldCleanup) {
-          await WWStorage.cleanupStale();
+          await storageCleanup.run();
         }
       })
       .catch((error) => {
