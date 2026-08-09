@@ -271,6 +271,9 @@ export const linksFilter = {
           compressedLink = isPubliLink ? dataCompression.compressAdLink(link) : link;
           escortListingFlag = getFlagForDomain(rawDomain);
         }
+        const isPubli24QueryLink = !Array.isArray(result)
+          && rawDomain === 'publi24.ro'
+          && link.includes('?q=');
         let isDomainSafe = false;
         let isDomainSuspicious = false;
         let isEscortListing = false;
@@ -288,7 +291,7 @@ export const linksFilter = {
 
         const linkObj: ProcessedLink = {
           link,
-          isDead: !!compressedLink && deadLinks.includes(compressedLink),
+          isDead: isPubli24QueryLink || (!!compressedLink && deadLinks.includes(compressedLink)),
           isSafe: isDomainSafe,
           isSuspicious: isDomainSuspicious,
         };
