@@ -78,7 +78,7 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
   }
   if (
     (
-      content.match(/(\W|^)(out\s*call|(doa?r|numai|decat)\s+(deplasar|depalsar|deplsar)(i{1,4}|e)|nu am locatie)(\W|$)/i)
+      content.match(/(\W|^)(out\s*call|(doa?r|numai|decat)\s+(deplasar|depalsar|deplsar)(i{1,4}|e)|ma deplasez|nu (am|detin) locatie)(\W|$)/i)
       || title.match(/(\W|^)(out\s*call|(deplasar|depalsar|deplsar)(i{1,4}|e))(\W|$)/i)
     )
     && !content.match(/(\W|^)(in\s*call|la\s+mine|locatie\s+proprie|si\s+deplasar[ie]|si\s+locatie|locatia\s+mea|in\s+locatie|nu\s+fac\s+deplasari)(\W|$)/i)) {
