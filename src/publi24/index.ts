@@ -70,7 +70,12 @@ const initializeAdPage = async () => {
 };
 
 const initializeListingPage = async () => {
-  renderer.registerAdsInContext(document.body, { applyFocusMode: true, isFromListing: true });
+  try {
+    renderer.registerAdsInContext(document.body, { applyFocusMode: true, isFromListing: true });
+  } catch (error) {
+    console.error('Failed to register listing ads:', error);
+  }
+
   renderer.renderNextVisibleAdButton();
 
   if (location.pathname.startsWith('/anunturi/matrimoniale')) {
@@ -87,14 +92,42 @@ const initializeListingPage = async () => {
   iosUtils.focusListingAdIfNeeded();
 };
 
+const shouldCleanupStaleStorage = async (): Promise<boolean> => {
+  if (localStorage.getItem('_pw_init') === 'true') {
+    return true;
+  }
+
+  if (Math.random() < 0.00001) {
+    return true;
+  }
+
+  try {
+    const localStorageSizeKb = utils.getStorageSizeKb();
+    const estimate = await navigator.storage?.estimate?.();
+    return localStorageSizeKb !== null
+      && estimate?.quota !== undefined
+      && estimate.quota > 0
+      && localStorageSizeKb * 1024 / estimate.quota > 0.8;
+  } catch (error) {
+    console.error('Failed to estimate storage usage:', error);
+    return false;
+  }
+};
+
 WWStorage.upgrade()
   .then(waitForSiteLoad)
   .then(() => {
     console.log('Booting publi24-advanced-filter');
 
-    WWStorage.cleanupStale().catch((error) => {
-      console.error('Failed to cleanup stale storage:', error);
-    });
+    shouldCleanupStaleStorage()
+      .then(async (shouldCleanup) => {
+        if (shouldCleanup) {
+          await WWStorage.cleanupStale();
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to cleanup stale storage:', error);
+      });
 
     userId.init().catch(console.error);
     sendAnalyticsEvent().catch(console.error);

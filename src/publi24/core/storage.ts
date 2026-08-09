@@ -94,12 +94,12 @@ function serializeAdUuid(adUuid: AdUuid): string {
 function removeAdItem(id: string, phone?: string | null) {
   const upperId = id.toUpperCase();
 
+  localStorage.removeItem(`ww2:${id}`);
+  delete _WW_STORE_CACHE.item[upperId];
+
   if (phone) {
     WWStorage.removePhoneAd(phone, upperId);
   }
-
-  localStorage.removeItem(`ww2:${upperId}`);
-  delete _WW_STORE_CACHE.item[upperId];
 }
 
 function removePhoneItem(phone: string) {
@@ -365,11 +365,11 @@ export const WWStorage = {
       return;
     }
 
-    const id = typeof uuidOrId === 'string' ? uuidOrId : uuidOrId.id;
+    const id = (typeof uuidOrId === 'string' ? uuidOrId : uuidOrId.id).toUpperCase();
 
     const ads = WWStorage.getPhoneAds(phone);
     const initialLength = ads.length;
-    const filteredAds = ads.filter(adUuid => adUuid.id !== id);
+    const filteredAds = ads.filter(adUuid => adUuid.id.toUpperCase() !== id);
 
     if (filteredAds.length < initialLength) {
       WWStorage.setPhoneProp(phone, 'ads', filteredAds.map(adUuid => serializeAdUuid(adUuid)));
@@ -720,29 +720,19 @@ export const WWStorage = {
     const threshold = Date.now() - ONE_YEAR_MS;
     const allItems: Record<string, string> = { ...localStorage };
     let removedCount = 0;
-    const phonesToCheck = new Set<string>();
 
     Object.entries(allItems).forEach(([key, value]) => {
       if (!key.match(/^ww2:[^:]+$/)) {
         return;
       }
 
-      try {
-        const adItem: AdItem = JSON.parse(value);
-        if (!adItem.lastSeen || adItem.lastSeen < threshold) {
-          const phone = adItem.phone;
-          const adId = key.replace(/^ww2:/, '');
-          removeAdItem(adId, phone);
-          // removeAdItem uppercases the id, but legacy keys may be lowercase. Ensure the exact key is deleted too.
-          localStorage.removeItem(key);
-          delete _WW_STORE_CACHE.item[adId.toUpperCase()];
-          removedCount++;
-          if (phone) {
-            phonesToCheck.add(phone);
-          }
-        }
-      } catch (error) {
-        console.error(`Failed to inspect ad storage item ${key} during stale cleanup:`, error);
+      const adItem: AdItem = JSON.parse(value);
+      if (!adItem.lastSeen || adItem.lastSeen < threshold) {
+        const phone = adItem.phone;
+        const adId = key.replace(/^ww2:/, '');
+        removeAdItem(adId, phone);
+        delete _WW_STORE_CACHE.item[adId.toUpperCase()];
+        removedCount++;
       }
     });
 
@@ -750,13 +740,59 @@ export const WWStorage = {
       console.log(`Cleaned up ${removedCount} stale Publi24 ads from storage`);
     }
 
-    let orphanedPhonesRemoved = 0;
-    phonesToCheck.forEach(phone => {
-      if (WWStorage.getPhoneAds(phone).length === 0) {
-        removePhoneItem(phone);
-        orphanedPhonesRemoved++;
+    const liveAdIds = new Set<string>();
+    const remainingItems: Record<string, string> = { ...localStorage };
+    Object.keys(remainingItems).forEach((key) => {
+      const match = key.match(/^ww2:([^:]+)$/);
+      if (match) {
+        liveAdIds.add(match[1].toUpperCase());
       }
     });
+
+    let orphanedPhoneReferencesRemoved = 0;
+    let orphanedPhonesRemoved = 0;
+    Object.entries(remainingItems).forEach(([key, value]) => {
+      const match = key.match(/^ww2:phone:(.+)$/);
+      if (!match) {
+        return;
+      }
+
+      const phone = match[1];
+      const phoneItem: PhoneItem = JSON.parse(value);
+      const ads = Array.isArray(phoneItem.ads) ? phoneItem.ads : [];
+
+      if (ads.length === 0) {
+        removePhoneItem(phone);
+        orphanedPhonesRemoved++;
+        return;
+      }
+
+      const retainedAds = ads.filter((adEntry) => {
+        const adId = adEntry.split('|')[0].toUpperCase();
+        return liveAdIds.has(adId);
+      });
+
+      const removedReferences = ads.length - retainedAds.length;
+      if (removedReferences === 0) {
+        return;
+      }
+
+      if (retainedAds.length === 0) {
+        removePhoneItem(phone);
+        orphanedPhoneReferencesRemoved += removedReferences;
+        orphanedPhonesRemoved++;
+        return;
+      }
+
+      phoneItem.ads = retainedAds;
+      localStorage.setItem(key, JSON.stringify(phoneItem));
+      delete _WW_STORE_CACHE.phone[phone];
+      orphanedPhoneReferencesRemoved += removedReferences;
+    });
+
+    if (orphanedPhoneReferencesRemoved > 0) {
+      console.log(`Cleaned up ${orphanedPhoneReferencesRemoved} orphaned Publi24 phone ad references`);
+    }
 
     if (orphanedPhonesRemoved > 0) {
       console.log(`Cleaned up ${orphanedPhonesRemoved} orphaned Publi24 phones from storage`);

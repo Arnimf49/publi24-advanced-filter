@@ -3,6 +3,7 @@ import {userId} from "../../common/userId";
 import {permissions} from "../../common/permissions";
 import {supabaseClient} from "../../common/supabase/supabaseClient";
 import {browserApi} from "../../common/globals";
+import {utils} from "../../common/utils";
 
 interface MonthCount {
   [month: string]: number;
@@ -29,19 +30,6 @@ interface AnalyticsData {
   user_agent: string;
   storage_size: number | null;
   is_incognito: boolean | null;
-}
-
-function getStorageSizeKb(): number | null {
-  try {
-    let totalBytes = 0;
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i) || '';
-      totalBytes += key.length + (localStorage.getItem(key) || '').length;
-    }
-    return Math.round(totalBytes / 1024 * 10) / 10;
-  } catch {
-    return null;
-  }
 }
 
 function detectIncognito(): boolean | null {
@@ -146,7 +134,7 @@ function collectAnalyticsData(): AnalyticsData {
     hidden_count: hiddenCount,
     settings_enabled: settingsEnabled,
     user_agent: navigator.userAgent,
-    storage_size: getStorageSizeKb(),
+    storage_size: utils.getStorageSizeKb(),
     is_incognito: detectIncognito(),
   };
 }
@@ -221,4 +209,3 @@ export async function sendAnalyticsEvent(): Promise<void> {
     WWStorage.setAnalytics({ ...WWStorage.getAnalytics(), lastChecked: now });
   }
 }
-

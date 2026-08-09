@@ -1,4 +1,19 @@
 export const utils = {
+  getStorageSizeKb(): number | null {
+    try {
+      let totalBytes = 0;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i) || '';
+        totalBytes += key.length + (localStorage.getItem(key) || '').length;
+      }
+
+      return Math.round(totalBytes / 1024 * 10) / 10;
+    } catch (error) {
+      console.error('Failed to calculate local storage size:', error);
+      return null;
+    }
+  },
+
   debugLog(message: string | number, data?: any) {
     if (process.env.WATCH_MODE) {
       console.log(`[WW-DEBUG] ${message}`, data || '');

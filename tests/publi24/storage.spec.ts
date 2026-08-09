@@ -38,6 +38,39 @@ test('Should cleanup stale ad storage on startup.', async ({ page, context }) =>
   expect(storageState.phoneItem).not.toContain('STALE_OLD|');
 });
 
+test('Should remove orphaned phone ad references while keeping live phone data.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  await page.evaluate(() => {
+    localStorage.setItem('ww2:LIVE_REFERENCE_AD', JSON.stringify({
+      phone: '0700000004',
+      lastSeen: Date.now(),
+    }));
+    localStorage.setItem('ww2:phone:0700000004', JSON.stringify({
+      hidden: true,
+      ads: [
+        'LIVE_REFERENCE_AD|anunturi/matrimoniale/escorte/cluj/cluj-napoca/live-reference-ad/',
+        'MISSING_REFERENCE_AD|anunturi/matrimoniale/escorte/cluj/cluj-napoca/missing-reference-ad/',
+      ],
+    }));
+  });
+
+  await page.reload();
+  await page.waitForTimeout(700);
+
+  const storageState = await page.evaluate(() => {
+    return {
+      liveAd: localStorage.getItem('ww2:LIVE_REFERENCE_AD'),
+      phoneItem: localStorage.getItem('ww2:phone:0700000004'),
+    };
+  });
+
+  expect(storageState.liveAd).not.toBeNull();
+  expect(storageState.phoneItem).toContain('LIVE_REFERENCE_AD|');
+  expect(storageState.phoneItem).not.toContain('MISSING_REFERENCE_AD|');
+  expect(storageState.phoneItem).toContain('"hidden":true');
+});
+
 test('Should cleanup orphaned phone storage when all its ads go stale.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
