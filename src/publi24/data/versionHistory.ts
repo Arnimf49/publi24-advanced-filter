@@ -8,6 +8,21 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.5',
+    releaseDate: '9 august 2026',
+    changeNew: [
+      'Curățarea progresivă a datelor vechi atunci când se atinge limita spațiului de stocare.',
+    ],
+    changeImprove: [
+      'Curățarea automată a datelor vechi îmbunătățită din nou.',
+      'Duplicatele locale care nu apar pe \'inspector-escort.com\' sunt afișate în modalul de duplicate.',
+      'Linkurile Publi24 care duc la paginile de listare sunt acum colorate în gri în rezultatele de imagini.',
+      'Procentul spațiului de stocare folosit, afișat în setări, este mai exact.',
+      'Mai multe domenii de escorte categorizate.',
+    ],
+    changeFix: []
+  },
+  {
     version: '3.4',
     releaseDate: '6 iulie 2026',
     changeNew: [
