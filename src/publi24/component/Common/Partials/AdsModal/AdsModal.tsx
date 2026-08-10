@@ -22,6 +22,7 @@ type AdsModalProps = {
   onLoadMore?: () => void;
   sectionBreaks?: number[];
   renderAds: (adsData: AdData[], sectionBreaks?: number[]) => React.ReactNode;
+  inline?: boolean;
 };
 
 const useLoadingDots = (isLoading: boolean | undefined) => {
@@ -70,6 +71,7 @@ const AdsModal: React.FC<AdsModalProps> = ({
   onLoadMore,
   sectionBreaks,
   renderAds,
+  inline = false,
 }) => {
   const removedCount = removed ?? 0;
   const displayCount = totalCount != null
@@ -87,6 +89,7 @@ const AdsModal: React.FC<AdsModalProps> = ({
       dataWwid="ads-modal"
       onCleanup={onCleanup}
       prose={false}
+      inline={inline}
     >
       <input
         type="text"

@@ -1,5 +1,4 @@
 import React from "react";
-import {misc} from "../../../core/misc";
 
 type LeafState = 'fresh' | 'stale' | 'old';
 
@@ -8,7 +7,12 @@ type LeafIconProps = {
 };
 
 export const LeafIcon = ({ state = 'fresh' }: LeafIconProps) => {
-  const theme = misc.getPubliTheme();
+  const savedTheme = typeof window !== 'undefined'
+    ? window.localStorage.getItem('theme')
+    : null;
+  const theme = savedTheme === 'dark' || savedTheme === 'light'
+    ? savedTheme
+    : (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 
   const getColors = () => {
     if (state === 'fresh') {

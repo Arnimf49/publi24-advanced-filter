@@ -18,6 +18,7 @@ type FavoritesModalProps = {
   topContent?: React.ReactNode;
   renderAds: (ads: AdData[]) => React.ReactNode;
   renderNoAd: (phone: string) => React.ReactNode;
+  inline?: boolean;
 };
 
 const FavoritesModal: React.FC<FavoritesModalProps> = ({
@@ -32,6 +33,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
   topContent,
   renderAds,
   renderNoAd,
+  inline = false,
 }) => {
   const [activeTab, setActiveTab] = useState<'active' | 'inactive'>('active');
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -60,6 +62,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
   return (
     <Modal
       close={onClose}
+      inline={inline}
       dataWwid="favorites-modal"
       onCleanup={onCleanup}
     >

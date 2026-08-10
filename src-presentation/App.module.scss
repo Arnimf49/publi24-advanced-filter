@@ -1,0 +1,244 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 84px;
+  margin: 0 auto;
+  padding: 0 max(16px, calc((100vw - 1800px) / 2));
+  border-bottom: 1px solid #d8d8d4;
+  background: rgb(247 247 245 / 74%);
+  backdrop-filter: blur(12px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #111111;
+  font-size: clamp(1.05rem, 1vw, 1.35rem);
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.brand:hover {
+  text-decoration: none;
+}
+
+.brand b {
+  font-weight: 750;
+}
+
+.logo {
+  width: 42px;
+  height: 42px;
+}
+
+.installButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: clamp(11px, 0.8vw, 15px) clamp(16px, 1.2vw, 22px);
+  border: 1px solid #1177bb;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #1177bb;
+  font-size: clamp(0.8rem, 0.9vw, 1rem);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.installButton:hover {
+  color: #1177bb;
+  background: transparent;
+}
+
+.hero,
+.featureBlock,
+.installSection {
+  width: min(100% - 48px, 1800px);
+  margin: 0 auto;
+}
+
+.hero {
+  width: 100%;
+  max-width: none;
+  min-height: auto;
+  padding: 72px max(24px, calc((100vw - 1800px) / 2)) 84px;
+}
+
+.heroCopy {
+  width: 100%;
+}
+
+.eyebrow,
+.sectionNumber {
+  margin: 0 0 22px;
+  color: #666663;
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.heroTitle,
+.featureCopy h2,
+.installSection h2,
+.heroDescription,
+.featureCopy > p {
+  margin-top: 0;
+}
+
+.heroTitle,
+.featureCopy h2,
+.installSection h2 {
+  letter-spacing: -0.065em;
+}
+
+.heroTitle {
+  width: 100%;
+  margin-bottom: 26px;
+  font-size: clamp(3.4rem, 5.5vw, 7rem);
+  line-height: 0.91;
+  font-weight: 780;
+}
+
+.heroDescription {
+  width: 100%;
+  margin-bottom: 0;
+  color: #555552;
+  font-size: clamp(1.05rem, 1vw, 1.35rem);
+  line-height: 1.55;
+}
+
+.featureBlock {
+  display: grid;
+  grid-template-columns: minmax(250px, 38fr) minmax(0, 62fr);
+  gap: clamp(40px, 6vw, 100px);
+  align-items: center;
+  padding: 104px 0 122px;
+  border-top: 1px solid #d8d8d4;
+}
+
+.featureCopy {
+  align-self: center;
+  padding-top: 0;
+}
+
+.featureCopy h2,
+.installSection h2 {
+  margin-bottom: 27px;
+  font-size: clamp(2.35rem, 4.7vw, 5.4rem);
+  line-height: 0.95;
+  font-weight: 760;
+}
+
+.installSection h2 {
+  max-width: none;
+}
+
+.featureCopy > p:not(.sectionNumber) {
+  margin-bottom: 18px;
+  font-size: clamp(1rem, 1vw, 1.35rem);
+  line-height: 1.65;
+}
+
+.featureCopy .supportingCopy {
+  color: #777773;
+  font-size: clamp(0.86rem, 0.8vw, 1.1rem);
+}
+
+.featureBlock > :last-child {
+  align-self: center;
+}
+
+.installSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 80px 0 110px;
+  border-top: 1px solid #d8d8d4;
+}
+
+.installSection .sectionNumber {
+  margin-bottom: 18px;
+}
+
+.installSection h2 {
+  margin-bottom: 0;
+}
+
+@media (max-width: 800px) {
+  .hero,
+  .featureBlock,
+  .installSection {
+    width: min(100% - 32px, 640px);
+  }
+
+  .hero {
+    display: block;
+    min-height: auto;
+    width: 100%;
+    padding: 64px 16px 80px;
+  }
+
+  .featureBlock {
+    display: block;
+    padding: 76px 0 88px;
+  }
+
+  .featureCopy {
+    padding-top: 0;
+    margin-bottom: 10px;
+  }
+
+  .installSection {
+    display: block;
+    padding: 68px 0 84px;
+  }
+
+  .installSection .installButton {
+    margin-top: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    min-height: 74px;
+  }
+
+  .brand {
+    font-size: 0.87rem;
+  }
+
+  .logo {
+    width: 34px;
+    height: 34px;
+  }
+
+  .installButton {
+    padding: 9px 12px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (min-width: 380px) and (max-width: 480px) {
+  .brand {
+    font-size: 1.15rem;
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .header .installButton {
+    padding: 10px 13px;
+    font-size: 0.75rem;
+  }
+}

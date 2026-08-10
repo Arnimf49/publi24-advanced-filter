@@ -1,14 +1,15 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
 import styles from './HideReason.module.scss';
-import {misc} from "../../../../core/misc";
 import {IS_AD_PAGE} from "../../../../core/globals";
-import {IS_MOBILE_VIEW} from "../../../../../common/globals";
 import {utils} from "../../../../../common/utils";
 import {MANUAL_HIDE_REASONS} from "../../../../core/hideReasons";
 import {ManualHideReasonWithKey} from "./HideReasonRoot";
 import {CloseIcon} from "../../Icons/CloseIcon";
 
 const REASONS = Object.keys(MANUAL_HIDE_REASONS);
+const isMobileView = typeof document !== 'undefined' && 'ontouchstart' in document.documentElement;
+
+const cx = (...args: (string | boolean | undefined | null)[]): string => args.filter(Boolean).join(' ');
 
 type HideReasonProps = {
   reasons?: string[];
@@ -34,7 +35,7 @@ const HideReason: React.FC<HideReasonProps> = ({
   const [showSubcategories, setShowSubcategories] = useState<boolean>(false);
 
   useLayoutEffect(() => {
-    if (containerRef.current && (IS_MOBILE_VIEW || IS_AD_PAGE())) {
+    if (containerRef.current && (isMobileView || IS_AD_PAGE())) {
       const bounding = containerRef.current.getBoundingClientRect();
       if (bounding.top < 120) {
         const scrollParent = utils.getScrollParent(containerRef.current);
@@ -117,7 +118,7 @@ const HideReason: React.FC<HideReasonProps> = ({
           <>
             <button
               type="button"
-              className={misc.cx(styles.reasonButton, styles.backButton)}
+               className={cx(styles.reasonButton, styles.backButton)}
               onClick={handleBackClick}
               data-wwid="back-button"
             >
@@ -126,7 +127,7 @@ const HideReason: React.FC<HideReasonProps> = ({
 
             <button
               type="button"
-              className={misc.cx(styles.reasonButton, styles.reasonSelected)}
+               className={cx(styles.reasonButton, styles.reasonSelected)}
               onClick={() => {
                 if (selectedCategory) {
                   setSelected(selectedCategory);
@@ -146,7 +147,7 @@ const HideReason: React.FC<HideReasonProps> = ({
               <button
                 key={subcategory}
                 type="button"
-                className={misc.cx(
+                 className={cx(
                   styles.reasonButton,
                   selected === `${selectedCategory}: ${subcategory}` && styles.reasonSelected
                 )}
@@ -166,7 +167,7 @@ const HideReason: React.FC<HideReasonProps> = ({
                 <button
                   key={reason}
                   type="button"
-                  className={misc.cx(
+                   className={cx(
                     styles.reasonButton,
                     isTemporar && styles.temporarButton,
                     selected === reason && styles.reasonSelected
@@ -190,7 +191,7 @@ const HideReason: React.FC<HideReasonProps> = ({
             {onShowClick && (
               <button
                 type="button"
-                className={misc.cx(styles.reasonButton, styles.showButton)}
+                className={cx(styles.reasonButton, styles.showButton)}
                 onClick={onShowClick}
                 data-wwid="show-button"
               >

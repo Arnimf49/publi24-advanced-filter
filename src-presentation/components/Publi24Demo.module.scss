@@ -1,0 +1,194 @@
+.demo {
+  overflow: hidden;
+  min-width: 0;
+  padding: 16px;
+}
+
+.demoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 42px;
+  padding: 0 4px 14px;
+}
+
+.stateSwitch {
+  display: flex;
+  padding: 3px;
+  border: 1px solid #c5c5c0;
+  border-radius: 999px;
+  background: #f8f8f6;
+}
+
+.stateSwitch button {
+  min-width: clamp(116px, 8vw, 150px);
+  padding: clamp(10px, 0.7vw, 14px) clamp(22px, 1.4vw, 30px);
+  border: 0;
+  border-radius: 999px;
+  color: #777773;
+  background: transparent;
+  font-size: clamp(0.7rem, 0.8vw, 0.95rem);
+  font-weight: 700;
+  transition: color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.stateSwitch button:hover {
+  color: #111111;
+}
+
+.stateSwitch button.stateActive {
+  color: #ffffff !important;
+  background: #111111;
+  -webkit-text-fill-color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.viewport {
+  position: relative;
+  overflow: hidden;
+  min-height: 660px;
+  border: 1px solid #c5c5c0;
+  border-radius: 10px;
+  background: #ffffff;
+  transition: background 300ms ease;
+}
+
+.extensionOn {
+  background: #fafafa;
+}
+
+.browserBar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 31px;
+  padding: 0 11px;
+  border-bottom: 1px solid #deded9;
+  background: #f0f0ed;
+}
+
+.browserDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b5b5af;
+}
+
+.address {
+  overflow: hidden;
+  margin-left: 9px;
+  color: #8b8b86;
+  font-size: 0.65rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.siteTopbar {
+  display: flex;
+  align-items: center;
+  height: 47px;
+  padding: 0 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e4e4e4;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+}
+
+:global(.publi24-demo-site) .siteTopbar .text-logo {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  margin: 0;
+  color: #1778bc;
+  font-family: "Lexend", Arial, sans-serif;
+  font-size: 1.25rem;
+  font-style: italic;
+  font-weight: 800;
+  line-height: 1;
+}
+
+:global(.publi24-demo-site) .siteTopbar .text-logo .t1,
+:global(.publi24-demo-site) .siteTopbar .text-logo .t3 {
+  color: #1778bc;
+}
+
+:global(.publi24-demo-site) .siteTopbar .text-logo .t2 {
+  color: #fbba10;
+}
+
+.siteContent {
+  padding: 19px 18px 25px;
+}
+
+:global(.publi24-demo-site) .siteContent {
+  width: auto;
+  margin: 16px 18px 24px;
+  padding: 0;
+}
+
+.siteBreadcrumb {
+  margin: 0 0 12px;
+  color: #999993;
+  font-size: 0.62rem;
+}
+
+.extensionPanel {
+  max-height: 510px;
+  overflow: hidden;
+  opacity: 1;
+  transform: translateY(0);
+  transform-origin: top center;
+  transition: max-height 420ms ease, opacity 280ms ease, transform 420ms ease;
+}
+
+.extensionOff .extensionPanel {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-14px) scale(0.98);
+  pointer-events: none;
+}
+
+@media (max-width: 560px) {
+  .demo {
+    padding: 0;
+  }
+
+  .demoHeader {
+    display: flex;
+  }
+
+  .stateSwitch {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .stateSwitch button {
+    flex: 1;
+  }
+
+  .viewport {
+    min-height: 540px;
+  }
+
+  :global(.publi24-demo-site) .siteContent {
+    margin: 10px 0 0;
+  }
+
+  .primaryDemoSite {
+    padding-bottom: 30px;
+  }
+
+  .siteTopbar {
+    background: #1778bc;
+  }
+
+  :global(.publi24-demo-site) .siteTopbar .text-logo .t1,
+  :global(.publi24-demo-site) .siteTopbar .text-logo .t3 {
+    color: #ffffff;
+  }
+
+  :global(.publi24-demo-site) .siteTopbar .text-logo .t2 {
+    color: #fbba10;
+  }
+}

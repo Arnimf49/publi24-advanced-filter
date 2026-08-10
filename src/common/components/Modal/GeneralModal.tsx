@@ -12,6 +12,7 @@ type GeneralModalProps = {
   dataWwid?: string;
   onCleanup?: () => void;
   prose?: boolean;
+  inline?: boolean;
 };
 
 const GeneralModal: React.FC<GeneralModalProps> =
@@ -24,9 +25,10 @@ const GeneralModal: React.FC<GeneralModalProps> =
   dataWwid = "general-modal",
   onCleanup,
   prose = true,
+  inline = false,
 }) => {
   return (
-    <Modal close={onClose} dataWwid={dataWwid} onCleanup={onCleanup}>
+    <Modal close={onClose} dataWwid={dataWwid} inline={inline} onCleanup={onCleanup}>
       <ContentModal
         title={title}
         onClose={onClose}

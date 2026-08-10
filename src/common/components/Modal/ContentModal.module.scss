@@ -7,6 +7,7 @@
   padding: 12px 10px;
   background: rgba(75, 75, 75, 0.478);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -154,6 +155,10 @@
   :global(.onMobile) & {
     padding: 10px;
   }
+}
+
+:global([data-inline="true"]) .container {
+  margin-top: 0;
 }
 
 @media screen and (max-width: 640px) {

@@ -6,6 +6,7 @@ type ModalProps = {
   children: ReactNode,
   close: () => void;
   scroll?: boolean;
+  inline?: boolean;
   dataWwid?: string;
   onCleanup?: () => void;
 };
@@ -17,22 +18,26 @@ const Modal: React.FC<ModalProps> =
   children,
   close,
   scroll = true,
+  inline = false,
   dataWwid,
   onCleanup,
 }) => {
   useEffect(() => {
-    const currentModalIndex = ++MODALS_OPEN;
-    document.body.style.overflow = 'hidden';
+    const currentModalIndex = inline ? MODALS_OPEN : ++MODALS_OPEN;
+    if (!inline) {
+      document.body.style.overflow = 'hidden';
+      window.history.pushState({ modalIndex: currentModalIndex }, '');
+    }
     let closedByPopstate = false;
 
-    window.history.pushState({ modalIndex: currentModalIndex }, '');
-
     const closeOnKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape' && currentModalIndex === MODALS_OPEN) close();
+      if (e.key === 'Escape' && (inline || currentModalIndex === MODALS_OPEN)) {
+        close();
+      }
     };
 
     const handlePopState = (): void => {
-      if (currentModalIndex === MODALS_OPEN) {
+      if (!inline && currentModalIndex === MODALS_OPEN) {
         closedByPopstate = true;
         close();
       }
@@ -45,11 +50,15 @@ const Modal: React.FC<ModalProps> =
       window.removeEventListener('keydown', closeOnKey);
       window.removeEventListener('popstate', handlePopState);
 
-      if (!closedByPopstate) {
+      if (!inline && !closedByPopstate) {
         window.history.back();
       }
 
       setTimeout(() => {
+        if (inline) {
+          return;
+        }
+
         --MODALS_OPEN;
         if (!MODALS_OPEN) {
           document.body.style.overflow = 'initial';
@@ -59,16 +68,18 @@ const Modal: React.FC<ModalProps> =
     }
   }, []);
 
-  return ReactDOM.createPortal(
+  const modal = (
     <div
-      className={`${styles.modalContainer} ${scroll ? styles.scroll : ''}`}
+      className={`${styles.modalContainer} ${scroll ? styles.scroll : ''} ${inline ? styles.inline : ''}`}
       onClick={close}
       data-wwid={dataWwid}
+      data-inline={inline ? 'true' : undefined}
     >
       {children}
-    </div>,
-    document.body
+    </div>
   );
+
+  return inline ? modal : ReactDOM.createPortal(modal, document.body);
 };
 
 export default Modal;

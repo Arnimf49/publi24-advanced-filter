@@ -32,7 +32,7 @@
     }
   }
 
-  :global(body.onMobile) & {
+  :global(.onMobile) & {
     overflow: hidden;
 
     > * {

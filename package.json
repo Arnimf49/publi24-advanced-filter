@@ -7,6 +7,9 @@
   "scripts": {
     "detect-duplicate-sitenames": "node src-mapper/detect-duplicate-sitenames.js",
     "build": "./misc/build.sh",
+    "presentation:dev": "vite --config src-presentation/vite.config.ts",
+    "presentation:build": "vite build --config src-presentation/vite.config.ts",
+    "presentation:preview": "vite preview --config src-presentation/vite.config.ts",
     "rollup-b": "rollup -c",
     "rollup": "rollup -c -w",
     "pw-open": "npx playwright test --ui",

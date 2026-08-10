@@ -1,0 +1,285 @@
+.page {
+  width: min(calc(100% - clamp(32px, 6vw, 120px)), 1500px);
+  margin: 0 auto;
+  padding: clamp(72px, 8vw, 140px) 0 clamp(88px, 9vw, 150px);
+}
+
+.intro {
+  width: 100%;
+  margin-bottom: clamp(58px, 6vw, 104px);
+}
+
+.kicker,
+.selectorLabel {
+  margin: 0 0 18px;
+  color: #1177bb;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.intro h1 {
+  max-width: none;
+  margin: 0 0 clamp(20px, 1.8vw, 32px);
+  font-size: clamp(2.25rem, 4.5vw, 5.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.07em;
+}
+
+.lede {
+  max-width: none;
+  margin: 0;
+  color: #5d5d59;
+  font-size: clamp(1.05rem, 1.35vw, 1.45rem);
+  line-height: 1.55;
+}
+
+.selectionGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: clamp(40px, 5vw, 100px);
+  padding: clamp(26px, 2vw, 38px) 0 clamp(54px, 5vw, 88px);
+  border-top: 1px solid #d8d8d4;
+}
+
+.selectorLabel {
+  margin-bottom: 20px;
+  color: #666663;
+}
+
+.deviceOptions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(10px, 0.9vw, 16px);
+}
+
+.deviceOption,
+.browserOption {
+  border: 1px solid #d5d5d0;
+  color: #111111;
+  background: transparent;
+  text-align: left;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.deviceOption {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(12px, 1vw, 18px);
+  min-height: clamp(112px, 8vw, 150px);
+  padding: clamp(18px, 1.5vw, 28px);
+  border-radius: 4px;
+}
+
+.deviceOption:hover,
+.browserOption:hover {
+  border-color: #1177bb;
+  transform: translateY(-2px);
+}
+
+.deviceOption.selected,
+.browserOption.selected {
+  border-color: #1177bb;
+  background: #eaf5fb;
+}
+
+.deviceIcon {
+  align-self: center;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.deviceOption strong,
+.deviceOption small {
+  display: block;
+}
+
+.deviceOption strong {
+  margin-bottom: clamp(8px, 0.7vw, 12px);
+  font-size: clamp(0.95rem, 1.05vw, 1.2rem);
+}
+
+.deviceOption small {
+  color: #686864;
+  font-size: clamp(0.75rem, 0.8vw, 0.95rem);
+  line-height: 1.35;
+}
+
+.browserOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.browserOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: clamp(12px, 0.8vw, 16px) clamp(14px, 1vw, 20px);
+  border-radius: 999px;
+  font-size: clamp(0.84rem, 0.9vw, 1rem);
+  font-weight: 650;
+}
+
+.recommended {
+  color: #1177bb;
+  font-size: 0.62rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.instructions {
+  padding: clamp(42px, 4vw, 68px) 0 clamp(54px, 5vw, 82px);
+  border-top: 1px solid #d8d8d4;
+  color: #111111;
+}
+
+.instructionsHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: clamp(28px, 2.5vw, 42px);
+  border-bottom: 1px solid #d8d8d4;
+}
+
+.instructionsHeader .selectorLabel {
+  color: #1177bb;
+}
+
+.instructions h2 {
+  margin: 0;
+  font-size: clamp(2rem, 3.8vw, 4.8rem);
+  line-height: 0.96;
+  letter-spacing: -0.06em;
+}
+
+.steps {
+  max-width: 790px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 20px;
+  padding: clamp(25px, 2vw, 34px) 0;
+  border-bottom: 1px solid #d8d8d4;
+}
+
+.stepNumber {
+  color: #77b6da;
+  font-size: 0.76rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+}
+
+.step strong {
+  display: block;
+  font-size: clamp(1rem, 1.25vw, 1.35rem);
+  line-height: 1.4;
+}
+
+.step p {
+  max-width: 650px;
+  margin: 9px 0 0;
+  color: #5d5d59;
+  font-size: clamp(0.9rem, 0.95vw, 1.05rem);
+  line-height: 1.55;
+}
+
+.step code {
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 0.88em;
+}
+
+.step code {
+  color: #1177bb;
+  background: #eaf5fb;
+}
+
+.action {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 3px;
+  border: 1px solid #1177bb;
+  color: #ffffff;
+  background: #1177bb;
+  font-size: 0.88em;
+  font-weight: 750;
+}
+
+.actionGroup {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  vertical-align: middle;
+}
+
+.inlineLink {
+  color: #1177bb;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.inlineLink:hover {
+  color: #0a63a3;
+}
+
+@media (max-width: 800px) {
+  .page {
+    width: min(100% - 32px, 640px);
+    padding: 68px 0 84px;
+  }
+
+  .intro {
+    margin-bottom: 58px;
+  }
+
+  .selectionGrid {
+    display: block;
+    padding-bottom: 54px;
+  }
+
+  .selectorBlock + .selectorBlock {
+    margin-top: 38px;
+  }
+
+  .deviceOption {
+    min-height: 100px;
+    padding: 14px;
+  }
+
+  .instructions {
+    padding: 32px 0 42px;
+  }
+}
+
+@media (max-width: 500px) {
+  .deviceOptions {
+    display: block;
+  }
+
+  .deviceOption {
+    width: 100%;
+    min-height: auto;
+    margin-bottom: 8px;
+  }
+
+  .instructionsHeader {
+    display: block;
+  }
+
+  .step {
+    grid-template-columns: 34px 1fr;
+    gap: 12px;
+  }
+
+}

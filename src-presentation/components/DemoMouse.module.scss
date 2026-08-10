@@ -1,0 +1,18 @@
+.mouse {
+  position: absolute;
+  z-index: 30;
+  top: 0;
+  left: 0;
+  width: 25px;
+  height: 31px;
+  pointer-events: none;
+  transform-origin: 1.5px 1.5px;
+  transform: translate3d(var(--mouse-x), var(--mouse-y), 0);
+  will-change: transform;
+  transition: transform 1100ms cubic-bezier(0.22, 0.75, 0.25, 1);
+}
+
+.clicking {
+  transform: translate3d(var(--mouse-x), var(--mouse-y), 0) scale(0.78);
+  transition-duration: 140ms;
+}
