@@ -72,7 +72,7 @@ const PhoneAndTags: React.FC<ContactInfoProps> = ({
           data-wwid="leaf-button"
         >
           <LeafIcon state={leafState} />
-          <span className={styles.leafTooltip}>Văzut prima data de extensie: <br/> {daysString}</span>
+          <span className={styles.leafTooltip}>Văzut prima dată de extensie: <br/> {daysString}</span>
         </button>
         <WhatsAppButton
           phone={phone}

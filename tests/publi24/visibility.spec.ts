@@ -149,7 +149,7 @@ test('Should hide phone number and thus hide duplicate ads.', async ({ page, con
 
   const secondAd = page.locator(`[data-articleid="${(await utilsPubli.getDuplicateAdIds(page, firstAd))[0]}"]`);
   const autoHideMessage = await secondAd.locator('[data-wwid="message"]').innerText();
-  expect(autoHideMessage).toEqual('ai mai ascuns un anunț cu acceeași numar de telefon, ascuns automat');
+  expect(autoHideMessage).toEqual('ai mai ascuns un anunț cu același număr de telefon, ascuns automat');
 })
 
 test('Should toggle focus mode and not see hidden ads.', async ({ page, context }) => {

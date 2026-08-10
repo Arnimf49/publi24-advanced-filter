@@ -43,7 +43,7 @@ const ImageSearchResultsHelp: React.FC<ImageSearchResultsHelpProps> = ({ onClose
         >
           <ImageIcon fill={isDark ? '#9fc2fa' : '#ffffff'} size={19} />
         </button>
-        Acest buton execută căutare pe Google Lens a pozelor anunțului. Pe Desktop căutarea se întâmplă prin deschiderea simultană a mai multor pagini noi, pentru fiecare poză una. Pe Mobil se deschide numai o singură pagină și se caută pe rând în aceeași pagină după toate pozele. Extensia procesează rezultatele și le salvează, după care închide pagina, sau avansează la următoarea poză, și te returnează la publi24. Există o opțiune la setări să nu închidă automat pagina de Google Lens, dacă dorești.
+        Acest buton execută căutare pe Google Lens a pozelor anunțului. Pe Desktop căutarea se întâmplă prin deschiderea simultană a mai multor pagini noi, pentru fiecare poză una. Pe Mobil se deschide numai o singură pagină și se caută pe rând în aceeași pagină după toate pozele. Extensia procesează rezultatele și le salvează, după care închide pagina sau avansează la următoarea poză și te returnează la publi24. Există o opțiune în setări să nu închidă automat pagina de Google Lens, dacă dorești.
       </p>
       <p>Căutarea de Lens se face prin <b>Rezultate exacte</b>, din moment ce Similare ar da foarte multe rezultate care nu au nicio treabă cu pozele.</p>
       <p>Rezultatele sunt afișate sub anunț, de la toate pozele, dar sunt deduplicate și filtrate. Se poate da click pe fiecare rezultat în parte pentru a deschide sursa. Următoarele sunt șterse pentru că nu au relevanță: linkuri care duc la același anunț ca și cel pe care se caută, linkuri de Publi24 care duc la pagina de listare. Lângă titlu se afișează când au fost rezultatele culese, dar și un cerc care semnifică prin culoare dacă rezultatele în ansamblu sunt considerate ok sau periculoase.</p>
@@ -51,13 +51,13 @@ const ImageSearchResultsHelp: React.FC<ImageSearchResultsHelpProps> = ({ onClose
       <ul>
         <li><Code>nerulat</Code> înseamnă că încă nu a fost rulat această căutare pentru anunț.</li>
         <li><Code>nu s-au găsit linkuri relevante</Code> înseamnă că ori nu s-a găsit nimic pe Google ori toate au fost filtrate.</li>
-        <li><Code>ddate șterse, caută din nou</Code> înseamnă că s-a făcut căutare cândva dar s-au pierdut datele între timp.</li>
+        <li><Code>date șterse, caută din nou</Code> înseamnă că s-a făcut căutare cândva, dar s-au pierdut datele între timp.</li>
         <li><Code status="unsafe">anunțuri găsite în alte locații</Code> înseamnă că s-au găsit alte anunțuri din alte locații de pe publi24 cu aceleași poze.</li>
         <li>Culoarea unui rezultat semnifică dacă extensia vede acel rezultat unul <Code status="safe">sigur</Code>, <Code status="suspicious">suspicios</Code> sau <Code status="unsafe">periculos</Code>.</li>
         <li>Rezultatele care au culoarea <Code status="suspicious">galbenă</Code> sunt de la site-uri străine recunoscute de extensie. Acestea afișează și steagul țării din care provin.</li>
         <li>Rezultatele cu <Code>gri</Code> sunt linkuri de la publi24 pe care extensia le consideră moarte: fie anunțul nu mai există și pagina duce la 404, fie linkul duce la o pagină cu lista de anunțuri în locul anunțului propriu-zis.</li>
       </ul>
-      <p>Căutarea și afișul de rezultate este făcut într-un fel de a ajuta accesul rapid la informații dar și de a da semnale ușor vizibile. Până la urmă concluzia finală pe baza rezultatelor este la latură ta.</p>
+      <p>Căutarea și afișarea rezultatelor sunt făcute pentru a ajuta accesul rapid la informații și pentru a oferi semnale ușor vizibile. Până la urmă, concluzia finală pe baza rezultatelor îți aparține.</p>
     </GeneralModal>
   );
 };

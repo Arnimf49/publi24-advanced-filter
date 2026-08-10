@@ -138,7 +138,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
 
       <div className={styles.buttons}>
         <button
-          title={!visible ? "Ma-m razgândit" : "Ascunde"}
+          title={!visible ? "M-am răzgândit" : "Ascunde"}
           type="button"
           className={`${styles.button} ${visible ? styles.visibilityButtonVisible : styles.visibilityButtonInvisible} radius`}
           data-wwid="toggle-hidden"
@@ -225,7 +225,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
           )}
           {!automaticHideReason && dueToPhoneHidden && (
             <p className={styles.message} data-wwid="message">
-              ai mai ascuns un anunț cu acceeași numar de telefon, <b>ascuns automat</b>
+              ai mai ascuns un anunț cu același număr de telefon, <b>ascuns automat</b>
             </p>
           )}
           {hideReason && (

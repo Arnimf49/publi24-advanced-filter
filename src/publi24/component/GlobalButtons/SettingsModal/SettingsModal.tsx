@@ -173,14 +173,14 @@ const SettingsModal: React.FC<SettingsModalProps> =
     >
       <SettingControl
         title="Căutare telefon manuală"
-        description="Când este activat, căutarea telefon nu va închide automat rezultatele. Trebuie să apeși butonul de continuare."
+        description="Când este activată, căutarea telefonului nu va închide automat rezultatele. Trebuie să apeși butonul de continuare."
         isOn={settings.manualPhoneSearchEnabled}
         onToggle={onToggleManualPhoneSearch}
         dataWwid="manual-phone-search-switch"
       />
       <SettingControl
         title="Căutare poze manuală"
-        description="Când este activat, căutarea poze nu va închide automat rezultatele. Trebuie să apeși butonul de continuare."
+        description="Când este activată, căutarea pozelor nu va închide automat rezultatele. Trebuie să apeși butonul de continuare."
         isOn={settings.manualImageSearchEnabled}
         onToggle={onToggleManualImageSearch}
         dataWwid="manual-image-search-switch"
@@ -190,7 +190,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
 
       <SettingControl
         title="Mesaj WhatsApp"
-        description="Când este activat, la deschiderea WhatsApp va include mesajul predefinit."
+        description="Când este activat, mesajul predefinit va fi inclus la deschiderea WhatsApp."
         isOn={settings.whatsappMessageEnabled}
         onToggle={onToggleWhatsappMessage}
         dataWwid="whatsapp-message-switch"
@@ -212,14 +212,14 @@ const SettingsModal: React.FC<SettingsModalProps> =
 
       <SettingControl
         title="Mod focus"
-        description="Cănd activat anunțurile ascunse anterior nu se vor mai afișa deloc pe pagina de listare. Util pentru a vedea numai cea ce ii nou sau încă ne-ascuns."
+        description="Când este activat, anunțurile ascunse anterior nu se vor mai afișa pe pagina de listare. Util pentru a vedea doar ceea ce este nou sau încă neascuns."
         isOn={settings.focusMode}
         onToggle={onToggleFocusMode}
         dataWwid="focus-mode-switch"
       />
       <SettingControl
         title="Singur anunț"
-        description="Cănd activat numai cel mai nou anunț de la aceeași telefon va fii vizibil pe pagina de listare."
+        description="Când este activat, pe pagina de listare va fi vizibil doar cel mai nou anunț de la același număr de telefon."
         isOn={settings.adDeduplication}
         onToggle={onToggleAdDeduplication}
         dataWwid="ad-deduplication-switch"
@@ -229,7 +229,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
 
       <SettingControl
         title="Motiv implicit ascundere"
-        description="Când este activat, motivul selectat va fi ales implicit la ascunderea manuală (dacă 'poze false' nu este deja selectat)."
+        description="Când este activat, motivul selectat va fi ales implicit la ascunderea manuală (dacă „poze false” nu este deja selectat)."
         isOn={settings.defaultManualHideReasonEnabled}
         onToggle={onToggleDefaultManualHideReason}
         dataWwid="default-manual-hide-reason-switch"
@@ -250,7 +250,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
 
       <SettingControl
         title="Ascundere automată"
-        description="Ascunde automat anunțuri pe bază la varii criterii."
+        description="Ascunde automat anunțuri pe baza unor criterii variate."
         isOn={settings.autoHide}
         onToggle={onToggleAutoHide}
         dataWwid="auto-hiding"
@@ -260,7 +260,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
         <div className={styles.controlInset}>
           <SettingControl
             title="Următorul numai vizibil"
-            description="La căutarea anunțului următor se va sări peste cele noi care sunt ascunse după analiză."
+            description="La căutarea următorului anunț se va sări peste cele noi care sunt ascunse după analiză."
             isOn={settings.nextOnlyVisible}
             onToggle={onToggleNextOnlyVisible}
             dataWwid="next-only-visible"
@@ -268,8 +268,8 @@ const SettingsModal: React.FC<SettingsModalProps> =
           />
 
           <SettingControl
-            title="Maximum ani"
-            description="Dacă specifică ani mai mare decăt cea setată va fii ascuns."
+            title="Vârstă maximă"
+            description="Dacă vârsta specificată este mai mare decât cea setată, anunțul va fi ascuns."
             isOn={settings.maxAge}
             onToggle={() => onToggleCriteria('maxAge')}
             dataWwid="auto-hide-criteria" dataCriteria="maxAge"
@@ -286,8 +286,8 @@ const SettingsModal: React.FC<SettingsModalProps> =
           </SettingControl>
 
           <SettingControl
-            title="Minimum înălțime"
-            description="Dacă specifică înălțime mai mică decăt cea setată va fii ascuns."
+            title="Înălțime minimă"
+            description="Dacă înălțimea specificată este mai mică decât cea setată, anunțul va fi ascuns."
             isOn={settings.minHeight}
             onToggle={() => onToggleCriteria('minHeight')}
             dataWwid="auto-hide-criteria" dataCriteria="minHeight"
@@ -304,8 +304,8 @@ const SettingsModal: React.FC<SettingsModalProps> =
           </SettingControl>
 
           <SettingControl
-            title="Maximum înălțime"
-            description="Dacă specifică înălțime mai mare decăt cea setată va fii ascuns."
+            title="Înălțime maximă"
+            description="Dacă înălțimea specificată este mai mare decât cea setată, anunțul va fi ascuns."
             isOn={settings.maxHeight}
             onToggle={() => onToggleCriteria('maxHeight')}
             dataWwid="auto-hide-criteria" dataCriteria="maxHeight"
@@ -322,8 +322,8 @@ const SettingsModal: React.FC<SettingsModalProps> =
           </SettingControl>
 
           <SettingControl
-            title="Maximum greutate"
-            description="Dacă specifică greutate mare decăt cea setată va fii ascuns."
+            title="Greutate maximă"
+            description="Dacă greutatea specificată este mai mare decât cea setată, anunțul va fi ascuns."
             isOn={settings.maxWeight}
             onToggle={() => onToggleCriteria('maxWeight')}
             dataWwid="auto-hide-criteria" dataCriteria="maxWeight"
@@ -341,7 +341,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
 
           <SettingControl
             title="Matură"
-            description="Dacă ii menționat matură atunci va fii ascuns."
+            description="Dacă este menționată maturitatea, anunțul va fi ascuns."
             isOn={settings.mature}
             onToggle={() => onToggleCriteria('mature')}
             dataWwid="auto-hide-criteria" dataCriteria="mature"
@@ -349,7 +349,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
           />
           <SettingControl
             title="Transsexual"
-            description="Dacă ii menționat trans atunci va fii ascuns."
+            description="Dacă este menționat „trans”, anunțul va fi ascuns."
             isOn={settings.trans}
             onToggle={() => onToggleCriteria('trans')}
             dataWwid="auto-hide-criteria" dataCriteria="trans"
@@ -357,7 +357,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
           />
           <SettingControl
             title="Siliconată"
-            description="Dacă zice că are botox / silicoane va fii ascuns."
+            description="Dacă se menționează botoxul sau silicoanele, anunțul va fi ascuns."
             isOn={settings.botox}
             onToggle={() => onToggleCriteria('botox')}
             dataWwid="auto-hide-criteria" dataCriteria="botox"
@@ -365,7 +365,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
           />
           <SettingControl
             title="Numai deplasări"
-            description="Dacă numai deplasări face / fară locație proprie va fii ascuns."
+            description="Dacă sunt oferite doar deplasări sau nu este indicată o locație proprie, anunțul va fi ascuns."
             isOn={settings.onlyTrips}
             onToggle={() => onToggleCriteria('onlyTrips')}
             dataWwid="auto-hide-criteria" dataCriteria="onlyTrips"
@@ -373,7 +373,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
           />
           <SettingControl
             title="Show web"
-            description="Dacă zice că face show web va fii ascuns. Cei care fac show web tind să fie mai țepari."
+            description="Dacă se menționează show web, anunțul va fi ascuns. Persoanele care oferă show web tind să fie mai înșelătoare."
             isOn={settings.showWeb}
             onToggle={() => onToggleCriteria('showWeb')}
             dataWwid="auto-hide-criteria" dataCriteria="showWeb"
@@ -381,7 +381,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
           />
           <SettingControl
             title="Risc BTS"
-            description="Dacă descrierea conține formulări cu indici că ar face normal sau anal neprotejat atunci va fii ascuns."
+            description="Dacă descrierea conține indicii că ar face sex normal sau anal neprotejat, anunțul va fi ascuns."
             isOn={settings.btsRisc}
             onToggle={() => onToggleCriteria('btsRisc')}
             dataWwid="auto-hide-criteria" dataCriteria="btsRisc"
@@ -389,7 +389,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
           />
           <SettingControl
             title="Party"
-            description="Dacă zice că face party va fii ascuns. Cei care fac party tind să fie mai obosite și mai riscante din multe puncte de vedere."
+            description="Dacă se menționează party, anunțul va fi ascuns. Persoanele care oferă party tind să fie mai obosite și mai riscante din multe puncte de vedere."
             isOn={settings.party}
             onToggle={() => onToggleCriteria('party')}
             dataWwid="auto-hide-criteria" dataCriteria="party"
@@ -401,7 +401,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
       <hr style={{ opacity: 0.2, marginTop: '25px', marginBottom: '20px' }} />
 
       <h2 className={styles.header}>Transfer date</h2>
-      <p className={styles.storageInfo}>Spatiu de stocare: <b>{storageUsagePercent === null ? 'n/a' : `${Math.floor(storageUsagePercent)}%`}</b> folosit.</p>
+      <p className={styles.storageInfo}>Spațiu de stocare: <b>{storageUsagePercent === null ? 'n/a' : `${Math.floor(storageUsagePercent)}%`}</b> folosit.</p>
       {importMessage && <p className={`${importMessage[0]} ${styles.importMessage}`}>{importMessage[1]}</p>}
       <button onClick={handleExport} className={styles.button}>↑ export</button>
       <button onClick={onImport} className={styles.button}>↓ import</button>
