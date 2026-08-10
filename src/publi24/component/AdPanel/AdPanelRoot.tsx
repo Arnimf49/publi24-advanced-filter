@@ -11,6 +11,8 @@ import ImageSlider from "./ImagesSlider/ImagesSlider";
 import AdsModalRoot from "../Common/Partials/AdsModal/AdsModalRoot";
 import {WWMemoryStorage} from "../../core/memoryStorage";
 import {inspectorEscorteApi, InspectorAd} from "../../core/inspectorEscorteApi";
+import PhoneAndTagsRoot from "../Common/Partials/PhoneAndTags/PhoneAndTagsRoot";
+import {misc} from "../../core/misc";
 
 interface AdPanelRootProps {
   id: string;
@@ -299,6 +301,12 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         isPhoneSearchLoading={memoryState.isPhoneSearchLoading}
         isImageSearchLoading={memoryState.isImageSearchLoading}
         errors={errors}
+        isDark={misc.getPubliTheme() === 'dark'}
+        renderPhoneAndTags={(adId, phone, children) => (
+          <PhoneAndTagsRoot adId={adId} phone={phone}>
+            {children}
+          </PhoneAndTagsRoot>
+        )}
         onVisibilityClick={onVisibilityClick}
         onFavClick={onFavClick}
         onInvestigateClick={onInvestigateClick}

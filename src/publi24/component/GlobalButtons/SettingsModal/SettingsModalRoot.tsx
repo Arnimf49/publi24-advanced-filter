@@ -3,6 +3,7 @@ import {AutoHideCriterias, WWStorage} from '../../../core/storage';
 import SettingsModal, {SettingsData} from "./SettingsModal";
 import React, {useCallback, useEffect, useState} from "react";
 import {utils} from '../../../../common/utils';
+import {misc} from '../../../core/misc';
 
 type SettingsModalRootProps = {
   onClose: () => void;
@@ -206,6 +207,7 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
         handleExport={handleExport}
         handleImport={handleImport}
         storageUsagePercent={storageUsagePercent}
+        isDark={misc.getPubliTheme() === 'dark'}
       />
     </Modal>
   );

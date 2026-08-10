@@ -6,11 +6,11 @@ import {HistoryIcon} from '../../../common/components/Icons/HistoryIcon';
 import {FeedbackIcon} from '../../../common/components/Icons/FeedbackIcon';
 import {SettingsIcon} from '../../../common/components/Icons/SettingsIcon';
 import {P24faLogoLight} from '../../../common/components/Logo/P24faLogoLight';
-import {IS_MOBILE_VIEW} from '../../../common/globals';
-import {utils} from "../../../common/utils";
 
 type GlobalButtonsProps = {
   favsCount: number | null;
+  isMobile: boolean;
+  onLogoClick: () => void;
   onFavsClick: MouseEventHandler;
   onSettingsClick: MouseEventHandler;
   onVersionHistoryClick: MouseEventHandler;
@@ -25,6 +25,8 @@ type GlobalButtonsProps = {
 const GlobalButtons: React.FC<GlobalButtonsProps> =
 ({
   favsCount,
+  isMobile,
+  onLogoClick,
   onFavsClick,
   onSettingsClick,
   onVersionHistoryClick,
@@ -81,7 +83,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
           title="Logo"
           aria-label="Logo"
         >
-          <P24faLogoLight className={styles.logo} padding={false} onClick={utils.openExtensionPage}/>
+          <P24faLogoLight className={styles.logo} padding={false} onClick={onLogoClick}/>
         </button>
       </div>
 
@@ -155,7 +157,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
       >
         <StarIcon className={styles.savesIcon}/>
         <span>
-          {IS_MOBILE_VIEW
+          {isMobile
             ? <>{favsCount || 0}</>
             : <>Favorite {favsCount || 0}</>
           }

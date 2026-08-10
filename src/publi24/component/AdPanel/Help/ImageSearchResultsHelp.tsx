@@ -3,14 +3,13 @@ import GeneralModal from '../../../../common/components/Modal/GeneralModal';
 import InfoIcon from '../../Common/Icons/InfoIcon';
 import {ImageIcon} from '../../Common/Icons/ImageIcon';
 import Code from "../../Common/Code/Code";
-import {misc} from "../../../core/misc";
 
 type ImageSearchResultsHelpProps = {
   onClose: () => void;
+  isDark: boolean;
 };
 
-const ImageSearchResultsHelp: React.FC<ImageSearchResultsHelpProps> = ({ onClose }) => {
-  const isDark = misc.getPubliTheme() === 'dark';
+const ImageSearchResultsHelp: React.FC<ImageSearchResultsHelpProps> = ({ onClose, isDark }) => {
 
   return (
     <GeneralModal

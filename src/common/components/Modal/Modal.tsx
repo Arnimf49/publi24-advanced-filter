@@ -1,7 +1,6 @@
 import React, {ReactNode, useEffect} from 'react';
 import styles from './Modal.module.scss';
 import * as ReactDOM from "react-dom";
-import {misc} from "../../../publi24/core/misc";
 
 type ModalProps = {
   children: ReactNode,
@@ -62,7 +61,7 @@ const Modal: React.FC<ModalProps> =
 
   return ReactDOM.createPortal(
     <div
-      className={misc.cx(styles.modalContainer, scroll && styles.scroll)}
+      className={`${styles.modalContainer} ${scroll ? styles.scroll : ''}`}
       onClick={close}
       data-wwid={dataWwid}
     >

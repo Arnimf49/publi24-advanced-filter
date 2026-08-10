@@ -10,6 +10,9 @@ import {modalState} from "../../../common/modalState";
 import {versionHistory} from "../../data/versionHistory";
 import {renderer} from "../../core/renderer";
 import NextVisibleAdButton from "./NextVisibleAdButton/NextVisibleAdButton";
+import {IS_MOBILE_VIEW} from "../../../common/globals";
+import {misc} from "../../core/misc";
+import {utils} from "../../../common/utils";
 
 type GlobalButtonsRootProps = {
 };
@@ -80,6 +83,9 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
       <GlobalButtons
         favsCount={favsCount}
         favsWithNoAdsCount={favsWithNoAdsCount}
+        isMobile={IS_MOBILE_VIEW}
+        isDark={misc.getPubliTheme() === 'dark'}
+        onLogoClick={utils.openExtensionPage}
         onFavsClick={onFavsClick}
         onSearchClick={onSearchClick}
         onSettingsClick={onSettingsClick}

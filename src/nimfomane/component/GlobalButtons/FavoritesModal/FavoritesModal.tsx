@@ -3,7 +3,6 @@ import Modal from '../../../../common/components/Modal/Modal';
 import ContentModal from '../../../../common/components/Modal/ContentModal';
 import styles from './FavoritesModal.module.scss';
 import {StarIcon} from '../../../../common/components/Icons/StarIcon';
-import {EscortCard} from './EscortCard';
 
 type FavoritesModalProps = {
   onClose: () => void;
@@ -12,6 +11,7 @@ type FavoritesModalProps = {
   inLocationEscorts: string[];
   otherLocationEscorts: string[];
   currentCity: string | null;
+  renderEscort: (user: string, index: number) => React.ReactNode;
 };
 
 const FavoritesModal: React.FC<FavoritesModalProps> = ({
@@ -21,6 +21,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
   inLocationEscorts,
   otherLocationEscorts,
   currentCity,
+  renderEscort,
 }) => {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const deleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -74,7 +75,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
                 </h4>
                 <div className={styles.escortsList}>
                   {inLocationEscorts.map((user, index) => (
-                    <EscortCard key={user} user={user} index={index} />
+                    <React.Fragment key={user}>{renderEscort(user, index)}</React.Fragment>
                   ))}
                 </div>
               </div>
@@ -87,7 +88,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
                 </h4>
                 <div className={styles.escortsList}>
                   {otherLocationEscorts.map((user, index) => (
-                    <EscortCard key={user} user={user} index={index} />
+                    <React.Fragment key={user}>{renderEscort(user, index)}</React.Fragment>
                   ))}
                 </div>
               </div>
@@ -96,7 +97,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
         ) : (
           <div className={styles.escortsList}>
             {favorites.map((user, index) => (
-              <EscortCard key={user} user={user} index={index} />
+              <React.Fragment key={user}>{renderEscort(user, index)}</React.Fragment>
             ))}
           </div>
         )}

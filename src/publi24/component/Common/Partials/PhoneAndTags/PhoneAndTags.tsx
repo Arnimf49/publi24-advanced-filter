@@ -1,13 +1,13 @@
 import React, { CSSProperties } from 'react';
 import styles from './PhoneAndTags.module.scss';
-import {misc} from "../../../../core/misc";
-import {IS_MOBILE_VIEW} from "../../../../../common/globals";
 import {LeafIcon} from "../../Icons/LeafIcon";
 import {dateLib} from "../../../../core/dateLib";
 import {WhatsAppButton} from "../../../../../common/components/Button/WhatsAppButton";
 
 type ContactInfoProps = {
   phone: string;
+  isMobile: boolean;
+  isDark: boolean;
   noPadding?: boolean;
   age?: number;
   ageWarn?: boolean;
@@ -22,6 +22,8 @@ type ContactInfoProps = {
 
 const PhoneAndTags: React.FC<ContactInfoProps> = ({
    phone,
+   isMobile,
+   isDark,
    noPadding = false,
    age,
    ageWarn = false,
@@ -45,15 +47,8 @@ const PhoneAndTags: React.FC<ContactInfoProps> = ({
     marginBottom: '4px',
   };
 
-  const ageChipClasses = misc.cx(
-    styles.chip,
-    ageWarn && styles.chipWarn
-  );
-
-  const bmiChipClasses = misc.cx(
-    styles.chip,
-    bmiWarn && styles.chipWarn
-  );
+  const ageChipClasses = `${styles.chip} ${ageWarn ? styles.chipWarn : ''}`;
+  const bmiChipClasses = `${styles.chip} ${bmiWarn ? styles.chipWarn : ''}`;
 
   const daysSinceFirstSeen = Math.floor((Date.now() - firstSeen) / 8.64e+7);
   const monthsSinceFirstSeen = daysSinceFirstSeen / 30;
@@ -67,7 +62,7 @@ const PhoneAndTags: React.FC<ContactInfoProps> = ({
   return (
     <>
       <h4 style={headingStyle}>
-        {IS_MOBILE_VIEW ? (
+        {isMobile ? (
           <a href={`tel:${phone}`} className={styles.phone} data-wwid="phone-number">{phone}</a>
         ) : (
           <span className={styles.phone} data-wwid="phone-number">{phone}</span>
@@ -83,8 +78,8 @@ const PhoneAndTags: React.FC<ContactInfoProps> = ({
           phone={phone}
           message={whatsappMessage}
           className={styles.whatsapp}
-          fill={misc.getPubliTheme() === 'light' ? '#7bcb32' : '#cfcfcf'}
-          stroke={misc.getPubliTheme() === 'light' ? '#fff' : '#222'}
+          fill={isDark ? '#cfcfcf' : '#7bcb32'}
+          stroke={isDark ? '#222' : '#fff'}
           svgStyle={svgStyle}
         />
         {children}

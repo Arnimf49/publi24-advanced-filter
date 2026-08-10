@@ -1,8 +1,7 @@
 import React, {ChangeEventHandler, useEffect, useState} from 'react';
 import GeneralModal from '../../../../../common/components/Modal/GeneralModal';
-import AdsList from '../AdList/AdsList';
 import styles from './AdsModal.module.scss';
-import {AdData} from "../../../../core/adData";
+import type {AdData} from "../../../../core/adData";
 import ErrorDisplay from "../../ErrorDisplay/ErrorDisplay";
 
 type AdsModalProps = {
@@ -22,6 +21,7 @@ type AdsModalProps = {
   isLoading?: boolean;
   onLoadMore?: () => void;
   sectionBreaks?: number[];
+  renderAds: (adsData: AdData[], sectionBreaks?: number[]) => React.ReactNode;
 };
 
 const useLoadingDots = (isLoading: boolean | undefined) => {
@@ -69,6 +69,7 @@ const AdsModal: React.FC<AdsModalProps> = ({
   isLoading,
   onLoadMore,
   sectionBreaks,
+  renderAds,
 }) => {
   const removedCount = removed ?? 0;
   const displayCount = totalCount != null
@@ -121,7 +122,7 @@ const AdsModal: React.FC<AdsModalProps> = ({
       </p>
 
       <div className={styles.contentContainer} data-wwid="content">
-        {adsData && <AdsList adsData={adsData} sectionBreaks={sectionBreaks} />}
+        {adsData && renderAds(adsData, sectionBreaks)}
         {errors && errors.length > 0 && errors.map((error, index) => (
           <ErrorDisplay key={index} errorMessage={error} dataWwId="load-error" />
         ))}

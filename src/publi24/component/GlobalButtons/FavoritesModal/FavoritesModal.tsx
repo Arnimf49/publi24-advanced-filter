@@ -1,14 +1,10 @@
 import React, {useState, useRef, MouseEventHandler} from 'react';
 import Modal from '../../../../common/components/Modal/Modal';
 import ContentModal from '../../../../common/components/Modal/ContentModal';
-import AdsList from '../../Common/Partials/AdList/AdsList';
 import styles from './FavoritesModal.module.scss';
-import {AdData} from "../../../core/adData";
-import PhoneAndTagsRoot from "../../Common/Partials/PhoneAndTags/PhoneAndTagsRoot";
+import type {AdData} from "../../../core/adData";
 import {StarIcon} from "../../../../common/components/Icons/StarIcon";
 import {RemoveIcon} from "../../Common/Icons/RemoveIcon";
-import {misc} from "../../../core/misc";
-import {Ad} from "./Ad";
 
 type FavoritesModalProps = {
   onClose: () => void;
@@ -18,6 +14,10 @@ type FavoritesModalProps = {
   notInLocationAds: AdData[];
   noAdsItems: string[];
   onCleanup?: () => void;
+  isDark: boolean;
+  topContent?: React.ReactNode;
+  renderAds: (ads: AdData[]) => React.ReactNode;
+  renderNoAd: (phone: string) => React.ReactNode;
 };
 
 const FavoritesModal: React.FC<FavoritesModalProps> = ({
@@ -28,6 +28,10 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
   notInLocationAds = [],
   noAdsItems = [],
   onCleanup,
+  isDark,
+  topContent,
+  renderAds,
+  renderNoAd,
 }) => {
   const [activeTab, setActiveTab] = useState<'active' | 'inactive'>('active');
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -60,7 +64,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
       onCleanup={onCleanup}
     >
       <ContentModal
-        title={<><StarIcon fill={misc.getPubliTheme() === 'dark' ? '#bfbfbf' : '#fff'}/> Favorite</>}
+        title={<><StarIcon fill={isDark ? '#bfbfbf' : '#fff'}/> Favorite</>}
         headerActions={<button
           type="button"
           className={styles.clearFavoritesButton}
@@ -71,9 +75,9 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
           <b>{confirmDelete ? 'sigur?' : 'șterge tot'}</b>
         </button>}
         onClose={onClose}
-        color={misc.getPubliTheme() === 'dark' ? 'rgb(101 44 62)' : '#b34c4c'}
+        color={isDark ? 'rgb(101 44 62)' : '#b34c4c'}
       >
-        <Ad/>
+        {topContent}
         {!isEmpty && (
           <div className={styles.toggleButtons}>
             <button
@@ -112,7 +116,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
                     <h4 className={styles.favoritesSectionHeader} data-wwid="favs-header">
                       În locație <span className={styles.count}>({inLocationAds.length})</span>
                     </h4>
-                    <AdsList adsData={inLocationAds} showDuplicates={true}/>
+                    {renderAds(inLocationAds)}
                   </div>
                 )}
 
@@ -121,7 +125,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
                     <h4 className={styles.favoritesSectionHeader} data-wwid="favs-header">
                       În alte locații <span className={styles.count}>({notInLocationAds.length})</span>
                     </h4>
-                    <AdsList adsData={notInLocationAds} showDuplicates={true}/>
+                    {renderAds(notInLocationAds)}
                   </div>
                 )}
               </>
@@ -144,7 +148,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
                 {noAdsItems.map((phone) => (
                   <div key={phone} className={styles.noAdItem}>
                     <div className={styles.noAdContent}>
-                      <PhoneAndTagsRoot phone={phone} noPadding={true}/>
+                      {renderNoAd(phone)}
                     </div>
                     <button
                       type="button"

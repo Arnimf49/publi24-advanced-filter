@@ -1,14 +1,14 @@
 import React, {useEffect, useRef} from 'react';
 import styles from './AdsList.module.scss';
-import {AdData} from "../../../../core/adData";
-import {renderer} from "../../../../core/renderer";
-import {IS_MOBILE_VIEW} from "../../../../../common/globals";
+import type {AdData} from "../../../../core/adData";
 
 type AdsListProps = {
   adsData: AdData[];
+  isMobile: boolean;
   emptyText?: string;
   showDuplicates?: boolean;
   sectionBreaks?: number[];
+  onRegister?: (context: HTMLElement, showDuplicates: boolean) => void;
 };
 
 const CalendarIcon = ({ isHighlighted }: { isHighlighted?: boolean }) => (
@@ -36,9 +36,11 @@ const LocationIcon = ({isHighlighted}: { isHighlighted?: boolean }) => (
 
 const AdsList: React.FC<AdsListProps> = ({
   adsData,
+  isMobile,
   emptyText = 'Niciun anunț găsit pentru acest număr.',
   showDuplicates = false,
   sectionBreaks = [],
+  onRegister,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -47,10 +49,10 @@ const AdsList: React.FC<AdsListProps> = ({
   };
 
   useEffect(() => {
-    if (ref.current) {
-      renderer.registerAdsInContext(ref.current, {renderOptions: {showDuplicates}});
+    if (ref.current && onRegister) {
+      onRegister(ref.current, showDuplicates);
     }
-  }, [adsData, showDuplicates]);
+  }, [adsData, onRegister, showDuplicates]);
 
   if (!adsData || adsData.length === 0) {
     return <p className={styles.emptyMessage}>{emptyText}</p>;
@@ -125,7 +127,7 @@ const AdsList: React.FC<AdsListProps> = ({
                     </p>
                   </div>
 
-                  {!IS_MOBILE_VIEW && item.qrCode && (
+                  {!isMobile && item.qrCode && (
                     <div className={`${styles.qrCode}`}>
                       <img
                         src={item.qrCode}

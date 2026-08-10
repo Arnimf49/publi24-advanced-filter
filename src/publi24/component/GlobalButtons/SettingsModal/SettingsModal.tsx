@@ -1,9 +1,8 @@
 import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
 import ContentModal from '../../../../common/components/Modal/ContentModal';
 import styles from './SettingsModal.module.scss';
-import {AutoHideCriterias} from "../../../core/storage";
+import type {AutoHideCriterias} from "../../../core/storage";
 import {SettingsIcon} from "../../../../common/components/Icons/SettingsIcon";
-import {misc} from "../../../core/misc";
 
 type SwitchProps = {
   isOn?: boolean;
@@ -108,6 +107,7 @@ type SettingsModalProps = {
   handleExport: () => void;
   handleImport: () => Promise<void>;
   storageUsagePercent: number | null;
+  isDark: boolean;
 };
 
 const SettingsModal: React.FC<SettingsModalProps> =
@@ -129,6 +129,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
   handleExport,
   handleImport,
   storageUsagePercent,
+  isDark,
 }) => {
   const [importMessage, setImportMessage] = useState<[string, string]|null>(null);
 
@@ -165,10 +166,10 @@ const SettingsModal: React.FC<SettingsModalProps> =
 
   return (
     <ContentModal
-      title={<><SettingsIcon fill={misc.getPubliTheme() === 'dark' ? '#bfbfbf' : '#fff'}/> Setări</>}
+      title={<><SettingsIcon fill={isDark ? '#bfbfbf' : '#fff'}/> Setări</>}
       onClose={onClose}
       maxWidth={600}
-      color={misc.getPubliTheme() === 'dark' ? 'rgb(127 105 24)' : '#c59b2f'}
+      color={isDark ? 'rgb(127 105 24)' : '#c59b2f'}
     >
       <SettingControl
         title="Căutare telefon manuală"
@@ -401,7 +402,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
 
       <h2 className={styles.header}>Transfer date</h2>
       <p className={styles.storageInfo}>Spatiu de stocare: <b>{storageUsagePercent === null ? 'n/a' : `${Math.floor(storageUsagePercent)}%`}</b> folosit.</p>
-      {importMessage && <p className={misc.cx(importMessage[0], styles.importMessage)}>{importMessage[1]}</p>}
+      {importMessage && <p className={`${importMessage[0]} ${styles.importMessage}`}>{importMessage[1]}</p>}
       <button onClick={handleExport} className={styles.button}>↑ export</button>
       <button onClick={onImport} className={styles.button}>↓ import</button>
 

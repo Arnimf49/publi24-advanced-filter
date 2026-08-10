@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {WWStorage} from "../../../../core/storage";
 import PhoneAndTags from "./PhoneAndTags";
+import {IS_MOBILE_VIEW} from "../../../../../common/globals";
+import {misc} from "../../../../core/misc";
 
 type PhoneAndTagsRoot = {
   adId?: string,
@@ -44,6 +46,8 @@ const PhoneAndTagsRoot: React.FC<PhoneAndTagsRoot> = ({
     <PhoneAndTags
       noPadding={noPadding}
       phone={phone}
+      isMobile={IS_MOBILE_VIEW}
+      isDark={misc.getPubliTheme() === 'dark'}
       age={age}
       ageWarn={ageWarn}
       bmi={bmi}

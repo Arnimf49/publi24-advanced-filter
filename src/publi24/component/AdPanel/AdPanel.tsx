@@ -8,13 +8,11 @@ import {NimfomaneIcon} from "./NimfomaneIcon";
 import {DdcIcon} from "./DdcIcon";
 import {Loader} from "../../../common/components/Loader/Loader";
 import {InlineLoader} from "../../../common/components/InlineLoader/InlineLoader";
-import {misc} from "../../core/misc";
-import PhoneAndTagsRoot from "../Common/Partials/PhoneAndTags/PhoneAndTagsRoot";
 import ErrorDisplay from "../Common/ErrorDisplay/ErrorDisplay";
 import InfoIcon from "../Common/Icons/InfoIcon";
 import PhoneSearchResultsHelp from "./Help/PhoneSearchResultsHelp";
 import ImageSearchResultsHelp from "./Help/ImageSearchResultsHelp";
-import {SearchResult} from "../../core/linksFilter";
+import type {SearchResult} from "../../core/linksFilter";
 
 interface ImageLink {
   link: string;
@@ -58,6 +56,12 @@ interface AdPanelProps {
   isPhoneSearchLoading?: boolean;
   isImageSearchLoading?: boolean;
   errors?: string[];
+  isDark: boolean;
+  renderPhoneAndTags: (
+    adId: string,
+    phone: string,
+    children: React.ReactNode,
+  ) => React.ReactNode;
 
   onVisibilityClick?: MouseEventHandler;
   onFavClick?: MouseEventHandler;
@@ -97,6 +101,8 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     isPhoneSearchLoading,
     isImageSearchLoading,
     errors = [],
+    isDark,
+    renderPhoneAndTags,
     onVisibilityClick,
     onFavClick,
     onInvestigateClick,
@@ -117,7 +123,6 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
   const loading = !hasNoPhone && !phone && errors.length === 0;
   const hasPhone = !hasNoPhone && phone;
 
-  const isDark = misc.getPubliTheme() === 'dark';
   const inlineLoader = (
     <InlineLoader
       size={16}
@@ -188,7 +193,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
             data-wwid="nimfomane-btn"
             className={styles.forumLink}
           >
-            <NimfomaneIcon/>
+            <NimfomaneIcon isDark={isDark}/>
           </a>
         )}
 
@@ -238,8 +243,8 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
       )}
 
       <div className={styles.results}>
-        {hasPhone && (
-          <PhoneAndTagsRoot adId={adId} phone={phone}>
+        {hasPhone && renderPhoneAndTags(adId, phone, (
+          <>
             {showDuplicates && hasDuplicateAdsWithSamePhone && (
               <button
                 title={`${numberOfAdsWithSamePhone} anunțuri cu acest telefon`}
@@ -253,8 +258,8 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                 <span data-wwid="duplicates-count">{numberOfAdsWithSamePhone}</span>&nbsp;<span data-wwid="duplicates" onClick={onViewDuplicatesClick}>anunțuri</span>
               </button>
             )}
-          </PhoneAndTagsRoot>
-        )}
+          </>
+        ))}
 
         {visible && (
           <>
@@ -400,12 +405,12 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
 
       {loading && (
         <div className={styles.results}>
-          <Loader classes={styles.loader} color={misc.getPubliTheme() === 'dark' ? '#9fc2fa' : '#17b'}/>
+          <Loader classes={styles.loader} color={isDark ? '#9fc2fa' : '#17b'}/>
         </div>
       )}
 
-      {showPhoneHelp && <PhoneSearchResultsHelp onClose={() => setShowPhoneHelp(false)} />}
-      {showImageHelp && <ImageSearchResultsHelp onClose={() => setShowImageHelp(false)} />}
+      {showPhoneHelp && <PhoneSearchResultsHelp isDark={isDark} onClose={() => setShowPhoneHelp(false)} />}
+      {showImageHelp && <ImageSearchResultsHelp isDark={isDark} onClose={() => setShowImageHelp(false)} />}
     </div>
   );
 };

@@ -3,14 +3,13 @@ import GeneralModal from '../../../../common/components/Modal/GeneralModal';
 import InfoIcon from '../../Common/Icons/InfoIcon';
 import {PhoneIcon} from '../../Common/Icons/PhoneIcon';
 import Code from '../../Common/Code/Code';
-import {misc} from '../../../core/misc';
 
 type PhoneSearchResultsHelpProps = {
   onClose: () => void;
+  isDark: boolean;
 };
 
-const PhoneSearchResultsHelp: React.FC<PhoneSearchResultsHelpProps> = ({ onClose }) => {
-  const isDark = misc.getPubliTheme() === 'dark';
+const PhoneSearchResultsHelp: React.FC<PhoneSearchResultsHelpProps> = ({ onClose, isDark }) => {
 
   return (
     <GeneralModal

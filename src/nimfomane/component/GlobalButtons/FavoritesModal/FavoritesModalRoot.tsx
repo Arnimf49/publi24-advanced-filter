@@ -4,6 +4,7 @@ import { NimfomaneStorage } from '../../../core/storage';
 import { favoritesAnalyzer } from '../../../core/favoritesAnalyzer';
 import { cityService } from '../../../core/cityService';
 import { profileActions } from '../../../core/profileActions';
+import {EscortCard} from './EscortCard';
 
 type FavoritesModalRootProps = {
   onClose: () => void;
@@ -91,6 +92,7 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
       inLocationEscorts={inLocationEscorts}
       otherLocationEscorts={otherLocationEscorts}
       currentCity={currentCity}
+      renderEscort={(user, index) => <EscortCard user={user} index={index} />}
     />
   );
 };

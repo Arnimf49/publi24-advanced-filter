@@ -5,6 +5,9 @@ import {AdData, adData} from '../../../core/adData';
 import {PhoneIcon} from "../../Common/Icons/PhoneIcon";
 import {misc} from "../../../core/misc";
 import {inspectorEscorteApi, InspectorAd} from '../../../core/inspectorEscorteApi';
+import AdsList from '../../Common/Partials/AdList/AdsList';
+import {renderer} from '../../../core/renderer';
+import {IS_MOBILE_VIEW} from '../../../../common/globals';
 
 const PAGE_SIZE = 15;
 
@@ -13,6 +16,10 @@ type PhoneSearchRootProps = {
 };
 
 const DEBOUNCE_DELAY = 1500;
+
+const registerAds = (context: HTMLElement, showDuplicates: boolean) => {
+  renderer.registerAdsInContext(context, {renderOptions: {showDuplicates}});
+};
 
 const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
   const [listState, setListState] = useState<{ads: AdData[], breaks: number[], errors: string[]} | null>(null);
@@ -156,6 +163,15 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
     }
   }, [listState]);
 
+  const renderAds = useCallback((ads: AdData[], sectionBreaks?: number[]) => (
+    <AdsList
+      adsData={ads}
+      sectionBreaks={sectionBreaks}
+      isMobile={IS_MOBILE_VIEW}
+      onRegister={registerAds}
+    />
+  ), []);
+
   return (
     <AdsModal
       {...({ source, sourcePhone: source === 'inspector-escorte' ? searchedPhone : undefined } as any)}
@@ -170,6 +186,7 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
       isLoading={isLoading}
       onLoadMore={loadNextPage}
       sectionBreaks={listState?.breaks}
+      renderAds={renderAds}
     />
   );
 };

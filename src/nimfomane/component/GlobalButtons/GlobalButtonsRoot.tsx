@@ -6,6 +6,8 @@ import VersionHistoryModal from '../../../common/components/VersionHistoryModal/
 import FeedbackModal from '../../../common/components/FeedbackModal/FeedbackModal';
 import SettingsModalRoot from './SettingsModal/SettingsModalRoot';
 import {versionHistory} from '../../data/versionHistory';
+import {IS_MOBILE_VIEW} from '../../../common/globals';
+import {utils} from '../../../common/utils';
 
 type GlobalButtonsRootProps = {};
 
@@ -57,6 +59,8 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
     <>
       <GlobalButtons
         favsCount={favsCount}
+        isMobile={IS_MOBILE_VIEW}
+        onLogoClick={utils.openExtensionPage}
         onFavsClick={onFavsClick}
         onSettingsClick={onSettingsClick}
         onVersionHistoryClick={onVersionHistoryClick}

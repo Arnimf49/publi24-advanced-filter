@@ -5,8 +5,15 @@ import {AdUuid, WWStorage} from "../../../../core/storage";
 import GlobalLoader from "../../GlobalLoader/GlobalLoader";
 import {modalState} from "../../../../../common/modalState";
 import {inspectorEscorteApi, InspectorAd} from "../../../../core/inspectorEscorteApi";
+import AdsList from "../AdList/AdsList";
+import {renderer} from "../../../../core/renderer";
+import {IS_MOBILE_VIEW} from "../../../../../common/globals";
 
 const PAGE_SIZE = 15;
+
+const registerAds = (context: HTMLElement, showDuplicates: boolean) => {
+  renderer.registerAdsInContext(context, {renderOptions: {showDuplicates}});
+};
 
 type AdsModalRootProps = {
   close: () => void;
@@ -114,6 +121,15 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
     }
   }, [listState]);
 
+  const renderAds = useCallback((ads: AdData[], sectionBreaks?: number[]) => (
+    <AdsList
+      adsData={ads}
+      sectionBreaks={sectionBreaks}
+      isMobile={IS_MOBILE_VIEW}
+      onRegister={registerAds}
+    />
+  ), []);
+
   if (listState === null) {
     return <GlobalLoader message={"La 15+ de anunțuri durează mai mult sa încarce, din cauză la limitari de Publi24."}/>;
   }
@@ -132,6 +148,7 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
       isLoadingMore={isLoadingMore}
       onLoadMore={loadNextPage}
       sectionBreaks={listState.breaks}
+      renderAds={renderAds}
     />
   );
 };

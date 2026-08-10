@@ -1,7 +1,10 @@
 import React from "react";
-import {misc} from "../../core/misc";
 
-export const NimfomaneIcon = () => {
+type NimfomaneIconProps = {
+  isDark: boolean;
+};
+
+export const NimfomaneIcon = ({isDark}: NimfomaneIconProps) => {
   return (
     <svg
       width="23px"
@@ -61,7 +64,7 @@ export const NimfomaneIcon = () => {
           <path
             id="rect285"
             style={{
-              fill: misc.getPubliTheme() === 'dark' ? '#bfbfbf' : '#ffffff',
+              fill: isDark ? '#bfbfbf' : '#ffffff',
               fillOpacity: 1,
               strokeWidth: 0.264583,
             }}
@@ -72,7 +75,7 @@ export const NimfomaneIcon = () => {
               fontVariationSettings: 'normal',
               opacity: 1,
               vectorEffect: 'none',
-              fill: misc.getPubliTheme() === 'dark' ? '#bfbfbf' : '#ffffff',
+              fill: isDark ? '#bfbfbf' : '#ffffff',
               fillOpacity: 1,
               strokeWidth: 0.263499,
               strokeLinecap: 'butt',

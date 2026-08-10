@@ -3,10 +3,21 @@ import GlobalLoader from '../../Common/GlobalLoader/GlobalLoader';
 import FavoritesModal from './FavoritesModal';
 import { WWStorage } from '../../../core/storage';
 import {adData, FavoritesData} from "../../../core/adData";
+import type {AdData} from "../../../core/adData";
 import {modalState} from "../../../../common/modalState";
+import {misc} from "../../../core/misc";
+import AdsList from "../../Common/Partials/AdList/AdsList";
+import PhoneAndTagsRoot from "../../Common/Partials/PhoneAndTags/PhoneAndTagsRoot";
+import {renderer} from "../../../core/renderer";
+import {IS_MOBILE_VIEW} from "../../../../common/globals";
+import {Ad} from "./Ad";
 
 type FavoritesModalRootProps = {
   onClose: () => void;
+};
+
+const registerAds = (context: HTMLElement, showDuplicates: boolean) => {
+  renderer.registerAdsInContext(context, {renderOptions: {showDuplicates}});
 };
 
 const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
@@ -50,6 +61,15 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
     });
   }, []);
 
+  const renderAds = useCallback((ads: AdData[]) => (
+    <AdsList
+      adsData={ads}
+      showDuplicates={true}
+      isMobile={IS_MOBILE_VIEW}
+      onRegister={registerAds}
+    />
+  ), []);
+
   if (favoritesData === null) {
     return <GlobalLoader message={'La 15+ de favorite durează mai mult să încarce favoritele, din cauza limitarilor de la Publi24.'} />;
   }
@@ -63,6 +83,10 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
       notInLocationAds={favoritesData.notInLocation}
       noAdsItems={favoritesData.noAds}
       onCleanup={cleanUpUrl}
+      isDark={misc.getPubliTheme() === 'dark'}
+      topContent={<Ad />}
+      renderAds={renderAds}
+      renderNoAd={(phone) => <PhoneAndTagsRoot phone={phone} noPadding={true} />}
     />
   );
 };

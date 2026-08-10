@@ -7,15 +7,15 @@ import {MenuIcon} from "../../../common/components/Icons/MenuIcon";
 import TutorialIcon from "../Common/Icons/TutorialIcon";
 import {P24faLogoDark} from "../../../common/components/Logo/P24faLogoDark";
 import {P24faLogoLight} from "../../../common/components/Logo/P24faLogoLight";
-import {misc} from "../../core/misc";
-import {IS_MOBILE_VIEW} from "../../../common/globals";
-import {utils} from "../../../common/utils";
 import {HistoryIcon} from "../../../common/components/Icons/HistoryIcon";
 import {FeedbackIcon} from "../../../common/components/Icons/FeedbackIcon";
 
 type GlobalButtonsProps = {
   favsCount: number | null;
   favsWithNoAdsCount: number | null;
+  isMobile: boolean;
+  isDark: boolean;
+  onLogoClick: () => void;
   onSearchClick: MouseEventHandler;
   onSettingsClick: MouseEventHandler;
   onFavsClick: MouseEventHandler;
@@ -33,6 +33,9 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
 ({
   favsCount,
   favsWithNoAdsCount,
+  isMobile,
+  isDark,
+  onLogoClick,
   onSearchClick,
   onSettingsClick,
   onFavsClick,
@@ -84,7 +87,6 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen, onMenuClose]);
 
-  const isDark = misc.getPubliTheme() === 'dark';
   const LogoComponent = isDark ? P24faLogoDark : P24faLogoLight;
 
   return (
@@ -96,7 +98,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
           title="Logo"
           aria-label="Logo"
         >
-          <LogoComponent className={styles.logo} padding={false} onClick={utils.openExtensionPage}/>
+            <LogoComponent className={styles.logo} padding={false} onClick={onLogoClick}/>
         </button>
       </div>
 
@@ -194,7 +196,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
       >
         <StarIcon className={styles.savesIcon}/>
         <span>
-          {IS_MOBILE_VIEW
+          {isMobile
             ? <>{favsCount || 0}<span>{favsWithNoAdsCount ? '+' + favsWithNoAdsCount : ''}</span></>
             : <>Favorite {favsCount || 0}<span>{favsWithNoAdsCount ? '+' + favsWithNoAdsCount : ''}</span></>
           }
