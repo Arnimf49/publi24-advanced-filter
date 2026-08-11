@@ -8,6 +8,8 @@
   background: rgba(75, 75, 75, 0.478);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  transform: translateZ(0);
+  will-change: transform;
   display: flex;
   justify-content: space-between;
   align-items: center;

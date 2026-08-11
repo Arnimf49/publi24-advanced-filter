@@ -42,8 +42,8 @@ const PHONE = '0740123456';
 const FIRST_SEEN = Date.now() - 90 * 24 * 60 * 60 * 1000;
 const SEARCH_ANIMATION_DURATION = 20000;
 const PHONE_SEARCH_RESULTS: SearchResult[] = [
-  ['nimfomane.com', 'https://nimfomane.com/topic/demo-phone'],
-  ['ddcforum.com', 'https://ddcforum.com/topic/demo-phone'],
+  ['nimfomane.com', 'https://nimfomane.com/forum/topic/230613-asd/'],
+  ['ddcforum.com', 'https://ddcforum.com/index.php?/forums/topic/36424-antonia-0791169479-grand-arena/'],
   'https://example-review-site.com/0740123456',
 ];
 const IMAGE_SEARCH_RESULTS: ImageSearchResult[] = [
@@ -90,7 +90,12 @@ const SearchFeatureDemo: React.FC<SearchFeatureDemoProps> = ({searchType}) => {
   const [playRequested, setPlayRequested] = useState(false);
   const [isAnimationPaused, setIsAnimationPaused] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
-  const isDemoActive = useDemoVisibility(stageRef, 4000, playRequested);
+  const resetAnimation = () => {
+    setPointerPosition({x: -40, y: 100});
+    setAnimationCycle((current) => current + 1);
+    setPhase('waiting');
+  };
+  const isDemoActive = useDemoVisibility(stageRef, 4000, playRequested, resetAnimation);
 
   const isLoading = phase === 'loading';
   const hasResults = phase === 'results';
@@ -223,7 +228,7 @@ const SearchFeatureDemo: React.FC<SearchFeatureDemoProps> = ({searchType}) => {
           setPhase('waiting');
         }}
       />
-      <div className={`${styles.viewport} ${searchType === 'image' ? styles.imageViewport : ''}`}>
+      <div className={`${styles.viewport} ${searchType === 'image' ? styles.imageViewport : ''}${isDemoActive && !isAnimationPaused ? ` ${demoStyles.mobileScrollThrough}` : ''}`}>
         <div className="publi24-demo-site">
           <div className={demoStyles.siteTopbar}>
             <Publi24SvgSprite />
@@ -243,8 +248,8 @@ const SearchFeatureDemo: React.FC<SearchFeatureDemoProps> = ({searchType}) => {
                 hasNoPhone={false}
                 showDuplicates={false}
                 hasDuplicateAdsWithSamePhone={false}
-                nimfomaneLink={searchType === 'phone' && hasResults ? 'https://nimfomane.com/topic/demo-phone' : undefined}
-                ddcLink={searchType === 'phone' && hasResults ? 'https://ddcforum.com/topic/demo-phone' : undefined}
+                nimfomaneLink={searchType === 'phone' && hasResults ? 'https://nimfomane.com/forum/topic/230613-asd/' : undefined}
+                ddcLink={searchType === 'phone' && hasResults ? 'https://ddcforum.com/index.php?/forums/topic/36424-antonia-0791169479-grand-arena/' : undefined}
                 phoneInvestigatedSinceDays={searchType === 'phone' && hasResults ? 'azi' : undefined}
                 imageInvestigatedSinceDays={searchType === 'image' && hasResults ? 'azi' : undefined}
                 searchLinks={searchType === 'phone' && hasResults ? PHONE_SEARCH_RESULTS : undefined}

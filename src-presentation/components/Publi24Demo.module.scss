@@ -94,6 +94,16 @@
   box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
 }
 
+.siteTopbar::after {
+  margin-left: auto;
+  color: #111111;
+  content: 'demo';
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  opacity: 0.38;
+}
+
 :global(.publi24-demo-site) .siteTopbar .text-logo {
   position: static;
   display: inline-flex;
@@ -149,7 +159,15 @@
   pointer-events: none;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 800px) {
+  .mobileScrollThrough {
+    :global([data-wwid="ads-modal"]),
+    :global([data-wwid="favorites-modal"]),
+    :global([data-wwid="settings-modal"]) {
+      overflow-y: hidden;
+    }
+  }
+
   .demo {
     padding: 0;
   }
@@ -181,6 +199,11 @@
 
   .siteTopbar {
     background: #1778bc;
+  }
+
+  .siteTopbar::after {
+    color: #ffffff;
+    opacity: 0.65;
   }
 
   :global(.publi24-demo-site) .siteTopbar .text-logo .t1,

@@ -68,7 +68,14 @@ const SettingsFeatureDemo: React.FC = () => {
   const [isAnimationPaused, setIsAnimationPaused] = useState(false);
   const [pointerPosition, setPointerPosition] = useState({x: -40, y: 100});
   const stageRef = useRef<HTMLDivElement>(null);
-  const isDemoActive = useDemoVisibility(stageRef, 4000, playRequested);
+  const resetAnimation = () => {
+    setIsMenuOpen(false);
+    setIsSettingsOpen(false);
+    setPointerPosition({x: -40, y: 100});
+    setAnimationCycle((current) => current + 1);
+    setPhase('waiting');
+  };
+  const isDemoActive = useDemoVisibility(stageRef, 4000, playRequested, resetAnimation);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 800px)');
@@ -254,7 +261,7 @@ const SettingsFeatureDemo: React.FC = () => {
           setPhase('waiting');
         }}
       />
-      <div className={styles.viewport}>
+      <div className={`${styles.viewport}${isDemoActive && !isAnimationPaused ? ` ${demoStyles.mobileScrollThrough}` : ''}`}>
         <div className="publi24-demo-site">
           <div className={demoStyles.siteTopbar}>
             <Publi24SvgSprite />

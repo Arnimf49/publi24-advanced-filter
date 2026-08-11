@@ -25,7 +25,12 @@ const Publi24Demo: React.FC<Publi24DemoProps> = ({extensionEnabled, onExtensionC
     typeof window !== 'undefined' && window.matchMedia('(max-width: 800px)').matches
   ));
   const demoRef = useRef<HTMLDivElement>(null);
-  const isDemoActive = useDemoVisibility(demoRef, 4000, playRequested);
+  const resetAnimation = () => {
+    setVisible(true);
+    setIsFavorite(false);
+    setAnimationCycle((current) => current + 1);
+  };
+  const isDemoActive = useDemoVisibility(demoRef, 4000, playRequested, resetAnimation);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 800px)');
@@ -103,7 +108,7 @@ const Publi24Demo: React.FC<Publi24DemoProps> = ({extensionEnabled, onExtensionC
           setAnimationCycle((current) => current + 1);
         }}
       />
-      <div className={`${styles.viewport} ${extensionEnabled ? styles.extensionOn : styles.extensionOff}`}>
+      <div className={`${styles.viewport} ${extensionEnabled ? styles.extensionOn : styles.extensionOff}${isDemoActive && !isAnimationPaused ? ` ${styles.mobileScrollThrough}` : ''}`}>
         <div className={styles.browserBar}>
           <span className={styles.browserDot} />
           <span className={styles.browserDot} />
