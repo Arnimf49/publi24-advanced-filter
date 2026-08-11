@@ -8,6 +8,17 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.6',
+    releaseDate: '11 august 2026',
+    changeNew: [
+      'Posibilitatea de a închide butoanele globale.',
+    ],
+    changeImprove: [
+      'Repoziționat butoanele globale pe desktop.',
+    ],
+    changeFix: []
+  },
+  {
     version: '3.2.2',
     releaseDate: '29 aprilie 2026',
     changeNew: [],
