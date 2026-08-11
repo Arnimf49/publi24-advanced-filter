@@ -183,7 +183,7 @@ const InstallPage: React.FC = () => {
     <section className={styles.page} aria-labelledby="install-page-title">
       <div className={styles.intro}>
         <p className={styles.kicker}>✦ Instalare ✦</p>
-        <h1 id="install-page-title">Alege cum vrei să folosești extensia.</h1>
+         <h1 id="install-page-title">Alege cum vrei să folosești extensia</h1>
         <p className={styles.lede}>
           Alege dispozitivul și browserul în care vrei să folosești extensia și vei primi instrucțiuni exacte.
         </p>
@@ -236,7 +236,7 @@ const InstallPage: React.FC = () => {
         <div className={styles.instructionsHeader}>
           <div>
             <p className={styles.selectorLabel}>Pașii tăi</p>
-            <h2>Instalează în {selectedBrowser.label}.</h2>
+             <h2>Instalează în {selectedBrowser.label}</h2>
           </div>
         </div>
 

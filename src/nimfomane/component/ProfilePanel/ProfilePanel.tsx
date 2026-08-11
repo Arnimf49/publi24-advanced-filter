@@ -1,7 +1,8 @@
 import React, {FC, useCallback, useState} from "react";
 import Modal from "../../../common/components/Modal/Modal";
-import {EscortImages} from "../TopicImage/EscortImages/EscortImages";
+import EscortImagesRoot from "../TopicImage/EscortImages/EscortImagesRoot";
 import {PanelRoot} from "../Panel/PanelRoot";
+import {IS_MOBILE_VIEW} from "../../../common/globals";
 
 interface ProfilePanelProps {
   user: string;
@@ -25,9 +26,10 @@ export const ProfilePanel: FC<ProfilePanelProps> = ({user, container}) => {
 
       {isModalOpen && (
         <Modal close={() => setImageModalOpen(false)} dataWwid="escort-image-modal">
-          <EscortImages
+          <EscortImagesRoot
             onClose={() => setImageModalOpen(false)}
             user={user}
+            isMobile={IS_MOBILE_VIEW}
           />
         </Modal>
       )}

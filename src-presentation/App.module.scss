@@ -59,7 +59,8 @@
 
 .hero,
 .featureBlock,
-.installSection {
+.installSection,
+.variantPrompt {
   width: min(100% - 48px, 1800px);
   margin: 0 auto;
 }
@@ -88,6 +89,7 @@
 .heroTitle,
 .featureCopy h2,
 .installSection h2,
+.variantPrompt p,
 .heroDescription,
 .featureCopy > p {
   margin-top: 0;
@@ -95,8 +97,57 @@
 
 .heroTitle,
 .featureCopy h2,
-.installSection h2 {
+.installSection h2,
+.variantPrompt p {
   letter-spacing: -0.065em;
+}
+
+.variantControl {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  padding: 4px;
+  border: 1px solid #c5c5c0;
+  border-radius: 999px;
+  background: #f8f8f6;
+  margin-top: 36px;
+}
+
+.variantButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 150px;
+  padding: 13px 26px;
+  border: 0;
+  border-radius: 999px;
+  color: #777773;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.variantButton:hover {
+  color: #111111;
+}
+
+.variantButtonActive {
+  color: #ffffff;
+  background: #111111;
+  transform: translateY(-1px);
+}
+
+.variantButtonPubli24.variantButtonActive {
+  background: #1778bc;
+}
+
+.variantButtonNimfomane.variantButtonActive {
+  background: #1f3050;
+}
+
+.variantButton.variantButtonActive:hover {
+  color: #ffffff;
 }
 
 .heroTitle {
@@ -130,7 +181,8 @@
 }
 
 .featureCopy h2,
-.installSection h2 {
+.installSection h2,
+.variantPrompt p {
   margin-bottom: 27px;
   font-size: clamp(2.35rem, 4.7vw, 5.4rem);
   line-height: 0.95;
@@ -173,6 +225,20 @@
   margin-bottom: 0;
 }
 
+.variantPrompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 48px 0;
+  border-top: 1px solid #d8d8d4;
+}
+
+.variantPrompt p {
+  margin: 0;
+  font-size: clamp(1.65rem, 3.3vw, 3.8rem);
+}
+
 @media (max-width: 800px) {
   .header {
     min-height: 60px;
@@ -185,7 +251,8 @@
 
   .hero,
   .featureBlock,
-  .installSection {
+  .installSection,
+  .variantPrompt {
     width: min(100% - 32px, 640px);
   }
 
@@ -216,8 +283,29 @@
     padding: 68px 0 84px;
   }
 
+  .variantPrompt {
+    display: block;
+    padding: 48px 0;
+  }
+
+  .variantPrompt .installButton {
+    display: flex;
+    width: fit-content;
+    margin-top: 32px;
+  }
+
   .installSection .installButton {
     margin-top: 32px;
+  }
+
+  .variantControl {
+    width: 100%;
+  }
+
+  .variantButton {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 16px;
   }
 }
 

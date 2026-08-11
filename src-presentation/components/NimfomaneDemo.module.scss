@@ -1,0 +1,164 @@
+.demo {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.stateSwitch {
+  display: flex;
+  width: fit-content;
+  margin: 0 auto 12px;
+  padding: 3px;
+  border: 1px solid #c5c5c0;
+  border-radius: 999px;
+  background: #f8f8f6;
+}
+
+.stateSwitch button {
+  min-width: 126px;
+  padding: 10px 22px;
+  border: 0;
+  border-radius: 999px;
+  color: #777773;
+  background: transparent;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.stateSwitch button:hover {
+  color: #111111;
+}
+
+.stateSwitch button.stateActive {
+  color: #ffffff !important;
+  background: #111111;
+  -webkit-text-fill-color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.viewport {
+  position: relative;
+  min-height: 620px;
+  overflow: hidden;
+  border: 1px solid #bec7d4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.site {
+  min-height: 620px;
+}
+
+.siteHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  margin-bottom: 16px;
+  padding: 0 22px;
+  color: #ffffff;
+  background: #1f3050;
+  font-family: Arial, sans-serif;
+}
+
+.siteHeader span {
+  color: #c7d2e5;
+  font-size: 0.7rem;
+}
+
+.siteHeaderLogo {
+  display: block;
+  width: 140px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.globalButtonsSlot {
+  position: absolute;
+  z-index: 4;
+  bottom: 12px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  transform: translateX(-50%);
+}
+
+.demo .globalButtonsSlot > div {
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important;
+}
+
+.extensionFeature {
+  animation: extensionFeatureFadeIn 420ms ease both;
+}
+
+.demo [data-demo-clicking="true"] {
+  animation: demoButtonClick 360ms ease;
+}
+
+@keyframes demoButtonClick {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  45% {
+    transform: scale(0.85);
+  }
+}
+
+@keyframes extensionFeatureFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 800px) {
+  .mobileScrollThrough {
+    :global([data-wwid="escort-image-modal"]),
+    :global([data-wwid="favorites-modal"]) {
+      overflow-y: hidden;
+    }
+  }
+
+  .stateSwitch {
+    width: calc(100% - 20px);
+  }
+
+  .stateSwitch button {
+    flex: 1;
+    min-width: 0;
+    padding: 9px 12px;
+  }
+
+  .viewport,
+  .site {
+    min-height: 560px;
+  }
+
+  .siteHeader {
+    padding: 0 14px;
+  }
+
+  .siteHeader span {
+    display: none;
+  }
+
+  .site :global(.ipsLayout_container) {
+    padding: 0 10px;
+  }
+
+  .globalButtonsSlot {
+    bottom: 8px;
+    right: auto;
+    left: 8px;
+    transform: none;
+  }
+
+}

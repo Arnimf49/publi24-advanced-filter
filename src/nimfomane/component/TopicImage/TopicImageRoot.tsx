@@ -2,8 +2,9 @@ import React, {FC, useEffect, useState} from "react";
 import {TopicImage} from "./TopicImage";
 import {NimfomaneStorage} from "../../core/storage";
 import Modal from "../../../common/components/Modal/Modal";
-import {EscortImages} from "./EscortImages/EscortImages";
+import EscortImagesRoot from "./EscortImages/EscortImagesRoot";
 import {NimfomaneMemoryStorage} from "../../core/memoryStorage";
+import {IS_MOBILE_VIEW} from "../../../common/globals";
 
 // @ts-ignore
 if (typeof browser === "undefined" && typeof chrome !== "undefined") {
@@ -75,9 +76,10 @@ export const TopicImageRoot: FC<TopicImageRootProps> =
 
       {isModalOpen && topic.ownerUser && (
         <Modal close={() => setImageModalOpen(false)} dataWwid="escort-image-modal">
-          <EscortImages
+          <EscortImagesRoot
             onClose={() => setImageModalOpen(false)}
             user={topic.ownerUser}
+            isMobile={IS_MOBILE_VIEW}
           />
         </Modal>
       )}

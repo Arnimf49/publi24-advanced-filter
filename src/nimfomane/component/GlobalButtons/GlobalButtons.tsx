@@ -20,6 +20,7 @@ type GlobalButtonsProps = {
   onMenuClose: () => void;
   hasNewVersion: boolean;
   currentVersion: string;
+  isDemo?: boolean;
 };
 
 const GlobalButtons: React.FC<GlobalButtonsProps> =
@@ -36,6 +37,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
   onMenuClose,
   hasNewVersion,
   currentVersion,
+  isDemo = false,
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const prevCountRef = useRef<null | number>(null);
@@ -75,7 +77,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
   }, [isMenuOpen, onMenuClose]);
 
   return (
-    <div className={styles.globalButtonsContainer}>
+    <div className={`${styles.globalButtonsContainer} ${isDemo ? styles.demoGlobalButtons : ''}`}>
       <div className={styles.logoWrapper}>
         <button
           type="button"

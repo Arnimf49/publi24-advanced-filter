@@ -6,6 +6,7 @@ import {StarIcon} from '../../../../common/components/Icons/StarIcon';
 
 type FavoritesModalProps = {
   onClose: () => void;
+  inline?: boolean;
   onClearFavorites: () => void;
   favorites: string[];
   inLocationEscorts: string[];
@@ -16,6 +17,7 @@ type FavoritesModalProps = {
 
 const FavoritesModal: React.FC<FavoritesModalProps> = ({
   onClose,
+  inline = false,
   onClearFavorites,
   favorites = [],
   inLocationEscorts,
@@ -45,6 +47,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
   return (
     <Modal
       close={onClose}
+      inline={inline}
       dataWwid="favorites-modal"
     >
       <ContentModal
