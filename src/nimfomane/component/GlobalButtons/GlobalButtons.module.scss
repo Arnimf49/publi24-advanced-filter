@@ -1,8 +1,10 @@
 .globalButtonsContainer {
+  --global-buttons-height: 48px;
   position: fixed;
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 2000;
   display: flex;
   align-items: center;
@@ -13,12 +15,119 @@
   background: #f8f8f8;
   box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.2);
 
-  :global(.onMobile) & {
+  :global(.onMobile) &, &.mobileGlobalButtons {
+    --global-buttons-height: 42px;
+    --global-buttons-toggle-width: 21.6px;
     position: absolute;
     bottom: 66px;
     left: 6px;
     transform: translateX(0%);
     box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.globalButtonsContainer.globalButtonsCollapsed {
+  transform: translateX(-50%) translateY(var(--global-buttons-height));
+}
+
+.globalButtonsContainer.mobileGlobalButtons.globalButtonsCollapsed,
+:global(.onMobile) .globalButtonsContainer.globalButtonsCollapsed {
+  transform: translateX(calc(-100% + var(--global-buttons-toggle-width) + 5px - 6px));
+}
+
+:global(.onMobile) .globalButtonsToggle,
+.mobileGlobalButtons .globalButtonsToggle {
+  position: relative;
+  top: auto;
+  right: auto;
+  left: auto;
+  width: var(--global-buttons-toggle-width);
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 0 18px 18px 0;
+  box-shadow: none;
+  transform: none;
+}
+
+:global(.onMobile) .globalButtonsToggleIcon,
+.mobileGlobalButtons .globalButtonsToggleIcon {
+  width: 10px;
+  height: 16px;
+  transform: rotate(90deg);
+}
+
+.globalButtonsToggleIconCollapsed {
+  transform: rotate(180deg);
+}
+
+:global(.onMobile) .globalButtonsToggleIconCollapsed,
+.mobileGlobalButtons .globalButtonsToggleIconCollapsed {
+  transform: rotate(270deg);
+}
+
+.globalButtonsToggle {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  width: 44px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 22px 22px 0 0 / 9px 9px 0 0;
+  background: #f8f8f8;
+  box-shadow: 2px -1px 5px 1px rgba(0, 0, 0, 0.14);
+  color: rgb(150 150 150);
+  cursor: pointer;
+  transform: translateX(-50%);
+  z-index: 2;
+
+  &:hover {
+    background: rgb(245 245 245);
+  }
+}
+
+.globalButtonsContainer.globalButtonsCollapsed .globalButtonsToggle {
+  background: rgb(47 73 121);
+  color: #fff;
+
+  &:hover {
+    background: rgb(47 73 121);
+  }
+}
+
+.globalButtonsToggleIcon {
+  width: 12.8px;
+  height: 8px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:global(body:not(.onMobile)) .globalButtonsContainer:not(.mobileGlobalButtons) {
+  bottom: 0;
+  left: calc(50% + 544px);
+  border-radius: 24px 24px 0 24px;
+}
+
+:global(body:not(.onMobile)) .globalButtonsContainer:not(.mobileGlobalButtons) .savesButton {
+  border-radius: 0 20px 0 0;
+}
+
+@media (max-width: 1350px) {
+  :global(body:not(.onMobile)) .globalButtonsContainer:not(.mobileGlobalButtons) {
+    right: 15px;
+    left: auto;
+    transform: none;
+  }
+
+  :global(body:not(.onMobile)) .globalButtonsContainer:not(.mobileGlobalButtons).globalButtonsCollapsed {
+    transform: translateY(var(--global-buttons-height));
   }
 }
 
@@ -59,7 +168,8 @@
     display: block;
   }
 
-  :global(.onMobile) & .logo {
+  :global(.onMobile) & .logo,
+  .mobileGlobalButtons & .logo {
     width: 36px;
     height: 36px;
   }
@@ -76,7 +186,7 @@
   display: block;
   border-radius: 9999px;
 
-  :global(.onMobile) & {
+  :global(.onMobile) &, .mobileGlobalButtons & {
     width: calc(34px + 8px);
     height: calc(34px + 8px);
   }
@@ -120,7 +230,7 @@
     stroke: rgb(31 48 80);
   }
 
-  :global(.onMobile) & {
+  :global(.onMobile) &, .mobileGlobalButtons & {
     padding: 8px;
     height: 34px;
   }
@@ -162,7 +272,7 @@
     flex-shrink: 0;
   }
 
-  :global(.onMobile) & {
+  :global(.onMobile) &, .mobileGlobalButtons & {
     padding-left: 9px;
     padding-right: 12px;
     gap: 4px;
@@ -208,7 +318,7 @@
   z-index: 3000;
   min-width: 200px;
 
-  :global(.onMobile) & {
+  :global(.onMobile) &, .mobileGlobalButtons & {
     left: 0px;
     transform: none;
     bottom: calc(10px + 34px + 3px + 3px);
@@ -226,7 +336,7 @@
   transform: rotate(45deg);
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 
-  :global(.onMobile) & {
+  :global(.onMobile) &, .mobileGlobalButtons & {
     left: 55px;
     margin-left: 0;
   }
@@ -246,7 +356,7 @@
   font-weight: 600;
   color: #333;
 
-  :global(.onMobile) & {
+  :global(.onMobile) &, .mobileGlobalButtons & {
     font-size: 12px;
   }
 }
@@ -257,7 +367,7 @@
   color: #333;
   opacity: 0.7;
 
-  :global(.onMobile) & {
+  :global(.onMobile) &, .mobileGlobalButtons & {
     font-size: 11px;
   }
 }
@@ -289,7 +399,7 @@
     background: rgba(47, 73, 121, 0.12);
   }
 
-  :global(.onMobile) & {
+  :global(.onMobile) &, .mobileGlobalButtons & {
     padding: 8px 12px;
     font-size: 14px;
     gap: 8px;

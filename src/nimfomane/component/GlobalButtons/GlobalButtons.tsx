@@ -6,6 +6,7 @@ import {HistoryIcon} from '../../../common/components/Icons/HistoryIcon';
 import {FeedbackIcon} from '../../../common/components/Icons/FeedbackIcon';
 import {SettingsIcon} from '../../../common/components/Icons/SettingsIcon';
 import {P24faLogoLight} from '../../../common/components/Logo/P24faLogoLight';
+import {NimfomaneStorage} from '../../core/storage';
 
 type GlobalButtonsProps = {
   favsCount: number | null;
@@ -40,8 +41,20 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
   isDemo = false,
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(isMobile);
+  const [isCollapsed, setIsCollapsed] = useState(() => NimfomaneStorage.isGlobalButtonsCollapsed());
   const prevCountRef = useRef<null | number>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 979px)');
+    const updateMobileViewport = () => setIsMobileViewport(isMobile || mediaQuery.matches);
+
+    updateMobileViewport();
+    mediaQuery.addEventListener('change', updateMobileViewport);
+
+    return () => mediaQuery.removeEventListener('change', updateMobileViewport);
+  }, [isMobile]);
 
   useEffect(() => {
     if (favsCount === null) {
@@ -76,8 +89,15 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen, onMenuClose]);
 
+  const onCollapseToggle = () => {
+    const nextIsCollapsed = !isCollapsed;
+
+    setIsCollapsed(nextIsCollapsed);
+    NimfomaneStorage.setGlobalButtonsCollapsed(nextIsCollapsed);
+  };
+
   return (
-    <div className={`${styles.globalButtonsContainer} ${isDemo ? styles.demoGlobalButtons : ''}`}>
+    <div className={`${styles.globalButtonsContainer} ${isMobileViewport ? styles.mobileGlobalButtons : ''} ${isCollapsed ? styles.globalButtonsCollapsed : ''} ${isDemo ? styles.demoGlobalButtons : ''}`}>
       <div className={styles.logoWrapper}>
         <button
           type="button"
@@ -159,11 +179,24 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
       >
         <StarIcon className={styles.savesIcon}/>
         <span>
-          {isMobile
+          {isMobileViewport
             ? <>{favsCount || 0}</>
             : <>Favorite {favsCount || 0}</>
           }
         </span>
+      </button>
+
+      <button
+        type="button"
+        className={styles.globalButtonsToggle}
+        onClick={onCollapseToggle}
+        aria-expanded={!isCollapsed}
+        aria-label={isCollapsed ? 'Afișează butoanele globale' : 'Ascunde butoanele globale'}
+        title={isCollapsed ? 'Afișează butoanele globale' : 'Ascunde butoanele globale'}
+      >
+        <svg className={`${styles.globalButtonsToggleIcon} ${isCollapsed ? styles.globalButtonsToggleIconCollapsed : ''}`} viewBox="0 0 24 14" aria-hidden="true">
+          <path d="M4 3L12 11L20 3" />
+        </svg>
       </button>
     </div>
   );

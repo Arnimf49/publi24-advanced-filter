@@ -164,6 +164,14 @@ export const NimfomaneStorage = {
     localStorage.setItem('p24fa:nimfo:version-seen', version);
   },
 
+  isGlobalButtonsCollapsed(): boolean {
+    return localStorage.getItem('p24fa:nimfo:global-buttons-collapsed') === 'true';
+  },
+
+  setGlobalButtonsCollapsed(collapsed: boolean): void {
+    localStorage.setItem('p24fa:nimfo:global-buttons-collapsed', collapsed ? 'true' : 'false');
+  },
+
   async upgrade(): Promise<void> {
     const version = NimfomaneStorage.getVersion();
     const currentVersion = 1;
