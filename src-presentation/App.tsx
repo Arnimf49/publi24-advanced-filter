@@ -8,6 +8,7 @@ import SearchFeatureDemo from './components/SearchFeatureDemo';
 import DuplicateFeatureDemo from './components/DuplicateFeatureDemo';
 import SettingsFeatureDemo from './components/SettingsFeatureDemo';
 import NimfomaneDemo from './components/NimfomaneDemo';
+import {presentationAsset} from './presentationAsset';
 import styles from './App.module.scss';
 
 type PresentationVariant = 'publi24' | 'nimfomane';
@@ -24,8 +25,8 @@ const getVariantFromUrl = (): PresentationVariant => {
 };
 
 const getVariantStylesheetUrl = (variant: PresentationVariant) => variant === 'nimfomane'
-  ? '/nimfomane.css'
-  : '/publi24.css';
+  ? presentationAsset.getUrl('nimfomane.css')
+  : presentationAsset.getUrl('publi24.css');
 
 const VariantStylesheet: React.FC<{variant: PresentationVariant}> = ({variant}) => {
   useEffect(() => {

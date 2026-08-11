@@ -11,14 +11,15 @@ import HideReasonRoot from '../../src/nimfomane/component/Panel/HideReason/HideR
 import AnimationStatusBar from './AnimationStatusBar';
 import DemoMouse from './DemoMouse';
 import useDemoVisibility from './useDemoVisibility';
+import {presentationAsset} from '../presentationAsset';
 import styles from './NimfomaneDemo.module.scss';
 
 export type NimfomaneDemoMode = 'extension' | 'hide' | 'favorites' | 'images';
 
-const BIKINI_LINE_ART_IMAGE = '/nimfomane-demo-bikini-line-art.jpg';
-const WOMAN_SILHOUETTE_IMAGE = '/nimfomane-demo-woman-silhouette.jpg';
-const BIKINI_LINE_ART_ALT_IMAGE = '/nimfomane-demo-bikini-line-art-alt.jpg';
-const WOMAN_PORTRAIT_IMAGE = '/nimfomane-demo-woman-portrait.jpg';
+const BIKINI_LINE_ART_IMAGE = presentationAsset.getUrl('nimfomane-demo-bikini-line-art.jpg');
+const WOMAN_SILHOUETTE_IMAGE = presentationAsset.getUrl('nimfomane-demo-woman-silhouette.jpg');
+const BIKINI_LINE_ART_ALT_IMAGE = presentationAsset.getUrl('nimfomane-demo-bikini-line-art-alt.jpg');
+const WOMAN_PORTRAIT_IMAGE = presentationAsset.getUrl('nimfomane-demo-woman-portrait.jpg');
 const FORUM_URL = 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/';
 
 type NimfomaneDemoProps = {
@@ -353,7 +354,7 @@ const NimfomaneSite: React.FC<{
   return (
     <div className={`${styles.site} ipsApp`} dir="ltr">
       <div className={styles.siteHeader}>
-        <img className={styles.siteHeaderLogo} src="/nimfomane-logo.png" alt="nimfomane" />
+         <img className={styles.siteHeaderLogo} src={presentationAsset.getUrl('nimfomane-logo.png')} alt="nimfomane" />
         <span>demo</span>
       </div>
       <div className="ipsLayout_container">
