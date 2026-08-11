@@ -749,6 +749,7 @@ export const WWStorage = {
 
     let orphanedPhoneReferencesRemoved = 0;
     let orphanedPhonesRemoved = 0;
+    const favoritePhones = new Set(WWStorage.getFavorites());
     Object.entries(remainingItems).forEach(([key, value]) => {
       const match = key.match(/^ww2:phone:(.+)$/);
       if (!match) {
@@ -756,6 +757,10 @@ export const WWStorage = {
       }
 
       const phone = match[1];
+      if (favoritePhones.has(phone)) {
+        return;
+      }
+
       const phoneItem: PhoneItem = JSON.parse(value);
       const ads = Array.isArray(phoneItem.ads) ? phoneItem.ads : [];
 

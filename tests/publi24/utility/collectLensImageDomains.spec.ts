@@ -92,7 +92,7 @@ async function resolveLensPage(
   }
 }
 
-test.only('Collect Lens image domains.', async ({ page, context }, testInfo) => {
+test.skip('Collect Lens image domains.', async ({ page, context }, testInfo) => {
   testInfo.setTimeout(60000 * 60 * 6);
 
   const checkedAds = loadCheckedAds();

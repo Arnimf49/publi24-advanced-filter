@@ -128,7 +128,7 @@ test('Should keep favorited phone in favorites list even when orphaned.', async 
   });
 
   expect(storageState.staleFavAd).toBeNull();
-  expect(storageState.phoneItem).toBeNull();
+  expect(storageState.phoneItem).not.toBeNull();
   expect(storageState.favorites).toContain('0700000003');
 });
 
