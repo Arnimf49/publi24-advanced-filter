@@ -227,10 +227,9 @@ test('Should merge unique local duplicates into inspector escorte results', asyn
 
   const modal = page.locator('[data-wwid="ads-modal"]');
   await expect(modal).toBeVisible();
-  await expect(modal.locator('[data-articleid]')).toHaveCount(1);
-
-  await modal.locator('[data-wwid="load-more"]').click();
   await expect(modal.locator('[data-articleid]')).toHaveCount(expectedCount);
+  await expect(modal.locator('[data-wwid="load-more"]')).not.toBeVisible();
+
   await expect(modal.locator('[data-wwid="count"]')).toHaveText(String(expectedCount));
   await expect(modal.locator(`[data-articleid="${adId}"]`)).toHaveCount(1);
   await expect(modal.locator(`[data-articleid="${localOnlyAdId}"]`)).toHaveCount(1);

@@ -84,12 +84,24 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
         const mergedSources = inspectorEscorteApi.mergeDuplicateSources(allInspectorAds, localAds);
 
         totalCountRef.current = mergedSources.inspectorAds.length + mergedSources.localOnlyAds.length;
-        pendingInspectorAdsRef.current = mergedSources.inspectorAds.slice(PAGE_SIZE);
-        pendingUuidsRef.current = mergedSources.localOnlyAds;
 
-        const firstBatch = mergedSources.inspectorAds.slice(0, PAGE_SIZE);
-        const {ads: items, errors} = await adData.loadInInspectorAdsData(firstBatch, phone, clean);
-        setListState({ads: items, breaks: [], errors});
+        const firstInspectorBatch = mergedSources.inspectorAds.slice(0, PAGE_SIZE);
+        const firstLocalBatch = mergedSources.localOnlyAds.slice(0, PAGE_SIZE - firstInspectorBatch.length);
+        pendingInspectorAdsRef.current = mergedSources.inspectorAds.slice(firstInspectorBatch.length);
+        pendingUuidsRef.current = mergedSources.localOnlyAds.slice(firstLocalBatch.length);
+
+        const [inspectorResult, localResult] = await Promise.all([
+          adData.loadInInspectorAdsData(firstInspectorBatch, phone, clean),
+          adData.loadInAdsData(firstLocalBatch, clean),
+        ]);
+        const localSectionBreak = inspectorResult.ads.length > 0 && localResult.ads.length > 0
+          ? [inspectorResult.ads.length]
+          : [];
+        setListState({
+          ads: [...inspectorResult.ads, ...localResult.ads],
+          breaks: localSectionBreak,
+          errors: [...inspectorResult.errors, ...localResult.errors],
+        });
       } else {
         pendingInspectorAdsRef.current = [];
         pendingUuidsRef.current = localAds.slice(PAGE_SIZE);
