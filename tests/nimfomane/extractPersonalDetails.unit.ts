@@ -18,6 +18,11 @@ const samples: Array<{file: string; expected: PersonalDetails}> = [
   {file: "sample10.txt", expected: {height: 170, weight: 58}},
   {file: "sample11.txt", expected: {age: 20, height: 160, weight: 50}},
   {file: "sample12.txt", expected: {age: 21, height: 160, weight: 50}},
+  {file: "sample13.txt", expected: {age: 29, height: 173, weight: 58}},
+  {file: "sample14.txt", expected: {age: 29, height: 173, weight: 58}},
+  {file: "sample15.txt", expected: {age: 30, height: 160}},
+  {file: "sample16.txt", expected: {age: 30, height: 160, weight: 80}},
+  {file: "sample17.txt", expected: {height: 155, weight: 48}},
 ];
 
 for (const sample of samples) {
