@@ -126,6 +126,12 @@
     transform: none;
   }
 
+  :global(body:not(.onMobile)) .globalButtonsContainer:not(.mobileGlobalButtons) .menuDropdown {
+    right: 15px;
+    left: auto;
+    transform: none;
+  }
+
   :global(body:not(.onMobile)) .globalButtonsContainer:not(.mobileGlobalButtons).globalButtonsCollapsed {
     transform: translateY(var(--global-buttons-height));
   }
