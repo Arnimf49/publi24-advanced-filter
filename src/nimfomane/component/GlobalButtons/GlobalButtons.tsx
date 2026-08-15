@@ -188,7 +188,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
 
       <button
         type="button"
-        className={styles.globalButtonsToggle}
+        className={`${styles.globalButtonsToggle} ${hasNewVersion && isCollapsed ? styles.globalButtonsToggleNewVersion : ''}`}
         onClick={onCollapseToggle}
         aria-expanded={!isCollapsed}
         aria-label={isCollapsed ? 'Afișează butoanele globale' : 'Ascunde butoanele globale'}

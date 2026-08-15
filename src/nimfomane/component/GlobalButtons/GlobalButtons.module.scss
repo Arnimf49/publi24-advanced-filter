@@ -98,6 +98,26 @@
   }
 }
 
+.globalButtonsContainer.globalButtonsCollapsed .globalButtonsToggle.globalButtonsToggleNewVersion {
+  background: linear-gradient(45deg, rgb(47 73 121), rgb(91 124 184), rgb(47 73 121));
+  background-size: 200% 200%;
+  animation: globalButtonsToggleVersionGradient 2.4s ease-in-out infinite;
+
+  &:hover {
+    background: linear-gradient(45deg, rgb(47 73 121), rgb(91 124 184), rgb(47 73 121));
+    background-size: 200% 200%;
+  }
+}
+
+@keyframes globalButtonsToggleVersionGradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
 .globalButtonsToggleIcon {
   width: 12.8px;
   height: 8px;
