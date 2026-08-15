@@ -102,9 +102,22 @@ function isExactMatchButtonSelected(button: HTMLElement): boolean {
 }
 
 function hasNoResults(): boolean {
-  return !!document.querySelector(
+  const hasErrorElement = document.querySelector(
     '[alt="Failure info image"], [alt="Imagine cu informații despre eroare"], [id="OotqVd"], [data-psd-lens-error-card]'
   );
+
+  if (hasErrorElement) {
+    return true;
+  }
+
+  const noExactMatchesTexts = [
+    'Nu au fost găsite potriviri exacte',
+    'No exact matches were found',
+  ];
+  return Array.from(document.querySelectorAll<HTMLElement>('[role="heading"]')).some(element => {
+    const text = element.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+    return noExactMatchesTexts.some(noExactMatchesText => text.includes(noExactMatchesText));
+  });
 }
 
 function isPubli24Result(result: ImageResult): boolean {
@@ -259,6 +272,12 @@ async function readImageLinks(isMobile: boolean, done: (results: ImageResult[]) 
     }
 
     const results = await waitForStableResults(isMobile, 150);
+
+    if (hasNoResults()) {
+      done([]);
+      return;
+    }
+
     done(filterPubli24AdPageResults(isMobile, results));
   } catch (error) {
     console.error("Error reading image links:", error);
