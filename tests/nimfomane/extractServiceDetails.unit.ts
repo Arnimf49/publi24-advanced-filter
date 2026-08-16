@@ -574,6 +574,18 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       },
     },
   },
+  {
+    file: "sample67.txt",
+    expected: {
+      baseRates: {'30m': 250, '1h': 500},
+      services: {
+        op: true, on: true, np: true, deepthroat: true, facesitting: true,
+        fk: true, cim: {extraCost: 100}, cob: true, massage: true, uro: true,
+        anal: false, hj: true, '69': true, gfe: true, ani: true, couples: true,
+        fingering: false,
+      },
+    },
+  },
 ];
 
 for (const sample of samples) {
@@ -582,7 +594,7 @@ for (const sample of samples) {
   });
 }
 
-for (const file of ["false-sample1.txt", "false-sample2.txt", "false-sample3.txt", "false-sample4.txt", "false-sample5.txt", "false-sample6.txt", "false-sample7.txt", "false-sample8.txt", "false-sample9.txt", "false-sample10.txt", "false-sample11.txt", "false-sample12.txt", "false-positive10.txt"]) {
+for (const file of ["false-sample1.txt", "false-sample2.txt", "false-sample3.txt", "false-sample4.txt", "false-sample5.txt", "false-sample6.txt", "false-sample7.txt", "false-sample8.txt", "false-sample9.txt", "false-sample10.txt", "false-sample11.txt", "false-sample12.txt", "false-sample13.txt", "false-positive10.txt"]) {
   test(`does not extract service details from ${file}`, () => {
     expect(escortInfoExtractor.extractServiceDetails(readSample(file))).toBeNull();
   });

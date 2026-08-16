@@ -130,6 +130,15 @@ function normalizePersonalDetails(details: PersonalDetails, contentDate?: number
     : {...details, age: adjustAgeToCurrentYear(details.age, contentDate)};
 }
 
+function bringsNewPersonalInformation(existing: PersonalDetails | undefined, incoming: PersonalDetails): boolean {
+  if (!existing) {
+    return true;
+  }
+
+  return (Object.keys(incoming) as Array<keyof PersonalDetails>)
+    .some(key => existing[key] === undefined && incoming[key] !== undefined);
+}
+
 function mergeDetails<T extends object>(details: T | undefined, incoming: T, preferIncoming: boolean): T {
   if (!details) {
     return incoming;
@@ -183,18 +192,21 @@ function collectText(
     ? normalizePersonalDetails(extractedPersonalDetails, effectiveContentDate)
     : null;
   if (personalDetails) {
-    const isPrimary = !details.personalDetailsRank
-      || comparePersonalRanks(sourceRank, details.personalDetailsRank) > 0;
-    recordSource(details.personalDetailsSourceUrls, sourceUrl, isPrimary);
-    details.personalDetails = mergeDetails(details.personalDetails, personalDetails, isPrimary);
-    if (isPrimary) {
-      details.personalDetailsSourceUrl = sourceUrl;
-      details.personalDetailsRank = sourceRank;
+    const bringsNewInformation = bringsNewPersonalInformation(details.personalDetails, personalDetails);
+    if (bringsNewInformation) {
+      const isPrimary = !details.personalDetailsRank
+        || comparePersonalRanks(sourceRank, details.personalDetailsRank) > 0;
+      recordSource(details.personalDetailsSourceUrls, sourceUrl, isPrimary);
+      details.personalDetails = mergeDetails(details.personalDetails, personalDetails, isPrimary);
+      if (isPrimary) {
+        details.personalDetailsSourceUrl = sourceUrl;
+        details.personalDetailsRank = sourceRank;
+      }
+      details.personalDetailsContentDate = Math.max(
+        details.personalDetailsContentDate || 0,
+        effectiveContentDate || 0,
+      ) || undefined;
     }
-    details.personalDetailsContentDate = Math.max(
-      details.personalDetailsContentDate || 0,
-      effectiveContentDate || 0,
-    ) || undefined;
   }
 
   if (details.serviceDetailsSourceUrls.length < MAX_SERVICE_SOURCES) {

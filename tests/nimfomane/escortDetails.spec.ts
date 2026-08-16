@@ -129,7 +129,7 @@ test('Should display multiple sources and details found in profile interest and 
 
   await openDetails(page);
 
-  await expect(page.locator('[data-wwid="personal-details-meta"] a')).toHaveCount(2);
+  await expect(page.locator('[data-wwid="personal-details-meta"] a')).toHaveCount(1);
   await expect(page.locator('[data-wwid="service-details-meta"] a')).toHaveCount(2);
   for (const link of await page.locator('[data-wwid="personal-details-meta"] a').all()) {
     await expect(link).toHaveAttribute('href', /nimfomane\.com\/forum\//);

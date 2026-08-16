@@ -132,6 +132,10 @@ const ANAL_EXCLUSION = /\bexclus(?:iv|a|e)?\b[^\n.;]{0,100}\b(?:sex\s+)?anal\b/i
 const NEGATIVE_EMOJIS = /[❌✖✘❎🚫⛔🛑]/u;
 const RATE_DURATION_WORDS = /\b(?:min(?:ute)?s?|mi|h(?:r)?|ore?|ora)\b|'/i;
 
+function isPriceAmount(amount: number): boolean {
+  return amount % 10 === 0;
+}
+
 function normalizeText(text: string): string {
   const compatibilityText = text.normalize('NFKC').replace(/./gu, character => SMALL_CAPS[character as keyof typeof SMALL_CAPS] || character);
   return compatibilityText.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
@@ -488,7 +492,7 @@ function amountMatches(line: string): Array<{amount: number; index: number}> {
     const amountText = match[1];
     const matchStart = match.index ?? 0;
     const index = matchStart + match[0].indexOf(amountText);
-    if (!isPhoneNumberPart(index)) {
+    if (!isPhoneNumberPart(index) && isPriceAmount(Number.parseInt(amountText.replace(/[.,]/g, ''), 10))) {
       matches.push({amount: Number.parseInt(amountText.replace(/[.,]/g, ''), 10), index});
     }
   }
@@ -507,7 +511,7 @@ function amountMatches(line: string): Array<{amount: number; index: number}> {
       const precedingText = line.slice(Math.max(0, index - 20), index);
       const extendedPrecedingText = line.slice(Math.max(0, index - 80), index);
       const followingText = line.slice(matchStart + match[0].length, matchStart + match[0].length + 15);
-      if (match[5] && /^(?:30|60|90|120)$/.test(amountText) && /^(?:\s*[-–:]?\s*)?(?:30|60|90|120)?\s*(?:de\s*)?(?:min|minute|mi|h|ora)/i.test(followingText)) {
+      if (/^(?:30|60|90|120)$/.test(amountText) && /^(?:\s*[-–:]?\s*)?(?:30|60|90|120)?\s*(?:de\s*)?(?:min|minute|mi|h|ora)/i.test(followingText)) {
         continue;
       }
       if (/(?:\+|extra|in\s+plus)\s*$/i.test(precedingText) || /\b(?:cim|cof|cob)\s*\([^)]*\)\s*-\s*$/i.test(extendedPrecedingText) || /^\s*(?:de\s*)?(?:lei|ron)?\s*(?:extra|in\s+plus)\b/i.test(followingText)) {
@@ -519,14 +523,16 @@ function amountMatches(line: string): Array<{amount: number; index: number}> {
       if (/\bfinaliz\w*[^\d]{0,12}:\s*$/i.test(extendedPrecedingText)) {
         continue;
       }
-      matches.push({amount: Number.parseInt(amountText, 10), index});
+      if (isPriceAmount(Number.parseInt(amountText, 10))) {
+        matches.push({amount: Number.parseInt(amountText, 10), index});
+      }
     }
   }
 
   for (const match of line.matchAll(/\b(\d{2,5})\s*nr\b/gi)) {
     const amountText = match[1];
     const index = (match.index ?? 0) + match[0].indexOf(amountText);
-    if (!isPhoneNumberPart(index) && !matches.some(existing => existing.index === index)) {
+    if (!isPhoneNumberPart(index) && isPriceAmount(Number.parseInt(amountText, 10)) && !matches.some(existing => existing.index === index)) {
       matches.push({amount: Number.parseInt(amountText, 10), index});
     }
   }
@@ -534,7 +540,7 @@ function amountMatches(line: string): Array<{amount: number; index: number}> {
   for (const match of line.matchAll(/\b(\d{2,5})\s*\(\s*1\s*-\s*2\s+finalizar\w*/gi)) {
     const amountText = match[1];
     const index = (match.index ?? 0) + match[0].indexOf(amountText);
-    if (!isPhoneNumberPart(index) && !matches.some(existing => existing.index === index)) {
+    if (!isPhoneNumberPart(index) && isPriceAmount(Number.parseInt(amountText, 10)) && !matches.some(existing => existing.index === index)) {
       matches.push({amount: Number.parseInt(amountText, 10), index});
     }
   }
@@ -542,7 +548,7 @@ function amountMatches(line: string): Array<{amount: number; index: number}> {
   for (const match of line.matchAll(/\b(\d{2,5})\s+\d+\s*fin(?:alizar\w*)?\s*\/\s*(?:30|60|90|120)\s*min\b/gi)) {
     const amountText = match[1];
     const index = (match.index ?? 0) + match[0].indexOf(amountText);
-    if (!isPhoneNumberPart(index) && !matches.some(existing => existing.index === index)) {
+    if (!isPhoneNumberPart(index) && isPriceAmount(Number.parseInt(amountText, 10)) && !matches.some(existing => existing.index === index)) {
       matches.push({amount: Number.parseInt(amountText, 10), index});
     }
   }
@@ -574,6 +580,12 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
     }
 
     const isOutcallLine = inOutcallSection || /\b(?:out\s*call|hotel|deplasar)\w*/i.test(line);
+    const isAvailabilityLine = /\b(?:disponibil\w*|program\w*|pana\s+la)\b.*\b(?:ora|h)\b/i.test(line)
+      && !/\b(?:lei|ron|pret\w*|tarif\w*|finaliz\w*|fin)\b/i.test(line);
+    if (isAvailabilityLine) {
+      continue;
+    }
+
     const isRateLine = /(?:\b(?:lei|ron|pret|preturi|tarif|cadou\w*|price|finaliz\w*|fin\b|\d+\s*(?:min|minute|mi|h|hr|ora|ore))\b|\b\d{2,5}\s*(?:lei|ron)\b|\d{2,5}\s*nr\b|')/i.test(line)
       || (isOutcallLine && /\b(?:ora|h)\s+\d{2,5}\b/i.test(line));
     if (!isRateLine) {
@@ -586,7 +598,7 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
       ? directOutcallHours
         .map(match => Number.parseInt(match[1], 10))
         .reverse()
-        .find(amount => amount >= 50)
+        .find(amount => amount >= 50 && isPriceAmount(amount))
       : undefined;
     if (directOutcallAmount !== undefined && directOutcallAmount >= 50) {
       outcallCandidates['1h'] = [...(outcallCandidates['1h'] || []), directOutcallAmount];
@@ -603,11 +615,17 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
     const moneyMatches = amountMatches(baseRateLine);
     const compactFinalizationRates = /\bfin\w*\s+(\d{2,5})\s+ora\s+(\d{2,5})\b/i.exec(baseRateLine);
     if (compactFinalizationRates && !isOutcallLine) {
-      baseCandidates['30m'] = [...(baseCandidates['30m'] || []), Number.parseInt(compactFinalizationRates[1], 10)];
-      baseCandidates['1h'] = [...(baseCandidates['1h'] || []), Number.parseInt(compactFinalizationRates[2], 10)];
+      const shortRate = Number.parseInt(compactFinalizationRates[1], 10);
+      const hourRate = Number.parseInt(compactFinalizationRates[2], 10);
+      if (isPriceAmount(shortRate)) {
+        baseCandidates['30m'] = [...(baseCandidates['30m'] || []), shortRate];
+      }
+      if (isPriceAmount(hourRate)) {
+        baseCandidates['1h'] = [...(baseCandidates['1h'] || []), hourRate];
+      }
     }
     const splitFinalizationsRate = /\b(\d{2,5})\s*(?:lei|ron)\s+1\s*\/\s*2\s+fin\w*\s+(?:in|de)\s+60\s*['’]/i.exec(baseRateLine);
-    if (splitFinalizationsRate && !isOutcallLine) {
+    if (splitFinalizationsRate && !isOutcallLine && isPriceAmount(Number.parseInt(splitFinalizationsRate[1], 10))) {
       baseCandidates['1h'] = [...(baseCandidates['1h'] || []), Number.parseInt(splitFinalizationsRate[1], 10)];
     }
     for (const money of moneyMatches) {
@@ -616,7 +634,7 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
       const outcallIndex = Math.max(prefix.lastIndexOf('outcall'), prefix.lastIndexOf('out call'), prefix.lastIndexOf('hotel'), prefix.lastIndexOf('deplasar'));
       const serviceContextIndex = Math.max(prefix.lastIndexOf('servici'), prefix.lastIndexOf('pret'), prefix.lastIndexOf('cadou'));
       const isOutcall = isOutcallLine && (inOutcallSection || (outcallIndex > serviceContextIndex && money.index - outcallIndex <= 70));
-      if (isOutcall && money.amount < 50) {
+      if (!isPriceAmount(money.amount) || isOutcall && money.amount < 50) {
         continue;
       }
       const finalizationIndex = line.search(/\b(?:finalizare|fin)\w*/i);
