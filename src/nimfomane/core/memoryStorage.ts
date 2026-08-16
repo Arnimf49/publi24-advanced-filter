@@ -4,6 +4,7 @@ export interface TopicMemoryState {
 
 export interface EscortMemoryState {
   escortAnalysisError: string | null;
+  profileStatsError: string | null;
 }
 
 const _NIMFO_TOPIC_MEMORY_STORE: Record<string, TopicMemoryState> = {};
@@ -17,6 +18,7 @@ const getEmptyTopicState = (): TopicMemoryState => ({
 
 const getEmptyEscortState = (): EscortMemoryState => ({
   escortAnalysisError: null,
+  profileStatsError: null,
 });
 
 export const NimfomaneMemoryStorage = {
@@ -43,6 +45,12 @@ export const NimfomaneMemoryStorage = {
   setEscortAnalysisError(user: string, error: string | null): void {
     const state = NimfomaneMemoryStorage.getEscortState(user);
     state.escortAnalysisError = error;
+    NimfomaneMemoryStorage.triggerEscortMemoryChanged(user);
+  },
+
+  setProfileStatsError(user: string, error: string | null): void {
+    const state = NimfomaneMemoryStorage.getEscortState(user);
+    state.profileStatsError = error;
     NimfomaneMemoryStorage.triggerEscortMemoryChanged(user);
   },
 

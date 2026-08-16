@@ -125,3 +125,50 @@ test('Should display no image or error icon if the case.', async ({ page }) => {
 
   await expect(imageSection.locator('[data-wwid="image-error-icon"]')).toBeVisible({timeout: 5000});
 });
+
+test('Should separate inactive favorites by last activity and removed profiles.', async ({ page }) => {
+  await utilsNimfomane.open(page);
+
+  const first = await utilsNimfomane.getNthTopic(page, 0);
+  const second = await utilsNimfomane.getNthTopic(page, 1);
+  const third = await utilsNimfomane.getNthTopic(page, 2);
+
+  for (const escort of [first, second, third]) {
+    await page.locator(`[data-wwtopic="${escort.id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
+  }
+
+  await utilsNimfomane.setEscortStorageProp(
+    page,
+    first.user,
+    'profileStats',
+    {lastVisited: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString()},
+  );
+  await utilsNimfomane.setEscortStorageProp(page, first.user, 'isUnverified', true);
+  await utilsNimfomane.setEscortStorageProp(page, first.user, 'profileStatsTime', Date.now());
+  await utilsNimfomane.setEscortStorageProp(page, second.user, 'profileNotFound', true);
+  await utilsNimfomane.setEscortStorageProp(page, second.user, 'profileStatsTime', Date.now());
+  await utilsNimfomane.setEscortStorageProp(
+    page,
+    third.user,
+    'profileStats',
+    {lastVisited: new Date(Date.now() - 60 * 60 * 1000).toISOString()},
+  );
+  await utilsNimfomane.setEscortStorageProp(page, third.user, 'profileStatsTime', Date.now());
+  await utilsNimfomane.throttleReload(page);
+  await page.locator('[data-wwid="favs-button"]').click();
+
+  await expect(page.locator('[data-wwid="toggle-active"]')).toHaveText('Active (1)');
+  await expect(page.locator('[data-wwid="toggle-inactive"]')).toHaveText('Inactive (2)');
+  const activeCards = page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-card"]');
+  await expect(activeCards).toHaveCount(1);
+  await expect(activeCards.locator('[data-wwid="escort-name"]')).toHaveText(third.user);
+  await expect(activeCards.locator('[data-wwid="escort-name"]')).not.toHaveText(first.user);
+  await expect(activeCards.locator('[data-wwid="escort-name"]')).not.toHaveText(second.user);
+
+  await page.locator('[data-wwid="toggle-inactive"]').click();
+  const inactiveCards = page.locator('[data-wwid="inactive"] [data-wwid="escort-card"]');
+  await expect(inactiveCards).toHaveCount(2);
+  await expect(inactiveCards.locator('[data-wwid="escort-name"]', {hasText: first.user})).toHaveCount(1);
+  await expect(inactiveCards.locator('[data-wwid="escort-name"]', {hasText: second.user})).toHaveCount(1);
+  await expect(inactiveCards.locator('[data-wwid="escort-name"]', {hasText: third.user})).toHaveCount(0);
+});

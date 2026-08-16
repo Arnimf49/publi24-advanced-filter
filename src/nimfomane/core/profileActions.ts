@@ -1,8 +1,9 @@
 import {elementHelpers} from "./elementHelpers";
 import {NimfomaneStorage, EscortItem} from "./storage";
 import {cityService} from "./cityService";
-import {page} from "../../common/page";
+import {page, BrowserError} from "../../common/page";
 import {jsonPage} from "./jsonPage";
+import {NimfomaneMemoryStorage} from "./memoryStorage";
 
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
@@ -61,9 +62,12 @@ export const profileActions = {
 
   async loadProfileStats(user: string, profileUrl: string, priority: number = 110): Promise<void> {
     const contentUrl = profileUrl.replace(/\/$/, '') + '/content/?all_activity=1&listResort=1';
+    let profileLoaded = false;
+    NimfomaneMemoryStorage.setProfileStatsError(user, null);
 
     const profilePromise = page.load(profileUrl, {priority}).then(doc => {
       const stats: EscortItem['profileStats'] = {};
+      profileLoaded = true;
 
       const profileStatsDiv = doc.querySelector('#elProfileStats');
       if (profileStatsDiv) {
@@ -81,7 +85,20 @@ export const profileActions = {
 
       const existing = NimfomaneStorage.getEscort(user).profileStats || {};
       NimfomaneStorage.setEscortProp(user, 'profileStats', {...existing, ...stats});
-    }).catch(error => console.error(`Error loading profile page for ${user}:`, error));
+      NimfomaneStorage.setEscortProp(user, 'profileNotFound', undefined);
+      NimfomaneMemoryStorage.setProfileStatsError(user, null);
+      NimfomaneStorage.setEscortProp(
+        user,
+        'isUnverified',
+        elementHelpers.isNeverificataProfilePage(doc) ? true : undefined,
+      );
+    }).catch(error => {
+      if ((error as BrowserError).code === 404) {
+        NimfomaneStorage.setEscortProp(user, 'profileNotFound', true);
+      }
+      NimfomaneMemoryStorage.setProfileStatsError(user, error instanceof Error ? error.message : String(error));
+      console.error(`Error loading profile page for ${user}:`, error);
+    });
 
     const contentPromise = jsonPage.load(contentUrl, {priority}).then(doc => {
       const currentCity = findCurrentCity(doc);
@@ -92,7 +109,9 @@ export const profileActions = {
     }).catch(error => console.error(`Error loading content page for ${user}:`, error));
 
     await Promise.all([profilePromise, contentPromise]);
-    NimfomaneStorage.setEscortProp(user, 'profileStatsTime', Date.now());
+    if (profileLoaded) {
+      NimfomaneStorage.setEscortProp(user, 'profileStatsTime', Date.now());
+    }
   },
 
   async refreshFavoritesProfileStats() {

@@ -31,6 +31,8 @@ export interface EscortItem {
     };
   };
   profileStatsTime?: number;
+  profileNotFound?: true;
+  isUnverified?: true;
   personalDetails?: PersonalDetails;
   personalDetailsSourceUrl?: string;
   personalDetailsSourceUrls?: string[];

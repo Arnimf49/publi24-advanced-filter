@@ -40,8 +40,8 @@ export const EscortCardRoot: React.FC<EscortCardRootProps> = ({user, index}) => 
 
   const profileUrl = escort.profileLink || `https://www.nimfomane.com/forum/profile/${encodeURIComponent(user)}/`;
   const isImageLoading = escort.optimizedProfileImage === undefined && !escortMemoryState.escortAnalysisError;
-  const isStatsLoading = !escort.profileStatsTime;
-  const isStatsStale = profileActions.isProfileStatsStale(user);
+  const isStatsLoading = !escort.profileStatsTime && !escortMemoryState.profileStatsError;
+  const isStatsStale = !escortMemoryState.profileStatsError && profileActions.isProfileStatsStale(user);
   const lastVisitedLabel = escort.profileStats?.lastVisited
     ? dateLib.getRelativeTime(escort.profileStats.lastVisited)
     : null;

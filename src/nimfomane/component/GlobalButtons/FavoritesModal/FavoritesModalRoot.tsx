@@ -6,12 +6,14 @@ import { cityService } from '../../../core/cityService';
 import { profileActions } from '../../../core/profileActions';
 import EscortCardRoot from './EscortCardRoot';
 
+const INACTIVE_AFTER_MS = 14 * 24 * 60 * 60 * 1000;
+
 type FavoritesModalRootProps = {
   onClose: () => void;
 };
 
 const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<string[]>(() => NimfomaneStorage.getFavorites());
   const [escortVersion, setEscortVersion] = useState(0);
 
   const fetchData = useCallback(() => {
@@ -37,8 +39,12 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
 
     const favUsers = NimfomaneStorage.getFavorites();
     favUsers.forEach(user => {
-      if (profileActions.hasNeverLoadedProfileStats(user) || profileActions.isProfileStatsStale(user)) {
-        const escort = NimfomaneStorage.getEscort(user);
+      const escort = NimfomaneStorage.getEscort(user);
+      if (
+        profileActions.hasNeverLoadedProfileStats(user) ||
+        profileActions.isProfileStatsStale(user) ||
+        escort.profileNotFound === undefined
+      ) {
         const profileUrl = escort.profileLink || `https://www.nimfomane.com/forum/profile/${encodeURIComponent(user)}/`;
         profileActions.loadProfileStats(user, profileUrl).catch(console.error);
       }
@@ -57,15 +63,36 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
 
   const currentCity = useMemo(() => cityService.getCurrentCity(), []);
 
+  const { activeFavorites, inactiveEscorts } = useMemo(() => {
+    const active: string[] = [];
+    const inactive: string[] = [];
+
+    favorites.forEach((user) => {
+      const escort = NimfomaneStorage.getEscort(user);
+      const lastVisited = escort.profileStats?.lastVisited;
+      const isInactiveByDate = escort.isUnverified === true && lastVisited
+        ? Date.now() - new Date(lastVisited).getTime() >= INACTIVE_AFTER_MS
+        : false;
+
+      if (escort.profileNotFound || isInactiveByDate) {
+        inactive.push(user);
+      } else {
+        active.push(user);
+      }
+    });
+
+    return {activeFavorites: active, inactiveEscorts: inactive};
+  }, [favorites, escortVersion]);
+
   const { inLocationEscorts, otherLocationEscorts } = useMemo(() => {
     if (!currentCity) {
-      return { inLocationEscorts: favorites, otherLocationEscorts: [] };
+      return { inLocationEscorts: activeFavorites, otherLocationEscorts: [] };
     }
 
     const inLocation: string[] = [];
     const otherLocation: string[] = [];
 
-    favorites.forEach((user) => {
+    activeFavorites.forEach((user) => {
       const escort = NimfomaneStorage.getEscort(user);
       const escortCity = escort.profileStats?.currentCity?.name;
 
@@ -77,7 +104,7 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
     });
 
     return { inLocationEscorts: inLocation, otherLocationEscorts: otherLocation };
-  }, [favorites, currentCity, escortVersion]);
+  }, [activeFavorites, currentCity, escortVersion]);
 
   const handleClearFavorites = useCallback(() => {
     NimfomaneStorage.clearFavorites();
@@ -91,6 +118,7 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
       favorites={favorites}
       inLocationEscorts={inLocationEscorts}
       otherLocationEscorts={otherLocationEscorts}
+      inactiveEscorts={inactiveEscorts}
       currentCity={currentCity}
        renderEscort={(user, index) => <EscortCardRoot user={user} index={index} />}
     />

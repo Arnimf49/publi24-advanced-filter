@@ -11,6 +11,7 @@ type FavoritesModalProps = {
   favorites: string[];
   inLocationEscorts: string[];
   otherLocationEscorts: string[];
+  inactiveEscorts: string[];
   currentCity: string | null;
   renderEscort: (user: string, index: number) => React.ReactNode;
 };
@@ -22,6 +23,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
   favorites = [],
   inLocationEscorts,
   otherLocationEscorts,
+  inactiveEscorts,
   currentCity,
   renderEscort,
 }) => {
@@ -29,6 +31,11 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
   const deleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const isEmpty = favorites.length === 0;
+  const activeCount = inLocationEscorts.length + otherLocationEscorts.length;
+  const inactiveCount = inactiveEscorts.length;
+  const [activeTab, setActiveTab] = useState<'active' | 'inactive'>('active');
+  const isActiveEmpty = activeCount === 0;
+  const isInactiveEmpty = inactiveCount === 0;
 
   const handleClearClick: MouseEventHandler = (event) => {
     event.stopPropagation();
@@ -65,11 +72,49 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
         color="rgb(137, 71, 97)"
         maxWidth={650}
       >
+        {!isEmpty && (
+          <div className={styles.toggleButtons}>
+            <button
+              type="button"
+              className={`${styles.toggleButton} ${activeTab === 'active' ? styles.active : ''}`}
+              onClick={() => setActiveTab('active')}
+              data-wwid="toggle-active"
+            >
+              <b>Active</b> <span className={styles.count}>({activeCount})</span>
+            </button>
+            <button
+              type="button"
+              className={`${styles.toggleButton} ${activeTab === 'inactive' ? styles.active : ''}`}
+              onClick={() => setActiveTab('inactive')}
+              data-wwid="toggle-inactive"
+            >
+              <b>Inactive</b> <span className={styles.count}>({inactiveCount})</span>
+            </button>
+          </div>
+        )}
+
         {isEmpty ? (
           <p className={styles.emptyMessage}>
             Nu ai încă escorte favorite. Apasă pe butonul cu steluța pe anunț ca să le adaugi aici.
           </p>
-        ) : currentCity && (inLocationEscorts.length > 0 || otherLocationEscorts.length > 0) ? (
+        ) : activeTab === 'inactive' ? (
+          isInactiveEmpty ? (
+            <p className={styles.emptyMessage}>Nu sunt escorte inactive favorite.</p>
+          ) : (
+            <div className={styles.section} data-wwid="inactive">
+              <h4 className={styles.favoritesSectionHeader}>
+                Inactive <span className={styles.count}>({inactiveCount})</span>
+              </h4>
+              <div className={styles.escortsList}>
+                {inactiveEscorts.map((user, index) => (
+                  <React.Fragment key={user}>{renderEscort(user, index)}</React.Fragment>
+                ))}
+              </div>
+            </div>
+          )
+        ) : isActiveEmpty ? (
+          <p className={styles.emptyMessage}>Nu ai escorte active favorite.</p>
+        ) : currentCity ? (
           <>
             {inLocationEscorts.length > 0 && (
               <div className={styles.section}>
@@ -99,7 +144,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
           </>
         ) : (
           <div className={styles.escortsList}>
-            {favorites.map((user, index) => (
+            {inLocationEscorts.map((user, index) => (
               <React.Fragment key={user}>{renderEscort(user, index)}</React.Fragment>
             ))}
           </div>
