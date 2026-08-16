@@ -8,6 +8,21 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.7',
+    releaseDate: '17 august 2026',
+    changeNew: [
+      'Extragere și afișare date personale și date despre servicii, pentru profile de escortă.',
+      'Categorizare profile active și inactive în favorite.'
+    ],
+    changeImprove: [
+      'Animație pe butonul global cel închis, cănd este o versiune nouă.'
+    ],
+    changeFix: [
+      'Poziționare greșită a meniului pe anumite ecrane, cu poziția nouă a butoanelor globale.',
+      'Pe profile \'neverificate\' nu se afișa panoul de butoane.'
+    ]
+  },
+  {
     version: '3.6',
     releaseDate: '11 august 2026',
     changeNew: [
