@@ -24,6 +24,7 @@ const samples: Array<{file: string; expected: PersonalDetails}> = [
   {file: "sample16.txt", expected: {age: 30, height: 160, weight: 80}},
   {file: "sample17.txt", expected: {height: 155, weight: 48}},
   {file: "sample18.txt", expected: {age: 35, height: 165, weight: 52}},
+  {file: "sample19.txt", expected: {age: 30, height: 160}},
 ];
 
 for (const sample of samples) {
@@ -32,7 +33,7 @@ for (const sample of samples) {
   });
 }
 
-for (const file of ["false-sample1.txt", "false-sample.txt"]) {
+for (const file of ["false-sample1.txt", "false-sample.txt", "false-sample2.txt", "false-sample3.txt", "false-sample4.txt", "false-sample5.txt", "false-sample6.txt"]) {
   test(`does not extract personal details from ${file}`, () => {
     expect(escortInfoExtractor.extractPersonalDetails(readSample(file))).toBeNull();
   });

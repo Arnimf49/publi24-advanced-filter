@@ -119,7 +119,6 @@
 
 .statusRow {
   display: flex;
-  flex-direction: column;
   align-items: center;
   flex-shrink: 0;
   color: #555;
@@ -127,6 +126,7 @@
 }
 
 .collectionMeta {
+  align-self: flex-end;
   color: #777;
   font-size: 12px;
   white-space: nowrap;
@@ -135,8 +135,10 @@
 .loadingState {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  text-align: right;
+  width: 100%;
+  text-align: center;
 }
 
 .refreshButton {
@@ -185,13 +187,7 @@
   }
 
   .detailsHeader {
-    align-items: flex-start;
-    flex-direction: column;
     gap: 8px;
-  }
-
-  .statusRow {
-    align-items: flex-start;
   }
 
   .identity {
@@ -203,13 +199,7 @@
   }
 
   .loadingState {
-    width: 100%;
     gap: 7px;
-    text-align: left;
-  }
-
-  .loadingState span {
-    max-width: 170px;
   }
 
   .detailsTable {

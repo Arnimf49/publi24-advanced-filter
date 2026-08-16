@@ -77,6 +77,18 @@ function getSignatureSourceUrl(post: Element, fallbackUrl: string): string {
   return sourceUrl.toString();
 }
 
+function getLinkedCommentPost(doc: Document, url: string): HTMLElement | null {
+  const commentId = new URL(url).searchParams.get('comment');
+  if (!commentId || !/^\d+$/.test(commentId)) {
+    return null;
+  }
+
+  const commentWrap = doc.getElementById(`comment-${commentId}_wrap`);
+  const commentElement = doc.getElementById(`elComment_${commentId}`);
+  const comment = commentWrap || commentElement;
+  return comment?.closest<HTMLElement>('.cPost, .ipsComment') || null;
+}
+
 function collectText(text: string, sourceUrl: string, contentDate: number | undefined, details: CollectedDetails): void {
   const effectiveContentDate = isProfileUrl(sourceUrl) ? undefined : contentDate;
 
@@ -239,21 +251,20 @@ async function collectEscortDetails(user: string, profileUrl: string, priority: 
     return;
   }
 
-  const activityLink = profilePage.querySelector<HTMLAnchorElement>('#elProfileActivityOverview .ipsStreamItem_title a');
+  const activityTitle = profilePage.querySelector<HTMLElement>('.ipsStreamItem_title');
+  const activityLink = activityTitle?.querySelector<HTMLAnchorElement>('[href]');
   if (activityLink) {
-    const activityPage = await page.load(resolveUrl(activityLink.getAttribute('href')!, profileUrl), {priority});
-    const matchingPosts = Array.from(activityPage.querySelectorAll<HTMLElement>('.cPost, .ipsComment')).filter(post => {
-      const author = post.querySelector<HTMLElement>('.cAuthorPane_author');
-      const authorName = author?.querySelector('a')?.textContent?.trim() || author?.textContent?.trim();
-      return authorName === user;
-    });
-    const lastPost = matchingPosts[matchingPosts.length - 1];
-    const signature = lastPost?.querySelector('[data-role="memberSignature"]');
+    const activityUrl = resolveUrl(activityLink.getAttribute('href')!, profileUrl);
+    const activityPage = await page.load(activityUrl, {priority});
+    const linkedPost = getLinkedCommentPost(activityPage, activityUrl);
+    const signatures = linkedPost?.querySelectorAll('[data-role="memberSignature"]') || [];
+    const signature = signatures[0];
     if (signature) {
-      const signaturePost = signature.closest<HTMLElement>('[data-commentid]') || lastPost!;
+      const signaturePost = signature.closest<HTMLElement>('[data-commentid]') || linkedPost!;
+      const sourceUrl = getSignatureSourceUrl(signaturePost, profileUrl);
       collectText(
         signature.textContent || '',
-        getSignatureSourceUrl(signaturePost, profileUrl),
+        sourceUrl,
         getPostDate(signaturePost),
         details,
       );

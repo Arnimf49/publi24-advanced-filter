@@ -54,6 +54,9 @@ const SERVICE_LABELS: Record<EscortServiceName, string> = {
   cof: 'COF',
   cob: 'COB',
   massage: 'masaj',
+  uro: 'URO',
+  squirt: 'squirt',
+  rolePlay: 'role play',
   ap: 'AP',
   anal: 'AP',
   hj: 'HJ',
@@ -77,9 +80,9 @@ const SERVICE_GROUPS: Array<{label: string; services: EscortServiceName[]}> = [
   {label: 'Finalizare', services: ['cim', 'cob', 'cof']},
   {label: 'Anal', services: ['ap', 'anal']},
   {label: 'Sărut', services: ['fk']},
+  {label: 'Comportament', services: ['gfe', 'pse', 'rolePlay']},
   {label: 'Masaj', services: ['massage', 'prostateMassage']},
-  {label: 'Comportament', services: ['gfe', 'pse']},
-  {label: 'Altele', services: ['hj', '69', 'cuni', 'ani', '3some', 'couples', 'lesbyShow', 'shower', 'bdsm', 'footfetish']},
+  {label: 'Altele', services: ['hj', '69', 'cuni', 'ani', '3some', 'couples', 'lesbyShow', 'shower', 'bdsm', 'footfetish', 'uro', 'squirt']},
 ];
 
 function formatRelativeTime(timestamp?: number): string | null {
@@ -88,17 +91,6 @@ function formatRelativeTime(timestamp?: number): string | null {
 
 function formatRate(rate?: number): string {
   return rate === undefined ? '-' : `${rate} lei`;
-}
-
-function formatRateList(rates?: EscortRates): string {
-  if (!rates) {
-    return '-';
-  }
-
-  const values = RATE_ROWS
-    .filter(row => rates[row.key] !== undefined)
-    .map(row => `${row.label}: ${formatRate(rates[row.key])}`);
-  return values.length ? values.join(', ') : '-';
 }
 
 function formatService(service: EscortServiceName, value: ServiceAvailability): {label: string; className: string; extraCost?: number} {
@@ -167,6 +159,14 @@ const RatesTable: React.FC<{details: ServiceDetails}> = ({details}) => {
                 {details.baseRates[row.key] !== undefined && formatRate(details.baseRates[row.key])}
                 {details.baseRates[row.key] !== undefined && details.outcallRates?.[row.key] !== undefined && ' · '}
                 {details.outcallRates?.[row.key] !== undefined && `deplasare: ${formatRate(details.outcallRates[row.key])}`}
+                {details.rateOverrides?.map(override => {
+                  const rate = override.rates?.[row.key];
+                  if (rate === undefined) {
+                    return null;
+                  }
+
+                  return <span key={override.after}> · după {override.after}: {formatRate(rate)}</span>;
+                })}
               </td>
             </tr>
           ))}
@@ -176,8 +176,8 @@ const RatesTable: React.FC<{details: ServiceDetails}> = ({details}) => {
   );
 };
 
-const RateOverridesTable: React.FC<{details: ServiceDetails}> = ({details}) => {
-  if (!details.rateOverrides?.length) {
+const ScheduleTable: React.FC<{details: ServiceDetails}> = ({details}) => {
+  if (!details.schedule?.length) {
     return null;
   }
 
@@ -185,10 +185,10 @@ const RateOverridesTable: React.FC<{details: ServiceDetails}> = ({details}) => {
     <div className={styles.subsection}>
       <table className={styles.detailsTable}>
         <tbody>
-          {details.rateOverrides.map(override => (
-            <tr key={override.after}>
-              <th>{override.after}</th>
-              <td>{formatRateList(override.rates)}</td>
+          {details.schedule.map(schedule => (
+            <tr key={`${schedule.days || 'all'}-${schedule.start}-${schedule.end}`}>
+              <th>Program</th>
+              <td>{schedule.days ? `${schedule.days}: ` : ''}{schedule.start} - {schedule.end}</td>
             </tr>
           ))}
         </tbody>
@@ -250,7 +250,7 @@ const ServiceDetailsSection: React.FC<{details: ServiceDetails; escort: EscortIt
       </div>
     </div>
     <RatesTable details={details} />
-    <RateOverridesTable details={details} />
+    <ScheduleTable details={details} />
     <ServicesTable details={details} />
   </section>
 );
@@ -291,31 +291,30 @@ const EscortDetailsModal: React.FC<EscortDetailsModalProps> = ({
                 <a href={profileUrl} target="_blank" rel="noopener noreferrer">{user}</a>
               </h3>
             </div>
-            <div className={styles.statusRow} data-wwid="escort-details-status">
-              {isLoading ? (
-                <div className={styles.loadingState}>
-                  <InlineLoader color="#2f4979" size={14} />
-                  <span>Se analizează datele din postări..</span>
-                </div>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className={styles.refreshButton}
-                    onClick={onRefresh}
-                    data-wwid="escort-details-refresh"
-                  >
-                    actualizează
-                  </button>
-                  {escort.escortDetailsTime && (
-                    <span className={styles.collectionMeta}>
-                      date culese {formatRelativeTime(escort.escortDetailsTime)}
-                    </span>
-                  )}
-                </>
-              )}
-            </div>
+            {!isLoading && (
+              <div className={styles.statusRow} data-wwid="escort-details-status">
+                <button
+                  type="button"
+                  className={styles.refreshButton}
+                  onClick={onRefresh}
+                  data-wwid="escort-details-refresh"
+                >
+                  actualizare
+                </button>
+              </div>
+            )}
           </div>
+          {isLoading && (
+            <div className={styles.loadingState} data-wwid="escort-details-loading">
+              <InlineLoader color="#2f4979" size={14} />
+              <span>Se analizează datele din postări..</span>
+            </div>
+          )}
+          {!isLoading && escort.escortDetailsTime && (
+            <span className={styles.collectionMeta}>
+              date culese {formatRelativeTime(escort.escortDetailsTime)}
+            </span>
+          )}
           {error && <p className={styles.error} data-wwid="escort-details-error">{error}</p>}
           {escort.personalDetails && <PersonalDetailsSection details={escort.personalDetails} escort={escort} />}
           {escort.serviceDetails && <ServiceDetailsSection details={escort.serviceDetails} escort={escort} />}
