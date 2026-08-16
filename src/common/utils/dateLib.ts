@@ -22,7 +22,7 @@ export const dateLib = {
     } else if (diffDays < 30) {
       return `de ${diffDays} zile`;
     } else {
-      return dateString;
+      return targetDate.toLocaleDateString('ro-RO');
     }
   }
 };

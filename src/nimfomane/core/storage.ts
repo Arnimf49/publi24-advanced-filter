@@ -1,3 +1,5 @@
+import {PersonalDetails, ServiceDetails} from './escortInfoExtractor';
+
 export interface TopicItem {
   url?: string;
   isOfEscort?: boolean;
@@ -29,6 +31,13 @@ export interface EscortItem {
     };
   };
   profileStatsTime?: number;
+  personalDetails?: PersonalDetails;
+  personalDetailsSourceUrl?: string;
+  personalDetailsContentDate?: number;
+  serviceDetails?: ServiceDetails;
+  serviceDetailsSourceUrl?: string;
+  serviceDetailsContentDate?: number;
+  escortDetailsTime?: number;
 }
 
 interface StorageCache {

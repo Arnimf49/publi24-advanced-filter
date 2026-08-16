@@ -2,9 +2,7 @@ import React, {RefObject} from 'react';
 import styles from './EscortCard.module.scss';
 import type {EscortItem} from '../../../core/storage';
 import {InlineLoader} from '../../../../common/components/InlineLoader/InlineLoader';
-import {Loader} from '../../../../common/components/Loader/Loader';
-import {NoImageIcon} from '../../TopicImage/NoImageIcon';
-import {ImageErrorIcon} from '../../TopicImage/ImageErrorIcon';
+import {escortProfileImage} from '../../EscortProfileImage/EscortProfileImage';
 
 export type EscortCardProps = {
   user: string;
@@ -13,10 +11,8 @@ export type EscortCardProps = {
   containerRef: RefObject<HTMLDivElement>;
   imageUrl?: string | null;
   imageLoading: boolean;
-  imageError: boolean;
   imageLoadError?: string | null;
   onImageClick?: () => void;
-  onImageError: () => void;
   profileStats?: EscortItem['profileStats'];
   statsLoading: boolean;
   statsStale: boolean;
@@ -32,10 +28,8 @@ export const EscortCard: React.FC<EscortCardProps> = ({
   containerRef,
   imageUrl,
   imageLoading,
-  imageError,
   imageLoadError,
   onImageClick,
-  onImageError,
   profileStats,
   statsLoading,
   statsStale,
@@ -43,9 +37,7 @@ export const EscortCard: React.FC<EscortCardProps> = ({
   panel,
   imageModal,
 }) => {
-  const showImage = typeof imageUrl === 'string' && !imageError && !imageLoadError;
-  const showNoImage = imageUrl === null && !imageLoadError;
-  const showError = imageError || !!imageLoadError;
+  const {EscortProfileImage} = escortProfileImage;
 
   return (
     <>
@@ -59,21 +51,13 @@ export const EscortCard: React.FC<EscortCardProps> = ({
         )}
         <div data-wwid="hide-reason-container" />
         <div className={styles.escortCardInset}>
-          <div className={styles.imageSection} data-wwid="escort-card-image-section">
-            {imageLoading && <Loader color="#555" />}
-            {showImage && (
-              <img
-                src={imageUrl}
-                alt={user}
-                className={styles.profileImage}
-                onClick={onImageClick}
-                onError={onImageError}
-                data-wwid="escort-card-image"
-              />
-            )}
-            {showNoImage && <NoImageIcon />}
-            {showError && <ImageErrorIcon />}
-          </div>
+          <EscortProfileImage
+            user={user}
+            imageUrl={imageUrl}
+            imageLoading={imageLoading}
+            imageLoadError={imageLoadError}
+            onClick={onImageClick}
+          />
           <div className={styles.contentSection}>
             <a href={profileUrl} target="_blank" rel="noopener noreferrer" className={styles.escortName} data-wwid="escort-name">
               {user}

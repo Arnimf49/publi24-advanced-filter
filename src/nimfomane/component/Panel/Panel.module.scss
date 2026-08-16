@@ -68,6 +68,28 @@
   }
 }
 
+.escortInfoButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px;
+  border: none;
+  background: rgb(216 222 235);
+  border-radius: 3px;
+  color: rgb(31 48 80);
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  &:hover {
+    background: rgb(217, 226, 246);
+  }
+}
+
 .favButton {
   display: inline-flex;
   align-items: center;

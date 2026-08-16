@@ -21,7 +21,6 @@ export const EscortCardRoot: React.FC<EscortCardRootProps> = ({user, index}) => 
   const escortMemoryState = NimfomaneMemoryStorage.getEscortState(user);
   const [isModalOpen, setImageModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [hasImageError, setHasImageError] = useState(false);
   const [_, setRenderCycle] = useState(0);
 
   useEffect(() => {
@@ -38,10 +37,6 @@ export const EscortCardRoot: React.FC<EscortCardRootProps> = ({user, index}) => 
       NimfomaneMemoryStorage.removeOnEscortMemoryChanged(user, incrementRender);
     };
   }, [user]);
-
-  useEffect(() => {
-    setHasImageError(false);
-  }, [escort.optimizedProfileImage]);
 
   const profileUrl = escort.profileLink || `https://www.nimfomane.com/forum/profile/${encodeURIComponent(user)}/`;
   const isImageLoading = escort.optimizedProfileImage === undefined && !escortMemoryState.escortAnalysisError;
@@ -61,10 +56,8 @@ export const EscortCardRoot: React.FC<EscortCardRootProps> = ({user, index}) => 
         ? nimfomaneUtils.normalizeCmsUrl(escort.optimizedProfileImage)
         : escort.optimizedProfileImage}
       imageLoading={isImageLoading}
-      imageError={hasImageError}
       imageLoadError={escortMemoryState.escortAnalysisError}
       onImageClick={() => setImageModalOpen(true)}
-      onImageError={() => setHasImageError(true)}
       profileStats={escort.profileStats}
       statsLoading={isStatsLoading}
       statsStale={isStatsStale}

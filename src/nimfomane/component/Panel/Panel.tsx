@@ -3,6 +3,7 @@ import styles from './Panel.module.scss';
 import {WhatsAppButton} from './Button/WhatsAppButton';
 import {HideButton} from '../../../common/components/Button/HideButton';
 import {StarIcon} from '../../../common/components/Icons/StarIcon';
+import InfoIcon from '../../../publi24/component/Common/Icons/InfoIcon';
 
 type PanelProps = {
   phone?: string | false;
@@ -12,11 +13,12 @@ type PanelProps = {
   isFav?: boolean;
   onHideClick: () => void;
   onFavClick?: () => void;
+  onEscortInfoClick?: () => void;
   onShowImages?: () => void;
   fullWidth?: boolean;
 };
 
-export const Panel: React.FC<PanelProps> = ({ phone, visible, hiddenReason, isEscort, isFav, onHideClick, onFavClick, onShowImages, fullWidth }) => {
+export const Panel: React.FC<PanelProps> = ({ phone, visible, hiddenReason, isEscort, isFav, onHideClick, onFavClick, onEscortInfoClick, onShowImages, fullWidth }) => {
   return (
     <div className={`${styles.panel} ${fullWidth ? styles.panelFullWidth : ''}`}>
       <div className={styles.buttons}>
@@ -46,6 +48,17 @@ export const Panel: React.FC<PanelProps> = ({ phone, visible, hiddenReason, isEs
           className={styles.whatsapp}
           size={25}
         />}
+        {isEscort && onEscortInfoClick && (
+          <button
+            type="button"
+            className={styles.escortInfoButton}
+            onClick={onEscortInfoClick}
+            title="Detalii escorta"
+            data-wwid="escort-info-button"
+          >
+            <InfoIcon size={24} />
+          </button>
+        )}
         {onShowImages && (
           <button
             className={styles.openPhotosButton}

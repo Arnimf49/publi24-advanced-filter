@@ -3,6 +3,7 @@ import * as ReactDOM from 'react-dom';
 import {NimfomaneStorage} from '../../core/storage';
 import {Panel} from './Panel';
 import HideReasonRoot from './HideReason/HideReasonRoot';
+import {escortDetailsModalRoot} from '../EscortDetailsModal/EscortDetailsModalRoot';
 
 type PanelRootProps = {
   id?: string;
@@ -16,6 +17,7 @@ type PanelRootProps = {
 export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container, hideReasonLayout = 'horizontal', onShowImages, fullWidth }) => {
   const [_, setRenderCycle] = useState(0);
   const [showHideReason, setShowHideReason] = useState(false);
+  const [showEscortDetails, setShowEscortDetails] = useState(false);
 
   const topic = id ? NimfomaneStorage.getTopic(id) : null;
   const effectiveEscortUser = escortUser || (topic?.isOfEscort ? topic.ownerUser : null);
@@ -131,6 +133,12 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container,
     }
   }, [isOfEscort, effectiveEscortUser]);
 
+  const onEscortInfoClick = useCallback(() => {
+    setShowEscortDetails(true);
+  }, []);
+
+  const {EscortDetailsModalRoot} = escortDetailsModalRoot;
+
   return (
     <>
       <Panel
@@ -141,6 +149,7 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container,
         isFav={isFav}
         onHideClick={onHideClick}
         onFavClick={onFavClick}
+        onEscortInfoClick={isOfEscort ? onEscortInfoClick : undefined}
         onShowImages={onShowImages}
         fullWidth={fullWidth}
       />
@@ -152,6 +161,12 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container,
           layout={hideReasonLayout}
         />,
         container.querySelector('[data-wwid="hide-reason-container"]') as HTMLElement,
+      )}
+      {showEscortDetails && effectiveEscortUser && (
+        <EscortDetailsModalRoot
+          user={effectiveEscortUser}
+          onClose={() => setShowEscortDetails(false)}
+        />
       )}
     </>
   );
