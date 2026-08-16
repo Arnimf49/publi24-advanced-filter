@@ -4,12 +4,12 @@ export const elementHelpers = {
   },
 
   isProfilePageEscort(page: HTMLElement | Document = document) {
-    const typeContainer = page.querySelector<HTMLElement>('.ipsPageHead_barText');
+    const typeContainer = page.querySelector<HTMLElement>('span.ipsPageHead_barText');
     return !!typeContainer?.innerText.match(/escort[aă]|neverificat[aă]/i);
   },
 
   isNeverificataProfilePage(page: HTMLElement | Document = document) {
-    const typeContainer = page.querySelector<HTMLElement>('.ipsPageHead_barText');
+    const typeContainer = page.querySelector<HTMLElement>('span.ipsPageHead_barText');
     return !!typeContainer?.innerText.match(/neverificat[aă]/i);
   },
 
