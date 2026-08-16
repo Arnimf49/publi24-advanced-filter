@@ -1,11 +1,13 @@
 import React, {useEffect, useRef, useState} from 'react';
 import type {Image} from '../../src/nimfomane/core/escortActions';
+import type {EscortItem} from '../../src/nimfomane/core/storage';
 import {Panel} from '../../src/nimfomane/component/Panel/Panel';
 import GlobalButtons from '../../src/nimfomane/component/GlobalButtons/GlobalButtons';
 import NimfomaneFavoritesModal from '../../src/nimfomane/component/GlobalButtons/FavoritesModal/FavoritesModal';
 import {EscortCard} from '../../src/nimfomane/component/GlobalButtons/FavoritesModal/EscortCard';
 import {TopicImage} from '../../src/nimfomane/component/TopicImage/TopicImage';
 import Modal from '../../src/common/components/Modal/Modal';
+import {escortDetailsModal} from '../../src/nimfomane/component/EscortDetailsModal/EscortDetailsModal';
 import {EscortImages} from '../../src/nimfomane/component/TopicImage/EscortImages/EscortImages';
 import HideReasonRoot from '../../src/nimfomane/component/Panel/HideReason/HideReasonRoot';
 import AnimationStatusBar from './AnimationStatusBar';
@@ -14,13 +16,44 @@ import useDemoVisibility from './useDemoVisibility';
 import {presentationAsset} from '../presentationAsset';
 import styles from './NimfomaneDemo.module.scss';
 
-export type NimfomaneDemoMode = 'extension' | 'hide' | 'favorites' | 'images';
+export type NimfomaneDemoMode = 'extension' | 'hide' | 'details' | 'images' | 'favorites';
 
 const BIKINI_LINE_ART_IMAGE = presentationAsset.getUrl('nimfomane-demo-bikini-line-art.jpg');
 const WOMAN_SILHOUETTE_IMAGE = presentationAsset.getUrl('nimfomane-demo-woman-silhouette.jpg');
 const BIKINI_LINE_ART_ALT_IMAGE = presentationAsset.getUrl('nimfomane-demo-bikini-line-art-alt.jpg');
 const WOMAN_PORTRAIT_IMAGE = presentationAsset.getUrl('nimfomane-demo-woman-portrait.jpg');
 const FORUM_URL = 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/';
+const MOCK_ESCORT_DETAILS: EscortItem = {
+  profileLink: '#nimfomane-demo-profile',
+  phone: '0759961330',
+  optimizedProfileImage: WOMAN_SILHOUETTE_IMAGE,
+  personalDetails: {age: 27, height: 168, weight: 58},
+  personalDetailsSourceUrl: '#nimfomane-demo-source',
+  serviceDetails: {
+    baseRates: {'30m': 150, '1h': 250, '2h': 450},
+    schedule: [{days: 'Luni - Sâmbătă', start: '10:00', end: '22:00'}],
+    services: {
+      op: true,
+      np: true,
+      massage: true,
+      gfe: {extraCost: 50},
+      deepthroat: {extraCost: 100},
+      anal: false,
+      cim: false,
+      cof: true,
+      cob: false,
+      squirt: true,
+      rolePlay: {extraCost: 75},
+      couples: false,
+      shower: true,
+      domination: false,
+      dirtyTalk: true,
+      goldenShower: false,
+    },
+  },
+  serviceDetailsSourceUrl: '#nimfomane-demo-source',
+  escortDetailsTime: Date.now(),
+};
 
 type NimfomaneDemoProps = {
   mode: NimfomaneDemoMode;
@@ -131,7 +164,8 @@ const DemoEscortCard: React.FC<{
   index: number;
   isFavorite: boolean;
   onFavorite: () => void;
-}> = ({topic, index, isFavorite, onFavorite}) => {
+  onDetails: () => void;
+}> = ({topic, index, isFavorite, onFavorite, onDetails}) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -161,6 +195,7 @@ const DemoEscortCard: React.FC<{
           isFav={isFavorite}
           onHideClick={() => undefined}
           onFavClick={onFavorite}
+          onEscortInfoClick={onDetails}
         />
       )}
     />
@@ -175,12 +210,13 @@ const NimfomaneTopic: React.FC<{
   isFavorite: boolean;
   onHide: () => void;
   onFavorite: () => void;
+  onDetails: () => void;
   onImageClick?: () => void;
   hideReasonOpen: boolean;
   onHideReasonClose: () => void;
   hiddenReason?: string;
   onHideReasonSelect: (reason: string) => void;
-}> = ({topic, extensionEnabled, isMobile, visible, isFavorite, onHide, onFavorite, onImageClick, hideReasonOpen, onHideReasonClose, hiddenReason, onHideReasonSelect}) => {
+}> = ({topic, extensionEnabled, isMobile, visible, isFavorite, onHide, onFavorite, onDetails, onImageClick, hideReasonOpen, onHideReasonClose, hiddenReason, onHideReasonSelect}) => {
   const panel = extensionEnabled && (
     <div className={styles.extensionFeature}>
       <Panel
@@ -191,6 +227,7 @@ const NimfomaneTopic: React.FC<{
         isFav={isFavorite}
         onHideClick={onHide}
         onFavClick={topic.isEscort ? onFavorite : undefined}
+        onEscortInfoClick={topic.isEscort ? onDetails : undefined}
       />
     </div>
   );
@@ -326,6 +363,7 @@ const NimfomaneSite: React.FC<{
   onFavorite: (id: string) => void;
   onHideReasonSelect: (id: string, reason: string) => void;
   onImageClick?: () => void;
+  onDetails: () => void;
   favoritesOpen: boolean;
   isMobile: boolean;
   onFavoritesOpen: () => void;
@@ -342,6 +380,7 @@ const NimfomaneSite: React.FC<{
   onFavorite,
   onHideReasonSelect,
   onImageClick,
+  onDetails,
   favoritesOpen,
   isMobile,
   onFavoritesOpen,
@@ -426,6 +465,7 @@ const NimfomaneSite: React.FC<{
                   isFavorite={favoriteTopics[topic.id] === true}
                    onHide={() => onHide(topic.id)}
                    onFavorite={() => onFavorite(topic.id)}
+                   onDetails={onDetails}
                    onImageClick={onImageClick}
                    hideReasonOpen={hideReasonTopicId === topic.id}
                    onHideReasonClose={onHideReasonClose}
@@ -467,7 +507,7 @@ const NimfomaneSite: React.FC<{
           currentCity="Cluj-Napoca"
           renderEscort={(user, index) => {
             const topic = TOPICS.find((candidate) => candidate.user === user);
-            return topic ? <DemoEscortCard topic={topic} index={index} isFavorite={true} onFavorite={() => onFavorite(topic.id)} /> : null;
+            return topic ? <DemoEscortCard topic={topic} index={index} isFavorite={true} onFavorite={() => onFavorite(topic.id)} onDetails={onDetails} /> : null;
           }}
         />
       )}
@@ -475,17 +515,21 @@ const NimfomaneSite: React.FC<{
   );
 };
 
-type DemoPhase = 'waiting' | 'entering' | 'hovering' | 'clicking' | 'waitingReason' | 'enteringReason' | 'hoveringReason' | 'clickingReason' | 'waitingSubcategory' | 'enteringSubcategory' | 'hoveringSubcategory' | 'clickingSubcategory' | 'waitingClose' | 'enteringClose' | 'hoveringClose' | 'clickingClose' | 'enteringGlobal' | 'hoveringGlobal' | 'clickingGlobal' | 'scrolling' | 'showing';
+type DemoPhase = 'waiting' | 'entering' | 'hovering' | 'clicking' | 'waitingReason' | 'enteringReason' | 'hoveringReason' | 'clickingReason' | 'waitingSubcategory' | 'enteringSubcategory' | 'hoveringSubcategory' | 'clickingSubcategory' | 'waitingClose' | 'enteringClose' | 'hoveringClose' | 'clickingClose' | 'enteringGlobal' | 'hoveringGlobal' | 'clickingGlobal' | 'waitingDetailsScroll' | 'scrolling' | 'showing';
 
 const FAVORITES_MODAL_DURATION = 10000;
 const IMAGE_MODAL_SCROLL_OFFSET = 100;
 const IMAGE_MODAL_SCROLL_SPEED = 207;
 const IMAGE_MODAL_MIN_SCROLL_DURATION = 2200;
 const IMAGE_MODAL_POST_SCROLL_DURATION = 3000;
+const DETAILS_MODAL_SCROLL_OFFSET = 60;
+const DETAILS_MODAL_SCROLL_SPEED = 115;
+const DETAILS_MODAL_MIN_SCROLL_DURATION = 2200;
 
 const ANIMATION_DURATION: Record<NimfomaneDemoMode, number> = {
   extension: 30000,
   hide: 11400,
+  details: 7600,
   favorites: 14100,
   images: 7800,
 };
@@ -498,6 +542,8 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
   const [hideReasonTopicId, setHideReasonTopicId] = useState<string | null>(null);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [detailsLoading, setDetailsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 800px)').matches);
   const [phase, setPhase] = useState<DemoPhase>('waiting');
   const [pointerPosition, setPointerPosition] = useState({x: -40, y: 100});
@@ -513,6 +559,8 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
     setHideReasonTopicId(null);
     setFavoritesOpen(false);
     setImageModalOpen(false);
+    setDetailsOpen(false);
+    setDetailsLoading(false);
     setPointerPosition({x: -40, y: 100});
     setPhase('waiting');
     setAnimationCycle((current) => current + 1);
@@ -574,6 +622,8 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
       setHideReasonTopicId(null);
       setFavoritesOpen(false);
       setImageModalOpen(false);
+      setDetailsOpen(false);
+      setDetailsLoading(false);
       setPointerPosition({x: -40, y: 100});
       setAnimationCycle((current) => current + 1);
       setPhase('waiting');
@@ -585,6 +635,8 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
           ? '[data-demo-state="enabled"]'
           : mode === 'images'
             ? '[data-wwid="topic-image"]'
+            : mode === 'details'
+              ? '[data-wwid="escort-info-button"]'
             : mode === 'favorites'
               ? '[data-wwid="fav-toggle"]'
               : '[data-wwid="toggle-hidden"]';
@@ -603,7 +655,7 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
         break;
       case 'clicking':
         timeout = window.setTimeout(() => {
-          if (!clickElement(mode === 'extension' ? '[data-demo-state="enabled"]' : mode === 'images' ? '[data-wwid="topic-image"]' : mode === 'favorites' ? '[data-wwid="fav-toggle"]' : '[data-wwid="toggle-hidden"]')) {
+          if (!clickElement(mode === 'extension' ? '[data-demo-state="enabled"]' : mode === 'images' ? '[data-wwid="topic-image"]' : mode === 'details' ? '[data-wwid="escort-info-button"]' : mode === 'favorites' ? '[data-wwid="fav-toggle"]' : '[data-wwid="toggle-hidden"]')) {
             return;
           }
 
@@ -619,6 +671,11 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
           else if (mode === 'favorites') {
             setFavoriteTopics((current) => ({...current, [TOPICS[0].id]: true}));
             setPhase('enteringGlobal');
+          }
+          else if (mode === 'details') {
+            setDetailsOpen(true);
+            setDetailsLoading(true);
+            setPhase('showing');
           }
           else {
             setPhase('scrolling');
@@ -704,13 +761,21 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
           }
         }, 300);
         break;
+      case 'waitingDetailsScroll':
+        timeout = window.setTimeout(() => setPhase('scrolling'), 2000);
+        break;
       case 'scrolling': {
-        const modal = findElement('[data-wwid="escort-image-modal"]');
+        const modal = findElement(mode === 'details'
+          ? '[data-wwid="escort-details-modal"]'
+          : '[data-wwid="escort-image-modal"]');
         if (!modal) {
           break;
         }
 
-        const maxScroll = Math.max(0, modal.scrollHeight - modal.clientHeight - IMAGE_MODAL_SCROLL_OFFSET);
+        const scrollOffset = mode === 'details' ? DETAILS_MODAL_SCROLL_OFFSET : IMAGE_MODAL_SCROLL_OFFSET;
+        const scrollSpeed = mode === 'details' ? DETAILS_MODAL_SCROLL_SPEED : IMAGE_MODAL_SCROLL_SPEED;
+        const minimumDuration = mode === 'details' ? DETAILS_MODAL_MIN_SCROLL_DURATION : IMAGE_MODAL_MIN_SCROLL_DURATION;
+        const maxScroll = Math.max(0, modal.scrollHeight - modal.clientHeight - scrollOffset);
         if (maxScroll <= 0) {
           setPhase('showing');
           break;
@@ -718,7 +783,7 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
 
         modal.scrollTop = 0;
         const startedAt = performance.now();
-        const duration = Math.max(IMAGE_MODAL_MIN_SCROLL_DURATION, maxScroll / IMAGE_MODAL_SCROLL_SPEED * 1000);
+        const duration = Math.max(minimumDuration, maxScroll / scrollSpeed * 1000);
         const animateScroll = (now: number) => {
           const progress = Math.min((now - startedAt) / duration, 1);
           const easedProgress = progress * progress * (3 - 2 * progress);
@@ -745,6 +810,8 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
               ? FAVORITES_MODAL_DURATION
               : mode === 'images'
                 ? IMAGE_MODAL_POST_SCROLL_DURATION
+                : mode === 'details'
+                  ? 5000
                 : 2400,
         );
         break;
@@ -781,6 +848,25 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
     || phase === 'clickingClose'
     || phase === 'clickingGlobal';
 
+  useEffect(() => {
+    if (!detailsOpen || !detailsLoading) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setDetailsLoading(false);
+      if (mode === 'details') {
+        setPhase('waitingDetailsScroll');
+      }
+    }, 2500);
+    return () => window.clearTimeout(timeout);
+  }, [detailsOpen, detailsLoading, mode]);
+
+  const openDetails = () => {
+    setDetailsOpen(true);
+    setDetailsLoading(true);
+  };
+
   return (
     <div className={`${styles.demo}${isMobile ? ' onMobile' : ''}`} ref={stageRef}>
       {mode === 'extension' && (
@@ -816,6 +902,7 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
            onFavorite={(id) => setFavoriteTopics((current) => ({...current, [id]: !current[id]}))}
            onHideReasonSelect={(id, reason) => setHideReasons((current) => ({...current, [id]: reason}))}
           onImageClick={mode === 'images' ? () => setImageModalOpen(true) : undefined}
+          onDetails={openDetails}
           favoritesOpen={favoritesOpen}
           isMobile={isMobile}
            onFavoritesOpen={() => setFavoritesOpen(true)}
@@ -836,6 +923,27 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
             />
           </Modal>
         )}
+        {detailsOpen && (() => {
+          const {EscortDetailsModal} = escortDetailsModal;
+          return (
+            <EscortDetailsModal
+              user={TOPICS[0].user}
+              escort={detailsLoading
+                ? {
+                  ...MOCK_ESCORT_DETAILS,
+                  personalDetails: undefined,
+                  serviceDetails: undefined,
+                  escortDetailsTime: undefined,
+                }
+                : MOCK_ESCORT_DETAILS}
+              isLoading={detailsLoading}
+              error={null}
+              onRefresh={() => setDetailsLoading(true)}
+              onClose={() => setDetailsOpen(false)}
+              inline={true}
+            />
+          );
+        })()}
       </div>
       {mode !== 'extension' && <DemoMouse x={pointerPosition.x} y={pointerPosition.y} isClicking={pointerIsClicking} />}
     </div>

@@ -21,6 +21,7 @@ type EscortDetailsModalProps = {
   imageLoadError?: string | null;
   onRefresh: () => void;
   onClose: () => void;
+  inline?: boolean;
 };
 
 type SectionMetaProps = {
@@ -193,12 +194,13 @@ const EscortDetailsModal: React.FC<EscortDetailsModalProps> = ({
   imageLoadError,
   onRefresh,
   onClose,
+  inline = false,
 }) => {
   const profileUrl = escort.profileLink || `https://nimfomane.com/forum/profile/${encodeURIComponent(user)}/`;
   const {EscortProfileImage} = escortProfileImage;
 
   return (
-    <Modal close={onClose} dataWwid="escort-details-modal">
+    <Modal close={onClose} inline={inline} dataWwid="escort-details-modal">
       <ContentModal
         title="Detalii escortă"
         onClose={onClose}

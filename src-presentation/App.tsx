@@ -158,9 +158,18 @@ const NimfomaneSections: React.FC = () => (
       <NimfomaneDemo mode="hide" />
     </section>
 
+    <section className={styles.featureBlock} aria-labelledby="nimfomane-details-title">
+      <div className={styles.featureCopy}>
+        <p className={styles.sectionNumber}>04 / Detalii</p>
+        <h2 id="nimfomane-details-title">Extrage informații și servicii</h2>
+        <p>Vezi detalii personale și despre servicii într-un mod mai clar, fără să intri și să cauți manual între postări.</p>
+      </div>
+      <NimfomaneDemo mode="details" />
+    </section>
+
     <section className={styles.featureBlock} aria-labelledby="nimfomane-favorites-title">
       <div className={styles.featureCopy}>
-        <p className={styles.sectionNumber}>04 / Favorite</p>
+        <p className={styles.sectionNumber}>05 / Favorite</p>
         <h2 id="nimfomane-favorites-title">Păstrează escorte la favorite</h2>
         <p>Adaugă un profil la favorite și deschide rapid lista cu numerele importante, chiar dacă topicul nu mai este în listare.</p>
       </div>

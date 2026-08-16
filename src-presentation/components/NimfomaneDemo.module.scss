@@ -122,7 +122,8 @@
 @media (max-width: 800px) {
   .mobileScrollThrough {
     :global([data-wwid="escort-image-modal"]),
-    :global([data-wwid="favorites-modal"]) {
+    :global([data-wwid="favorites-modal"]),
+    :global([data-wwid="escort-details-modal"]) {
       overflow-y: hidden;
     }
   }
