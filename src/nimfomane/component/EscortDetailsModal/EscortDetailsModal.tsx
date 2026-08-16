@@ -48,7 +48,9 @@ const SERVICE_LABELS: Record<EscortServiceName, string> = {
   on: 'ON',
   np: 'NP',
   nn: 'NN',
-  deepthroat: 'facefuck',
+  deepthroat: 'oral adânc',
+  facesitting: 'facesitting',
+  facefuck: 'facefuck',
   fk: 'FK',
   cim: 'CIM',
   cof: 'COF',
@@ -70,19 +72,31 @@ const SERVICE_LABELS: Record<EscortServiceName, string> = {
   couples: 'cupluri',
   lesbyShow: 'show lesbian',
   shower: 'duș împreună',
-  bdsm: 'BDSM',
+  dom: 'dominare nespecifică',
+  domSoft: 'dominare soft',
+  domHard: 'dominare hard',
+  domination: 'dominare nespecifică',
+  verbalHum: 'umilire verbală',
+  dirtyTalk: 'dirty talk',
+  whipping: 'biciuire',
+  spitting: 'scuipat',
+  strapOn: 'strap-on',
+  fisting: 'fisting',
+  goldenShower: 'golden shower',
   footfetish: 'foot fetish',
+  fingering: 'degete',
 };
 
 const SERVICE_GROUPS: Array<{label: string; services: EscortServiceName[]}> = [
   {label: 'Sex', services: ['np', 'nn']},
-  {label: 'Oral', services: ['op', 'on', 'deepthroat']},
+  {label: 'Oral', services: ['op', 'on', 'deepthroat', 'facefuck']},
+  {label: 'Limbi', services: ['fk', 'cuni', 'ani', 'facesitting', '69']},
   {label: 'Finalizare', services: ['cim', 'cob', 'cof']},
   {label: 'Anal', services: ['ap', 'anal']},
-  {label: 'Sărut', services: ['fk']},
   {label: 'Comportament', services: ['gfe', 'pse', 'rolePlay']},
   {label: 'Masaj', services: ['massage', 'prostateMassage']},
-  {label: 'Altele', services: ['hj', '69', 'cuni', 'ani', '3some', 'couples', 'lesbyShow', 'shower', 'bdsm', 'footfetish', 'uro', 'squirt']},
+  {label: 'Domniare', services: ['dom', 'domSoft', 'domHard', 'domination', 'verbalHum', 'dirtyTalk', 'whipping', 'spitting', 'strapOn']},
+  {label: 'Altele', services: ['hj', '3some', 'couples', 'lesbyShow', 'shower', 'footfetish', 'fingering', 'uro', 'goldenShower', 'fisting', 'squirt']},
 ];
 
 function formatRelativeTime(timestamp?: number): string | null {
@@ -143,7 +157,9 @@ const PersonalDetailsSection: React.FC<{details: PersonalDetails; escort: Escort
 );
 
 const RatesTable: React.FC<{details: ServiceDetails}> = ({details}) => {
-  const rows = RATE_ROWS.filter(row => details.baseRates[row.key] !== undefined || details.outcallRates?.[row.key] !== undefined);
+  const rows = RATE_ROWS.filter(row => details.baseRates[row.key] !== undefined
+    || details.outcallRates?.[row.key] !== undefined
+    || details.dominationRates?.[row.key] !== undefined);
   if (!rows.length) {
     return null;
   }
@@ -159,6 +175,7 @@ const RatesTable: React.FC<{details: ServiceDetails}> = ({details}) => {
                 {details.baseRates[row.key] !== undefined && formatRate(details.baseRates[row.key])}
                 {details.baseRates[row.key] !== undefined && details.outcallRates?.[row.key] !== undefined && ' · '}
                 {details.outcallRates?.[row.key] !== undefined && `deplasare: ${formatRate(details.outcallRates[row.key])}`}
+                {details.dominationRates?.[row.key] !== undefined && ` · dominare: ${formatRate(details.dominationRates[row.key])}`}
                 {details.rateOverrides?.map(override => {
                   const rate = override.rates?.[row.key];
                   if (rate === undefined) {
@@ -318,6 +335,13 @@ const EscortDetailsModal: React.FC<EscortDetailsModalProps> = ({
           {error && <p className={styles.error} data-wwid="escort-details-error">{error}</p>}
           {escort.personalDetails && <PersonalDetailsSection details={escort.personalDetails} escort={escort} />}
           {escort.serviceDetails && <ServiceDetailsSection details={escort.serviceDetails} escort={escort} />}
+          {!isLoading && !escort.personalDetails && !escort.serviceDetails && (
+            <p className={styles.noDetails}>Nu s-au găsit detalii personale sau despre servicii</p>
+          )}
+          <p className={styles.disclaimer}>
+            Informațiile se culeg exclusiv din conținutul titularei. Un algoritm determinist extrage informațiile.
+            Acesta funcționează în majoritatea cazurilor, dar nu perfect. Întotdeauna verifică sursa când trebuie să știi la sigur.
+          </p>
         </section>
       </ContentModal>
     </Modal>

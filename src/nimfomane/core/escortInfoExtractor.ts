@@ -19,6 +19,8 @@ export type EscortServiceName =
   | 'np'
   | 'nn'
   | 'deepthroat'
+  | 'facesitting'
+  | 'facefuck'
   | 'fk'
   | 'cim'
   | 'cof'
@@ -40,14 +42,26 @@ export type EscortServiceName =
   | 'couples'
   | 'lesbyShow'
   | 'shower'
-  | 'bdsm'
-  | 'footfetish';
+  | 'dom'
+  | 'domSoft'
+  | 'domHard'
+  | 'domination'
+  | 'verbalHum'
+  | 'dirtyTalk'
+  | 'whipping'
+  | 'spitting'
+  | 'strapOn'
+  | 'fisting'
+  | 'goldenShower'
+  | 'footfetish'
+  | 'fingering';
 
 export interface ServiceDetails {
   baseRates: EscortRates;
   outcallRates?: EscortRates;
   rateOverrides?: RateOverride[];
   schedule?: EscortSchedule[];
+  dominationRates?: EscortRates;
   services?: Partial<Record<EscortServiceName, ServiceAvailability>>;
 }
 
@@ -68,11 +82,13 @@ const SMALL_CAPS = {
 };
 
 const SERVICE_PATTERNS: Record<EscortServiceName, RegExp> = {
-  op: /\b(?:op|oral\s*(?:sex\s+)?(?:protejat|pro)|sex\s+oral\s*(?:protejat|pro)|oral\s*\(\s*pro\b|sex\s+oral\s*\(\s*pro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:protejat|pro)\b/g,
-  on: /\b(?:on|oral\s*(?:sex\s+)?(?:neprotejat|nepro)|sex\s+oral\s*(?:neprotejat|nepro)|oral\s*\(\s*pro\s*\/\s*nepro\b|oral\s*\(\s*nepro\b|sex\s+oral\s*\(\s*nepro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:neprotejat|nepro)\b/g,
+  op: /\b(?:op|bj|bj\s+p\s*\/\s*n|oral\s*(?:sex\s+)?(?:protejat|pro)|sex\s+oral\s*(?:protejat|pro)|oral\s*\(\s*pro\b|sex\s+oral\s*\(\s*pro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:protejat|pro)\b/g,
+  on: /\b(?:on|bj|bj\s+p\s*\/\s*n|oral\s*(?:sex\s+)?(?:neprotejat|nepro)|sex\s+oral\s*(?:neprotejat|nepro)|oral\s*\(\s*pro\s*\/\s*nepro\b|oral\s*\(\s*nepro\b|sex\s+oral\s*\(\s*nepro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:neprotejat|nepro|fara\s+prezervativ)\b/g,
   np: /\bnp\b|\b(?:sex\s+)?normal\b(?!\s+neprotejat)(?:\s*\(\s*(?:(?:obligatoriu|doar)\s+)?protejat\s*[!.,;]?\s*\)|\s+(?:(?:obligatoriu|doar)\s+)?protejat\b|\s+in\s+diferite\s+pozitii\b)|\bsex\s*\(\s*(?:(?:obligatoriu|doar)\s+)?protejat\s*\)|\bact(?:ul)?\s+sexual\s+protejat\b/g,
   nn: /\b(?:sex\s+)?normal\s+neprotejat\b|\bact(?:ul)?\s+sexual\s+neprotejat\b/g,
-  deepthroat: /\b(?:dt|deep\s*throat|deepthroat|deep|face\s*fuck)\b|\boral\s+adanc\b/g,
+  deepthroat: /\b(?:dt|deep\s*throat|deepthroat|deep)\b|\boral\s+adanc\b/g,
+  facesitting: /\bface\s*sitting\b|\bfacesitting\b/g,
+  facefuck: /\bface\s*fuck\b|\bfacefuck\b/g,
   fk: /\b(?:fk|french\s+kiss)\b|(?<=fara\s)sarut(?:uri)?\b/g,
   cim: /\bcim\b|\bfin(?:aliz\w*)?\s+orala\b|\bejacul\w*\s+orala\b|\b(?:orala|faciala)\s*(?:\/|,|sau)\s*orala\b/g,
   cof: /\bcof\b|\bfin(?:aliz\w*)?\s+faciala\b|\bejacul\w*\s+faciala\b|\b(?:orala|faciala)\s*(?:\/|,|sau)\s*faciala\b/g,
@@ -84,8 +100,8 @@ const SERVICE_PATTERNS: Record<EscortServiceName, RegExp> = {
   ap: /\bap\b|\banal\s+protejat\b/g,
   anal: /\banal\b/g,
   hj: /\bhand\s*jo+b\b|\bjob\s+manual\b/g,
-  '69': /\b69\b/g,
-  gfe: /\bgfe\b/g,
+  '69': /\b69\b|\bpoziti(?:a|e|ile)?\s*69\b/g,
+  gfe: /\bgfe\b|\bgirlfriend\s+experience\b/g,
   prostateMassage: /\bmasaj\s+prostatic\b|\bprostat(?:a|ic)\b/g,
   pse: /\bpse\b|porn\s+star\s+experience/g,
   cuni: /\bcunn?ilingus\b|\bcunni\b/g,
@@ -94,8 +110,19 @@ const SERVICE_PATTERNS: Record<EscortServiceName, RegExp> = {
   couples: /\bcupl(?:u|uri)\b/g,
   lesbyShow: /\b(?:show\s+lesb\w*|lesb\w*\s+show)\b/g,
   shower: /\bdus\s+(?:impreuna|asistat|in\s+doi)\b/g,
-  bdsm: /\bbdsm\b|\bdominare\w*\b|\bdominatie\w*\b|\brough\b/g,
-  footfetish: /\bfoot\s*fetish\b|\bfetis(?:ul)?\s+(?:pentru\s+)?picioare\b/g,
+  dom: /\bdom\b|\bdominare\w*\s+nespecific\w*\b/g,
+  domSoft: /\bdominar\w*\b[^\n.;]{0,40}\bsoft\b|\bsoft\b[^\n.;]{0,40}\bdominar\w*\b/g,
+  domHard: /\bdominar\w*\b[^\n.;]{0,40}\bhard\b|\bhard\b[^\n.;]{0,40}\bdominar\w*\b/g,
+  verbalHum: /\bumilir(?:e|ii|ea)?\s+verbal\w*\b|\bverbal\w*\s+umilir\w*\b|\bumilint\w*\b/g,
+  dirtyTalk: /\bdirty\s*talk\b/g,
+  whipping: /\bbiciuir\w*\b|\bwhipp(?:ing|ed)\b|\blovir\w*\b/g,
+  spitting: /\b(?:spit(?:ting|ing)?|scuipat\w*)\b/g,
+  domination: /\bbdsm\b|\bdominare\w*\b|\bdominatie\w*\b|\brough\b/g,
+  strapOn: /\bstrap[\s-]?on\b/g,
+  fisting: /\bfist(?:ing)?\b/g,
+  goldenShower: /\bgolden\s+shower\b/g,
+  footfetish: /\bfoot\s*fetish\b|\bfooth\s*fetish\b|\bfetis(?:ul)?\s+(?:pentru\s+)?picioare\b/g,
+  fingering: /\bfingering\b|\bdeget(?:e|ele|elor|ul|ului)?\b(?!-?picioare)/g,
 };
 
 const SERVICE_NAMES = Object.keys(SERVICE_PATTERNS) as EscortServiceName[];
@@ -110,10 +137,38 @@ function normalizeText(text: string): string {
   return compatibilityText.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
 }
 
+function isQuestionSentence(text: string, start: number, end: number): boolean {
+  const previousQuestion = text.lastIndexOf('?', start - 1);
+  if (previousQuestion !== -1 && start - previousQuestion <= 40) {
+    return true;
+  }
+
+  const sentenceStart = Math.max(
+    text.lastIndexOf('.', start - 1),
+    text.lastIndexOf('!', start - 1),
+    text.lastIndexOf('?', start - 1),
+    text.lastIndexOf('\n', start - 1),
+  ) + 1;
+  const sentenceEndCandidates = ['.', '!', '?', '\n']
+    .map(character => text.indexOf(character, end))
+    .filter(index => index !== -1);
+  const sentenceEnd = sentenceEndCandidates.length ? Math.min(...sentenceEndCandidates) : text.length;
+  const sentence = text.slice(sentenceStart, sentenceEnd).trim();
+
+  return sentence.includes('?')
+    || /^(?:cine|ce|cum|cand|unde|de\s+ce|cat(?:a|i|e)?|care|ai\s+(?:spus|zis)|ați\s+(?:spus|zis))\b/i.test(sentence);
+}
+
 function findAge(text: string): number | undefined {
   const agePattern = /\b(\d{1,2})\s*(?:de\s*)?ani\b/g;
 
   for (const match of text.matchAll(agePattern)) {
+    const matchStart = match.index ?? 0;
+    const matchEnd = matchStart + match[0].length;
+    if (isQuestionSentence(text, matchStart, matchEnd)) {
+      continue;
+    }
+
     const age = Number.parseInt(match[1], 10);
     if (age < 17 || age > 70) {
       continue;
@@ -141,7 +196,8 @@ function findAge(text: string): number | undefined {
     }
     const profileNameBeforeAge = /\.\s*[a-z]{2,20}\s*$/i.test(beforeAge.slice(-40));
     const profileDetailsAfterAge = /^\s*[/|>]\s*(?:\d{2,3}\s*(?:kg|kilo(?:grame)?s?)|1[.,']\s*\d{2})\b/i.test(line.slice(match.index! + match[0].length - lineStart));
-    if (!/\b(?:am|sunt)\b/i.test(beforeAge) && line.length > 100 && !profileNameBeforeAge && !profileDetailsAfterAge) {
+    const profileIntroduction = /\b(?:am|sunt|numele\s+meu\s+este|ma\s+numesc)\b/i.test(beforeAge);
+    if (!profileIntroduction && line.length > 100 && !profileNameBeforeAge && !profileDetailsAfterAge) {
       continue;
     }
 
@@ -152,17 +208,23 @@ function findAge(text: string): number | undefined {
 }
 
 function findHeight(text: string): number | undefined {
-  const decimalHeight = /(?:^|[^\d])1[.,']\s*([3-9]\d)(?=\s*(?:m(?:etri)?\b|cm\b|inaltime\b|si\b|$|[|#]|[^\da-z]))/g;
+  const decimalHeight = /(?:^|[^\d])1(?:[.,']|\s+)\s*([3-9]\d)(?=\s*(?:m(?:etri)?\b|cm\b|inaltime\b|si\b|$|[|#]|[^\da-z]))/g;
   const centimetreHeight = /(?:^|[^\d])(1[3-9]\d)\s*(?:cm\b|centimetri?\b|inaltime\b)/g;
 
-  const decimalMatch = decimalHeight.exec(text);
-  if (decimalMatch) {
+  for (const decimalMatch of text.matchAll(decimalHeight)) {
+  const matchStart = decimalMatch.index ?? 0;
+  const matchEnd = matchStart + decimalMatch[0].length;
+  if (!isQuestionSentence(text, matchStart, matchEnd)) {
     return 100 + Number.parseInt(decimalMatch[1], 10);
   }
+  }
 
-  const centimetreMatch = centimetreHeight.exec(text);
-  if (centimetreMatch) {
+  for (const centimetreMatch of text.matchAll(centimetreHeight)) {
+  const matchStart = centimetreMatch.index ?? 0;
+  const matchEnd = matchStart + centimetreMatch[0].length;
+  if (!isQuestionSentence(text, matchStart, matchEnd)) {
     return Number.parseInt(centimetreMatch[1], 10);
+  }
   }
 
   return undefined;
@@ -172,8 +234,17 @@ function findWeight(text: string): number | undefined {
   const weightPattern = /\b(\d{2,3})\s*(?:de\s*)?(?:kg|kilo(?:grame)?s?)\b/gi;
 
   for (const match of text.matchAll(weightPattern)) {
+    const matchStart = match.index ?? 0;
+    const matchEnd = matchStart + match[0].length;
+    if (isQuestionSentence(text, matchStart, matchEnd)) {
+      continue;
+    }
+
     const beforeWeight = text.slice(Math.max(0, match.index! - 30), match.index);
     if (/\b(?:sub|peste|maxim(?:um)?|limita)\s*$/i.test(beforeWeight)) {
+      continue;
+    }
+    if (/\b(?:pus\s+pe\s+mine|dat\s+jos)\b/i.test(beforeWeight)) {
       continue;
     }
 
@@ -199,7 +270,10 @@ function isNegativeOccurrence(text: string, service: EscortServiceName, start: n
   const before = statement.slice(0, Math.max(0, relativeStart));
   const after = statement.slice(Math.max(0, relativeStart));
   const lastPositiveQualifier = Math.max(before.lastIndexOf('doar'), before.lastIndexOf('numai'));
-  const negativeBefore = NEGATIVE_ACTION.test(before.slice(-80)) || NEGATIVE_WORDS.test(before.slice(-25)) || ANAL_EXCLUSION.test(statement) || NEGATIVE_EMOJIS.test(before.slice(-40));
+  const negativeBefore = service === 'fingering'
+    ? text.slice(start, end).toLowerCase() !== 'fingering'
+      && /\b(?:nu\s+(?:mai\s+)?(?:fac|ofer(?:im)?|practic|prestez|accept|primesc)|fara)\b[^\n.;]{0,100}$/i.test(before)
+    : NEGATIVE_ACTION.test(before.slice(-80)) || NEGATIVE_WORDS.test(before.slice(-25)) || ANAL_EXCLUSION.test(statement) || NEGATIVE_EMOJIS.test(before.slice(-40));
   const negativeAfterWords = /\b(?:nu\s+(?:mai\s+)?(?:fac|ofer(?:im)?|practic|prestez)|deloc)\b/i.test(after.slice(0, 18));
   const negativeAfterTargetsOtherService = SERVICE_NAMES.some(otherService => {
     if (otherService === service) {
@@ -244,7 +318,7 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
       : nearby.slice(costOffset, serviceEndOffset);
     return SERVICE_NAMES.some(otherService => otherService !== service && new RegExp(SERVICE_PATTERNS[otherService].source, 'i').test(between));
   };
-  const extraPattern = /(?:\+\s*|extra\s*(?:cost)?\s*[:+]?|in\s+plus\s*|supliment(?:ar)?\s*[:+]?)(\d{2,4})\s*(?:lei|ron)?\b|(\d{2,4})\s*(?:lei|ron)?\s*extra\b|(\d{2,4})\s*(?:lei|ron)?\s*(?:extra|in\s+plus)\b/gi;
+  const extraPattern = /(?:\+\s*\(\s*|\+\s*|extra\s*(?:cost)?\s*[:+]?|in\s+plus\s*|supliment(?:ar)?\s*[:+]?)(\d{2,4})\s*(?:lei|ron)?\b|(\d{2,4})\s*(?:lei|ron)?\s*extra\b|(\d{2,4})\s*(?:lei|ron)?\s*(?:extra|in\s+plus)\b/gi;
   for (const extraMatch of nearby.matchAll(extraPattern)) {
     const extraEnd = (extraMatch.index ?? 0) + extraMatch[0].length;
     const extraMatchEndsBeforeService = extraEnd < serviceEndOffset;
@@ -262,6 +336,17 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
     const serviceSuffixExtra = new RegExp(`\\b${service}\\s*\\([^)]*\\)\\s*-\\s*(\\d{2,4})\\s*(?:lei|ron)?\\b`, 'gi');
     for (const suffixMatch of nearby.matchAll(serviceSuffixExtra)) {
       return Number.parseInt(suffixMatch[1], 10);
+    }
+  }
+
+  const labeledExtra = service === 'cim'
+    ? /(?:finaliz\w*|fin)\s+oral\w*\s*\)?\s*(\d{2,4})(?!\s*(?:de\s*)?(?:lei|ron)?\s*extra\b)\s*(?:de\s*)?(?:lei|ron)?\b/gi
+    : service === 'cof'
+      ? /(?:finaliz\w*|fin)\s+facial\w*\s*\)?\s*(\d{2,4})(?!\s*(?:de\s*)?(?:lei|ron)?\s*extra\b)\s*(?:de\s*)?(?:lei|ron)?\b/gi
+      : undefined;
+  if (labeledExtra) {
+    for (const extraMatch of nearby.matchAll(labeledExtra)) {
+      return Number.parseInt(extraMatch[1], 10);
     }
   }
 
@@ -320,7 +405,7 @@ function extractOneService(text: string, service: EscortServiceName): ServiceAva
 }
 
 function durationFromText(text: string, amountIndex: number, otherAmountIndexes: number[]): keyof EscortRates | undefined {
-  const durationPattern = /\b(30|60|90|120)\s*(?:['’]\s*)?(?:de\s*)?(?:(?:min(?:ute)?s?|mi)\b|['’])|\b(o\s+ora\s+si\s+30)\s+minute?\b|\bjumatatea\s+(?:de\s+)?ora\b|\b(1|2)\s*(?:['’]\s*)?(?:h|hr|ore?|ora)\b|\b(doua)\s+ore?\b|\b(ora|h)\b/gi;
+  const durationPattern = /\b(30|60|90|120)\s*(?:(?:de[\s.]*)?(?:min(?:ute)?s?|mi)\b|['’])|\b(o\s+ora\s+si\s+30)\s+minute?\b|\bjumatatea\s+(?:de\s+)?ora\b|\b(1|2)\s*(?:(?:[/]|['’])\s*)?(?:h|hr|ore?|ora)\b|\b(doua)\s+ore?\b|\b(ora|h)\b/gi;
   const durations: Array<{index: number; duration: keyof EscortRates}> = [];
   const durationText = text.replace(/\bmax(?=\d)/gi, '   ');
 
@@ -340,8 +425,12 @@ function durationFromText(text: string, amountIndex: number, otherAmountIndexes:
   const followingDuration = durations
     .filter(duration => duration.index >= amountIndex && !otherAmountIndexes.some(index => index > amountIndex && index < duration.index))
     .sort((left, right) => left.index - right.index)[0];
+  const splitFinalizationsDuration = /^\s*(?:lei|ron)?\s*(?:1\s*\/\s*2|1\s+sau\s+2)\s+fin(?:alizar\w*)?\s+(?:in|de)\s+60\s*['’]/i.test(text.slice(amountIndex, amountIndex + 70));
+  if (splitFinalizationsDuration) {
+    return '1h';
+  }
   const followingIsDirect = followingDuration
-    && /\d{2,5}\s*(?:de\s*)?(?:lei|ron)?\s*(?:o\s+)?[-:–]?\s*$/i.test(text.slice(amountIndex, followingDuration.index));
+    && /\d{2,5}\s*(?:de\s*)?(?:lei|ron)?\s*(?:o\s+)?[-:–/]?\s*$/i.test(text.slice(amountIndex, followingDuration.index));
   const followingIsParenthesized = followingDuration
     && text.slice(amountIndex, followingDuration.index).includes('(');
 
@@ -375,7 +464,7 @@ function durationFromText(text: string, amountIndex: number, otherAmountIndexes:
 
 function amountMatches(line: string): Array<{amount: number; index: number}> {
   const matches: Array<{amount: number; index: number}> = [];
-  const moneyPattern = /\b(\d{2,5})\s*(?:de\s*)?(?:lei|ron)\b|\b(\d{2,5})\s*(?=\s*(?:finalizar\w*|fin)\b)|\b(\d{2,5})\s*(?=-\s*\(?\s*(?:fin|final|\d+\s*finalizar\w*|\d+\s*['’]?\s*(?:min|mi|h|hr|ore?|ora)|\d+\s*\/\s*\d+\s*fin|\d+\s*'))|\b(\d{2,5})\s*(?=\(\s*(?:30|60|90|120)\s*(?:min|mi|h|hr|ore?|ora))|\b(?:finalizar\w*)\D{0,12}(\d{2,5})(?!\s*[:]|\s*(?:de\s*)?(?:min|minute|mi|h|hr|ore?|ora)\b)\b|\b(\d{2,5})\s*(?=\s*(?:(?:30|60|90|120)\s*(?:['’]\s*)?(?:min|mi|h|hr|ore?|ora)|(?:1|2)\s*(?:['’]\s*)?(?:h|hr|ore?|ora)|(?:ora|h)\b))|\b(\d{2,5})\s*(?=(?:num(?:arul|ar)\s*)?\(\s*(?:30|60|90|120)\s*(?:min|mi|h|hr|ore?|ora))|\b(\d{2,5})\s*(?=-\s*(?:oral|normal|masaj|diferite|gfe|fk|finaliz\w*|o\s+(?:finaliz\w*|ora)\b|anal)\b)|\b(\d{2,5})\s*(?=\s*o\s+(?:finalizar\w*|ora)\b)|\b(\d{2,5})\s*(?=\s*\(\s*(?:1\s*\/\s*2|1\s+sau\s+2)\s+finalizar\w*)|\b(?:30|60|90|120)\s*(?:['’]\s*)?(?:de\s*)?(?:min(?:ute)?s?|mi)\b[\s:=-]{1,12}(\d{2,5})\b|\b(?:1|2)\s*(?:['’]\s*)?(?:h|hr|ore?|ora)\b[\s:=-]{1,12}(\d{2,5})\b/gi;
+  const moneyPattern = /\b(\d{2,5})\s*(?:de\s*)?(?:lei|ron)\b|\b(\d{2,5})\s*(?=\s*(?:finalizar\w*|fin)\b)|\b(\d{2,5})\s*(?=-\s*\(?\s*(?:fin|final|\d+\s*finalizar\w*|\d+\s*['’]?\s*(?:min|mi|h|hr|ore?|ora)|\d+\s*\/\s*\d+\s*fin|\d+\s*'))|\b(\d{2,5})\s*(?=\(\s*(?:30|60|90|120)\s*(?:min|mi|h|hr|ore?|ora))|\b(?:finalizar\w*)\D{0,12}(\d{2,5})(?!\s*[:]|\s*(?:de\s*)?(?:min|minute|mi|h|hr|ore?|ora)\b)\b|\b(\d{2,5})\s*(?=\s*(?:(?:30|60|90|120)\s*(?:['’]\s*)?(?:min|mi|h|hr|ore?|ora)|(?:1|2)\s*(?:['’]\s*)?(?:h|hr|ore?|ora)|(?:ora|h)\b))|\b(\d{2,5})\s*(?=(?:num(?:arul|ar)\s*)?\(\s*(?:30|60|90|120)\s*(?:min|mi|h|hr|ore?|ora))|\b(\d{2,5})\s*(?=-\s*(?:oral|normal|masaj|diferite|gfe|fk|finaliz\w*|o\s+(?:finaliz\w*|ora)\b|(?:h|hr|ore?|ora)|anal)\b)|\b(\d{2,5})\s*(?=\s*o\s+(?:finalizar\w*|ora)\b)|\b(\d{2,5})\s*(?=\s*\(\s*(?:1\s*\/\s*2|1\s+sau\s+2)\s+finalizar\w*)|\b(?:30|60|90|120)\s*(?:['’]\s*)?(?:de\s*)?(?:min(?:ute)?s?|mi)\b[\s:=-]{1,12}(\d{2,5})\b|\b(?:1|2)\s*(?:['’]\s*)?(?:h|hr|ore?|ora)\b[\s:=-]{1,12}(\d{2,5})\b|\b(?:ora|h)\b[\s:=-]{1,12}(\d{2,5})\b/gi;
 
   const formattedMoneyPattern = /\b(\d{1,3}(?:[.,]\d{3})+)\s*(?:lei|ron)\b/gi;
   const isPhoneNumberPart = (index: number): boolean => {
@@ -401,7 +490,7 @@ function amountMatches(line: string): Array<{amount: number; index: number}> {
   }
 
   for (const match of line.matchAll(moneyPattern)) {
-    const amountText = match[1] || match[2] || match[3] || match[4] || match[5] || match[6] || match[7] || match[8] || match[9] || match[10] || match[11] || match[12];
+    const amountText = match[1] || match[2] || match[3] || match[4] || match[5] || match[6] || match[7] || match[8] || match[9] || match[10] || match[11] || match[12] || match[13];
     if (amountText) {
       const matchStart = match.index ?? 0;
       const index = matchStart + match[0].lastIndexOf(amountText);
@@ -430,7 +519,23 @@ function amountMatches(line: string): Array<{amount: number; index: number}> {
     }
   }
 
+  for (const match of line.matchAll(/\b(\d{2,5})\s*nr\b/gi)) {
+    const amountText = match[1];
+    const index = (match.index ?? 0) + match[0].indexOf(amountText);
+    if (!isPhoneNumberPart(index) && !matches.some(existing => existing.index === index)) {
+      matches.push({amount: Number.parseInt(amountText, 10), index});
+    }
+  }
+
   for (const match of line.matchAll(/\b(\d{2,5})\s*\(\s*1\s*-\s*2\s+finalizar\w*/gi)) {
+    const amountText = match[1];
+    const index = (match.index ?? 0) + match[0].indexOf(amountText);
+    if (!isPhoneNumberPart(index) && !matches.some(existing => existing.index === index)) {
+      matches.push({amount: Number.parseInt(amountText, 10), index});
+    }
+  }
+
+  for (const match of line.matchAll(/\b(\d{2,5})\s+\d+\s*fin(?:alizar\w*)?\s*\/\s*(?:30|60|90|120)\s*min\b/gi)) {
     const amountText = match[1];
     const index = (match.index ?? 0) + match[0].indexOf(amountText);
     if (!isPhoneNumberPart(index) && !matches.some(existing => existing.index === index)) {
@@ -441,42 +546,86 @@ function amountMatches(line: string): Array<{amount: number; index: number}> {
   return matches;
 }
 
-function extractRates(text: string): {baseRates: EscortRates; outcallRates: EscortRates} {
+function extractRates(text: string): {baseRates: EscortRates; outcallRates: EscortRates; dominationRates: EscortRates} {
   const baseRates: EscortRates = {};
   const outcallRates: EscortRates = {};
+  const dominationRates: EscortRates = {};
   const baseCandidates: Partial<Record<keyof EscortRates, number[]>> = {};
   const outcallCandidates: Partial<Record<keyof EscortRates, number[]>> = {};
+  const dominationCandidates: Partial<Record<keyof EscortRates, number[]>> = {};
   const suppressBaseRates = !/\b(?:servici|prestat\w*|meniu|ofer\s+urmatoarele)\b/i.test(text) && /\b(?:duo|colab|show\s+lesb|programari\s+in\s+3)\b/i.test(text);
   let inOutcallSection = false;
+  let inDominationSection = false;
 
   for (const line of text.split('\n')) {
+    if (/\b(?:servicii?\s+de\s+dominare|dominare\s+activ[ăa])\b/i.test(line)) {
+      inDominationSection = true;
+    }
+    if (/\bnu\s+(?:prestez|accept)\b/i.test(line)) {
+      inDominationSection = false;
+    }
+
     if (/\bdeplasar\w*\s*:/i.test(line)) {
       inOutcallSection = true;
     }
 
     const isOutcallLine = inOutcallSection || /\b(?:out\s*call|hotel|deplasar)\w*/i.test(line);
-    const isRateLine = /(?:\b(?:lei|ron|pret|preturi|tarif|cadou\w*|price|finaliz\w*|fin\b|\d+\s*(?:min|minute|mi|h|hr|ora|ore))\b|\b\d{2,5}\s*(?:lei|ron)\b|')/i.test(line);
+    const isRateLine = /(?:\b(?:lei|ron|pret|preturi|tarif|cadou\w*|price|finaliz\w*|fin\b|\d+\s*(?:min|minute|mi|h|hr|ora|ore))\b|\b\d{2,5}\s*(?:lei|ron)\b|\d{2,5}\s*nr\b|')/i.test(line)
+      || (isOutcallLine && /\b(?:ora|h)\s+\d{2,5}\b/i.test(line));
     if (!isRateLine) {
       continue;
     }
+    const directOutcallHours = /\b(?:ora|h)\s+(\d{2,5})\b/gi.test(line)
+      ? [...line.matchAll(/\b(?:ora|h)\s+(\d{2,5})\b/gi)]
+      : [];
+    const directOutcallAmount = /\b(?:out\s*call|hotel|deplasar)\w*\b/i.test(line)
+      ? directOutcallHours
+        .map(match => Number.parseInt(match[1], 10))
+        .reverse()
+        .find(amount => amount >= 50)
+      : undefined;
+    if (directOutcallAmount !== undefined && directOutcallAmount >= 50) {
+      outcallCandidates['1h'] = [...(outcallCandidates['1h'] || []), directOutcallAmount];
+    }
 
-    const modifiedRateIndex = line.search(/\b(?:dupa|de\s+la)\s+ora\b/i);
+    const isServiceExtraLine = /\bserv(?:icii)?\s+extra\b/i.test(line)
+      || /^\s*\([^)]*(?:finaliz|fin\s+facial)/i.test(line);
+    if (isServiceExtraLine) {
+      continue;
+    }
+
+    const modifiedRateIndex = line.search(/\b(?:dupa|de\s+la)(?:\s+ora)?\b/i);
     const baseRateLine = modifiedRateIndex === -1 ? line : line.slice(0, modifiedRateIndex);
     const moneyMatches = amountMatches(baseRateLine);
+    const splitFinalizationsRate = /\b(\d{2,5})\s*(?:lei|ron)\s+1\s*\/\s*2\s+fin\w*\s+(?:in|de)\s+60\s*['’]/i.exec(baseRateLine);
+    if (splitFinalizationsRate && !isOutcallLine) {
+      baseCandidates['1h'] = [...(baseCandidates['1h'] || []), Number.parseInt(splitFinalizationsRate[1], 10)];
+    }
     for (const money of moneyMatches) {
       let duration = durationFromText(baseRateLine, money.index, moneyMatches.filter(otherMoney => otherMoney !== money).map(otherMoney => otherMoney.index));
       const prefix = baseRateLine.slice(0, money.index);
       const outcallIndex = Math.max(prefix.lastIndexOf('outcall'), prefix.lastIndexOf('out call'), prefix.lastIndexOf('hotel'), prefix.lastIndexOf('deplasar'));
       const serviceContextIndex = Math.max(prefix.lastIndexOf('servici'), prefix.lastIndexOf('pret'), prefix.lastIndexOf('cadou'));
       const isOutcall = isOutcallLine && (inOutcallSection || (outcallIndex > serviceContextIndex && money.index - outcallIndex <= 70));
-      if (!duration && /\b(?:finalizare|fin)\w*/i.test(line) && !isOutcall) {
+      if (isOutcall && money.amount < 50) {
+        continue;
+      }
+      const finalizationIndex = line.search(/\b(?:finalizare|fin)\w*/i);
+      if (!duration && finalizationIndex !== -1 && money.index <= finalizationIndex + 40 && !isOutcall) {
+        duration = '30m';
+      }
+      if (!duration && /\d{2,5}\s*nr\b/i.test(line) && !isOutcall) {
         duration = '30m';
       }
       if (!duration || (suppressBaseRates && !isOutcall)) {
         continue;
       }
 
-      const candidates = isOutcall ? outcallCandidates : baseCandidates;
+      const candidates = inDominationSection && !isOutcall
+        ? dominationCandidates
+        : isOutcall
+          ? outcallCandidates
+          : baseCandidates;
       candidates[duration] = [...(candidates[duration] || []), money.amount];
     }
   }
@@ -490,14 +639,19 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
     if (outcall?.length) {
       outcallRates[duration] = Math.min(...outcall);
     }
+    const domination = dominationCandidates[duration];
+    if (domination?.length) {
+      dominationRates[duration] = Math.min(...domination);
+    }
   }
 
-  return {baseRates, outcallRates};
+  return {baseRates, outcallRates, dominationRates};
 }
 
 function extractRateOverrides(text: string, baseRates: EscortRates): RateOverride[] {
   const overrides: RateOverride[] = [];
-  const thresholdPattern = /\b(?:dupa|de\s+la)\s+ora\s+(\d{1,2})(?:[:.](\d{2}))?\b/gi;
+  const thresholdPattern = /\b(?:dupa|de\s+la)(?:\s+ora)?\s+(\d{1,2})(?:[:.](\d{2}))?\b/gi;
+  const durations = ['30m', '1h', '1.5h', '2h'] as Array<keyof EscortRates>;
 
   for (const thresholdMatch of text.matchAll(thresholdPattern)) {
     const hour = Number.parseInt(thresholdMatch[1], 10);
@@ -508,10 +662,36 @@ function extractRateOverrides(text: string, baseRates: EscortRates): RateOverrid
 
     const thresholdEnd = (thresholdMatch.index ?? 0) + thresholdMatch[0].length;
     const lineEnd = text.indexOf('\n', thresholdEnd);
-    const tail = text.slice(thresholdEnd, lineEnd === -1 ? text.length : lineEnd);
+    const firstLineEnd = lineEnd === -1 ? text.length : lineEnd;
+    const tail = text.slice(thresholdEnd, firstLineEnd);
+    const followingLines = text.slice(firstLineEnd + 1).split('\n');
+    const sequentialAmounts: number[] = [];
+    for (const followingLine of followingLines) {
+      const sequentialAmount = /^[^\d]*(\d{2,5})[^\d]*$/.exec(followingLine.trim());
+      if (!sequentialAmount) {
+        break;
+      }
+
+      sequentialAmounts.push(Number.parseInt(sequentialAmount[1], 10));
+      if (sequentialAmounts.length >= durations.filter(duration => baseRates[duration] !== undefined).length) {
+        break;
+      }
+    }
     const override: RateOverride = {after: `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`};
     const surchargeMatch = /\+\s*(\d{2,5})\s*(?:lei|ron)?\b|\bcu\s+(\d{2,5})\s*(?:de\s+)?(?:lei|ron)?\s+in\s+plus\b/i.exec(tail);
     const rates = extractRates(tail).baseRates;
+    if (!Object.keys(rates).length && sequentialAmounts.length) {
+      for (const [index, duration] of durations.filter(duration => baseRates[duration] !== undefined).entries()) {
+        const amount = sequentialAmounts[index];
+        if (amount !== undefined) {
+          rates[duration] = amount;
+        }
+      }
+    }
+    const pairedPricesMatch = /\bpret(?:urile|uri)?\s+sunt\s+(\d{2,5})\s*\/\s*(\d{2,5})\b/i.exec(tail);
+    const pairedPrices = pairedPricesMatch && Object.keys(baseRates).includes('30m') && Object.keys(baseRates).includes('1h')
+      ? {'30m': Number.parseInt(pairedPricesMatch[1], 10), '1h': Number.parseInt(pairedPricesMatch[2], 10)}
+      : undefined;
     const surcharge = surchargeMatch?.[1] || surchargeMatch?.[2];
     if (surcharge) {
       const amount = Number.parseInt(surcharge, 10);
@@ -522,6 +702,8 @@ function extractRateOverrides(text: string, baseRates: EscortRates): RateOverrid
       override.rates = {...effectiveRates, ...rates};
     } else if (Object.keys(rates).length) {
       override.rates = rates;
+    } else if (pairedPrices) {
+      override.rates = pairedPrices;
     }
     if (override.rates) {
       overrides.push(override);
@@ -616,7 +798,8 @@ function extractSchedule(text: string): EscortSchedule[] {
 
   for (const line of text.split('\n')) {
     const hasScheduleContext = /\b(?:program\w*|orar|interval|disponib\w*)\b/i.test(line)
-      || DAY_EXPRESSION_PATTERN.test(line);
+      || DAY_EXPRESSION_PATTERN.test(line)
+      || /⏰/u.test(line);
     DAY_EXPRESSION_PATTERN.lastIndex = 0;
     if (!hasScheduleContext) {
       continue;
@@ -683,6 +866,15 @@ export const escortInfoExtractor = {
       return null;
     }
 
+    const temporaryPromotionOnlyText = /\bpromot\w*\b/i.test(normalizedText)
+      && /\bservicii\s+clasice\b/i.test(normalizedText)
+      && /\bsemnatur\w*\b/i.test(normalizedText);
+    const limitedPromotionText = /\blocur\w*\s+limitat\w*\b/i.test(normalizedText)
+      && /\bscot\w*\s+la\s+bataie\b/i.test(normalizedText);
+    if (temporaryPromotionOnlyText || limitedPromotionText) {
+      return null;
+    }
+
     const hasServiceContext = /\b(?:servici\w*|prestat\w*|meniu|ofer\w*|pret(?:uri|urile)|tarif(?:e|ele)|cadou\w*|price|finalizare\w*)\b/i.test(normalizedText);
     if (!Object.keys(rates.baseRates).length && !Object.keys(rates.outcallRates).length && !rateOverrides.length && !hasServiceContext) {
       return null;
@@ -701,6 +893,11 @@ export const escortInfoExtractor = {
           services[service] = details;
         }
       }
+
+      if (services.domSoft !== undefined || services.domHard !== undefined) {
+        delete services.dom;
+        delete services.domination;
+      }
     }
 
     if (!Object.keys(rates.baseRates).length) {
@@ -710,6 +907,9 @@ export const escortInfoExtractor = {
     const details: ServiceDetails = {baseRates: rates.baseRates};
     if (Object.keys(rates.outcallRates).length) {
       details.outcallRates = rates.outcallRates;
+    }
+    if (Object.keys(rates.dominationRates).length) {
+      details.dominationRates = rates.dominationRates;
     }
     if (rateOverrides.length) {
       details.rateOverrides = rateOverrides;
