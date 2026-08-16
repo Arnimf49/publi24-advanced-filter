@@ -36,7 +36,7 @@ for (const sample of samples) {
   });
 }
 
-for (const file of ["false-sample1.txt", "false-sample.txt", "false-sample2.txt", "false-sample3.txt", "false-sample4.txt", "false-sample5.txt", "false-sample6.txt", "false-sample7.txt"]) {
+for (const file of ["false-sample1.txt", "false-sample.txt", "false-sample2.txt", "false-sample3.txt", "false-sample4.txt", "false-sample5.txt", "false-sample6.txt", "false-sample7.txt", "false-sample8.txt"]) {
   test(`does not extract personal details from ${file}`, () => {
     expect(escortInfoExtractor.extractPersonalDetails(readSample(file))).toBeNull();
   });

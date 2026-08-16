@@ -82,10 +82,10 @@ const SMALL_CAPS = {
 };
 
 const SERVICE_PATTERNS: Record<EscortServiceName, RegExp> = {
-  op: /\b(?:op|bj|bj\s+p\s*\/\s*n|oral\s*(?:sex\s+)?(?:protejat|pro)|sex\s+oral\s*(?:protejat|pro)|oral\s*\(\s*pro\b|sex\s+oral\s*\(\s*pro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:protejat|pro)\b/g,
-  on: /\b(?:on|bj|bj\s+p\s*\/\s*n|oral\s*(?:sex\s+)?(?:neprotejat|nepro)|sex\s+oral\s*(?:neprotejat|nepro)|oral\s*\(\s*pro\s*\/\s*nepro\b|oral\s*\(\s*nepro\b|sex\s+oral\s*\(\s*nepro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:neprotejat|nepro|fara\s+prezervativ)\b/g,
-  np: /\bnp\b|\b(?:sex\s+)?normal\b(?!\s+neprotejat)(?:\s*\(\s*(?:(?:obligatoriu|doar)\s+)?protejat\s*[!.,;]?\s*\)|\s+(?:(?:obligatoriu|doar)\s+)?protejat\b|\s+in\s+diferite\s+pozitii\b)|\bsex\s*\(\s*(?:(?:obligatoriu|doar)\s+)?protejat\s*\)|\bact(?:ul)?\s+sexual\s+protejat\b/g,
-  nn: /\b(?:sex\s+)?normal\s+neprotejat\b|\bact(?:ul)?\s+sexual\s+neprotejat\b/g,
+  op: /\b(?:op|bj|bj\s+p\s*\/\s*n|p\s*\/\s*n|oral\s*(?:sex\s+)?(?:protejat|pro)|sex\s+oral\s*(?:protejat|pro)|oral\s*\(\s*pro\b|sex\s+oral\s*\(\s*pro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:protejat|pro)\b/g,
+  on: /\b(?:on|bj|bj\s+p\s*\/\s*n|p\s*\/\s*n|oral\s*(?:sex\s+)?(?:neprotejat|nepro)|sex\s+oral\s*(?:neprotejat|nepro)|oral\s*\(\s*pro\s*\/\s*nepro\b|oral\s*\(\s*nepro\b|sex\s+oral\s*\(\s*nepro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:neprotejat|nepro|fara\s+prezervativ)\b/g,
+  np: /\bnp\b|\b(?:sex\s+)?normal(?:ul)?\b(?!\s+neprotejat)(?:\s*\(\s*(?:(?:obligatoriu|doar)\s+)?protejat\s*[!.,;]?\s*\)|\s+(?:(?:obligatoriu|doar)\s+)?protejat\b|\s+in\s+diferite\s+pozitii\b)|\bsex\s*\(\s*(?:(?:obligatoriu|doar)\s+)?protejat\s*\)|\bact(?:ul)?\s+sexual\s+protejat\b/g,
+  nn: /\b(?:sex\s+)?normal(?:ul)?\s+neprotejat\b|\bact(?:ul)?\s+sexual\s+neprotejat\b/g,
   deepthroat: /\b(?:dt|deep\s*throat|deepthroat|deep)\b|\boral\s+adanc\b/g,
   facesitting: /\bface\s*sitting\b|\bfacesitting\b/g,
   facefuck: /\bface\s*fuck\b|\bfacefuck\b/g,
@@ -188,6 +188,10 @@ function findAge(text: string): number | undefined {
     }
 
     if (/\b(?:limita\s+de\s+varsta|varsta\s+(?:minima|maxima)|(?:pe|la)\s+vremea\s+aceea)\b/i.test(beforeAge)) {
+      continue;
+    }
+
+    if (/\b\d{1,2}\s*,\s*\d{1,2}\s+sau\s*$/i.test(beforeAge)) {
       continue;
     }
 
@@ -597,6 +601,11 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
     const modifiedRateIndex = line.search(/\b(?:dupa|de\s+la)(?:\s+ora)?\b/i);
     const baseRateLine = modifiedRateIndex === -1 ? line : line.slice(0, modifiedRateIndex);
     const moneyMatches = amountMatches(baseRateLine);
+    const compactFinalizationRates = /\bfin\w*\s+(\d{2,5})\s+ora\s+(\d{2,5})\b/i.exec(baseRateLine);
+    if (compactFinalizationRates && !isOutcallLine) {
+      baseCandidates['30m'] = [...(baseCandidates['30m'] || []), Number.parseInt(compactFinalizationRates[1], 10)];
+      baseCandidates['1h'] = [...(baseCandidates['1h'] || []), Number.parseInt(compactFinalizationRates[2], 10)];
+    }
     const splitFinalizationsRate = /\b(\d{2,5})\s*(?:lei|ron)\s+1\s*\/\s*2\s+fin\w*\s+(?:in|de)\s+60\s*['’]/i.exec(baseRateLine);
     if (splitFinalizationsRate && !isOutcallLine) {
       baseCandidates['1h'] = [...(baseCandidates['1h'] || []), Number.parseInt(splitFinalizationsRate[1], 10)];
@@ -618,6 +627,11 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
         duration = '30m';
       }
       if (!duration || (suppressBaseRates && !isOutcall)) {
+        continue;
+      }
+      if (compactFinalizationRates && !isOutcall
+        && money.index >= (compactFinalizationRates.index ?? 0)
+        && money.index < (compactFinalizationRates.index ?? 0) + compactFinalizationRates[0].length) {
         continue;
       }
 

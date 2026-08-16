@@ -565,6 +565,15 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       },
     },
   },
+  {
+    file: "sample66.txt",
+    expected: {
+      baseRates: {'30m': 100, '1h': 200},
+      services: {
+        op: true, on: true, np: true, cim: true, cob: true,
+      },
+    },
+  },
 ];
 
 for (const sample of samples) {

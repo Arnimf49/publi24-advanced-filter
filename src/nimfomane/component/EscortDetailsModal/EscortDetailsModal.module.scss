@@ -29,6 +29,7 @@
 .sectionMeta {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   color: #777;
   font-size: 12px;
@@ -196,7 +197,7 @@
     justify-content: flex-end;
     gap: 6px;
     text-align: right;
-    white-space: nowrap;
+    white-space: normal;
   }
 
   .detailsHeader {

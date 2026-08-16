@@ -33,9 +33,11 @@ export interface EscortItem {
   profileStatsTime?: number;
   personalDetails?: PersonalDetails;
   personalDetailsSourceUrl?: string;
+  personalDetailsSourceUrls?: string[];
   personalDetailsContentDate?: number;
   serviceDetails?: ServiceDetails;
   serviceDetailsSourceUrl?: string;
+  serviceDetailsSourceUrls?: string[];
   serviceDetailsContentDate?: number;
   escortDetailsTime?: number;
 }

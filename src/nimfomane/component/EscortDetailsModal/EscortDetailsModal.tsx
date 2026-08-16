@@ -27,6 +27,7 @@ type EscortDetailsModalProps = {
 
 type SectionMetaProps = {
   sourceUrl?: string;
+  sourceUrls?: string[];
   contentDate?: number;
 };
 
@@ -117,14 +118,19 @@ function formatService(service: EscortServiceName, value: ServiceAvailability): 
   return {label: SERVICE_LABELS[service], className: '', extraCost: value.extraCost};
 }
 
-const SectionMeta: React.FC<SectionMetaProps> = ({sourceUrl, contentDate}) => {
+const SectionMeta: React.FC<SectionMetaProps> = ({sourceUrl, sourceUrls, contentDate}) => {
   const relativeDate = formatRelativeTime(contentDate);
+  const urls = sourceUrls?.length ? sourceUrls : sourceUrl ? [sourceUrl] : [];
 
   return (
     <div className={styles.sectionMeta}>
       {relativeDate && <span>{relativeDate},</span>}
-      {sourceUrl ? (
-        <a href={sourceUrl} target="_blank" rel="noopener noreferrer">sursă</a>
+      {urls.length ? (
+        urls.map((url, index) => (
+          <a key={url} href={url} target="_blank" rel="noopener noreferrer">
+            {urls.length === 1 ? 'sursă' : `sursă ${index + 1}`}
+          </a>
+        ))
       ) : (
         <span>sursă indisponibilă</span>
       )}
@@ -139,6 +145,7 @@ const PersonalDetailsSection: React.FC<{details: PersonalDetails; escort: Escort
       <div data-wwid="personal-details-meta">
         <SectionMeta
           sourceUrl={escort.personalDetailsSourceUrl}
+          sourceUrls={escort.personalDetailsSourceUrls}
           contentDate={escort.personalDetailsContentDate}
         />
       </div>
@@ -224,7 +231,14 @@ const ServicesTable: React.FC<{details: ServiceDetails}> = ({details}) => {
       <table className={styles.detailsTable}>
         <tbody>
           {SERVICE_GROUPS.map(group => {
-            const services = group.services.filter(service => details.services?.[service] !== undefined);
+            const services = group.services.filter(service => {
+              if (service === 'dom'
+                && (details.services?.domSoft !== undefined || details.services?.domHard !== undefined)) {
+                return false;
+              }
+
+              return details.services?.[service] !== undefined;
+            });
             if (!services.length) {
               return null;
             }
@@ -262,6 +276,7 @@ const ServiceDetailsSection: React.FC<{details: ServiceDetails; escort: EscortIt
       <div data-wwid="service-details-meta">
         <SectionMeta
           sourceUrl={escort.serviceDetailsSourceUrl}
+          sourceUrls={escort.serviceDetailsSourceUrls}
           contentDate={escort.serviceDetailsContentDate}
         />
       </div>
