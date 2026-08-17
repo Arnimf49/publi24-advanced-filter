@@ -8,7 +8,8 @@
     "detect-duplicate-sitenames": "node src-mapper/detect-duplicate-sitenames.js",
     "build": "./misc/build.sh",
     "presentation:dev": "vite --config src-presentation/vite.config.ts",
-    "presentation:build": "vite build --config src-presentation/vite.config.ts",
+    "presentation:typecheck": "tsc --noEmit -p src-presentation/tsconfig.json",
+    "presentation:build": "npm run presentation:typecheck && vite build --config src-presentation/vite.config.ts",
     "presentation:preview": "vite preview --config src-presentation/vite.config.ts",
     "rollup-b": "rollup -c",
     "rollup": "rollup -c -w",
@@ -61,7 +62,8 @@
     "sass": "^1.86.3",
     "tsx": "^4.21.0",
     "typescript": "^5.8.3",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "vite-plugin-checker": "^0.14.5"
   },
   "dependencies": {
     "@splidejs/splide": "4.1.4",

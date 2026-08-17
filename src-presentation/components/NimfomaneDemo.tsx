@@ -176,8 +176,7 @@ const DemoEscortCard: React.FC<{
       containerRef={containerRef}
       imageUrl={topic.image}
       imageLoading={false}
-      imageError={false}
-      onImageError={() => undefined}
+      imageLoadError={null}
       profileStats={{
         posts: 72,
         lastVisited: '2026-08-11T04:24:36Z',
@@ -293,7 +292,7 @@ const NimfomaneTopic: React.FC<{
               className="ipsType_break"
               id={topic.authorLinkId}
             >
-              {topic.authorStyle === 'struck' ? <s>{topic.user}</s> : <b><font color="#FF0000" face="Tahoma">{topic.user}</font></b>}
+              {topic.authorStyle === 'struck' ? <s>{topic.user}</s> : <b><span style={{color: '#FF0000', fontFamily: 'Tahoma'}}>{topic.user}</span></b>}
             </a>,
           </span>
           <time dateTime={topic.dateTime} title={topic.date} data-short={topic.date}>{topic.date}</time>
@@ -335,7 +334,7 @@ const NimfomaneTopic: React.FC<{
             className="ipsType_break"
             id={topic.lastPosterLinkId}
           >
-            {topic.lastPosterStyle === 'highlighted' ? <b><font color="#FF0000" face="Tahoma">{topic.lastPoster}</font></b> : topic.lastPoster}
+            {topic.lastPosterStyle === 'highlighted' ? <b><span style={{color: '#FF0000', fontFamily: 'Tahoma'}}>{topic.lastPoster}</span></b> : topic.lastPoster}
           </a>
         </li>
         <li className="ipsType_light"><time dateTime={topic.lastPosterDateTime} title={topic.lastPosterDateTitle} data-short={topic.lastPosterDateShort}>4 hours ago</time></li>
@@ -504,6 +503,7 @@ const NimfomaneSite: React.FC<{
           favorites={favoriteUsers}
           inLocationEscorts={favoriteUsers}
           otherLocationEscorts={[]}
+          inactiveEscorts={[]}
           currentCity="Cluj-Napoca"
           renderEscort={(user, index) => {
             const topic = TOPICS.find((candidate) => candidate.user === user);
