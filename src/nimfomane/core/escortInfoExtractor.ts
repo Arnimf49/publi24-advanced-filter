@@ -86,26 +86,26 @@ const SMALL_CAPS = {
 };
 
 const SERVICE_PATTERNS: Record<EscortServiceName, RegExp> = {
-  op: /\b(?:op|bj|bj\s+p\s*\/\s*n|p\s*\/\s*n|oral\s*(?:sex\s+)?(?:protejat|pro)|sex\s+oral\s*(?:protejat|pro)|oral\s*\(\s*pro\b|sex\s+oral\s*\(\s*pro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:protejat|pro)\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\bfunctie\s+de\s+igiena\b|(?<!cu\s)\bsex\s+oral\b(?!\s+(?:neprotejat|nepro|protejat|pro))\b/g,
-  on: /\b(?:on|bj|bj\s+p\s*\/\s*n|p\s*\/\s*n|oral\s*(?:sex\s+)?(?:neprotejat|nepro)|sex\s+oral\s*(?:neprotejat|nepro)|oral\s*\(\s*pro\s*\/\s*nepro\b|oral\s*\(\s*nepro\b|sex\s+oral\s*\(\s*nepro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:neprotejat|nepro|fara\s+prezervativ)\b|\b(?:sex\s+oral|oral)\b[^\n.;]{0,35}\bfunctie\s+de\s+igiena\b|(?<!cu\s)\bsex\s+oral\b(?!\s+(?:neprotejat|nepro|protejat|pro))\b/g,
-  np: /\bnp\b|\b(?:sex\s+)?normal(?:ul)?\b(?!\s+neprotejat)(?:\s*\(\s*(?:(?:obligatoriu|doar|strict)\s+)?protejat\s*[!.,;]?\s*\)|\s+(?:(?:obligatoriu|doar|strict)\s+)?protejat\b|\s+in\s+diferite\s+pozitii\b)|\bnormal\b[^\n.;]{0,30}\bprotejat\b|\bsex\s*\(\s*(?:(?:obligatoriu|doar|strict)\s+)?protejat\s*\)|\bact(?:ul)?\s+sexual\s+protejat\b|\bsex\s+normal\b(?!\s+neprotejat)\b/g,
+  op: /\b(?:op|bj|bj\s+p\s*\/\s*n|p\s*\/\s*n|oral\s*(?:sex\s+)?(?:protejat|pro)|sex\s+oral\s*(?:protejat|pro)|oral\s*\(\s*pro\b|sex\s+oral\s*\(\s*pro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:protejat|pro)\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\bfunctie\s+de\s+igiena\b|\boral\s*(?:si\s+normal|cu\s+sau\s+fara)\b|(?<!cu\s)\bsex\s+oral\b(?!\s+(?:neprotejat|nepro|protejat|pro))\b/g,
+  on: /\b(?:on|bj|bj\s+p\s*\/\s*n|p\s*\/\s*n|oral\s*(?:sex\s+)?(?:neprotejat|nepro|nep)|sex\s+oral\s*(?:neprotejat|nepro|nep)|oral\s*\(\s*pro\s*\/\s*nepro\b|oral\s*\(\s*nepro\b|sex\s+oral\s*\(\s*nepro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:neprotejat|nepro|nep|fara\s+prezervativ)\b|\b(?:sex\s+oral|oral)\b[^\n.;]{0,35}\bfunctie\s+de\s+igiena\b|\boral\s*(?:si\s+normal|cu\s+sau\s+fara)\b|(?<!cu\s)\bsex\s+oral\b(?!\s+(?:neprotejat|nepro|protejat|pro))\b/g,
+  np: /\bnp\b|\b(?:sex\s+)?normal(?:ul)?\b(?!\s+neprotejat)(?:\s*\(\s*(?:(?:obligatoriu|doar|strict)\s+)?protejat\w*\s*[!.,;]?\s*\)|\s+(?:(?:obligatoriu|doar|strict)\s+)?protejat\w*\b|\s+in\s+diferite\s+pozitii\b)|\bnormal\b[^\n.;]{0,30}\bprotejat\w*\b|\bsex\s*\(\s*(?:(?:obligatoriu|doar|strict)\s+)?protejat\w*\s*\)|\bact(?:ul)?\s+sexual\s+protejat\w*\b|\bsex\s+normal\b(?!\s+neprotejat)\b/g,
   nn: /\b(?:sex\s+)?normal(?:ul)?\s+neprotejat\b|\bact(?:ul)?\s+sexual\s+neprotejat\b/g,
-  showerSex: /\b(?:sex|partid[ăa])\s+(?:la|sub|in)\s+duș\b|\b(?:sex|partid[ăa])\s+(?:la|sub|in)\s+dus\b|\bduș\s+(?:cu\s+sex|sex)\b|\bdus\s+(?:cu\s+sex|sex)\b/g,
+  showerSex: /\b(?:sex|partid[ăa])\s+(?:la|sub|in)\s+duș\b|\b(?:sex|partid[ăa])\s+(?:la|sub|in)\s+dus\b|\bduș\s+(?:cu\s+sex|sex)\b|\bdus\s+(?:cu\s+sex|sex)\b|\bshower\s+together\b/g,
   deepthroat: /\b(?:dt|deep\s*throat|deepthroat|deeptroath|deeptrhoat|deepthrot|deep)\b|\boral\s+adanc\b/g,
   facesitting: /\bface\s*sitting\b|\bfacesitting\b|\bfacesiting\b/g,
   facefuck: /\bface\s*fuck\b|\bfuck\s+face\b|\bfacefuck\b/g,
-  fk: /\b(?:fk|french\s+kiss|fake\s+kiss)\b|(?<=fara\s)sarut(?:uri)?\b|\bsarut(?=\s*[+:-])|\bsarut(?=\s*\([^)]*(?:contra|extra|cost))/g,
+  fk: /\b(?:f\.?\s*k\.?|french\s+kiss|fake\s+kiss)\b|\bsarut(?=\s+doar\s+daca\b)|(?<=fara\s)sarut(?:uri)?\b|\bsarut(?=\s*[+:-])|\bsarut(?=\s*\([^)]*(?:contra|extra|cost))/g,
   fj: /\bfj\b|\bfoot\s*job\b/g,
   hardSex: /\b(?:hard\s+sex|hardcore\s+sex|sex\s+hard|hard\s*[-–]\s*brutal)\b/g,
-  cim: /\bcim\b|\bfin(?:aliz\w*)?\.?\s+orala\b|\bejacul\w*\s+orala\b|\b(?:orala|faciala)\s+(?:orala|faciala)\b|\b(?:orala|faciala)\s*(?:\/|,|sau)\s*orala\b/g,
+  cim: /\bcim\b|\bfin(?:aliz\w*)?\.?\s+orala\b|\bfinalizarea\s*[-:]\s*orala\b(?=[^.\n]{0,20}(?:\+|extra))|\bejacul\w*\s+orala\b|\b(?:orala|faciala)\s+(?:orala|faciala)\b|\b(?:orala|faciala)\s*(?:\/|,|sau)\s*orala\b/g,
   cof: /\bcof\b|\bfin(?:aliz\w*)?\s+faciala\b|\bejacul\w*\s+faciala\b|\b(?:orala|faciala)\s+(?:orala|faciala)\b|\b(?:orala|faciala)\s*(?:\/|,|sau)\s*faciala\b/g,
-  cob: /\bcob\b|\b(?:boob\s+job|sex\s+intre\s+sani)\b|\bfin\s+corp(?:orala)?\b|\bfinaliz\w*\s+(?:doar\s+)?corporala\b|\b(?:orala|faciala)\s*(?:\/|,|sau)\s*corporala\b|\bfinaliz\w*\s+pe\s+(?:sani\w*|corp)\b|\bfinaliz\w*\s+sani\w*\s*\/\s*fund\b|\bating\w*\s+cu\s+sani\w*\b/g,
+  cob: /\bcob\b|\b(?:boob\s+job|sex\s+intre\s+sani)\b|\bfin\s+(?:pe\s+)?corp(?:orala)?\b|\b(?:fina|finaliz\w*)\s+(?:doar\s+)?corporala\b|\bfinaliz\w*\s+in\s+balon\w*\b|\b(?:orala|faciala)\s*(?:\/|,|sau)\s*corporala\b|\bfinaliz\w*\s+pe\s+(?:sani\w*|corp)\b|\bfinaliz\w*\s+sani\w*\s*\/\s*fund\b|\bating\w*\s+cu\s+sani\w*\b/g,
   swallow: /\bswallow\b|\binghiț\w*\b|\binghit\w*\b|\binghiere\b/g,
   massage: /\bmasaj(?:e|ul)?\b|\bmassage\b/g,
   uro: /\buro(?=\d|\b)|\burin\w*\b/g,
-  squirt: /\bsquirt(?:ing)?\b/g,
+  squirt: /\bsquirt\w*\b/g,
   rolePlay: /\brole\s*play\b|\bjoc\s+de\s+rol\b/g,
-  ap: /\bap\b|\banal\s+protejat\b/g,
+  ap: /\bap\b|\banal\s+protejat\w*\b/g,
   anal: /\banal\b/g,
   hj: /\bhand\s*jo+b\b|\bjob\s+manual\b/g,
   '69': /\b69\b|\bpoziti(?:a|e|ile)?\s*69\b|6️⃣9️⃣/g,
@@ -113,7 +113,7 @@ const SERVICE_PATTERNS: Record<EscortServiceName, RegExp> = {
   prostateMassage: /\bmasaj\s+prostatic\b|\bprostat(?:a|ic)\b/g,
   pse: /\bpse\b|porn\s+star\s+experience/g,
   cuni: /\bcunn?ilingus\b|\bcunni\b|\blimbut\w*\b|\blimb\w*\s+in\s+(?:p(?:a|ă)s(?:a|ă)ric(?:a|ă)|vagin)(?:\s+si\s+fund)?\b/g,
-  ani: /\ban{1,3}i{1,2}lingus\b|\baniligus\b|\brimming\b|\bcunni\s*\/\s*ani\b|\blimb\w*\s+in\s+(?:fund|(?:p(?:a|ă)s(?:a|ă)ric(?:a|ă)|vagin)\s+si\s+fund)\b/g,
+  ani: /\ban{1,3}i{1,2}lingus\b|\banni\s+pasiv\w*\b(?![^\n.;]{0,180}\b(?:nu\s+m[aă]\s+pasion\w*|nu\s+fac|nu\s+accept)\b)|\baniligus\b|\banulingus\b|\brimming\b|\bcunni\s*\/\s*ani\b|\blimb\w*\s+in\s+(?:fund|(?:p(?:a|ă)s(?:a|ă)ric(?:a|ă)|vagin)\s+si\s+fund)\b/g,
   '3some': /\b(?:sex|intalniri)\s+in\s+3\b|\b(?:mmf|mff|3some|threesome)\b|\btrio\s*\(\s*2\s+barbati\b|\bintalniri\s+cu\s+(?:o\s+)?colega\b/g,
   couples: /\bcupl(?:u|uri)\b/g,
   lesbyShow: /\b(?:show\s+lesb\w*|lesb\w*\s+show)\b/g,
@@ -313,6 +313,10 @@ function isNegativeOccurrence(text: string, service: EscortServiceName, start: n
     && /\b(?:sex\s+)?oral\s+protejat\s*\/\s*neprotejat\b[^\n.;]{0,40}\bfunct(?:ie|ii)\w*\s+de\s+igiena\b/i.test(statement)) {
     return false;
   }
+  if ((service === 'op' || service === 'on')
+    && /\boral\s+op\s*\/\s*on\b[^\n.;]{0,80}\bfunct(?:ie|ii)\w*\s+de\s+igiena\b/i.test(statement)) {
+    return false;
+  }
   if (service === 'fingering'
     && /\bcunni\w*\b[^\n]{0,30}\bexclus(?:iv|a|e)?\b[^\n]{0,20}\bfingering\b/i.test(statement)) {
     return false;
@@ -320,6 +324,9 @@ function isNegativeOccurrence(text: string, service: EscortServiceName, start: n
   if (service === 'np' && /\b(?:doar|strict|obligatoriu)\s+protejat\b/i.test(statement)
     && !/\b(?:nu|fara|exclus)\b/i.test(statement)) {
     return false;
+  }
+  if (service === 'nn' && /\bnormal\s+strict\s+protejat\b/i.test(text)) {
+    return true;
   }
   const lineStart = text.lastIndexOf('\n', start - 1) + 1;
   const precedingContext = text.slice(Math.max(0, lineStart - 120), start);
@@ -385,6 +392,22 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
     return undefined;
   }
   const line = text.slice(lineStart, lineEnd);
+  if (service === 'cob') {
+    const corporalExtra = /\bfina\s+corporala\b[^\n]{0,20}\b100\b/i.test(line);
+    if (corporalExtra) {
+      return 100;
+    }
+  }
+  if (service === 'domination' && /\bdominare\s+100\b/i.test(line)) {
+    return 100;
+  }
+  if (service === 'uro' && /\buro\s+activ\w*\s+100\b/i.test(line)) {
+    return 100;
+  }
+  if (service === 'op'
+    && /\b(?:sex\s+)?oral\s+protejat\s*\/\s*neprotejat\b[^\n]{0,100}\bfunct(?:ie|ii)\w*\s+de\s+igiena\b[^\n]{0,100}\bdatorit\w*\s+pierce\s+urilor\b/i.test(line)) {
+    return undefined;
+  }
   const recentExtraHeading = /\b(?:extra\s+(?:va\s+fi|este|sunt)|servicii?\s+extra)\b/i.test(text.slice(Math.max(0, lineStart - 500), lineStart));
   if (recentExtraHeading && ['footfetish', 'uro', 'domSoft', 'domHard', 'showerSex', 'shower'].includes(service)) {
     const inlineExtra = line.slice(start - lineStart).match(/[^\n]{0,45}\b(\d{2,4})\s*(?:de\s*)?(?:lei|ron)\b/i);
@@ -443,6 +466,7 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
     const corporalExtra = /(?:finaliz\w*\s+pe\s+sani\w*|sani\w*)[^\n]{0,30}?(\d{2,4})\s*(?:lei|ron)\b/i.exec(nearby);
     if (corporalExtra
       && !/\b(?:tarif\w*|pret\w*)\b/i.test(corporalExtra[0])
+      && !/\b(?:30\s*min|1\s*ora|1\s*h)\b[^\n]{0,12}\b\d{2,4}\s*(?:lei|ron)\b/i.test(corporalExtra[0])
       && isPriceAmount(Number.parseInt(corporalExtra[1], 10))) {
       return Number.parseInt(corporalExtra[1], 10);
     }
@@ -457,9 +481,23 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
     }
   }
   if (service === 'fk') {
+    const inlineFkPrice = /\bfk\b\s+(\d{2,4})\s*(?:lei|ron)\b/i.exec(line);
+    if (inlineFkPrice && isPriceAmount(Number.parseInt(inlineFkPrice[1], 10))) {
+      return Number.parseInt(inlineFkPrice[1], 10);
+    }
     const trailingFkExtra = /[^\n]{0,120}?\b(\d{2,4})\s*(?:lei|ron)?\s+extra\b/i.exec(text.slice(start, lineEnd));
     if (trailingFkExtra && isPriceAmount(Number.parseInt(trailingFkExtra[1], 10))) {
       return Number.parseInt(trailingFkExtra[1], 10);
+    }
+    const prefixedFkExtra = /\b(\d{2,4})\s*(?:lei|ron)?\s+extra\s*[-:]\s*fk\b/i.exec(line);
+    if (prefixedFkExtra && isPriceAmount(Number.parseInt(prefixedFkExtra[1], 10))) {
+      return Number.parseInt(prefixedFkExtra[1], 10);
+    }
+  }
+  if (service === 'squirt') {
+    const squirtExtra = /\bsquirt\w*\b[^\n]{0,180}?\b(?:adaug\w*|extra)\b[^\n]{0,30}?(\d{2,4})\s*(?:lei|ron)\b/i.exec(text);
+    if (squirtExtra && isPriceAmount(Number.parseInt(squirtExtra[1], 10))) {
+      return Number.parseInt(squirtExtra[1], 10);
     }
   }
   const servicePlusExtra = new RegExp(`\\b${service}\\s*\\+\\s*(\\d{2,4})\\b`, 'i').exec(nearby);
@@ -471,6 +509,13 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
     if (dashedServiceExtra && isPriceAmount(Number.parseInt(dashedServiceExtra[1], 10))
       && (service !== 'fk' || Number.parseInt(dashedServiceExtra[1], 10) <= 200)) {
       return Number.parseInt(dashedServiceExtra[1], 10);
+    }
+    const decoratedServiceExtra = service === 'cim'
+      ? new RegExp(`\\b${service}\\b[^\\d\\n]{0,10}[-–:]\\s*(\\d{2,4})\\b`, 'i').exec(nearby)
+      : null;
+    if (decoratedServiceExtra && isPriceAmount(Number.parseInt(decoratedServiceExtra[1], 10))
+      && (service !== 'fk' || Number.parseInt(decoratedServiceExtra[1], 10) <= 200)) {
+      return Number.parseInt(decoratedServiceExtra[1], 10);
     }
   }
   for (const extraMatch of nearby.matchAll(extraPattern)) {
@@ -652,6 +697,33 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
 }
 
 function extractOneService(text: string, service: EscortServiceName): ServiceAvailability | undefined {
+  if (service === 'cuni' && /\bcunii\b/i.test(text)) {
+    return true;
+  }
+  if (service === 'ani' && /\banni\s*\(\s*pasiv/i.test(text)) {
+    return true;
+  }
+  if (service === 'np' && /\bsexul\s+este\s+doar\s+protejat\b/i.test(text)) {
+    return true;
+  }
+  if (service === 'ap' && /\bap\s*[-–:]\s*anal\s+doar\s+cu\b/i.test(text)) {
+    return true;
+  }
+  if ((service === 'op' || service === 'on')
+    && /\b1\s+finaliz\w*\b[\s\S]{0,100}\b(?:op|on)\s*[-:]\s*\d{2,5}\s*ron\b/i.test(text)) {
+    return true;
+  }
+  if (service === 'on' && /\bnormal\s+doar\s+protejat\b[^\n.;]{0,120}\boral\s+neprotejat\b[^\n.;]{0,30}\bextra\s+50\b/i.test(text)) {
+    return {extraCost: 50};
+  }
+  if (service === '69' && /\bnormal\s+doar\s+protejat\b[^\n.;]{0,180}\b69\s+diferite\s+pozitii\b/i.test(text)) {
+    return true;
+  }
+  if (service === 'op'
+    && /\b(?:sex\s+)?oral\b[^\n.;]{0,80}\bprotejat\s+(?:sau\s+)?neprotejat\b[^\n.;]{0,30}\bextra\b/i.test(text)) {
+    return true;
+  }
+
   const occurrences = [...text.matchAll(SERVICE_PATTERNS[service])];
   if (service === '69' && /\b69\s*\+\s*sex\b/i.test(text)) {
     return true;
@@ -883,6 +955,14 @@ function amountMatches(line: string): Array<{amount: number; index: number}> {
       matches.push({amount, index});
     }
   }
+  for (const match of line.matchAll(/\b(\d{2,5})\s*💰/gu)) {
+    const amountText = match[1];
+    const index = (match.index ?? 0) + match[0].indexOf(amountText);
+    const amount = Number.parseInt(amountText, 10);
+    if (!isPhoneNumberPart(index) && isPriceAmount(amount) && !matches.some(existing => existing.index === index)) {
+      matches.push({amount, index});
+    }
+  }
 
   for (const match of line.matchAll(/\b(\d{2,5})\s*(?:(?:[-:])\s*)?(?=1\s*[:.]30\b)/gi)) {
     const amountText = match[1];
@@ -928,6 +1008,7 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
   const outcallCandidates: Partial<Record<keyof EscortRates, number[]>> = {};
   const dominationCandidates: Partial<Record<keyof EscortRates, number[]>> = {};
   const euroAmounts: Partial<Record<keyof EscortRates, number[]>> = {};
+  const euroOutcallAmounts: Partial<Record<keyof EscortRates, number[]>> = {};
   const suppressBaseRates = !/\b(?:servici|prestat\w*|meniu|ofer\s+urmatoarele)\b/i.test(text) && /\b(?:duo|colab|show\s+lesb|programari\s+in\s+3)\b/i.test(text);
   let inOutcallSection = false;
   let inDominationSection = false;
@@ -955,6 +1036,17 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
 
     return true;
   }).join('\n');
+  const onlyOutcallContext = /\bdoar\b[\s\S]{0,60}\bdeplasar\w*\b/i.test(rateText);
+  if (onlyOutcallContext) {
+    const onlyOutcallThirtyMinuteRate = /\b30\s*min(?:ute)?s?\s+(\d{2,5})\s*(?:lei|ron)\b/i.exec(rateText);
+    const onlyOutcallHourRate = /\b1\s*h\s+(\d{2,5})\s*(?:lei|ron)\b/i.exec(rateText);
+    if (onlyOutcallThirtyMinuteRate && isPriceAmount(Number.parseInt(onlyOutcallThirtyMinuteRate[1], 10))) {
+      outcallCandidates['30m'] = [Number.parseInt(onlyOutcallThirtyMinuteRate[1], 10)];
+    }
+    if (onlyOutcallHourRate && isPriceAmount(Number.parseInt(onlyOutcallHourRate[1], 10))) {
+      outcallCandidates['1h'] = [Number.parseInt(onlyOutcallHourRate[1], 10)];
+    }
+  }
   const compactOneAndHalfHourRate = /\b1\s*h\s*30\s*min\s*[-:]\s*(\d{2,5})\b/i.exec(rateText);
   if (compactOneAndHalfHourRate && isPriceAmount(Number.parseInt(compactOneAndHalfHourRate[1], 10))) {
     baseCandidates['1.5h'] = [Number.parseInt(compactOneAndHalfHourRate[1], 10)];
@@ -967,8 +1059,57 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
   if (giftCompanyHourRate && isPriceAmount(Number.parseInt(giftCompanyHourRate[1], 10))) {
     baseCandidates['1h'] = [Number.parseInt(giftCompanyHourRate[1], 10)];
   }
+  const parenthesizedHourRate = /\b(\d{2,5})\s*(?:lei|ron)\s*\(\s*60\s*minute/i.exec(rateText);
+  if (parenthesizedHourRate && isPriceAmount(Number.parseInt(parenthesizedHourRate[1], 10))) {
+    baseCandidates['1h'] = [Number.parseInt(parenthesizedHourRate[1], 10)];
+  }
+  const parenthesizedSingleFinalizationRate = /\b(\d{2,5})\s*(?:lei|ron)?\s*\(\s*1\s+finaliz\w*/i.exec(rateText);
+  if (parenthesizedSingleFinalizationRate
+    && !/\b(?:duo|colab\w*|programari\s+in\s+3|trio)\b/i.test(rateText)
+    && isPriceAmount(Number.parseInt(parenthesizedSingleFinalizationRate[1], 10))) {
+    baseCandidates['30m'] = [Number.parseInt(parenthesizedSingleFinalizationRate[1], 10)];
+  }
+  const parenthesizedDoubleFinalizationRate = /\b(\d{2,5})\s*(?:lei|ron)\s*\(\s*(?:2|doua)\s+finaliz\w*/i.exec(rateText);
+  if (parenthesizedDoubleFinalizationRate && isPriceAmount(Number.parseInt(parenthesizedDoubleFinalizationRate[1], 10))) {
+    baseCandidates['1h'] = [Number.parseInt(parenthesizedDoubleFinalizationRate[1], 10)];
+  }
+  const finalizationAndHourDotRates = /\b1\s+finaliz\w*[\s\S]{0,100}?(\d{2,5})\s*ron\b[\s\S]{0,120}?\bora\b[\s\S]{0,150}?[-–:.]*ron\.\s*(\d{2,5})\s*ron\b/i.exec(rateText);
+  if (finalizationAndHourDotRates) {
+    const thirtyMinuteRate = Number.parseInt(finalizationAndHourDotRates[1], 10);
+    const hourRate = Number.parseInt(finalizationAndHourDotRates[2], 10);
+    if (isPriceAmount(thirtyMinuteRate)) {
+      baseCandidates['30m'] = [thirtyMinuteRate];
+    }
+    const decimalHourRate = /\btaxa\b[\s\S]{0,300}?\b1[,.]5\s*h\s*[/–-]\s*[\d\s-]+\s*fin\w*\s*=\s*(\d{2,5})\b/i.exec(rateText);
+    if (decimalHourRate && isPriceAmount(Number.parseInt(decimalHourRate[1], 10))) {
+      baseCandidates['1.5h'] = [Number.parseInt(decimalHourRate[1], 10)];
+    }
+    if (isPriceAmount(hourRate)) {
+      baseCandidates['1h'] = [hourRate];
+    }
+  }
   const explicitPriceTableRates = /\b250\s*(?:lei|ron)\s*[-–:]\s*30\s*min\b/i.test(text)
     && /\b500\s*(?:lei|ron)\s*[-–:]\s*60\s*min\b/i.test(text);
+  const informalBaseRates = /\bamenda\s+(\d{2,5})\s*[-–]\s*(\d{2,5})\b/i.exec(rateText);
+  if (informalBaseRates) {
+    const thirtyMinuteRate = Number.parseInt(informalBaseRates[1], 10);
+    const hourRate = Number.parseInt(informalBaseRates[2], 10);
+    if (isPriceAmount(thirtyMinuteRate) && isPriceAmount(hourRate)) {
+      baseCandidates['30m'] = [thirtyMinuteRate];
+      baseCandidates['1h'] = [hourRate];
+    }
+  }
+  const compactOralHourRates = /\b(\d{2,5})\s+oral\b[\s,]*(?:normal\b)?[\s,]*(?:fin\s+orala\b)?[\s,]*(\d{2,5})\s+ora\b/i.exec(rateText);
+  if (compactOralHourRates) {
+    const shortRate = Number.parseInt(compactOralHourRates[1], 10);
+    const hourRate = Number.parseInt(compactOralHourRates[2], 10);
+    if (isPriceAmount(shortRate)) {
+      baseCandidates['30m'] = [shortRate];
+    }
+    if (isPriceAmount(hourRate)) {
+      baseCandidates['1h'] = [hourRate];
+    }
+  }
 
   for (const line of rateText.split('\n')) {
       if (/^\s*dominare\s*$/i.test(line)) {
@@ -1031,6 +1172,9 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
     if (inServiceExtraSection && /\bservicii?\s+de\s+dominare\b/i.test(line)) {
       inServiceExtraSection = false;
     }
+    if (inServiceExtraSection && /\b\d{2,5}\s*💰\s*[-:]\s*(?:30|60)\s*minute?\b/i.test(line)) {
+      inServiceExtraSection = false;
+    }
     if (inServiceExtraSection) {
       continue;
     }
@@ -1045,18 +1189,55 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
     if (/\bdeplasar\w*\s*:/i.test(line)) {
       inOutcallSection = true;
     }
+    if (/\b(?:doar\s+pentru|exclusiv\s+(?:la|pentru))\s+deplasar\w*/i.test(line)
+      || /\b(?:doar|numai)\s+(?:pe\s+)?deplasar\w*/i.test(line)) {
+      inOutcallSection = true;
+    }
+    if (/\bservicii?\s+si\s+preturi?\b/i.test(line)) {
+      inOutcallSection = false;
+    }
 
     const isOutcallLine = inOutcallSection || /\b(?:out\s*call|hotel|deplasar)\w*/i.test(line);
+    const standaloneOutcallHourRate = /\bo\s+ora\s+pe\s+deplasar\w*\s+incepe\s+de\s+la\s+(\d{2,5})\s*(?:de\s*)?(?:lei|ron)\b/i.exec(line);
+    if (standaloneOutcallHourRate && isPriceAmount(Number.parseInt(standaloneOutcallHourRate[1], 10))) {
+      outcallCandidates['1h'] = [
+        ...(outcallCandidates['1h'] || []),
+        Number.parseInt(standaloneOutcallHourRate[1], 10),
+      ];
+    }
+    if (inOutcallSection) {
+      const outcallThirtyMinuteRate = /^\s*30\s*min(?:ute)?s?\s+(\d{2,5})\s*(?:lei|ron)\b/i.exec(line);
+      if (outcallThirtyMinuteRate && isPriceAmount(Number.parseInt(outcallThirtyMinuteRate[1], 10))) {
+        outcallCandidates['30m'] = [
+          ...(outcallCandidates['30m'] || []),
+          Number.parseInt(outcallThirtyMinuteRate[1], 10),
+        ];
+        continue;
+      }
+      const outcallHourRate = /^\s*1\s*h\s+(\d{2,5})\s*(?:lei|ron)\b/i.exec(line);
+      if (outcallHourRate && isPriceAmount(Number.parseInt(outcallHourRate[1], 10))) {
+        outcallCandidates['1h'] = [
+          ...(outcallCandidates['1h'] || []),
+          Number.parseInt(outcallHourRate[1], 10),
+        ];
+        continue;
+      }
+    }
     const isAvailabilityLine = /\b(?:disponibil\w*|program\w*|pana\s+la)\b.*\b(?:ora|h)\b/i.test(line)
       && !/\b(?:lei|ron|pret\w*|tarif\w*|finaliz\w*|fin)\b/i.test(line);
     if (isAvailabilityLine) {
+      continue;
+    }
+    if (/\bcupl(?:u|uri)\s*[:–-]\s*\d{2,5}\s*(?:lei|ron)?\s*\/?\s*ora\b/i.test(line)) {
       continue;
     }
 
     const isBarePairedRateLine = /^\s*\d{2,5}\s*\/\s*\d{2,5}\s*$/i.test(line);
     const isBareDashedRateLine = /^\s*\d{2,5}\s*[-–]\s*\d{2,5}\s*$/i.test(line);
     const isStandaloneServiceExtraRate = /^\s*(?:finaliz\w*|orala(?:\s+faciala)?|faciala|dominare\w*)\s*[-:]\s*\d{1,3}\s*$/i.test(line);
-    if (isStandaloneServiceExtraRate) {
+    const isLabeledFinalizationExtraRate = /^\s*finaliz\w*\s+(?:oral\w*|facial\w*|corpor\w*)\s*[-:]\s*\d{1,4}\s*(?:lei|ron)?\s*$/i.test(line);
+    const isUnpunctuatedFinalizationExtraRate = /^\s*[^a-z0-9]{0,8}finaliz\w*\s+oral\w*\s+\d{1,4}\s*(?:lei|ron)\s*$/i.test(line);
+    if (isStandaloneServiceExtraRate || isLabeledFinalizationExtraRate || isUnpunctuatedFinalizationExtraRate) {
       continue;
     }
     const isRateLine = isBarePairedRateLine
@@ -1067,9 +1248,18 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
       || /\b\d{2,5}(?:finaliz\w*|ora)\b/i.test(line)
       || /\b\d{2,5}\s+finzaliz\w*\b/i.test(line)
       || (isOutcallLine && (/\b(?:ora|h)\s+\d{2,5}\b/i.test(line)
-        || /\bdeplasar\w*\s*:\s*\d{2,5}\b/i.test(line)));
+        || /\bdeplasar\w*\s*:\s*\d{2,5}\b/i.test(line)
+        || /\bdeplasar\w*\s+la\s+hotele\s+\d{2,5}\b/i.test(line)));
     if (!isRateLine) {
       continue;
+    }
+    const emojiCurrencyDurationRates = /\b(\d{2,5})\s*💰\s*[-:]\s*(30|60)\s*minute?\b/i.exec(line);
+    if (emojiCurrencyDurationRates && !isOutcallLine) {
+      const duration = emojiCurrencyDurationRates[2] === '30' ? '30m' : '1h';
+      const amount = Number.parseInt(emojiCurrencyDurationRates[1], 10);
+      if (isPriceAmount(amount)) {
+        baseCandidates[duration] = [...(baseCandidates[duration] || []), amount];
+      }
     }
     const dashedHourRate = /^\s*(\d{2,5})\s*[-:]\s*(?:ora|1\s*h)\b/i.exec(line);
     if (dashedHourRate && !isOutcallLine && isPriceAmount(Number.parseInt(dashedHourRate[1], 10))) {
@@ -1092,6 +1282,14 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
         Number.parseInt(compactHourRateInLine[1], 10),
       ];
     }
+    const abbreviatedFinalizationRate = /\b(\d{2,5})\s*[-:]\s*o\s+fin\.\s*$/i.exec(line);
+    if (abbreviatedFinalizationRate && !isOutcallLine
+      && isPriceAmount(Number.parseInt(abbreviatedFinalizationRate[1], 10))) {
+      baseCandidates['30m'] = [
+        ...(baseCandidates['30m'] || []),
+        Number.parseInt(abbreviatedFinalizationRate[1], 10),
+      ];
+    }
     const standaloneOneAndHalfHourRate = /\b(\d{2,5})\s*[-:]\s*1\s*[:.]30\b/i.exec(line);
     if (standaloneOneAndHalfHourRate && !isOutcallLine
       && isPriceAmount(Number.parseInt(standaloneOneAndHalfHourRate[1], 10))) {
@@ -1106,6 +1304,22 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
       baseCandidates['1.5h'] = [
         ...(baseCandidates['1.5h'] || []),
         Number.parseInt(compactOneAndHalfHourRate[1], 10),
+      ];
+    }
+    const dottedOneAndHalfHourRate = /\b1\s*h\s*[.:]\s*30\s*[-:]\s*(\d{2,5})\b/i.exec(line);
+    if (dottedOneAndHalfHourRate && !isOutcallLine
+      && isPriceAmount(Number.parseInt(dottedOneAndHalfHourRate[1], 10))) {
+      baseCandidates['1.5h'] = [
+        ...(baseCandidates['1.5h'] || []),
+        Number.parseInt(dottedOneAndHalfHourRate[1], 10),
+      ];
+    }
+    const compactThirtyMinuteRate = /\b1\s*fin\s*\(\s*3\s*o\s*min\b[^)]*\)\s*[-:]\s*(\d{2,5})\s*(?:lei|ron)\b/i.exec(line);
+    if (compactThirtyMinuteRate && !isOutcallLine
+      && isPriceAmount(Number.parseInt(compactThirtyMinuteRate[1], 10))) {
+      baseCandidates['30m'] = [
+        ...(baseCandidates['30m'] || []),
+        Number.parseInt(compactThirtyMinuteRate[1], 10),
       ];
     }
     const compactDurationRates = /\bcadou\s+(\d{2,5})\s+fin\w*\s*\(\s*30\s*(?:de\s*)?min[^,;]*,\s*(\d{2,5})\s+ora\b[^,;]*,\s*(\d{2,5})\s*\(\s*90\s*(?:de\s*)?min/i.exec(line);
@@ -1218,7 +1432,20 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
         Number.parseInt(defaultOutcallAmount[1], 10),
       ];
     }
-
+    const dashedOutcallRate = /\bdeplasar\w*\s+(\d{2,5})\s*[-–]\s*60\s*min/i.exec(line);
+    if (dashedOutcallRate && isPriceAmount(Number.parseInt(dashedOutcallRate[1], 10))) {
+      outcallCandidates['1h'] = [
+        ...(outcallCandidates['1h'] || []),
+        Number.parseInt(dashedOutcallRate[1], 10),
+      ];
+    }
+    const hotelOutcallAmount = /\bdeplasar\w*\s+la\s+hotele\s+(\d{2,5})\b/i.exec(line);
+    if (hotelOutcallAmount && isPriceAmount(Number.parseInt(hotelOutcallAmount[1], 10))) {
+      outcallCandidates['1h'] = [
+        ...(outcallCandidates['1h'] || []),
+        Number.parseInt(hotelOutcallAmount[1], 10),
+      ];
+    }
     const isInlineRateLine = /\b(?:lei|ron|finaliz\w*|ora|ore|min(?:ute)?)\b/i.test(line);
     const isServiceExtraLine = (/\bserv(?:icii)?\s+extra\b/i.test(line) && !isInlineRateLine)
       || (/^\s*\W*extra\b/i.test(line) && !isInlineRateLine)
@@ -1337,6 +1564,13 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
       baseCandidates['1h'] = [...(baseCandidates['1h'] || []), Number.parseInt(splitFinalizationsRate[1], 10)];
     }
     for (const money of moneyMatches) {
+      const candidateContext = baseRateLine.slice(Math.max(0, money.index - 110), Math.min(baseRateLine.length, money.index + 45));
+      const hasNarrativeRateContext = /\b(?:mergi\s+la|iti\s+recomand|recomand\w*|plangi\s+dupa|nu\s+te\s+plangi|v[aă]d\s+c[aă])\b/i.test(candidateContext);
+      const hasOfferRateContext = /\b(?:servici\w*|prestat\w*|meniu|ofer\w*|pret(?:uri|urile)?|tarif(?:e|ele)?|cadou\w*)\b/i.test(baseRateLine)
+        || /\b(?:finaliz\w*|oral|normal)\b\s*[-/:]?\s*\d{2,5}\s*(?:lei|ron)\b/i.test(candidateContext);
+      if (hasNarrativeRateContext && !hasOfferRateContext) {
+        continue;
+      }
       const threeSomeIndex = baseRateLine.search(/\b(?:3some|threesome|mmf|mff)\b/i);
       if (threeSomeIndex !== -1 && money.index > threeSomeIndex) {
         continue;
@@ -1441,6 +1675,9 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
       if (candidates === baseCandidates && baseRateLine.slice(money.index, money.index + 12).includes('€')) {
         euroAmounts[duration] = [...(euroAmounts[duration] || []), money.amount];
       }
+      if (candidates === outcallCandidates && baseRateLine.slice(money.index, money.index + 12).includes('€')) {
+        euroOutcallAmounts[duration] = [...(euroOutcallAmounts[duration] || []), money.amount];
+      }
     }
   }
 
@@ -1478,6 +1715,42 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
   if (explicitPriceTableRates) {
     baseCandidates['30m'] = [250];
     baseCandidates['1h'] = [500];
+  }
+  const compactCurrencyDurationRates = /\b(\d{2,5})\s*(?:lei|ron)\s*[-–:]\s*30\s*['’][\s\S]{0,80}?\b(\d{2,5})\s*(?:lei|ron)\s*[-–:]\s*60\s*['’]/i.exec(rateText);
+  if (compactCurrencyDurationRates) {
+    const thirtyMinuteRate = Number.parseInt(compactCurrencyDurationRates[1], 10);
+    const hourRate = Number.parseInt(compactCurrencyDurationRates[2], 10);
+    if (isPriceAmount(thirtyMinuteRate) && isPriceAmount(hourRate)) {
+      baseCandidates['30m'] = [thirtyMinuteRate];
+      baseCandidates['1h'] = [hourRate];
+    }
+  }
+  const compactGiftDurationRates = /\bcadou\s+(\d{2,5})\s*\(\s*30\s*min\b[^/\n]{0,20}\/\s*(\d{2,5})\s*\(\s*1\s*ora?\b/i.exec(rateText);
+  if (compactGiftDurationRates) {
+    const thirtyMinuteRate = Number.parseInt(compactGiftDurationRates[1], 10);
+    const hourRate = Number.parseInt(compactGiftDurationRates[2], 10);
+    if (isPriceAmount(thirtyMinuteRate) && isPriceAmount(hourRate)) {
+      baseCandidates['30m'] = [thirtyMinuteRate];
+      baseCandidates['1h'] = [hourRate];
+    }
+  }
+  const compactMinuteHourRates = /\b30\s*min\s*[-:]\s*(\d{2,5})\s*(?:lei|ron)\b[\s\S]{0,40}?\b1\s*ora?\s*[-:]\s*(\d{2,5})\s*(?:lei|ron)\b/i.exec(rateText);
+  if (compactMinuteHourRates) {
+    const thirtyMinuteRate = Number.parseInt(compactMinuteHourRates[1], 10);
+    const hourRate = Number.parseInt(compactMinuteHourRates[2], 10);
+    if (isPriceAmount(thirtyMinuteRate) && isPriceAmount(hourRate)) {
+      baseCandidates['30m'] = [thirtyMinuteRate];
+      baseCandidates['1h'] = [hourRate];
+    }
+  }
+  const slashFinalizationDurationRates = /\b(\d{2,5})\s*\/\s*1\s+fin\w*\s*[-:]\s*30\s*min\b[\s\S]{0,40}?\b(\d{2,5})\s*\/\s*2\s+fin\w*\s*[-:]\s*1\s*ora\b/i.exec(rateText);
+  if (slashFinalizationDurationRates) {
+    const thirtyMinuteRate = Number.parseInt(slashFinalizationDurationRates[1], 10);
+    const hourRate = Number.parseInt(slashFinalizationDurationRates[2], 10);
+    if (isPriceAmount(thirtyMinuteRate) && isPriceAmount(hourRate)) {
+      baseCandidates['30m'] = [thirtyMinuteRate];
+      baseCandidates['1h'] = [hourRate];
+    }
   }
   const compactThirtyAndHourRates = /\b1\s+finaliz\w*\s*[-:]\s*(\d{2,5})\s*(?:lei|ron)\b[\s\S]{0,30}?\b1\s*h\s*[-:]\s*(\d{2,5})\s*(?:lei|ron)\b/i.exec(rateText);
   if (compactThirtyAndHourRates) {
@@ -1632,7 +1905,7 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
   const compactHourRate = /\b(\d{2,5})\s*ora\b/i.exec(rateText);
   const compactHourPrefix = compactHourRate ? rateText.slice(Math.max(0, compactHourRate.index ?? 0) - 40, compactHourRate.index ?? 0) : '';
   if (compactHourRate && !ptFinalizationRates
-    && !/\b(?:dominare|deplasar\w*|hotel)\b/i.test(compactHourPrefix)
+    && !/\b(?:dominare|deplasar\w*|hotel|outcall)\b/i.test(compactHourPrefix)
     && isPriceAmount(Number.parseInt(compactHourRate[1], 10))) {
     baseCandidates['1h'] = [Number.parseInt(compactHourRate[1], 10)];
   }
@@ -1640,12 +1913,30 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
   if (compactFinalizationRate && isPriceAmount(Number.parseInt(compactFinalizationRate[1], 10))) {
     baseCandidates['30m'] = [Number.parseInt(compactFinalizationRate[1], 10)];
   }
+  const compactFinRate = /\b(\d{2,5})fin\b/i.exec(rateText);
+  if (compactFinRate && isPriceAmount(Number.parseInt(compactFinRate[1], 10))) {
+    baseCandidates['30m'] = [Number.parseInt(compactFinRate[1], 10)];
+  }
+  const pairedOneHourFinalizationRate = /\b(\d{2,5})\s*[-:]\s*2\s*fin\w*\s*\(\s*1\s*h\b/i.exec(rateText);
+  if (pairedOneHourFinalizationRate && isPriceAmount(Number.parseInt(pairedOneHourFinalizationRate[1], 10))) {
+    baseCandidates['1h'] = [Number.parseInt(pairedOneHourFinalizationRate[1], 10)];
+  }
   const compactHourRateWithoutSpace = /\b(\d{2,5})ora\b/i.exec(rateText);
-  if (compactHourRateWithoutSpace && isPriceAmount(Number.parseInt(compactHourRateWithoutSpace[1], 10))) {
+  const compactHourRateWithoutSpacePrefix = compactHourRateWithoutSpace
+    ? rateText.slice(Math.max(0, compactHourRateWithoutSpace.index ?? 0) - 40, compactHourRateWithoutSpace.index ?? 0)
+    : '';
+  if (compactHourRateWithoutSpace
+    && !/\b(?:deplasar\w*|hotel|outcall)\b/i.test(compactHourRateWithoutSpacePrefix)
+    && isPriceAmount(Number.parseInt(compactHourRateWithoutSpace[1], 10))) {
     baseCandidates['1h'] = [Number.parseInt(compactHourRateWithoutSpace[1], 10)];
   }
   const compactHourRateWithSuffix = /\b(\d{2,5})\s*h\s*(?:\(|,|💚|$)/i.exec(rateText);
-  if (compactHourRateWithSuffix && isPriceAmount(Number.parseInt(compactHourRateWithSuffix[1], 10))) {
+  const compactHourRateWithSuffixPrefix = compactHourRateWithSuffix
+    ? rateText.slice(Math.max(0, compactHourRateWithSuffix.index ?? 0) - 40, compactHourRateWithSuffix.index ?? 0)
+    : '';
+  if (compactHourRateWithSuffix
+    && !/\b(?:deplasar\w*|hotel|outcall)\b/i.test(compactHourRateWithSuffixPrefix)
+    && isPriceAmount(Number.parseInt(compactHourRateWithSuffix[1], 10))) {
     baseCandidates['1h'] = [Number.parseInt(compactHourRateWithSuffix[1], 10)];
   }
   const primaryFinalizationRate = /\btarif\w*\s*[:\-]\s*(\d{2,5})\s*(?:de\s*)?(?:lei|ron)?\s+finaliz\w*\b/i.exec(rateText);
@@ -1691,6 +1982,36 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
   if (finalizationThenHourRates) {
     baseCandidates['30m'] = [Number.parseInt(finalizationThenHourRates[1], 10)];
     baseCandidates['1h'] = [Number.parseInt(finalizationThenHourRates[2], 10)];
+  }
+  const simpleFinalizationHourRates = /\b(\d{2,5})\s+o\s+finaliz\w*\s*[/|-]\s*(\d{2,5})\s+o\s+ora\b/i.exec(rateText);
+  if (simpleFinalizationHourRates) {
+    const shortRate = Number.parseInt(simpleFinalizationHourRates[1], 10);
+    const hourRate = Number.parseInt(simpleFinalizationHourRates[2], 10);
+    if (isPriceAmount(shortRate)) {
+      baseCandidates['30m'] = [shortRate];
+    }
+    for (const match of rateText.matchAll(/\b(\d{2,5})\s*💰\s*[-:]\s*(30|60)\s*minute?\b/gi)) {
+      const amount = Number.parseInt(match[1], 10);
+      if (isPriceAmount(amount)) {
+        baseCandidates[match[2] === '30' ? '30m' : '1h'] = [amount];
+      }
+    }
+    const explicitFinalizationThirtyMinuteRate = /\b(\d{2,5})\s+finaliz\w*\s*\(\s*30\s*(?:de\s*)?minute?\b/i.exec(rateText);
+    if (explicitFinalizationThirtyMinuteRate
+      && isPriceAmount(Number.parseInt(explicitFinalizationThirtyMinuteRate[1], 10))) {
+      baseCandidates['30m'] = [Number.parseInt(explicitFinalizationThirtyMinuteRate[1], 10)];
+    }
+    if (isPriceAmount(hourRate)) {
+      baseCandidates['1h'] = [hourRate];
+    }
+  }
+  const standaloneOutcallHourRate = /\bo\s+ora\s+pe\s+deplasar\w*\s+incepe\s+de\s+la\s+(\d{2,5})\s*(?:de\s*)?(?:lei|ron)\b/i.exec(rateText);
+  if (standaloneOutcallHourRate && isPriceAmount(Number.parseInt(standaloneOutcallHourRate[1], 10))) {
+    outcallCandidates['1h'] = [Number.parseInt(standaloneOutcallHourRate[1], 10)];
+  }
+  const listedHourRate = /\b(?:o\s+)?ora\s*\(\s*60\s*minute?\s*(?:\+\s*)?\)\s*[-:–]?\s*(\d{2,5})\s*(?:lei|ron)\b/i.exec(rateText);
+  if (listedHourRate && isPriceAmount(Number.parseInt(listedHourRate[1], 10))) {
+    baseCandidates['1h'] = [Number.parseInt(listedHourRate[1], 10)];
   }
   const explicitHotelHourRate = /\b(\d{2,5})\s*ora\s+la\s+hotel\b/i.exec(rateText);
   if (explicitHotelHourRate) {
@@ -1761,6 +2082,22 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
   if (hotelInlineHourRate && isPriceAmount(Number.parseInt(hotelInlineHourRate[1], 10))) {
     outcallCandidates['1h'] = [Number.parseInt(hotelInlineHourRate[1], 10)];
   }
+  const prefixedHotelRate = /\b(\d{2,5})\s*(?:lei|ron)\s*[-–:]\s*deplasar\w*\s+la\s+hotel\b/i.exec(text);
+  if (prefixedHotelRate && isPriceAmount(Number.parseInt(prefixedHotelRate[1], 10))) {
+    outcallCandidates['1h'] = [Number.parseInt(prefixedHotelRate[1], 10)];
+  }
+  const abbreviatedOutcallHourRate = /\bdeplasar\w*\s+(\d{2,5})\s*[-:]\s*(?:ora|h)\b/i.exec(text);
+  if (abbreviatedOutcallHourRate && isPriceAmount(Number.parseInt(abbreviatedOutcallHourRate[1], 10))) {
+    outcallCandidates['1h'] = [Number.parseInt(abbreviatedOutcallHourRate[1], 10)];
+  }
+  const finalDecimalHourRate = /\btaxa\b[\s\S]{0,300}?\b1[,.]5\s*h\s*[/–-]\s*[\d\s-]+\s*fin\w*\s*=\s*(\d{2,5})\b/i.exec(rateText);
+  if (finalDecimalHourRate && isPriceAmount(Number.parseInt(finalDecimalHourRate[1], 10))) {
+    baseCandidates['1.5h'] = [Number.parseInt(finalDecimalHourRate[1], 10)];
+  }
+  if (finalizationAndHourDotRates) {
+    baseCandidates['30m'] = [Number.parseInt(finalizationAndHourDotRates[1], 10)];
+    baseCandidates['1h'] = [Number.parseInt(finalizationAndHourDotRates[2], 10)];
+  }
 
   for (const duration of ['30m', '1h', '1.5h', '2h'] as Array<keyof EscortRates>) {
     const base = baseCandidates[duration];
@@ -1772,7 +2109,8 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
     }
     const validOutcall = outcall?.filter(isPriceAmount);
     if (validOutcall?.length) {
-      outcallRates[duration] = Math.min(...validOutcall);
+      const amount = Math.min(...validOutcall);
+      outcallRates[duration] = euroOutcallAmounts[duration]?.includes(amount) ? `${amount}€` : amount;
     }
     const domination = dominationCandidates[duration];
     const validDomination = domination?.filter(isPriceAmount);
@@ -1784,12 +2122,38 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
   if (finalCouplesOutcallRate) {
     outcallRates['1h'] = Number.parseInt(finalCouplesOutcallRate[1], 10);
   }
+  if (/\bovernight\b/i.test(rateText)) {
+    const halfHourRate = /(?<!\d)(\d{2,5})\s*[-–:]\s*30\s*(?:de\s*)?minute\b/i.exec(rateText);
+    if (halfHourRate && isPriceAmount(Number.parseInt(halfHourRate[1], 10))) {
+      baseRates['30m'] = Number.parseInt(halfHourRate[1], 10);
+    }
+    const ninetyMinuteRate = /(?<!\d)(\d{2,5})\s*[-–:]\s*90\s*(?:de\s*)?minute\b/i.exec(rateText);
+    if (ninetyMinuteRate && isPriceAmount(Number.parseInt(ninetyMinuteRate[1], 10))) {
+      baseRates['1.5h'] = Number.parseInt(ninetyMinuteRate[1], 10);
+    }
+  }
+  if (/\b\d{2,5}\s*ron\s*\/\s*60\s*min\b[\s\S]{0,100}\b\d{2,5}\s*ron\s*\/\s*30\s*min\b/i.test(rateText)) {
+    const halfHourRate = /\b(\d{2,5})\s*ron\s*\/\s*30\s*min\b/i.exec(rateText);
+    if (halfHourRate && isPriceAmount(Number.parseInt(halfHourRate[1], 10))) {
+      baseRates['30m'] = Number.parseInt(halfHourRate[1], 10);
+    }
+  }
+  if (/\bcuplu\s*:\s*1000\s*(?:lei|ron)\s*\/?\s*ora\b/i.test(rateText)) {
+    const standardHourRate = /\b700\s*\/\s*ora\b/i.exec(rateText);
+    if (standardHourRate) {
+      baseRates['1h'] = 700;
+    }
+  }
 
   return {baseRates, outcallRates, dominationRates};
 }
 
 function extractRateOverrides(text: string, baseRates: EscortRates): RateOverride[] {
   const overrides: RateOverride[] = [];
+  const couplesRate = /\bcupl(?:u|uri)\s*:\s*(\d{2,5})\s*(?:lei|ron)\s*\/?\s*ora\b/i.exec(text);
+  if (couplesRate && isPriceAmount(Number.parseInt(couplesRate[1], 10))) {
+    overrides.push({after: 'cuplu', rates: {'1h': Number.parseInt(couplesRate[1], 10)}});
+  }
   const thresholdPattern = /\b(?:dupa|de\s+la)(?:\s+ora)?\s+(\d{1,2})(?:[:.](\d{2}))?\b/gi;
   const durations = ['30m', '1h', '1.5h', '2h'] as Array<keyof EscortRates>;
 
@@ -1797,6 +2161,12 @@ function extractRateOverrides(text: string, baseRates: EscortRates): RateOverrid
     const hour = Number.parseInt(thresholdMatch[1], 10);
     const minute = thresholdMatch[2] ? Number.parseInt(thresholdMatch[2], 10) : 0;
     if (hour > 23 || minute > 59) {
+      continue;
+    }
+    const thresholdLineStart = text.lastIndexOf('\n', thresholdMatch.index ?? 0) + 1;
+    const thresholdLineEnd = text.indexOf('\n', thresholdLineStart);
+    const thresholdLine = text.slice(thresholdLineStart, thresholdLineEnd === -1 ? text.length : thresholdLineEnd);
+    if (/\bdisponib\w*\b/i.test(thresholdLine)) {
       continue;
     }
 
@@ -1952,17 +2322,32 @@ function extractSchedule(text: string): EscortSchedule[] {
   const schedules: EscortSchedule[] = [];
 
   for (const line of text.split('\n')) {
-    const hasScheduleContext = /\b(?:program\w*|orar|interval|disponib\w*)\b/i.test(line)
+    const hasScheduleContext = /\b(?:program\w*|orar|interval)\b/i.test(line)
       || DAY_EXPRESSION_PATTERN.test(line)
-      || /⏰/u.test(line);
+      || (/⏰/u.test(line) && !/\b(?:lei|ron|finaliz\w*|taxa|examen)\b/i.test(line));
     DAY_EXPRESSION_PATTERN.lastIndex = 0;
     if (!hasScheduleContext) {
+      continue;
+    }
+
+    const separatedDailySchedule = /\b(?:de\s+la|incepe\s+de\s+la)\s+ora?\s*(\d{1,2})(?::(\d{2}))?\s+pana\s+la\s+(\d{1,2})(?::(\d{2}))?\b/i.exec(line);
+    if (separatedDailySchedule) {
+      schedules.push({
+        start: `${separatedDailySchedule[1].padStart(2, '0')}:${separatedDailySchedule[2] || '00'}`,
+        end: `${separatedDailySchedule[3].padStart(2, '0')}:${separatedDailySchedule[4] || '00'}`,
+        days: /\bzilnic\b/i.test(line) ? 'zilnic' : undefined,
+      });
       continue;
     }
 
     for (const match of line.matchAll(SCHEDULE_TIME_RANGE_PATTERN)) {
       const rangeStart = match.index ?? 0;
       const rangeEnd = rangeStart + match[0].length;
+      const hasExplicitScheduleWord = /\b(?:program\w*|orar|interval|disponib\w*)\b/i.test(line);
+      if (/[,.]\s*$/.test(line.slice(Math.max(0, rangeStart - 2), rangeStart))
+        || (!hasExplicitScheduleWord && /\b(?:lei|ron|finaliz\w*|taxa|examen)\b/i.test(line))) {
+        continue;
+      }
       if (/\d\s*\/\s*\d\s*(?:zi(?:le)?|zilelor)\b/i.test(line.slice(rangeStart, rangeEnd + 12))) {
         continue;
       }
@@ -2040,6 +2425,18 @@ export const escortInfoExtractor = {
     }
 
     const hasServiceContext = /\b(?:servici\w*|prestat\w*|meniu|ofer\w*|pret(?:uri|urile)|tarif(?:e|ele)|cadou\w*|price|finalizare\w*)\b/i.test(normalizedText);
+    const hasStructuredListingContext = /\b(?:servici\w*|prestat\w*|meniu|ofer\w*|pret(?:uri|urile)|tarif(?:e|ele)|cadou\w*|price)\b/i.test(normalizedText);
+    const hasOfferHeading = /\b(?:servici\w*|prestat\w*|meniu|ofer\w*|cadou\w*)\b/i.test(normalizedText);
+    const narrativeRateOnlyText = /\bmi\s*[.-]?\s*a\s*dat\s+\d{2,5}\s+pe\s+finalizare\b/i.test(normalizedText)
+      && /\b(?:minte\w*|recenzi\w*|a\s+terminat|nu\s+se\s+scoal\w*|probleme\s+de\s+erectie)\b/i.test(normalizedText)
+      && !hasStructuredListingContext;
+    const rhetoricalRateDiscussion = /\b(?:preturi\s+exagerat\w*|cat(?:a|e)?\s+ai\s+vrea|stai\s+acasa|pe[șs]te\s+de\s+fac|in\s+vazul\s+lumii|publicitat\w*\s+si\s+chiri\w*)\b/i.test(normalizedText)
+      && !hasOfferHeading;
+    const argumentativeRateDiscussion = /\b(?:rupt\s+timp\w*|fiecare\s+persoana\s+in\s+parte\b[\s\S]{0,100}\b(?:aleg\w*|dore\w*)|piata\s+atat\s+de\s+variat\w*)\b/i.test(normalizedText)
+      && !hasOfferHeading;
+    if (narrativeRateOnlyText || rhetoricalRateDiscussion || argumentativeRateDiscussion) {
+      return null;
+    }
     const recognizedServices = SERVICE_NAMES.filter(service => new RegExp(SERVICE_PATTERNS[service].source, 'i').test(normalizedText));
     const hasRecognizedService = recognizedServices.length > 0;
     if (!hasServiceContext && recognizedServices.length === 1 && recognizedServices[0] === '3some') {
@@ -2100,7 +2497,7 @@ export const escortInfoExtractor = {
       }
     }
 
-    if (!Object.keys(rates.baseRates).length) {
+    if (!Object.keys(rates.baseRates).length && !Object.keys(rates.outcallRates).length) {
       return null;
     }
 

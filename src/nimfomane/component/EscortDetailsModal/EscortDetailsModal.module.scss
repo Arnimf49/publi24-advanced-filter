@@ -46,6 +46,15 @@
   gap: 6px;
 }
 
+.tableSectionStart th,
+.tableSectionStart td {
+  border-top: 9px solid #ececec !important;
+
+  :global(.dark) & {
+    border-top-color: #1f1f1f !important;
+  }
+}
+
 .detailsTable {
   width: 100%;
   border-collapse: collapse;

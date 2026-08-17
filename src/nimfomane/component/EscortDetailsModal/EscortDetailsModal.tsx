@@ -85,86 +85,60 @@ const PersonalDetailsSection: React.FC<{details: PersonalDetails; escort: Escort
   </section>
 );
 
-const RatesTable: React.FC<{details: ServiceDetails}> = ({details}) => {
+const ServiceDetailsTable: React.FC<{details: ServiceDetails}> = ({details}) => {
   const rows = serviceDisplay.getRateRows(details);
-  if (!rows.length) {
+  const schedules = details.schedule || [];
+  const serviceGroups = serviceDisplay.getServiceGroups(details.services);
+  if (!rows.length && !schedules.length && !serviceGroups.length) {
     return null;
   }
 
   return (
-    <div className={styles.subsection}>
-      <table className={styles.detailsTable}>
-        <tbody>
-          {rows.map(row => (
-            <tr key={row.key}>
-              <th>{row.label}</th>
-              <td>{row.values.map((value, index) => (
-                <React.Fragment key={value}>
-                  {index > 0 && ' · '}
-                  {value}
+    <table className={styles.detailsTable}>
+      <tbody>
+        {rows.map(row => (
+          <tr key={`rate-${row.key}`}>
+            <th>{row.label}</th>
+            <td>{row.values.map((value, index) => (
+              <React.Fragment key={value}>
+                {index > 0 && ' · '}
+                {value}
+              </React.Fragment>
+            ))}</td>
+          </tr>
+        ))}
+        {schedules.map((schedule, index) => (
+          <tr
+            key={`schedule-${schedule.days || 'all'}-${schedule.start}-${schedule.end}`}
+            className={index === 0 ? styles.tableSectionStart : undefined}
+          >
+            <th>Program</th>
+            <td>{schedule.days ? `${schedule.days}: ` : ''}{schedule.start} - {schedule.end}</td>
+          </tr>
+        ))}
+        {serviceGroups.map((group, index) => (
+          <tr
+            key={`services-${group.label}`}
+            className={index === 0 ? styles.tableSectionStart : undefined}
+          >
+            <th>{group.label}</th>
+            <td>
+              {group.services.map((service, serviceIndex) => (
+                <React.Fragment key={service.service}>
+                  {serviceIndex > 0 && ', '}
+                  <span className={service.isNotIncluded ? styles.notIncluded : ''}>
+                    {service.label}
+                    {service.extraCost !== undefined && (
+                      <> (<em className={styles.extraCost}>+{service.extraCost} lei</em>)</>
+                    )}
+                  </span>
                 </React.Fragment>
-              ))}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
-
-const ScheduleTable: React.FC<{details: ServiceDetails}> = ({details}) => {
-  if (!details.schedule?.length) {
-    return null;
-  }
-
-  return (
-    <div className={styles.subsection}>
-      <table className={styles.detailsTable}>
-        <tbody>
-          {details.schedule.map(schedule => (
-            <tr key={`${schedule.days || 'all'}-${schedule.start}-${schedule.end}`}>
-              <th>Program</th>
-              <td>{schedule.days ? `${schedule.days}: ` : ''}{schedule.start} - {schedule.end}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
-
-const ServicesTable: React.FC<{details: ServiceDetails}> = ({details}) => {
-  if (!details.services || !Object.keys(details.services).length) {
-    return null;
-  }
-
-  return (
-    <div className={styles.subsection}>
-      <table className={styles.detailsTable}>
-        <tbody>
-          {serviceDisplay.getServiceGroups(details.services).map(group => {
-            return (
-              <tr key={group.label}>
-                <th>{group.label}</th>
-                <td>
-                  {group.services.map((service, index) => (
-                    <React.Fragment key={service.service}>
-                      {index > 0 && ', '}
-                      <span className={service.isNotIncluded ? styles.notIncluded : ''}>
-                        {service.label}
-                        {service.extraCost !== undefined && (
-                          <> (<em className={styles.extraCost}>+{service.extraCost} lei</em>)</>
-                        )}
-                      </span>
-                    </React.Fragment>
-                  ))}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+              ))}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 
@@ -180,9 +154,7 @@ const ServiceDetailsSection: React.FC<{details: ServiceDetails; escort: EscortIt
         />
       </div>
     </div>
-    <RatesTable details={details} />
-    <ScheduleTable details={details} />
-    <ServicesTable details={details} />
+    <ServiceDetailsTable details={details} />
   </section>
 );
 
@@ -255,7 +227,8 @@ const EscortDetailsModal: React.FC<EscortDetailsModalProps> = ({
           )}
           <p className={styles.disclaimer}>
             Informațiile se culeg exclusiv din conținutul titularei. Un algoritm determinist extrage informațiile.
-            Acesta funcționează în majoritatea cazurilor, dar nu perfect. Întotdeauna verifică sursa când trebuie să știi la sigur.
+            Acesta funcționează în majoritatea cazurilor, dar nu perfect. Servicii din poze nu se pot extrage.
+            Întotdeauna verifică sursa când trebuie să știi la sigur.
           </p>
         </section>
       </ContentModal>

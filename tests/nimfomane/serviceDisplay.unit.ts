@@ -77,14 +77,25 @@ test("formats all applicable rate sources in display order", () => {
     rateOverrides: [
       {after: "21:00", rates: {"1h": 600}},
       {after: "23:00", rates: {"30m": 400}},
+      {after: "cuplu", rates: {"1h": 1000}},
     ],
   })).toEqual([
     {key: "30m", label: "30 minute", values: ["300 lei", "după 23:00: 400 lei"]},
     {
       key: "1h",
       label: "1 oră",
-      values: ["500 lei", "dominare: 700 lei", "după 21:00: 600 lei", "deplasare: 800 lei"],
+      values: ["500 lei", "dominare: 700 lei", "după 21:00: 600 lei", "cuplu: 1000 lei", "deplasare: 800 lei"],
     },
+  ]);
+});
+
+test("preserves euro formatting for outcall rates", () => {
+  expect(serviceDisplay.getRateRows({
+    baseRates: {"30m": 300, "1h": 500},
+    outcallRates: {"1h": "150€"},
+  })).toEqual([
+    {key: "30m", label: "30 minute", values: ["300 lei"]},
+    {key: "1h", label: "1 oră", values: ["500 lei", "deplasare: 150€"]},
   ]);
 });
 

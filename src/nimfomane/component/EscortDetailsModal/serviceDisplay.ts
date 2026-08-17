@@ -123,7 +123,8 @@ function getRateRows(details: ServiceDetails): DisplayedRateRow[] {
     details.rateOverrides?.forEach(override => {
       const rate = override.rates?.[row.key];
       if (rate !== undefined) {
-        values.push(`după ${override.after}: ${formatRate(rate)}`);
+        const label = override.after === 'cuplu' ? 'cuplu' : `după ${override.after}`;
+        values.push(`${label}: ${formatRate(rate)}`);
       }
     });
     if (details.outcallRates?.[row.key] !== undefined) {
