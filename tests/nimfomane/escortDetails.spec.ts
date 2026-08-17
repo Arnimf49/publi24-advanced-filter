@@ -37,8 +37,8 @@ function profileBody(source: DetailSource): string {
 }
 
 function postsBody(profileLink: string): string {
-  const firstTopic = sourceUrl(profileLink, 'topic/101-first/');
-  const secondTopic = sourceUrl(profileLink, 'topic/102-second/');
+  const firstTopic = `${sourceUrl(profileLink, 'topic/101-first/')}?do=findComment&comment=1`;
+  const secondTopic = `${sourceUrl(profileLink, 'topic/102-second/')}?do=findComment&comment=2`;
   return `<html><body>
     <div class="ipsPagination"><a data-page="1" href="${profileLink}/content/?type=forums_topic_post">1</a></div>
     <div class="cPost" data-commentid="1"><time datetime="2026-08-01T12:00:00Z"></time>
@@ -52,7 +52,7 @@ function postsBody(profileLink: string): string {
 
 async function mockEscortDetails(page: import("playwright-core").Page, profileLink: string, options: MockDetailsOptions = {}) {
   const source = options.source || 'interest';
-  const activityUrl = 'https://nimfomane.com/forum/topic/999-test/';
+  const activityUrl = 'https://nimfomane.com/forum/topic/999-test/?do=findComment&comment=7';
 
   await page.route('**://nimfomane.com/forum/**', route => route.abort());
 
@@ -130,6 +130,8 @@ test('Should display multiple sources and details found in profile interest and 
   await openDetails(page);
 
   await expect(page.locator('[data-wwid="personal-details-meta"] a')).toHaveCount(1);
+  await expect(page.locator('[data-wwid="personal-details-meta"] a'))
+    .toHaveAttribute('href', 'https://nimfomane.com/forum/topic/101-first/?do=findComment&comment=1');
   await expect(page.locator('[data-wwid="service-details-meta"] a')).toHaveCount(2);
   for (const link of await page.locator('[data-wwid="personal-details-meta"] a').all()) {
     await expect(link).toHaveAttribute('href', /nimfomane\.com\/forum\//);
@@ -150,7 +152,7 @@ test('Should find details from a signature and activity posts.', async ({page}) 
 
   await expect(page.locator('[data-wwid="personal-details-section"] td').first()).toContainText('28 ani');
   await expect(page.locator('[data-wwid="personal-details-meta"] a[href*="topic/999-test"]'))
-    .toHaveAttribute('href', /topic\/999-test/);
+    .toHaveAttribute('href', 'https://nimfomane.com/forum/topic/999-test/?do=findComment&comment=7');
 });
 
 test('Should find details in posts when profile fields and signature are empty.', async ({page}) => {

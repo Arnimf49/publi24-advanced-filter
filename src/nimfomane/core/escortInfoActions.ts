@@ -43,51 +43,10 @@ function isProfileUrl(url: string): boolean {
 }
 
 function getExactSourceUrl(element: Element, fallbackUrl: string): string {
-  const sourceContainer = element.closest<HTMLElement>('.cPost, .ipsComment, .cProfileSidebarBlock, #elProfileTabs_content, .ipsBox') || element;
-  const sourceLink = Array.from(sourceContainer.querySelectorAll<HTMLAnchorElement>('a[href*="/topic/"]'))
-    .find(link => !link.closest('.ipsQuote'));
-  const href = sourceLink?.getAttribute('href');
-  return href ? resolveUrl(href, fallbackUrl) : fallbackUrl;
-}
-
-function getSignatureSourceUrl(post: Element, fallbackUrl: string): string {
-  const exactSourceUrl = getExactSourceUrl(post, fallbackUrl);
-  if (exactSourceUrl !== fallbackUrl) {
-    return exactSourceUrl;
-  }
-
-  const commentId = post.getAttribute('data-commentid');
-  const quoteDataAttribute = post.getAttribute('data-quotedata');
-  if (!commentId || !quoteDataAttribute) {
-    return fallbackUrl;
-  }
-
-  let quoteData: {contentid?: unknown};
-  try {
-    quoteData = JSON.parse(quoteDataAttribute) as {contentid?: unknown};
-  } catch (error) {
-    console.warn('Unable to parse post quote data', error);
-    return fallbackUrl;
-  }
-
-  const contentId = String(quoteData.contentid || '');
-  if (!/^\d+$/.test(contentId) || !/^\d+$/.test(commentId)) {
-    return fallbackUrl;
-  }
-
-  const sourceUrl = new URL(fallbackUrl);
-  const forumPath = sourceUrl.pathname.split('/profile/')[0] || '/';
-  sourceUrl.pathname = `${forumPath.replace(/\/$/, '')}/`;
-  sourceUrl.search = new URLSearchParams({
-    app: 'forums',
-    module: 'forums',
-    controller: 'topic',
-    id: contentId,
-    do: 'findComment',
-    comment: commentId,
-  }).toString();
-  sourceUrl.hash = '';
-  return sourceUrl.toString();
+    const sourceContainer = element.closest<HTMLElement>('.cPost, .ipsComment, .cProfileSidebarBlock, #elProfileTabs_content, .ipsBox') || element;
+    const sourceLink = sourceContainer.querySelector<HTMLAnchorElement>('.ipsStreamItem_title a[data-linktype="link"], .ipsType_sectionHead [href]');
+    const href = sourceLink?.getAttribute('href');
+    return href ? resolveUrl(href, fallbackUrl) : fallbackUrl;
 }
 
 function getLinkedCommentPost(doc: Document, url: string): HTMLElement | null {
@@ -404,7 +363,7 @@ async function collectEscortDetails(user: string, profileUrl: string, priority: 
     const signature = signatures[0];
     if (signature) {
       const signaturePost = signature.closest<HTMLElement>('[data-commentid]') || linkedPost!;
-      const sourceUrl = getSignatureSourceUrl(signaturePost, profileUrl);
+      const sourceUrl = activityUrl;
       collectText(
         signature.textContent || '',
         sourceUrl,
