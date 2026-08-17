@@ -47,10 +47,9 @@ function isProfileUrl(url: string): boolean {
   return /\/profile\/[^/]+\/?(?:\?.*)?$/i.test(url);
 }
 
-function getExactSourceUrl(element: Element, fallbackUrl: string): string {
-  const sourceContainer = element.closest<HTMLElement>('.cPost, .ipsComment, .cProfileSidebarBlock, #elProfileTabs_content, .ipsBox') || element;
-  const sourceLink = sourceContainer.querySelector<HTMLAnchorElement>(
-    '[data-role="commentContent"] a[href], .ipsStreamItem_title a[data-linktype="link"], .ipsType_sectionHead [href]',
+function getTopicPostSourceUrl(element: Element, fallbackUrl: string): string {
+  const sourceLink = element.querySelector<HTMLAnchorElement>(
+    '.ipsType_sectionHead [href]:last-child',
   );
   const href = sourceLink?.getAttribute('href');
   return href ? resolveUrl(href, fallbackUrl) : fallbackUrl;
@@ -59,13 +58,11 @@ function getExactSourceUrl(element: Element, fallbackUrl: string): string {
 function getLinkedCommentPost(doc: Document, url: string): HTMLElement | null {
   const commentId = new URL(url).searchParams.get('comment');
   if (!commentId || !/^\d+$/.test(commentId)) {
+    console.warn('No comment ID in URL:', url);
     return null;
   }
 
-  const commentWrap = doc.getElementById(`comment-${commentId}_wrap`);
-  const commentElement = doc.getElementById(`elComment_${commentId}`);
-  const comment = commentWrap || commentElement;
-  return comment?.closest<HTMLElement>('.cPost, .ipsComment') || null;
+  return doc.querySelector(`[data-commentid="${commentId}"]`)!;
 }
 
 function compareRanks(left: SourceRank, right: SourceRank): number {
@@ -363,12 +360,15 @@ function collectPostContent(doc: Document, sourceUrl: string, user: string, deta
     if (postDate !== undefined && postDate < oldestPostDate) {
       return true;
     }
+    if (!post) {
+      continue;
+    }
 
     const contentCopy = content.cloneNode(true) as HTMLElement;
     contentCopy.querySelectorAll('.ipsQuote').forEach(quote => quote.remove());
     collectText(
       contentCopy.textContent || '',
-      getExactSourceUrl(content, sourceUrl),
+      getTopicPostSourceUrl(post, sourceUrl),
       postDate,
       details,
       COMMENT_SOURCE_PRIORITY,
@@ -390,19 +390,18 @@ async function collectEscortDetails(user: string, profileUrl: string, priority: 
   };
   const profilePage = await page.load(profileUrl, {priority});
 
-  const activityTitle = profilePage.querySelector<HTMLElement>('.ipsStreamItem_title');
-  const activityLink = activityTitle?.querySelector<HTMLAnchorElement>('[href]');
-  if (activityLink) {
-    const activityUrl = resolveUrl(activityLink.getAttribute('href')!, profileUrl);
-    const activityPage = await page.load(activityUrl, {priority});
-    const linkedPost = getLinkedCommentPost(activityPage, activityUrl);
+  const lastestPostLink = profilePage?.querySelector<HTMLAnchorElement>('.ipsStreamItem_title [href][data-linktype="link"]');
+  if (lastestPostLink) {
+    const latestPostUrl = lastestPostLink.getAttribute('href')!;
+    const activityPage = await page.load(latestPostUrl, {priority});
+    const linkedPost = getLinkedCommentPost(activityPage, latestPostUrl);
     const signatures = linkedPost?.querySelectorAll('[data-role="memberSignature"]') || [];
     const signature = signatures[0];
     if (signature) {
       const signaturePost = signature.closest<HTMLElement>('[data-commentid]') || linkedPost!;
       collectText(
         signature.textContent || '',
-        activityUrl,
+        latestPostUrl,
         getPostDate(signaturePost),
         details,
         SIGNATURE_SOURCE_PRIORITY,
@@ -420,7 +419,7 @@ async function collectEscortDetails(user: string, profileUrl: string, priority: 
 
     collectText(
       sidebarDetail.textContent || '',
-      getExactSourceUrl(sidebarDetail, profileUrl),
+      profileUrl,
       undefined,
       details,
       INTEREST_SOURCE_PRIORITY,
@@ -436,7 +435,7 @@ async function collectEscortDetails(user: string, profileUrl: string, priority: 
       const tabUrl = resolveUrl(servicesTab.getAttribute('href')!, profileUrl);
       collectText(
         tabDetails.textContent || '',
-        getExactSourceUrl(tabDetails, tabUrl),
+        tabUrl,
         undefined,
         details,
         ABOUT_SOURCE_PRIORITY,
