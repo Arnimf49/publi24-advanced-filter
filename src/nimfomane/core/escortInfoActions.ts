@@ -1,6 +1,6 @@
 import {page} from '../../common/page';
 import {jsonPage} from './jsonPage';
-import {escortInfoExtractor, PersonalDetails, ServiceDetails} from './escortInfoExtractor';
+import {escortInfoExtractor, PersonalDetails, RateOverride, ServiceDetails} from './escortInfoExtractor';
 import {NimfomaneStorage} from './storage';
 import type {EscortItem} from './storage';
 
@@ -19,6 +19,8 @@ interface CollectedDetails {
   serviceDetailsSourceUrls: string[];
   serviceDetailsContentDate?: number;
   serviceDetailsRank?: SourceRank;
+  serviceProfileSourceSelected?: boolean;
+  servicePostSourceSelected?: boolean;
 }
 
 interface SourceRank {
@@ -26,9 +28,12 @@ interface SourceRank {
   contentDate?: number;
 }
 
-const PROFILE_SOURCE_PRIORITY = 1;
-const COMMENT_SOURCE_PRIORITY = 2;
-const MAX_SERVICE_SOURCES = 2;
+const ABOUT_SOURCE_PRIORITY = 1;
+const INTEREST_SOURCE_PRIORITY = 2;
+const COMMENT_SOURCE_PRIORITY = 3;
+const SIGNATURE_SOURCE_PRIORITY = 4;
+const SERVICE_POST_OVERRIDE_PRIORITY = 5;
+const SIGNATURE_SERVICE_PRIORITY = 6;
 
 function normalizeProfileUrl(url: string): string {
   return url.replace(/\/$/, '').replace(/\?.*$/, '');
@@ -43,10 +48,12 @@ function isProfileUrl(url: string): boolean {
 }
 
 function getExactSourceUrl(element: Element, fallbackUrl: string): string {
-    const sourceContainer = element.closest<HTMLElement>('.cPost, .ipsComment, .cProfileSidebarBlock, #elProfileTabs_content, .ipsBox') || element;
-    const sourceLink = sourceContainer.querySelector<HTMLAnchorElement>('.ipsStreamItem_title a[data-linktype="link"], .ipsType_sectionHead [href]');
-    const href = sourceLink?.getAttribute('href');
-    return href ? resolveUrl(href, fallbackUrl) : fallbackUrl;
+  const sourceContainer = element.closest<HTMLElement>('.cPost, .ipsComment, .cProfileSidebarBlock, #elProfileTabs_content, .ipsBox') || element;
+  const sourceLink = sourceContainer.querySelector<HTMLAnchorElement>(
+    '[data-role="commentContent"] a[href], .ipsStreamItem_title a[data-linktype="link"], .ipsType_sectionHead [href]',
+  );
+  const href = sourceLink?.getAttribute('href');
+  return href ? resolveUrl(href, fallbackUrl) : fallbackUrl;
 }
 
 function getLinkedCommentPost(doc: Document, url: string): HTMLElement | null {
@@ -70,7 +77,7 @@ function compareRanks(left: SourceRank, right: SourceRank): number {
 }
 
 function comparePersonalRanks(left: SourceRank, right: SourceRank): number {
-  return (left.contentDate || 0) - (right.contentDate || 0);
+  return compareRanks(left, right);
 }
 
 function adjustAgeToCurrentYear(age: number, contentDate?: number): number {
@@ -123,6 +130,60 @@ function mergeDetails<T extends object>(details: T | undefined, incoming: T, pre
   return merged;
 }
 
+function mergeRateOverrides(
+  overrides: RateOverride[] | undefined,
+  incoming: RateOverride[] | undefined,
+  preferIncoming: boolean,
+): RateOverride[] | undefined {
+  if (!overrides && !incoming) {
+    return undefined;
+  }
+
+  const merged = new Map<string, RateOverride>();
+  for (const override of overrides || []) {
+    merged.set(override.after, {
+      ...override,
+      rates: override.rates ? {...override.rates} : undefined,
+    });
+  }
+
+  for (const override of incoming || []) {
+    const existing = merged.get(override.after);
+    if (!existing) {
+      merged.set(override.after, {
+        ...override,
+        rates: override.rates ? {...override.rates} : undefined,
+      });
+      continue;
+    }
+
+    const rates = existing.rates || override.rates
+      ? mergeDetails(existing.rates, override.rates || {}, preferIncoming)
+      : undefined;
+    merged.set(override.after, {
+      ...existing,
+      ...override,
+      rates,
+    });
+  }
+
+  return [...merged.values()];
+}
+
+function mergeServiceDetails(
+  details: ServiceDetails | undefined,
+  incoming: ServiceDetails,
+  preferIncoming: boolean,
+): ServiceDetails {
+  const merged = mergeDetails(details, incoming, preferIncoming);
+  const rateOverrides = mergeRateOverrides(details?.rateOverrides, incoming.rateOverrides, preferIncoming);
+  if (rateOverrides) {
+    merged.rateOverrides = rateOverrides;
+  }
+
+  return merged;
+}
+
 function recordSource(urls: string[], sourceUrl: string, isPrimary: boolean): void {
   const existingIndex = urls.indexOf(sourceUrl);
   if (existingIndex >= 0) {
@@ -142,6 +203,7 @@ function collectText(
   contentDate: number | undefined,
   details: CollectedDetails,
   sourcePriority: number,
+  serviceSourceType: 'profile' | 'post',
 ): void {
   const effectiveContentDate = isProfileUrl(sourceUrl) ? undefined : contentDate;
   const sourceRank = {sourcePriority, contentDate: effectiveContentDate};
@@ -152,9 +214,9 @@ function collectText(
     : null;
   if (personalDetails) {
     const bringsNewInformation = bringsNewPersonalInformation(details.personalDetails, personalDetails);
-    if (bringsNewInformation) {
-      const isPrimary = !details.personalDetailsRank
-        || comparePersonalRanks(sourceRank, details.personalDetailsRank) > 0;
+    const isPrimary = !details.personalDetailsRank
+      || comparePersonalRanks(sourceRank, details.personalDetailsRank) > 0;
+    if (bringsNewInformation || isPrimary) {
       recordSource(details.personalDetailsSourceUrls, sourceUrl, isPrimary);
       details.personalDetails = mergeDetails(details.personalDetails, personalDetails, isPrimary);
       if (isPrimary) {
@@ -168,22 +230,37 @@ function collectText(
     }
   }
 
-  if (details.serviceDetailsSourceUrls.length < MAX_SERVICE_SOURCES) {
-    const serviceDetails = escortInfoExtractor.extractServiceDetails(text);
-    if (serviceDetails) {
-      const isPrimary = !details.serviceDetailsRank || compareRanks(sourceRank, details.serviceDetailsRank) > 0;
-      recordSource(details.serviceDetailsSourceUrls, sourceUrl, isPrimary);
-      details.serviceDetailsSourceUrls.splice(MAX_SERVICE_SOURCES);
-      details.serviceDetails = mergeDetails(details.serviceDetails, serviceDetails, isPrimary);
-      if (isPrimary) {
-        details.serviceDetailsSourceUrl = sourceUrl;
-        details.serviceDetailsRank = sourceRank;
-      }
-      details.serviceDetailsContentDate = Math.max(
-        details.serviceDetailsContentDate || 0,
-        effectiveContentDate || 0,
-      ) || undefined;
+  const serviceDetails = escortInfoExtractor.extractServiceDetails(text);
+  if (serviceDetails) {
+    if (serviceSourceType === 'profile' && details.serviceProfileSourceSelected) {
+      return;
     }
+    if (serviceSourceType === 'post' && details.servicePostSourceSelected) {
+      return;
+    }
+
+    const isPostOverride = serviceSourceType === 'post';
+    const serviceSourceRank = sourcePriority === SIGNATURE_SOURCE_PRIORITY
+      ? {sourcePriority: SIGNATURE_SERVICE_PRIORITY, contentDate: effectiveContentDate}
+      : isPostOverride
+      ? {sourcePriority: SERVICE_POST_OVERRIDE_PRIORITY, contentDate: effectiveContentDate}
+      : sourceRank;
+    const isPrimary = !details.serviceDetailsRank
+      || compareRanks(serviceSourceRank, details.serviceDetailsRank) > 0;
+    recordSource(details.serviceDetailsSourceUrls, sourceUrl, isPrimary);
+    const preferIncoming = isPrimary
+      || (isPostOverride && details.serviceDetailsRank?.sourcePriority !== SIGNATURE_SERVICE_PRIORITY);
+    details.serviceDetails = mergeServiceDetails(details.serviceDetails, serviceDetails, preferIncoming);
+    if (isPrimary) {
+      details.serviceDetailsSourceUrl = sourceUrl;
+      details.serviceDetailsRank = serviceSourceRank;
+    }
+    details.serviceProfileSourceSelected = details.serviceProfileSourceSelected || serviceSourceType === 'profile';
+    details.servicePostSourceSelected = details.servicePostSourceSelected || isPostOverride;
+    details.serviceDetailsContentDate = Math.max(
+      details.serviceDetailsContentDate || 0,
+      effectiveContentDate || 0,
+    ) || undefined;
   }
 }
 
@@ -215,7 +292,7 @@ function clearProfileContentDates(user: string, escort: EscortItem): void {
 function hasAllDetails(details: CollectedDetails): boolean {
   return hasCompletePersonalDetails(details)
     && !!details.serviceDetails
-    && details.serviceDetailsSourceUrls.length >= MAX_SERVICE_SOURCES;
+    && !!details.servicePostSourceSelected;
 }
 
 function hasCompletePersonalDetails(details: CollectedDetails): boolean {
@@ -295,6 +372,7 @@ function collectPostContent(doc: Document, sourceUrl: string, user: string, deta
       postDate,
       details,
       COMMENT_SOURCE_PRIORITY,
+      'post',
     );
     saveCollectedDetails(user, details);
     if (hasAllDetails(details)) {
@@ -312,6 +390,28 @@ async function collectEscortDetails(user: string, profileUrl: string, priority: 
   };
   const profilePage = await page.load(profileUrl, {priority});
 
+  const activityTitle = profilePage.querySelector<HTMLElement>('.ipsStreamItem_title');
+  const activityLink = activityTitle?.querySelector<HTMLAnchorElement>('[href]');
+  if (activityLink) {
+    const activityUrl = resolveUrl(activityLink.getAttribute('href')!, profileUrl);
+    const activityPage = await page.load(activityUrl, {priority});
+    const linkedPost = getLinkedCommentPost(activityPage, activityUrl);
+    const signatures = linkedPost?.querySelectorAll('[data-role="memberSignature"]') || [];
+    const signature = signatures[0];
+    if (signature) {
+      const signaturePost = signature.closest<HTMLElement>('[data-commentid]') || linkedPost!;
+      collectText(
+        signature.textContent || '',
+        activityUrl,
+        getPostDate(signaturePost),
+        details,
+        SIGNATURE_SOURCE_PRIORITY,
+        'profile',
+      );
+      saveCollectedDetails(user, details);
+    }
+  }
+
   const sidebarDetails = profilePage.querySelectorAll('.cProfileSidebarBlock li:nth-child(3)');
   for (const sidebarDetail of sidebarDetails) {
     if (hasAllDetails(details)) {
@@ -323,15 +423,11 @@ async function collectEscortDetails(user: string, profileUrl: string, priority: 
       getExactSourceUrl(sidebarDetail, profileUrl),
       undefined,
       details,
-      PROFILE_SOURCE_PRIORITY,
+      INTEREST_SOURCE_PRIORITY,
+      'profile',
     );
     saveCollectedDetails(user, details);
   }
-  if (hasAllDetails(details)) {
-    NimfomaneStorage.setEscortProp(user, 'escortDetailsTime', Date.now());
-    return;
-  }
-
   const servicesTab = profilePage.querySelector<HTMLAnchorElement>('a[href*="tab=field_core_pfield_11"]');
   if (servicesTab) {
     const tabPage = await page.load(resolveUrl(servicesTab.getAttribute('href')!, profileUrl), {priority});
@@ -343,33 +439,8 @@ async function collectEscortDetails(user: string, profileUrl: string, priority: 
         getExactSourceUrl(tabDetails, tabUrl),
         undefined,
         details,
-        PROFILE_SOURCE_PRIORITY,
-      );
-      saveCollectedDetails(user, details);
-    }
-  }
-  if (hasAllDetails(details)) {
-    NimfomaneStorage.setEscortProp(user, 'escortDetailsTime', Date.now());
-    return;
-  }
-
-  const activityTitle = profilePage.querySelector<HTMLElement>('.ipsStreamItem_title');
-  const activityLink = activityTitle?.querySelector<HTMLAnchorElement>('[href]');
-  if (activityLink) {
-    const activityUrl = resolveUrl(activityLink.getAttribute('href')!, profileUrl);
-    const activityPage = await page.load(activityUrl, {priority});
-    const linkedPost = getLinkedCommentPost(activityPage, activityUrl);
-    const signatures = linkedPost?.querySelectorAll('[data-role="memberSignature"]') || [];
-    const signature = signatures[0];
-    if (signature) {
-      const signaturePost = signature.closest<HTMLElement>('[data-commentid]') || linkedPost!;
-      const sourceUrl = activityUrl;
-      collectText(
-        signature.textContent || '',
-        sourceUrl,
-        getPostDate(signaturePost),
-        details,
-        PROFILE_SOURCE_PRIORITY,
+        ABOUT_SOURCE_PRIORITY,
+        'profile',
       );
       saveCollectedDetails(user, details);
     }

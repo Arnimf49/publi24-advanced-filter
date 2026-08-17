@@ -13,7 +13,9 @@ interface MockDetailsOptions {
 }
 
 function sourceUrl(profileLink: string, suffix: string): string {
-  return `${profileLink.replace(/\/$/, '')}/${suffix}`;
+  const profileUrl = new URL(profileLink);
+  const forumPath = profileUrl.pathname.split('/profile/')[0];
+  return `${profileUrl.origin}${forumPath}/${suffix}`;
 }
 
 function sourceText(): string {
@@ -28,7 +30,7 @@ function profileBody(source: DetailSource): string {
     ? '<a href="/forum/profile/test/?tab=field_core_pfield_11">servicii</a><div id="elProfileTabs_content"></div>'
     : '';
   const activity = source === 'signature'
-    ? '<div class="ipsStreamItem_title"><a href="/forum/topic/999-test/?comment=7">activitate</a></div>'
+    ? '<div class="ipsStreamItem_title"><a href="/forum/topic/999-test/?do=findComment&comment=7">activitate</a></div>'
     : '';
 
   return `<html><body>${sidebar}${servicesTab}${activity}
@@ -129,9 +131,7 @@ test('Should display multiple sources and details found in profile interest and 
 
   await openDetails(page);
 
-  await expect(page.locator('[data-wwid="personal-details-meta"] a')).toHaveCount(1);
-  await expect(page.locator('[data-wwid="personal-details-meta"] a'))
-    .toHaveAttribute('href', 'https://nimfomane.com/forum/topic/101-first/?do=findComment&comment=1');
+  await expect(page.locator('[data-wwid="personal-details-meta"] a')).toHaveCount(2);
   await expect(page.locator('[data-wwid="service-details-meta"] a')).toHaveCount(2);
   for (const link of await page.locator('[data-wwid="personal-details-meta"] a').all()) {
     await expect(link).toHaveAttribute('href', /nimfomane\.com\/forum\//);

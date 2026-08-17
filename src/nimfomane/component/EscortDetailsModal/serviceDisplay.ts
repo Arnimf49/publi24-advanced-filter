@@ -35,13 +35,17 @@ const SERVICE_LABELS: Record<EscortServiceName, string> = {
   on: 'ON',
   np: 'NP',
   nn: 'NN',
-  deepthroat: 'oral adânc',
+  showerSex: 'sex la duș',
+  deepthroat: 'deepthroat',
   facesitting: 'facesitting',
   facefuck: 'facefuck',
   fk: 'FK',
+  fj: 'FJ',
+  hardSex: 'hard',
   cim: 'CIM',
   cof: 'COF',
   cob: 'COB',
+  swallow: 'swallow',
   massage: 'masaj',
   uro: 'URO',
   squirt: 'squirt',
@@ -75,15 +79,15 @@ const SERVICE_LABELS: Record<EscortServiceName, string> = {
 };
 
 const SERVICE_GROUPS: Array<{label: string; services: EscortServiceName[]}> = [
-  {label: 'Sex', services: ['np', 'nn']},
+  {label: 'Sex', services: ['np', 'nn', 'showerSex', 'hardSex']},
   {label: 'Oral', services: ['op', 'on', 'deepthroat', 'facefuck']},
   {label: 'Limbi', services: ['fk', 'cuni', 'ani', 'facesitting', '69']},
-  {label: 'Finalizare', services: ['cim', 'cob', 'cof']},
+  {label: 'Finalizare', services: ['cim', 'cob', 'cof', 'swallow']},
   {label: 'Anal', services: ['ap', 'anal']},
   {label: 'Comportament', services: ['gfe', 'pse', 'rolePlay']},
   {label: 'Masaj', services: ['massage', 'prostateMassage']},
   {label: 'Domniare', services: ['dom', 'domSoft', 'domHard', 'domination', 'verbalHum', 'dirtyTalk', 'whipping', 'spitting', 'strapOn']},
-  {label: 'Altele', services: ['hj', '3some', 'couples', 'lesbyShow', 'shower', 'footfetish', 'fingering', 'uro', 'goldenShower', 'fisting', 'squirt']},
+  {label: 'Altele', services: ['hj', 'fj', '3some', 'couples', 'lesbyShow', 'shower', 'footfetish', 'fingering', 'uro', 'goldenShower', 'fisting', 'squirt']},
 ];
 
 function formatService(service: EscortServiceName, value: ServiceAvailability): DisplayedService {
@@ -102,8 +106,8 @@ function formatService(service: EscortServiceName, value: ServiceAvailability): 
   };
 }
 
-function formatRate(rate: number): string {
-  return `${rate} lei`;
+function formatRate(rate: number | string): string {
+  return typeof rate === 'string' ? rate : `${rate} lei`;
 }
 
 function getRateRows(details: ServiceDetails): DisplayedRateRow[] {
@@ -112,9 +116,6 @@ function getRateRows(details: ServiceDetails): DisplayedRateRow[] {
 
     if (details.baseRates[row.key] !== undefined) {
       values.push(formatRate(details.baseRates[row.key]!));
-    }
-    if (details.outcallRates?.[row.key] !== undefined) {
-      values.push(`deplasare: ${formatRate(details.outcallRates[row.key]!)}`);
     }
     if (details.dominationRates?.[row.key] !== undefined) {
       values.push(`dominare: ${formatRate(details.dominationRates[row.key]!)}`);
@@ -125,6 +126,9 @@ function getRateRows(details: ServiceDetails): DisplayedRateRow[] {
         values.push(`după ${override.after}: ${formatRate(rate)}`);
       }
     });
+    if (details.outcallRates?.[row.key] !== undefined) {
+      values.push(`deplasare: ${formatRate(details.outcallRates[row.key]!)}`);
+    }
 
     if (!values.length) {
       return [];
@@ -141,7 +145,14 @@ function getServiceGroups(services?: Partial<Record<EscortServiceName, ServiceAv
 
   return SERVICE_GROUPS.flatMap(group => {
     const serviceNames = group.services.filter(service => {
+      if (group.label === 'Anal' && service === 'anal') {
+        return false;
+      }
       if (service === 'dom'
+        && (services.domSoft !== undefined || services.domHard !== undefined)) {
+        return false;
+      }
+      if (service === 'domination'
         && (services.domSoft !== undefined || services.domHard !== undefined)) {
         return false;
       }
@@ -153,9 +164,17 @@ function getServiceGroups(services?: Partial<Record<EscortServiceName, ServiceAv
       return [];
     }
 
+    const displayedServices = serviceNames.flatMap(service => {
+      const value = services[service]!;
+      return [formatService(service, value)];
+    });
+    if (!displayedServices.length) {
+      return [];
+    }
+
     return [{
       label: group.label,
-      services: serviceNames.map(service => formatService(service, services[service]!)),
+      services: displayedServices,
     }];
   });
 }

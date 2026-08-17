@@ -5,7 +5,7 @@ test("groups available services and formats extra costs", () => {
   expect(serviceDisplay.getServiceGroups({
     op: true,
     cim: {extraCost: 50},
-    anal: false,
+    ap: false,
   })).toEqual([
     {
       label: "Oral",
@@ -17,7 +17,29 @@ test("groups available services and formats extra costs", () => {
     },
     {
       label: "Anal",
-      services: [{service: "anal", label: "AP (nu)", isNotIncluded: true}],
+      services: [{service: "ap", label: "AP (nu)", isNotIncluded: true}],
+    },
+  ]);
+});
+
+test("displays deepthroat by its identifier", () => {
+  expect(serviceDisplay.getServiceGroups({deepthroat: true})).toEqual([
+    {
+      label: "Oral",
+      services: [{service: "deepthroat", label: "deepthroat", isNotIncluded: false}],
+    },
+  ]);
+});
+
+test("displays merged AP availability entries under one key", () => {
+  expect(serviceDisplay.getServiceGroups({
+    ap: {extraCost: 100},
+  })).toEqual([
+    {
+      label: "Anal",
+      services: [
+        {service: "ap", label: "AP", isNotIncluded: false, extraCost: 100},
+      ],
     },
   ]);
 });
@@ -33,8 +55,16 @@ test("hides the generic dom service when specific variants are present", () => {
       services: [
         {service: "domSoft", label: "dominare soft (nu)", isNotIncluded: true},
         {service: "domHard", label: "dominare hard", isNotIncluded: false, extraCost: 100},
-        {service: "domination", label: "dominare nespecifică", isNotIncluded: false},
       ],
+    },
+  ]);
+});
+
+test("shows hard sex in the Sex group", () => {
+  expect(serviceDisplay.getServiceGroups({hardSex: false})).toEqual([
+    {
+      label: "Sex",
+      services: [{service: "hardSex", label: "hard (nu)", isNotIncluded: true}],
     },
   ]);
 });
@@ -53,7 +83,7 @@ test("formats all applicable rate sources in display order", () => {
     {
       key: "1h",
       label: "1 oră",
-      values: ["500 lei", "deplasare: 800 lei", "dominare: 700 lei", "după 21:00: 600 lei"],
+      values: ["500 lei", "dominare: 700 lei", "după 21:00: 600 lei", "deplasare: 800 lei"],
     },
   ]);
 });
