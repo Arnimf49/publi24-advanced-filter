@@ -17,7 +17,7 @@ type FavoritesModalRootProps = {
 };
 
 const registerAds = (context: HTMLElement, showDuplicates: boolean) => {
-  renderer.registerAdsInContext(context, {renderOptions: {showDuplicates}});
+  renderer.registerAdsInContext(context, {updateSeenTime: true, renderOptions: {showDuplicates}});
 };
 
 const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {

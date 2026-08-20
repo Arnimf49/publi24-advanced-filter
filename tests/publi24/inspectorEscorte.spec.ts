@@ -88,6 +88,11 @@ test('Should paginate inspector escorte ads correctly.', async ({ page, context 
   await expect(sourceBanner.locator('a')).toHaveAttribute('href', `https://inspector-escorte.com/phone/${phone}`);
 
   await expect(modal.locator('[data-articleid]')).toHaveCount(15, { timeout: 60000 });
+  const replicaAd = modal.locator('[data-ww-replica-ad]').first();
+  await expect(replicaAd).toHaveAttribute('data-ww-seen-time', /^\d+$/);
+  const replicaId = (await replicaAd.getAttribute('data-articleid'))!;
+  const replicaTimestamp = Number(await replicaAd.getAttribute('data-ww-seen-time'));
+  expect((await utilsPubli.getAdStorageData(page, replicaId)).lastSeen).toBe(replicaTimestamp);
 
   const loadMoreButton = modal.locator('[data-wwid="load-more"]');
   await expect(loadMoreButton).toBeVisible();

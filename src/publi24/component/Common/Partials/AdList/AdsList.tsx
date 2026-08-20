@@ -68,6 +68,8 @@ const AdsList: React.FC<AdsListProps> = ({
           <div
             className={`${styles.articleItem} article-item`}
             data-articleid={item.id}
+            data-ww-replica-ad="1"
+            data-ww-seen-time={item.timestamp}
             onClick={() => handleItemClick(item.url)}
           >
           <div className={`${styles.articleIndex} ww-article-index`}>

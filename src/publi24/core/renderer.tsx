@@ -59,6 +59,7 @@ let INVESTIGATE_TIMEOUT: number = 500;
 interface RegisterAdsOptions {
   applyFocusMode?: boolean;
   isFromListing?: boolean;
+  updateSeenTime?: boolean;
   renderOptions?: RenderOptions;
 }
 
@@ -91,6 +92,7 @@ export const renderer = {
   registerAdsInContext(context: HTMLElement | Document, {
     applyFocusMode = false,
     isFromListing = false,
+    updateSeenTime = false,
     renderOptions
   }: RegisterAdsOptions = {}): Array<() => void> {
     let itemsNodeList = context.querySelectorAll<HTMLElement>('[data-articleid]:not([data-ww-registered])');
@@ -130,12 +132,13 @@ export const renderer = {
         return () => {};
       }
 
-      if (isFromListing) {
+      if (isFromListing || updateSeenTime) {
         try {
           const lastSeen = adActions.adSeen(item, articleId);
 
           if (
-            WWStorage.isAdDeduplicationEnabled()
+            isFromListing
+            && WWStorage.isAdDeduplicationEnabled()
             && adData.hasAdNewerDuplicate(articleId)
             && lastSeen !== undefined
           ) {

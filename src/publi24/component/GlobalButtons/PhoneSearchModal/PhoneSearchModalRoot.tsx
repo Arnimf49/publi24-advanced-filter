@@ -18,7 +18,7 @@ type PhoneSearchRootProps = {
 const DEBOUNCE_DELAY = 1500;
 
 const registerAds = (context: HTMLElement, showDuplicates: boolean) => {
-  renderer.registerAdsInContext(context, {renderOptions: {showDuplicates}});
+  renderer.registerAdsInContext(context, {updateSeenTime: true, renderOptions: {showDuplicates}});
 };
 
 const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {

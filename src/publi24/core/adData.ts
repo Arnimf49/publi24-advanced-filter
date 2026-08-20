@@ -64,7 +64,7 @@ async function loadInspectorEscorteAd(phone: string, ad: InspectorAd): Promise<A
 
   WWStorage.setAdPhone(id, phone, new Date(ad.created_at).getTime());
   WWStorage.addPhoneAd(phone, id, publi24Url);
-  WWStorage.setSeenTime(id, Date.now());
+  WWStorage.setSeenTime(id, new Date(ad.updated_at).getTime());
 
   return {id, url: publi24Url};
 }
@@ -89,6 +89,11 @@ export const adData = {
   },
 
   getItemDate(item: Element) {
+    if (item.getAttribute('data-ww-replica-ad') === '1') {
+      const seenTimestamp = item.getAttribute('data-ww-seen-time')!;
+      return new Date(Number(seenTimestamp));
+    }
+
     if (IS_AD_PAGE()) {
       const dateEl = IS_MOBILE_VIEW
         ? document.querySelector<HTMLElement>('.valid-from')

@@ -12,7 +12,7 @@ import {IS_MOBILE_VIEW} from "../../../../../common/globals";
 const PAGE_SIZE = 15;
 
 const registerAds = (context: HTMLElement, showDuplicates: boolean) => {
-  renderer.registerAdsInContext(context, {renderOptions: {showDuplicates}});
+  renderer.registerAdsInContext(context, {updateSeenTime: true, renderOptions: {showDuplicates}});
 };
 
 type AdsModalRootProps = {

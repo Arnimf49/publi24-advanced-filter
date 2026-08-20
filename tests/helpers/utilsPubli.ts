@@ -315,6 +315,12 @@ export const utilsPubli = {
     }, articleId);
   },
 
+  async getAdStorageData(page: Page, articleId: string): Promise<any> {
+    return await page.evaluate((id) => {
+      return JSON.parse(localStorage.getItem(`ww2:${id.toUpperCase()}`) || '{}');
+    }, articleId);
+  },
+
   async getPhoneStorageData(page: Page, phone: string): Promise<any> {
     return await page.evaluate((phone) => {
       return JSON.parse(localStorage.getItem(`ww2:phone:${phone}`) || '{}');
