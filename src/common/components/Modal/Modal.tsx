@@ -71,7 +71,10 @@ const Modal: React.FC<ModalProps> =
   const modal = (
     <div
       className={`${styles.modalContainer} ${scroll ? styles.scroll : ''} ${inline ? styles.inline : ''}`}
-      onClick={close}
+      onClick={(event) => {
+        event.stopPropagation();
+        close();
+      }}
       data-wwid={dataWwid}
       data-inline={inline ? 'true' : undefined}
     >

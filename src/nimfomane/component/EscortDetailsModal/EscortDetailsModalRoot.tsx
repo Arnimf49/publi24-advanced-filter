@@ -1,7 +1,10 @@
 import React, {useCallback, useEffect, useState} from 'react';
+import Modal from '../../../common/components/Modal/Modal';
+import {IS_MOBILE_VIEW} from '../../../common/globals';
 import {escortInfoActions} from '../../core/escortInfoActions';
 import {NimfomaneStorage, EscortItem} from '../../core/storage';
 import {NimfomaneMemoryStorage} from '../../core/memoryStorage';
+import EscortImagesRoot from '../TopicImage/EscortImages/EscortImagesRoot';
 import {escortDetailsModal} from './EscortDetailsModal';
 
 type EscortDetailsModalRootProps = {
@@ -13,6 +16,7 @@ const EscortDetailsModalRoot: React.FC<EscortDetailsModalRootProps> = ({user, on
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [escort, setEscort] = useState<EscortItem>(() => NimfomaneStorage.getEscort(user));
+  const [isImageModalOpen, setImageModalOpen] = useState(false);
   const [_, setRenderCycle] = useState(0);
   const escortMemoryState = NimfomaneMemoryStorage.getEscortState(user);
 
@@ -59,6 +63,16 @@ const EscortDetailsModalRoot: React.FC<EscortDetailsModalRootProps> = ({user, on
       imageLoadError={escortMemoryState.escortAnalysisError}
       onRefresh={handleRefresh}
       onClose={onClose}
+      onImageClick={() => setImageModalOpen(true)}
+      imageModal={isImageModalOpen ? (
+        <Modal close={() => setImageModalOpen(false)} dataWwid="escort-image-modal">
+          <EscortImagesRoot
+            onClose={() => setImageModalOpen(false)}
+            user={user}
+            isMobile={IS_MOBILE_VIEW}
+          />
+        </Modal>
+      ) : null}
     />
   );
 };

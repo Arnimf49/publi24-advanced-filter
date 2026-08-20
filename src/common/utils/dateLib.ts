@@ -1,3 +1,11 @@
+const isOlderThanMonths = (dateString: string, months: number): boolean => {
+  const targetDate = new Date(dateString);
+  const ageMs = Date.now() - targetDate.getTime();
+  const monthMs = 30 * 24 * 60 * 60 * 1000;
+
+  return !Number.isNaN(targetDate.getTime()) && ageMs > months * monthMs;
+};
+
 export const dateLib = {
   getRelativeTime(dateString: string): string {
     const targetDate = new Date(dateString);
@@ -19,10 +27,19 @@ export const dateLib = {
       return `de ${diffHours} ore`;
     } else if (diffDays === 1) {
       return 'de 1 zi';
-    } else if (diffDays < 30) {
+    } else if (diffDays <= 60) {
       return `de ${diffDays} zile`;
     } else {
-      return targetDate.toLocaleDateString('ro-RO');
+      const diffMonths = Math.floor(diffDays / 30);
+
+      if (diffMonths < 12) {
+        return diffMonths === 1 ? 'de 1 lună' : `de ${diffMonths} luni`;
+      }
+
+      const years = diffMonths / 12;
+      const formattedYears = Number.isInteger(years) ? `${years}` : years.toFixed(1);
+      return years === 1 ? 'de 1 an' : `de ${formattedYears} ani`;
     }
-  }
+  },
+  isOlderThanMonths,
 };

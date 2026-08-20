@@ -21,6 +21,8 @@ type EscortDetailsModalProps = {
   imageLoadError?: string | null;
   onRefresh: () => void;
   onClose: () => void;
+  onImageClick?: () => void;
+  imageModal?: React.ReactNode;
   inline?: boolean;
 };
 
@@ -28,6 +30,7 @@ type SectionMetaProps = {
   sourceUrl?: string;
   sourceUrls?: string[];
   contentDate?: number;
+  outdatedAfterMonths?: number;
 };
 
 const PERSONAL_ROWS: Array<{key: keyof PersonalDetails; label: string; suffix: string}> = [
@@ -40,13 +43,21 @@ function formatRelativeTime(timestamp?: number): string | null {
   return timestamp ? dateLib.getRelativeTime(new Date(timestamp).toISOString()) : null;
 }
 
-const SectionMeta: React.FC<SectionMetaProps> = ({sourceUrl, sourceUrls, contentDate}) => {
+const SectionMeta: React.FC<SectionMetaProps> = ({
+  sourceUrl,
+  sourceUrls,
+  contentDate,
+  outdatedAfterMonths,
+}) => {
   const relativeDate = formatRelativeTime(contentDate);
   const urls = sourceUrls?.length ? sourceUrls : sourceUrl ? [sourceUrl] : [];
+  const isOutdated = contentDate && outdatedAfterMonths
+    ? dateLib.isOlderThanMonths(new Date(contentDate).toISOString(), outdatedAfterMonths)
+    : false;
 
   return (
     <div className={styles.sectionMeta}>
-      {relativeDate && <span>{relativeDate},</span>}
+      {relativeDate && <span className={isOutdated ? styles.outdated : undefined}>{relativeDate},</span>}
       {urls.length ? (
         urls.map((url, index) => (
           <a key={url} href={url} target="_blank" rel="noopener noreferrer">
@@ -151,6 +162,7 @@ const ServiceDetailsSection: React.FC<{details: ServiceDetails; escort: EscortIt
           sourceUrl={escort.serviceDetailsSourceUrl}
           sourceUrls={escort.serviceDetailsSourceUrls}
           contentDate={escort.serviceDetailsContentDate}
+          outdatedAfterMonths={3}
         />
       </div>
     </div>
@@ -166,6 +178,8 @@ const EscortDetailsModal: React.FC<EscortDetailsModalProps> = ({
   imageLoadError,
   onRefresh,
   onClose,
+  onImageClick,
+  imageModal,
   inline = false,
 }) => {
   const profileUrl = escort.profileLink || `https://nimfomane.com/forum/profile/${encodeURIComponent(user)}/`;
@@ -190,34 +204,42 @@ const EscortDetailsModal: React.FC<EscortDetailsModalProps> = ({
                 imageLoading={escort.optimizedProfileImage === undefined && !imageLoadError}
                 imageLoadError={imageLoadError}
                 variant="details"
+                onClick={onImageClick}
               />
-              <h3 className={styles.userName} data-wwid="escort-details-user">
-                <a href={profileUrl} target="_blank" rel="noopener noreferrer">{user}</a>
-              </h3>
-            </div>
-            {!isLoading && (
-              <div className={styles.statusRow} data-wwid="escort-details-status">
-                <button
-                  type="button"
-                  className={styles.refreshButton}
-                  onClick={onRefresh}
-                  data-wwid="escort-details-refresh"
-                >
-                  actualizare
-                </button>
               </div>
-            )}
+              <div className={styles.headerInfo}>
+                <h3 className={styles.userName} data-wwid="escort-details-user">
+                  <a href={profileUrl} target="_blank" rel="noopener noreferrer">{user}</a>
+                </h3>
+                {!isLoading && (
+                  <div className={styles.statusRow} data-wwid="escort-details-status">
+                    <button
+                      type="button"
+                      className={styles.refreshButton}
+                      onClick={onRefresh}
+                      data-wwid="escort-details-refresh"
+                    >
+                      actualizare
+                    </button>
+                    {escort.escortDetailsTime && (
+                      <span
+                        className={`${styles.collectionMeta} ${dateLib.isOlderThanMonths(
+                          new Date(escort.escortDetailsTime).toISOString(),
+                          1,
+                        ) ? styles.outdated : ''}`}
+                      >
+                        date culese {formatRelativeTime(escort.escortDetailsTime)}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
           </div>
           {isLoading && (
             <div className={styles.loadingState} data-wwid="escort-details-loading">
               <InlineLoader color="#2f4979" size={14} />
               <span>Se analizează datele din postări..</span>
             </div>
-          )}
-          {!isLoading && escort.escortDetailsTime && (
-            <span className={styles.collectionMeta}>
-              date culese {formatRelativeTime(escort.escortDetailsTime)}
-            </span>
           )}
           {error && <p className={styles.error} data-wwid="escort-details-error">{error}</p>}
           {escort.personalDetails && <PersonalDetailsSection details={escort.personalDetails} escort={escort} />}
@@ -232,6 +254,7 @@ const EscortDetailsModal: React.FC<EscortDetailsModalProps> = ({
           </p>
         </section>
       </ContentModal>
+      {imageModal}
     </Modal>
   );
 };
