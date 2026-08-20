@@ -4,6 +4,19 @@ import PhoneAndTags from "./PhoneAndTags";
 import {IS_MOBILE_VIEW} from "../../../../../common/globals";
 import {misc} from "../../../../core/misc";
 
+const randomizeWhatsappMessage = (message: string): string => {
+  if (!WWStorage.isWhatsappMessageRandomizationEnabled() || !message) {
+    return message;
+  }
+
+  const postfixes = [
+    '', ' 🙂', ' 😃', ' 😉', ' 😌', ' 😎', ' ⭐', ' 🙏', ' 🌟',
+    ' ,', ' -', ' _', ' \'', ' "', ' \\', ' *', ' #', ' ~', ' `', ' /',
+  ];
+
+  return message + postfixes[Math.floor(Math.random() * postfixes.length)];
+};
+
 type PhoneAndTagsRoot = {
   adId?: string,
   phone: string;
@@ -18,13 +31,17 @@ const PhoneAndTagsRoot: React.FC<PhoneAndTagsRoot> = ({
  children,
 }) => {
   const [whatsappMessage, setWhatsappMessage] = useState<string | null>(
-    WWStorage.isWhatsappMessageEnabled() ? WWStorage.getWhatsappMessage() : null
+    WWStorage.isWhatsappMessageEnabled()
+      ? randomizeWhatsappMessage(WWStorage.getWhatsappMessage())
+      : null
   );
 
   useEffect(() => {
     const handleSettingsChange = () => {
       setWhatsappMessage(
-        WWStorage.isWhatsappMessageEnabled() ? WWStorage.getWhatsappMessage() : null
+        WWStorage.isWhatsappMessageEnabled()
+          ? randomizeWhatsappMessage(WWStorage.getWhatsappMessage())
+          : null
       );
     };
 

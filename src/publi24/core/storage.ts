@@ -575,6 +575,15 @@ export const WWStorage = {
     return localStorage.getItem('ww:whatsapp-message-enabled') === 'true';
   },
 
+  setWhatsappMessageRandomizationEnabled(enabled: boolean): void {
+    localStorage.setItem('ww:whatsapp-message-randomization-enabled', enabled ? 'true' : 'false');
+    WWStorage.triggerSettingsChanged();
+  },
+
+  isWhatsappMessageRandomizationEnabled(): boolean {
+    return localStorage.getItem('ww:whatsapp-message-randomization-enabled') !== 'false';
+  },
+
   setWhatsappMessage(message: string): void {
     localStorage.setItem('ww:whatsapp-message', message);
     WWStorage.triggerSettingsChanged();

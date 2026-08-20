@@ -22,6 +22,7 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
 
   useEffect(() => {
     const whatsappMessageEnabled = WWStorage.isWhatsappMessageEnabled();
+    const whatsappMessageRandomizationEnabled = WWStorage.isWhatsappMessageRandomizationEnabled();
     const whatsappMessage = WWStorage.getWhatsappMessage();
     const focusMode = WWStorage.isFocusMode();
     const adDeduplication = WWStorage.isAdDeduplicationEnabled();
@@ -35,6 +36,7 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
 
     setSettings({
       whatsappMessageEnabled,
+      whatsappMessageRandomizationEnabled,
       whatsappMessage,
       focusMode,
       adDeduplication,
@@ -73,6 +75,15 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
   const handleWhatsappMessageChange = useCallback((message: string) => {
     WWStorage.setWhatsappMessage(message);
     setSettings(prev => prev ? { ...prev, whatsappMessage: message } : null);
+  }, []);
+
+  const handleToggleWhatsappMessageRandomization = useCallback(() => {
+    const currentValue = WWStorage.isWhatsappMessageRandomizationEnabled();
+    WWStorage.setWhatsappMessageRandomizationEnabled(!currentValue);
+    setSettings(prev => prev ? {
+      ...prev,
+      whatsappMessageRandomizationEnabled: !currentValue,
+    } : null);
   }, []);
 
   const handleToggleAdDeduplication = useCallback(() => {
@@ -193,6 +204,7 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
         onClose={onClose}
         settings={settings}
         onToggleWhatsappMessage={handleToggleWhatsappMessage}
+        onToggleWhatsappMessageRandomization={handleToggleWhatsappMessageRandomization}
         onWhatsappMessageChange={handleWhatsappMessageChange}
         onToggleFocusMode={handleToggleFocusMode}
         onToggleAdDeduplication={handleToggleAdDeduplication}

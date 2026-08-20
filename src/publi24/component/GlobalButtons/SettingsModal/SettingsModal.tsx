@@ -78,6 +78,7 @@ const SettingControl: React.FC<SettingControlProps> =
 
 export type SettingsData = {
   whatsappMessageEnabled: boolean;
+  whatsappMessageRandomizationEnabled: boolean;
   whatsappMessage: string;
   focusMode: boolean;
   adDeduplication: boolean;
@@ -93,6 +94,7 @@ type SettingsModalProps = {
   onClose: () => void;
   settings: SettingsData;
   onToggleWhatsappMessage: () => void;
+  onToggleWhatsappMessageRandomization: () => void;
   onWhatsappMessageChange: (message: string) => void;
   onToggleFocusMode: () => void;
   onToggleAdDeduplication: () => void;
@@ -115,6 +117,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
   onClose,
   settings,
   onToggleWhatsappMessage,
+  onToggleWhatsappMessageRandomization,
   onWhatsappMessageChange,
   onToggleFocusMode,
   onToggleAdDeduplication,
@@ -207,6 +210,17 @@ const SettingsModal: React.FC<SettingsModalProps> =
           style={{ width: '100%', maxWidth: '100%', resize: 'none' }}
         />
       </SettingControl>
+      {settings.whatsappMessageEnabled && (
+        <div className={styles.controlInset}>
+          <SettingControl
+            title="Randomizare mesaj WhatsApp"
+            description="Adaugă aleatoriu un postfix sau niciun postfix mesajului predefinit. Poate ajuta, în unele cazuri, la prevenirea suspendării temporare a contului, în special în cazul numerelor de telefon noi."
+            isOn={settings.whatsappMessageRandomizationEnabled}
+            onToggle={onToggleWhatsappMessageRandomization}
+            dataWwid="whatsapp-message-randomization-switch"
+          />
+        </div>
+      )}
 
       <hr style={{ opacity: 0.2, marginTop: '25px', marginBottom: '25px' }} />
 
