@@ -8,6 +8,17 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.8',
+    releaseDate: '21 august 2026',
+    changeNew: [
+      'Randomizarea mesajului predefinit de WhatsApp printr-un emoji sau caracter la sfârșit, activată implicit în setări.'
+    ],
+    changeImprove: [],
+    changeFix: [
+      'Setarea \'Singur anunț\' ascundea toate anunțurile cănd acestea erau afișate prin duplicate de la \'inspector\'.',
+    ]
+  },
+  {
     version: '3.7',
     releaseDate: '17 august 2026',
     changeNew: [],
