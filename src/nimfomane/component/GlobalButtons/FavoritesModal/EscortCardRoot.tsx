@@ -64,7 +64,7 @@ export const EscortCardRoot: React.FC<EscortCardRootProps> = ({user, index}) => 
       lastVisitedLabel={lastVisitedLabel}
       panel={mounted && ref.current ? <PanelRoot escortUser={user} container={ref.current} hideReasonLayout="vertical" /> : null}
       imageModal={isModalOpen ? (
-        <Modal close={() => setImageModalOpen(false)} dataWwid="escort-image-modal">
+        <Modal close={() => setImageModalOpen(false)} mobileContentOverlay dataWwid="escort-image-modal">
           <EscortImagesRoot onClose={() => setImageModalOpen(false)} user={user} isMobile={IS_MOBILE_VIEW} />
         </Modal>
       ) : null}

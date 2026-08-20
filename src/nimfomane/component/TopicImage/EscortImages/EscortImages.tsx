@@ -1,4 +1,4 @@
-import React, {FC, MouseEventHandler, RefObject} from "react";
+import React, {FC, MouseEventHandler, Ref} from "react";
 import type {Image} from "../../../core/escortActions";
 import classes from './EscortImages.module.scss';
 import {CloseIcon} from "../../../../publi24/component/Common/Icons/CloseIcon";
@@ -15,7 +15,7 @@ export interface EscortImagesProps {
   isMobile: boolean;
   onClose: MouseEventHandler;
   onLogoClick: () => void;
-  containerRef?: RefObject<HTMLDivElement>;
+  containerRef?: Ref<HTMLDivElement>;
 }
 
 export const EscortImages: FC<EscortImagesProps> = ({
@@ -38,9 +38,9 @@ export const EscortImages: FC<EscortImagesProps> = ({
   );
 
   return (
-    <div className={classes.container} ref={containerRef} data-wwid="escort-images">
+    <div className={classes.container} data-wwid="escort-images">
       {!isMobile && headerContent}
-      <div className={classes.content}>
+      <div className={classes.content} ref={containerRef}>
         {!images.length && !loading && !error && <div className={classes.noImages}>Nu sunt poze</div>}
         {images.map((image, index) => (
           <div key={index} data-wwid="escort-image" className={classes.image_container}>

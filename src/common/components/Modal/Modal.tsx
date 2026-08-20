@@ -7,6 +7,7 @@ type ModalProps = {
   close: () => void;
   scroll?: boolean;
   inline?: boolean;
+  mobileContentOverlay?: boolean;
   dataWwid?: string;
   onCleanup?: () => void;
 };
@@ -19,6 +20,7 @@ const Modal: React.FC<ModalProps> =
   close,
   scroll = true,
   inline = false,
+  mobileContentOverlay = false,
   dataWwid,
   onCleanup,
 }) => {
@@ -70,7 +72,7 @@ const Modal: React.FC<ModalProps> =
 
   const modal = (
     <div
-      className={`${styles.modalContainer} ${scroll ? styles.scroll : ''} ${inline ? styles.inline : ''}`}
+      className={`${styles.modalContainer} ${scroll ? styles.scroll : ''} ${inline ? styles.inline : ''} ${mobileContentOverlay ? styles.mobileContentOverlay : ''}`}
       onClick={(event) => {
         event.stopPropagation();
         close();

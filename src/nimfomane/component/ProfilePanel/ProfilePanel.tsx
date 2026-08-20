@@ -25,7 +25,7 @@ export const ProfilePanel: FC<ProfilePanelProps> = ({user, container}) => {
       />
 
       {isModalOpen && (
-        <Modal close={() => setImageModalOpen(false)} dataWwid="escort-image-modal">
+        <Modal close={() => setImageModalOpen(false)} mobileContentOverlay dataWwid="escort-image-modal">
           <EscortImagesRoot
             onClose={() => setImageModalOpen(false)}
             user={user}

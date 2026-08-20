@@ -65,7 +65,7 @@ const EscortDetailsModalRoot: React.FC<EscortDetailsModalRootProps> = ({user, on
       onClose={onClose}
       onImageClick={() => setImageModalOpen(true)}
       imageModal={isImageModalOpen ? (
-        <Modal close={() => setImageModalOpen(false)} dataWwid="escort-image-modal">
+        <Modal close={() => setImageModalOpen(false)} mobileContentOverlay dataWwid="escort-image-modal">
           <EscortImagesRoot
             onClose={() => setImageModalOpen(false)}
             user={user}

@@ -1,4 +1,4 @@
-import React, {FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from "react";
+import React, {FC, useCallback, useEffect, useLayoutEffect, useMemo, useState} from "react";
 import {escortActions, Image} from "../../../core/escortActions";
 import {utils} from "../../../../common/utils";
 import {EscortImages} from './EscortImages';
@@ -15,8 +15,11 @@ export const EscortImagesRoot: FC<EscortImagesRootProps> = ({user, onClose, isMo
   const [loading, setLoading] = useState(false);
   const [ended, setEnded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const ref = useRef<HTMLDivElement>(null);
-  const scrollParent = useMemo(() => utils.getScrollParent(ref.current, false) as HTMLDivElement, [ref.current]);
+  const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(null);
+  const scrollParent = useMemo(
+    () => utils.getScrollParent(scrollElement, false),
+    [scrollElement],
+  );
 
   const loadMoreImages = useCallback(async () => {
     if (loading) {
@@ -58,7 +61,7 @@ export const EscortImagesRoot: FC<EscortImagesRootProps> = ({user, onClose, isMo
   }, [loading, loadedPages, user]);
 
   const handleScroll = useCallback(() => {
-    if (!scrollParent) {
+    if (!(scrollParent instanceof HTMLElement)) {
       return;
     }
 
@@ -76,6 +79,10 @@ export const EscortImagesRoot: FC<EscortImagesRootProps> = ({user, onClose, isMo
       return () => {};
     }
 
+    if (!(scrollParent instanceof HTMLElement)) {
+      return;
+    }
+
     scrollParent.addEventListener('scroll', handleScroll);
     return () => scrollParent.removeEventListener('scroll', handleScroll);
   }, [ended, handleScroll, scrollParent]);
@@ -89,7 +96,7 @@ export const EscortImagesRoot: FC<EscortImagesRootProps> = ({user, onClose, isMo
       isMobile={isMobile}
       onClose={onClose}
       onLogoClick={utils.openExtensionPage}
-      containerRef={ref}
+      containerRef={setScrollElement}
     />
   );
 };

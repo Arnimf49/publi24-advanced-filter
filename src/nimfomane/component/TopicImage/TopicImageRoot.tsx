@@ -75,7 +75,7 @@ export const TopicImageRoot: FC<TopicImageRootProps> =
       />
 
       {isModalOpen && topic.ownerUser && (
-        <Modal close={() => setImageModalOpen(false)} dataWwid="escort-image-modal">
+        <Modal close={() => setImageModalOpen(false)} mobileContentOverlay dataWwid="escort-image-modal">
           <EscortImagesRoot
             onClose={() => setImageModalOpen(false)}
             user={topic.ownerUser}
