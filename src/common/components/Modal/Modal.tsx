@@ -26,7 +26,14 @@ const Modal: React.FC<ModalProps> =
 }) => {
   useEffect(() => {
     const currentModalIndex = inline ? MODALS_OPEN : ++MODALS_OPEN;
+    const shouldResetScroll = !inline && mobileContentOverlay && document.body.classList.contains('onMobile');
+    const initialScrollY = shouldResetScroll ? window.scrollY : 0;
+
     if (!inline) {
+      if (shouldResetScroll) {
+        window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
+      }
+
       document.body.style.overflow = 'hidden';
       window.history.pushState({ modalIndex: currentModalIndex }, '');
     }
@@ -65,6 +72,11 @@ const Modal: React.FC<ModalProps> =
         if (!MODALS_OPEN) {
           document.body.style.overflow = 'initial';
         }
+
+        if (shouldResetScroll) {
+          window.scrollTo({ left: 0, top: initialScrollY, behavior: 'instant' });
+        }
+
         onCleanup?.()
       }, 10);
     }
