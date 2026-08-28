@@ -141,6 +141,15 @@ function getFlagForDomain(domain: string): string | null {
   return null;
 }
 
+function isGotoPath(gotoPath: string): boolean {
+  try {
+    return new URL(gotoPath, 'https://www.google.com').pathname === '/goto';
+  } catch (error) {
+    console.error(`Error parsing possible Google redirect URL "${gotoPath}":`, error);
+    return false;
+  }
+}
+
 export const linksFilter = {
   isAdUrl(url: ImageResult) {
     if (Array.isArray(url)) {
@@ -155,19 +164,24 @@ export const linksFilter = {
   },
 
   filterLinks(links: SearchResult[], itemUrl: string): SearchResult[] {
-    return links.filter((l: SearchResult) => {
-      if (Array.isArray(l)) {
-        const name = l[0];
-        return !BLACKLISTED_LINKS.some(
-          (b: string) => name.startsWith(b
-            .replace(/^https?:\/\//, '')
-            .replace(/\/$/, '')
-          )
-        );
-      }
-      return !BLACKLISTED_LINKS.some((b: string) => l.indexOf(b) === 0)
-        && !linksFilter.isUrlSameAd(l, itemUrl);
-    });
+    return links
+      .filter((l: SearchResult) => {
+        if (typeof l === 'string' && isGotoPath(l)) {
+          return false;
+        }
+
+        if (Array.isArray(l)) {
+          const name = l[0];
+          return !BLACKLISTED_LINKS.some(
+            (b: string) => name.startsWith(b
+              .replace(/^https?:\/\//, '')
+              .replace(/\/$/, '')
+            )
+          );
+        }
+        return !BLACKLISTED_LINKS.some((b: string) => l.indexOf(b) === 0)
+          && !linksFilter.isUrlSameAd(l, itemUrl);
+      });
   },
 
   getImageResultsStatus(imageSearchDomains: ImageLinkDomainGroup[] | undefined, isStale?: boolean): 'green' | 'yellow' | 'red' | null {

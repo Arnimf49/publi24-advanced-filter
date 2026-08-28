@@ -16,12 +16,27 @@ function getResults() {
 }
 
 function buildGotoResultName(anchor: HTMLAnchorElement): string {
-  const heading = anchor.querySelector<HTMLElement>('h1, h2, h3, h4, h5');
-  const headingText = heading?.textContent?.trim() ?? '';
-  const fullText = anchor.textContent ?? '';
-  const domainMatch = fullText.match(/https?:\/\/([^\s/]+)/);
-  const domainPrefix = domainMatch ? domainMatch[1] : '';
-  return domainPrefix ? `${domainPrefix} ${headingText}`.trim() : headingText;
+  const urlText = anchor.querySelector<HTMLElement>('[role="text"]')?.textContent?.trim() ?? '';
+  const resultTitle = anchor.querySelector<HTMLElement>('[role="heading"]')?.textContent?.trim() ?? '';
+  const domainMatch = urlText.match(/https?:\/\/([^\s/]+)/);
+
+  if (domainMatch) {
+    const domain = domainMatch[1].replace(/^www\./, '').toLowerCase();
+    const titleText = resultTitle;
+    return titleText ? `${domain} | ${titleText}` : domain;
+  }
+
+  const fullText = (anchor.textContent ?? '').replace(/\s+/g, ' ').trim();
+  return resultTitle.split(/\s+/)[0] || fullText.split(/\s+/)[0] || 'unknown';
+}
+
+function isGotoHref(href: string): boolean {
+  try {
+    return new URL(href, 'https://www.google.com').pathname === '/goto';
+  } catch (error) {
+    console.error(`Error parsing possible Google redirect URL "${href}":`, error);
+    return false;
+  }
 }
 
 function extractResultLinks(wwid: string) {
@@ -50,7 +65,7 @@ function extractResultLinks(wwid: string) {
             if (href === null) {
               return null;
             }
-            if (href.startsWith('goto')) {
+            if (isGotoHref(href)) {
               return [buildGotoResultName(anchor), href];
             }
             return href;
