@@ -5,6 +5,17 @@ import {COOKIES_JSON, STORAGE_JSON, utils} from "./utils";
 import {solve} from "recaptcha-solver";
 import {ElementHandle, Page} from "playwright-core";
 
+const debugGooglePopups = true;
+
+const getDebugPageUrl = (page: Page) => {
+  if (page.isClosed()) {
+    return '<closed>';
+  }
+
+  const url = new URL(page.url());
+  return `${url.origin}${url.pathname}`;
+};
+
 export const utilsPubli = {
   clearPopups(page: Page) {
     setInterval(async () => {
@@ -86,7 +97,27 @@ export const utilsPubli = {
       const secondaryPages: Page[] = [];
 
       context.on('page', page => {
+        const pageId = secondaryPages.length + 1;
         secondaryPages.push(page);
+
+        if (debugGooglePopups) {
+          console.info(`[google-popup:${pageId}] opened ${getDebugPageUrl(page)}`);
+          page.on('framenavigated', frame => {
+            if (frame === page.mainFrame()) {
+              console.info(`[google-popup:${pageId}] navigated ${getDebugPageUrl(page)}`);
+            }
+          });
+          page.on('close', () => {
+            console.info(`[google-popup:${pageId}] closed`);
+          });
+          page.on('response', response => {
+            const url = response.url();
+            if (url.includes('/userverify') || url.includes('/payload')) {
+              const type = url.includes('/userverify') ? 'userverify' : 'audio';
+              console.info(`[google-popup:${pageId}] ${type} response ${response.status()}`);
+            }
+          });
+        }
       });
 
       await (typeof triggerButton === 'function' ? await triggerButton() : triggerButton).click();
@@ -100,10 +131,23 @@ export const utilsPubli = {
           throw new Error('Consent page on google!');
         }
         if (altPage.url().startsWith("https://www.google.com/sorry/index")) {
-          await solve(altPage, {
-            delay: process.env.CI ? 200 : 64,
-            wait: process.env.CI ? 7000 : 5000,
-          });
+          if (debugGooglePopups) {
+            console.info(`[google-popup:${secondaryPages.indexOf(altPage) + 1}] solver start ${getDebugPageUrl(altPage)}`);
+          }
+          try {
+            const solved = await solve(altPage, {
+              delay: process.env.CI ? 200 : 64,
+              wait: process.env.CI ? 7000 : 5000,
+            });
+            if (debugGooglePopups) {
+              console.info(`[google-popup:${secondaryPages.indexOf(altPage) + 1}] solver result=${solved} ${getDebugPageUrl(altPage)}`);
+            }
+          } catch (error) {
+            if (debugGooglePopups) {
+              console.error(`[google-popup:${secondaryPages.indexOf(altPage) + 1}] solver error closed=${altPage.isClosed()} ${getDebugPageUrl(altPage)}`, error);
+            }
+            throw error;
+          }
         }
         if (close) {
           await altPage.waitForEvent('close')

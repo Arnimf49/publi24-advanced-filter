@@ -21,7 +21,7 @@
     "domain-mapper:server": "tsx src-mapper/ai-classifier/index.ts",
     "domain-mapper:ui": "vite --config src-mapper/vite.config.js",
     "domain-mapper": "concurrently \"npm run domain-mapper:server\" \"npm run domain-mapper:ui\"",
-    "postinstall": "sed -i 's/:visible//g' node_modules/recaptcha-solver/lib/index.js node_modules/recaptcha-solver/lib/index.mjs || true"
+    "postinstall": "patch-package"
   },
   "author": "",
   "license": "MIT",
@@ -53,6 +53,7 @@
     "express": "^5.1.0",
     "fingerprint-generator": "2.1.82",
     "fingerprint-injector": "2.1.82",
+    "patch-package": "^8.0.1",
     "postcss": "^8.5.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

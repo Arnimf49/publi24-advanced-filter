@@ -232,4 +232,3 @@ test('Should be able to do manual search', async ({ page, context }, testInfo) =
     4000,
   );
 });
-

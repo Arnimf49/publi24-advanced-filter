@@ -7,7 +7,7 @@ echo "Building with rollup..."
 rollup -c
 
 echo "Building Chrome version..."
-web-ext build --ignore-files "tests" "test-results" "misc" "src" "src-mapper" "package.json" "package-lock.json" "playwright.config.ts" "node_modules" "tsconfig.json" "rollup.config.js" "scripts" --overwrite-dest
+web-ext build --ignore-files "tests" "test-results" "misc" "src" "src-mapper" "package.json" "package-lock.json" "patches" "playwright.config.ts" "node_modules" "tsconfig.json" "rollup.config.js" "scripts" --overwrite-dest
 
 MANIFEST_VERSION=$(jq -r '.version' manifest.json)
 ORIGINAL_ZIP="web-ext-artifacts/publi24_filtru_avansat-${MANIFEST_VERSION}.zip"
@@ -22,7 +22,7 @@ jq '.background = {scripts: ["dist/common/background/background.js"]}' manifest.
 mv manifest.json.tmp manifest.json
 
 echo "Building Firefox version..."
-web-ext build --ignore-files "tests" "test-results" "misc" "src" "src-mapper" "package.json" "package-lock.json" "playwright.config.ts" "node_modules" "tsconfig.json" "rollup.config.js" "scripts" --overwrite-dest
+web-ext build --ignore-files "tests" "test-results" "misc" "src" "src-mapper" "package.json" "package-lock.json" "patches" "playwright.config.ts" "node_modules" "tsconfig.json" "rollup.config.js" "scripts" --overwrite-dest
 
 FIREFOX_ZIP="web-ext-artifacts/publi24_filtru_avansat-${MANIFEST_VERSION}-firefox.zip"
 mv "$ORIGINAL_ZIP" "$FIREFOX_ZIP"
