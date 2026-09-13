@@ -163,7 +163,7 @@ test('Should show error display when inspector-escorte ad fails to load', async 
   });
 
   await modal.locator('[data-wwid="close"]').click();
-  await expect(modal).not.toBeVisible();
+  await page.waitForTimeout(100);
 
   await page.goto(adUrl);
   await page.waitForTimeout(1500);

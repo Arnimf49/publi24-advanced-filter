@@ -30,7 +30,7 @@ function profileBody(source: DetailSource): string {
     ? '<a href="/forum/profile/test/?tab=field_core_pfield_11">servicii</a><div id="elProfileTabs_content"></div>'
     : '';
   const activity = source === 'signature'
-    ? '<div class="ipsStreamItem_title"><a href="/forum/topic/999-test/?do=findComment&comment=7">activitate</a></div>'
+    ? '<div class="ipsStreamItem_title"><a data-linktype="link" href="https://nimfomane.com/forum/topic/999-test/?do=findComment&comment=7">activitate</a></div>'
     : '';
 
   return `<html><body>${sidebar}${servicesTab}${activity}

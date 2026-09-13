@@ -170,7 +170,7 @@ test('Should refresh favorites stats in background without opening the modal.', 
   await page.waitForFunction(
     (user) => {
       const escort = JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${user}`) || '{}');
-      return escort.profileStats?.posts === 9999;
+      return escort.profileStats?.posts === 9999 && escort.profileStatsTime;
     },
     user,
     {timeout: 15000}
@@ -182,6 +182,8 @@ test('Should refresh favorites stats in background without opening the modal.', 
   const escortCard = page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-card"]');
   await expect(escortCard.locator('[data-wwid="stat-posts"] [data-wwid="inline-loader"]')).not.toBeVisible();
   await expect(escortCard.locator('[data-wwid="stat-posts"]')).toContainText('9999');
+
+  await page.unrouteAll({behavior: 'ignoreErrors'});
 });
 
 test('Should display location titles in various conditions.', async ({ page }) => {
