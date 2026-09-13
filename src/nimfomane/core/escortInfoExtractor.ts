@@ -88,7 +88,7 @@ const SMALL_CAPS = {
 const SERVICE_PATTERNS: Record<EscortServiceName, RegExp> = {
   op: /\b(?:op|bj|bj\s+p\s*\/\s*n|p\s*\/\s*n|oral\s*(?:sex\s+)?(?:protejat|pro)|sex\s+oral\s*(?:protejat|pro)|oral\s*\(\s*pro\b|sex\s+oral\s*\(\s*pro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:protejat|pro)\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\bfunctie\s+de\s+igiena\b|\boral\s*(?:si\s+normal|cu\s+sau\s+fara)\b|(?<!cu\s)\bsex\s+oral\b(?!\s+(?:neprotejat|nepro|protejat|pro))\b/g,
   on: /\b(?:on|bj|bj\s+p\s*\/\s*n|p\s*\/\s*n|oral\s*(?:sex\s+)?(?:neprotejat|nepro|nep)|sex\s+oral\s*(?:neprotejat|nepro|nep)|oral\s*\(\s*pro\s*\/\s*nepro\b|oral\s*\(\s*nepro\b|sex\s+oral\s*\(\s*nepro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:neprotejat|nepro|nep|fara\s+prezervativ)\b|\b(?:sex\s+oral|oral)\b[^\n.;]{0,35}\bfunctie\s+de\s+igiena\b|\boral\s*(?:si\s+normal|cu\s+sau\s+fara)\b|(?<!cu\s)\bsex\s+oral\b(?!\s+(?:neprotejat|nepro|protejat|pro))\b/g,
-  np: /\bnp\b|\b(?:sex\s+)?normal(?:ul)?\b(?!\s+neprotejat)(?:\s*\(\s*(?:(?:obligatoriu|doar|strict)\s+)?protejat\w*\s*[!.,;]?\s*\)|\s+(?:(?:obligatoriu|doar|strict)\s+)?protejat\w*\b|\s+in\s+diferite\s+pozitii\b)|\bnormal\b[^\n.;]{0,30}\bprotejat\w*\b|\bsex\s*\(\s*(?:(?:obligatoriu|doar|strict)\s+)?protejat\w*\s*\)|\bact(?:ul)?\s+sexual\s+protejat\w*\b|\bsex\s+normal\b(?!\s+neprotejat)\b/g,
+  np: /\bnp\b|\b(?:sex\s+)?normal(?:ul)?\b(?!\s+neprotejat)(?:\s*\(\s*(?:(?:obligatoriu|doar|strict)\s+)?(?:protejat|potejat)\w*\s*[!.,;]?\s*\)|\s+(?:(?:obligatoriu|doar|strict)\s+)?(?:protejat|potejat)\w*\b|\s+in\s+diferite\s+pozitii\b)|\bnormal\b[^\n.;]{0,30}\b(?:protejat|potejat)\w*\b|\bsex\s*\(\s*(?:(?:obligatoriu|doar|strict)\s+)?(?:protejat|potejat)\w*\s*\)|\bact(?:ul)?\s+sexual\s+(?:protejat|potejat)\w*\b|\bsex\s+normal\b(?!\s+neprotejat)\b/g,
   nn: /\b(?:sex\s+)?normal(?:ul)?\s+neprotejat\b|\bact(?:ul)?\s+sexual\s+neprotejat\b/g,
   showerSex: /\b(?:sex|partid[ăa])\s+(?:la|sub|in)\s+duș\b|\b(?:sex|partid[ăa])\s+(?:la|sub|in)\s+dus\b|\bduș\s+(?:cu\s+sex|sex)\b|\bdus\s+(?:cu\s+sex|sex)\b|\bshower\s+together\b/g,
   deepthroat: /\b(?:dt|deep\s*throat|deepthroat|deeptroath|deeptrhoat|deepthrot|deep)\b|\boral\s+adanc\b/g,
@@ -372,9 +372,19 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
   const lineStart = text.lastIndexOf('\n', start - 1) + 1;
   const lineEndIndex = text.indexOf('\n', end);
   const lineEnd = lineEndIndex === -1 ? text.length : lineEndIndex;
+  const line = text.slice(lineStart, lineEnd);
   const nearbyStart = Math.max(lineStart, start - 80);
   const nearbyEnd = Math.min(lineEnd, end + 55);
   const nearby = text.slice(nearbyStart, nearbyEnd);
+  if (service === 'on' && /\bstrap\s+on\b/i.test(line) && !/\bfull\s+service\b/i.test(text)) {
+    return undefined;
+  }
+  if (service === 'hj' && /\bdus\s+impreuna\b[^\n]*\bhandjob\b[^\n]*\+\s*50\b/i.test(line)) {
+    return undefined;
+  }
+  if (service === 'shower' && /\bdus\s+impreuna\b[^\n]*\bhandjob\b[^\n]*\+\s*50\b/i.test(line)) {
+    return 50;
+  }
   if (service === 'domination') {
     const parenthesizedExtra = /\(\s*(\d{2,4})\s*(?:lei|ron)\s*\)/i.exec(nearby);
     if (parenthesizedExtra && isPriceAmount(Number.parseInt(parenthesizedExtra[1], 10))) {
@@ -391,7 +401,6 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
     && /\bschato\b[^\n]{0,50}\bextra\b[^\n]{0,30}\bdominare\b/i.test(nearby)) {
     return undefined;
   }
-  const line = text.slice(lineStart, lineEnd);
   if (service === 'cob') {
     const corporalExtra = /\bfina\s+corporala\b[^\n]{0,20}\b100\b/i.test(line);
     if (corporalExtra) {
@@ -409,6 +418,16 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
     return undefined;
   }
   const recentExtraHeading = /\b(?:extra\s+(?:va\s+fi|este|sunt)|servicii?\s+extra)\b/i.test(text.slice(Math.max(0, lineStart - 500), lineStart));
+  const sameLineExtraHeading = /\bservicii?\s+extra\b/i.test(line.slice(0, start - lineStart));
+  if ((recentExtraHeading || sameLineExtraHeading) && ['69', 'cuni', 'ani', 'fj', 'footfetish'].includes(service)) {
+    const groupedExtra = /(?:\b69\b|\bcunn?ilingus\b|\ban{1,3}i{1,2}lingus\b|\bfoot\s*job\b|\bfootfetish\b)[^.!?]{0,120}\(\s*\+\s*(\d{2,4})\s*\)/i.exec(line);
+    if (groupedExtra
+      && (groupedExtra.index ?? 0) <= start - lineStart
+      && (groupedExtra.index ?? 0) + groupedExtra[0].length >= start - lineStart
+      && isPriceAmount(Number.parseInt(groupedExtra[1], 10))) {
+      return Number.parseInt(groupedExtra[1], 10);
+    }
+  }
   if (recentExtraHeading && ['footfetish', 'uro', 'domSoft', 'domHard', 'showerSex', 'shower'].includes(service)) {
     const inlineExtra = line.slice(start - lineStart).match(/[^\n]{0,45}\b(\d{2,4})\s*(?:de\s*)?(?:lei|ron)\b/i);
     if (inlineExtra && isPriceAmount(Number.parseInt(inlineExtra[1], 10))) {
@@ -697,6 +716,9 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
 }
 
 function extractOneService(text: string, service: EscortServiceName): ServiceAvailability | undefined {
+  if ((service === 'op' || service === 'np') && /\boral\s*,\s*normal\s*,\s*(?:atingeri|mangai|handjob)\b/i.test(text)) {
+    return true;
+  }
   if (service === 'cuni' && /\bcunii\b/i.test(text)) {
     return true;
   }
@@ -1051,8 +1073,8 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
   if (compactOneAndHalfHourRate && isPriceAmount(Number.parseInt(compactOneAndHalfHourRate[1], 10))) {
     baseCandidates['1.5h'] = [Number.parseInt(compactOneAndHalfHourRate[1], 10)];
   }
-  const giftCompanyThirtyMinuteRate = /\b(\d{2,5})\s*(?:lei|ron)\s*[-–:]\s*o\s+finaliz\w*\s*\(\s*30\s*minute/i.exec(rateText);
-  const giftCompanyHourRate = /\b(\d{2,5})\s*(?:lei|ron)\s*[-–:]\s*doua\s+finaliz\w*\s*\(\s*60\s*minute/i.exec(rateText);
+  const giftCompanyThirtyMinuteRate = /\b(\d{2,5})[ \t]*(?:(?:lei|ron)[ \t]*)?[-–:][ \t]*(?:o[ \t]+finaliz\w*|(?:o[ \t]+)?1[ \t]+finaliz\w*)[ \t]*\([ \t]*30[ \t]+minute/i.exec(rateText);
+  const giftCompanyHourRate = /\b(\d{2,5})[ \t]*(?:lei|ron)[ \t]*[-–:][ \t]*(?:2|doua)[ \t]+finaliz\w*[ \t]*\([ \t]*60[ \t]+minute/i.exec(rateText);
   if (giftCompanyThirtyMinuteRate && isPriceAmount(Number.parseInt(giftCompanyThirtyMinuteRate[1], 10))) {
     baseCandidates['30m'] = [Number.parseInt(giftCompanyThirtyMinuteRate[1], 10)];
   }

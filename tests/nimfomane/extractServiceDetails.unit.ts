@@ -2084,6 +2084,46 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       },
     },
   },
+  {
+    file: "sample200.txt",
+    expected: {
+      baseRates: {'30m': 200, '1h': 400},
+      services: {
+        op: true, on: true, np: true, hj: true, cob: true, massage: {extraCost: 50},
+        '69': {extraCost: 100}, cuni: {extraCost: 100}, ani: {extraCost: 100},
+        fj: {extraCost: 100}, footfetish: {extraCost: 100}, shower: {extraCost: 50},
+        fk: false, cim: false, cof: false, fingering: false,
+        deepthroat: false, ap: false,
+      },
+    },
+  },
+  {
+    file: "sample201.txt",
+    expected: {
+      baseRates: {'30m': 250, '1h': 500},
+      services: {
+        '69': true, op: true, on: true, np: true, cob: true,
+        facesitting: true, footfetish: true, hj: true, cuni: true, ani: true,
+        massage: true, prostateMassage: {extraCost: 50}, domSoft: {extraCost: 50},
+        strapOn: {extraCost: 100}, fk: false, cim: false, cof: false,
+        fingering: false, ap: false,
+      },
+    },
+  },
+  {
+    file: "sample202.txt",
+    expected: {
+      baseRates: {'30m': 200, '1h': 400},
+      services: {
+        '69': {extraCost: 100}, op: true, on: true, np: true,
+        deepthroat: false, fk: false, fj: {extraCost: 100},
+        cim: false, cof: false, cob: {extraCost: 50}, massage: {extraCost: 50},
+        hj: true, cuni: {extraCost: 100}, ani: {extraCost: 100},
+        shower: {extraCost: 50}, footfetish: {extraCost: 100},
+        fingering: false, ap: false,
+      },
+    },
+  },
 ];
 
 for (const sample of samples) {
