@@ -10,6 +10,12 @@ export interface Image {
   topicUrl: string;
 }
 
+const isCityImage = (imageElement: Element): boolean => {
+  const streamItem = imageElement.closest('.ipsStreamItem');
+  const sectionLink = streamItem?.querySelector<HTMLAnchorElement>('.ipsStreamItem_status a:last-child');
+  return !sectionLink || !!cityService.getCityFromForumUrl(sectionLink.href);
+};
+
 const extractPhoneFromElements = (elements: NodeListOf<HTMLElement> | HTMLElement[]): string | null => {
   for (const element of elements) {
     const normalized = utils.normalizeDigits(element.innerText);
@@ -87,7 +93,8 @@ export const escortActions = {
     do {
       const pageData = await jsonPage.load(profileContentUrl, {priority});
 
-      const image = pageData.querySelector('.ipsStreamItem_snippet [data-background-src]');
+      const image = [...pageData.querySelectorAll('.ipsStreamItem_snippet [data-background-src]')]
+        .find(isCityImage);
       if (image) {
         NimfomaneStorage.setEscortProp(user, 'optimizedProfileImage', image.getAttribute('data-background-src'));
         NimfomaneStorage.setEscortProp(user, 'optimizedProfileImageTime', Date.now());
@@ -125,12 +132,11 @@ export const escortActions = {
     const imageElements = pageData.querySelectorAll('.ipsStreamItem_snippet [data-background-src]');
 
     const images = [...imageElements].flatMap(el => {
-      const streamItem = el.closest('.ipsStreamItem');
-      const sectionLink = streamItem?.querySelector<HTMLAnchorElement>('.ipsStreamItem_status a:last-child');
-      if (sectionLink && !cityService.getCityFromForumUrl(sectionLink.href)) {
+      if (!isCityImage(el)) {
         return [];
       }
 
+      const streamItem = el.closest('.ipsStreamItem');
       return [{
         url: el.getAttribute('data-background-src')!,
         date: el.closest('.ipsStreamItem_container')!.querySelector('time')!.innerText,
