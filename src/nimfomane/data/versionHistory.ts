@@ -8,6 +8,18 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.8.3',
+    releaseDate: '13 septembrie 2026',
+    changeNew: [],
+    changeImprove: [],
+    changeFix: [
+      'Poza de profil nu se apăsa la partea de jos cănd topicul era ascuns pe mobil',
+      'Inconsistență între alegerea pozei principale de profil și cele afișate in modalul cu poze',
+      'Pozele postate în secțiunea de \'Servicii adiacente\' nu erau incluse',
+      'Cazuri adiționale în care lista de servicii nu se extrăgeau corect',
+    ]
+  },
+  {
     version: '3.8.2',
     releaseDate: '29 august 2026',
     changeNew: [],
