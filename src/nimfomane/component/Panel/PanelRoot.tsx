@@ -74,13 +74,22 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container,
     children.forEach(child => {
       if (child === hideReasonContainer) return;
 
-      if (visible) {
-        child.style.opacity = '1';
-        child.style.mixBlendMode = 'initial';
-      } else {
-        child.style.opacity = '0.5';
-        child.style.mixBlendMode = 'luminosity';
-      }
+      const panel = child.dataset.wwid === 'panel-container'
+        ? child.querySelector<HTMLElement>('[data-wwid="panel"]')
+        : null;
+      const styleTargets = panel
+        ? Array.from(panel.children) as HTMLElement[]
+        : [child];
+
+      styleTargets.forEach(styleTarget => {
+        if (visible) {
+          styleTarget.style.opacity = '1';
+          styleTarget.style.mixBlendMode = 'initial';
+        } else {
+          styleTarget.style.opacity = '0.5';
+          styleTarget.style.mixBlendMode = 'luminosity';
+        }
+      });
     });
   }, [visible, container]);
 

@@ -68,6 +68,7 @@ export const renderer = {
     container.style.position = 'relative';
 
     const panelContainer = document.createElement('div');
+    panelContainer.setAttribute('data-wwid', 'panel-container');
     const root = ReactDOM.createRoot(panelContainer);
     root.render(<ProfilePanel user={user} container={container}/>);
     container.appendChild(panelContainer);
@@ -179,6 +180,7 @@ export const renderer = {
 
   renderTopicPanel(container: HTMLDivElement, id: string): () => void {
     const panelContainer = document.createElement('div');
+    panelContainer.setAttribute('data-wwid', 'panel-container');
     const root = ReactDOM.createRoot(panelContainer);
 
     const hideReasonContainer = document.createElement('div');

@@ -20,7 +20,7 @@ type PanelProps = {
 
 export const Panel: React.FC<PanelProps> = ({ phone, visible, hiddenReason, isEscort, isFav, onHideClick, onFavClick, onEscortInfoClick, onShowImages, fullWidth }) => {
   return (
-    <div className={`${styles.panel} ${fullWidth ? styles.panelFullWidth : ''}`}>
+    <div className={`${styles.panel} ${fullWidth ? styles.panelFullWidth : ''}`} data-wwid="panel">
       <div className={styles.buttons}>
         <HideButton
           visible={visible}
