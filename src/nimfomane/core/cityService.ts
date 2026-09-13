@@ -89,7 +89,10 @@ const CITY_TO_LINKS: Record<string, string[]> = {
   'Sălaj': ['https://nimfomane.com/forum/forum/42-escorte-salaj/'],
   'Lugoj': ['https://nimfomane.com/forum/forum/416-escorte-lugoj/'],
   'Turda': ['https://nimfomane.com/forum/forum/417-escorte-turda/'],
-  'Alte orașe': ['https://nimfomane.com/forum/forum/9-escorte-din-alte-orase/'],
+  'Alte orașe': [
+    'https://nimfomane.com/forum/forum/9-escorte-din-alte-orase/',
+    'https://nimfomane.com/forum/forum/186-dominare-stapane-fetish/',
+  ],
   'Vaslui': ['https://nimfomane.com/forum/forum/41-escorte-vaslui/'],
   'Teleorman': ['https://nimfomane.com/forum/forum/32-escorte-teleorman/'],
   'Petroșani': ['https://nimfomane.com/forum/forum/24-escorte-petrosani/'],
