@@ -3,6 +3,8 @@ import {utilsPubli} from "../helpers/utilsPubli";
 import {ElementHandle, Page} from "playwright-core";
 import {utils} from "../helpers/utils";
 
+const GOOGLE_GOTO_ACTIVE = true;
+
 test('Should search for images and show relevant results.', async ({ page, context }, testInfo) => {
   testInfo.setTimeout(60000 * 6);
 
@@ -25,6 +27,20 @@ test('Should search for images and show relevant results.', async ({ page, conte
         const href = await link.getAttribute('href');
         const text = await link.innerText();
         const extractedDomain = new URL(href).hostname.replace(/^www\./, '');
+
+        if (GOOGLE_GOTO_ACTIVE) {
+          expect(extractedDomain).toEqual('google.com');
+
+          if (text.startsWith('#')) {
+            domainIndex++;
+            expect(text).toEqual(`#${domainIndex}`);
+          } else {
+            domainIndex = 1;
+            expect(text).not.toContain('google.com');
+          }
+
+          continue;
+        }
 
         if (domain !== extractedDomain) {
           domain = extractedDomain;

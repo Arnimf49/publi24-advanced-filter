@@ -3,6 +3,8 @@ import {utilsPubli} from "../helpers/utilsPubli";
 import {ElementHandle, errors, Page} from "playwright-core";
 import {utils} from "../helpers/utils";
 
+const GOOGLE_GOTO_ACTIVE = true;
+
 test('Should search for phone number and article id and show relevant results.', async ({ page, context }, testInfo) => {
   testInfo.setTimeout(60000 * 3);
 
@@ -25,7 +27,11 @@ test('Should search for phone number and article id and show relevant results.',
       for (let link of links) {
         const href = await link.getAttribute('href');
         const text = await link.innerText();
-        if (href.match(/https:\/\/nimfomane\.com\/forum/) && !text.match(/^(https?:\/\/)|(www\.)/)) {
+        const isNimfomaneResult = GOOGLE_GOTO_ACTIVE
+          ? text.startsWith('nimfomane.com ')
+          : href.match(/https:\/\/nimfomane\.com\/forum/) && !text.match(/^(https?:\/\/)|(www\.)/);
+
+        if (isNimfomaneResult) {
           nimfomaneLinks.push(link);
         }
       }
@@ -37,7 +43,13 @@ test('Should search for phone number and article id and show relevant results.',
       const nimfomaneLinks = [];
 
       for (let link of links) {
-        if ((await link.getAttribute('href')).match(/https:\/\/nimfomane\.com\/forum\/topic/)) {
+        const href = await link.getAttribute('href');
+        const text = await link.innerText();
+        const isNimfomaneResult = GOOGLE_GOTO_ACTIVE
+          ? text.startsWith('nimfomane.com ')
+          : href.match(/https:\/\/nimfomane\.com\/forum\/topic/);
+
+        if (isNimfomaneResult) {
           nimfomaneLinks.push(link);
         }
       }
@@ -48,7 +60,13 @@ test('Should search for phone number and article id and show relevant results.',
 
       const nimfomaneButton = await ad.$('[data-wwid="nimfomane-btn"]');
       expect(await nimfomaneButton.isVisible()).toBe(true);
-      expect(await nimfomaneButton.getAttribute('href')).toEqual(await nimfomaneLinks[0].getAttribute('href'));
+
+      if (GOOGLE_GOTO_ACTIVE) {
+        const buttonHref = await nimfomaneButton.getAttribute('href');
+        expect(new URL(buttonHref).hostname.replace(/^www\./, '')).toEqual('google.com');
+      } else {
+        expect(await nimfomaneButton.getAttribute('href')).toEqual(await nimfomaneLinks[0].getAttribute('href'));
+      }
 
       return true;
     },
@@ -192,4 +210,3 @@ test('Should show "date șterse, caută din nou" when phone search results are c
   const className = await messageElement.getAttribute('class');
   expect(className).toContain('missingResults');
 });
-

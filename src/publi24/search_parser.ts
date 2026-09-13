@@ -17,7 +17,9 @@ function getResults() {
 
 function buildGotoResultName(anchor: HTMLAnchorElement): string {
   const urlText = anchor.querySelector<HTMLElement>('[role="text"]')?.textContent?.trim() ?? '';
-  const resultTitle = anchor.querySelector<HTMLElement>('[role="heading"]')?.textContent?.trim() ?? '';
+  const resultTitle = anchor.querySelector<HTMLElement>('[role="heading"]')?.textContent?.trim()
+    ?? anchor.querySelector<HTMLElement>('h3')?.textContent?.trim()
+    ?? '';
   const domainMatch = urlText.match(/https?:\/\/([^\s/]+)/);
 
   if (domainMatch) {
