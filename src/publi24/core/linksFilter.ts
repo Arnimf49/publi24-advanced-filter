@@ -10,52 +10,62 @@ export interface EscortDomainEntry {
 }
 
 const BLACKLISTED_LINKS: string[] = [
-  'https://meiwakucheck.com/',
-  'https://www.jpnumber.com/',
-  'https://telefonforsaljare.nu/',
-  'https://www.180.se/',
-  'https://www.180.dk/',
-  'https://www.eniro.se/',
-  'https://z1kk2ror.canina101.es/',
-  'https://www.telefonforsaljare.nu/',
-  'https://denwam.com/',
-  'https://cinetesuna.ro/',
-  'https://www.france-inverse.com/',
-  'http://www.zibadpl.blogfa.com/',
-  'https://www.telephoneannuaire.fr/',
-  'https://nmqzg.forschungsstelle-ordensgeschichte.de/',
-  'https://k6q4ubh5h.echantillon-lipton.fr/',
-  'https://4qkhz6bjo.thiasbarber.fr/',
-  'https://www.denwam.com/',
-  'https://www.leelam.af/',
-  'http://kto-zvonil.com.ua/',
-  'https://www.hitta.se/',
-  'https://chonso.mobifone.vn/',
-  'http://chonso.mobifone.vn/',
-  'https://denwacho.net/',
-  'https://www.telefonforsaljare.nu/',
-  'https://sunat.ro/',
-  'https://www.telefoncontact.online/',
-  'https://www.telefonreclamatii.online/',
-  'https://www.contact-telefon.online/',
-  'https://mobile.inelenco.com/',
-  'https://genealogic.review/',
-  'https://www.merinfo.se/',
-  'https://telefon-kontakte.ch/',
-  'http://www.telefonforsaljare.nu/',
-  'https://www.telnavi.jp/',
-  'https://www.reverseau.com/',
-  'https://www.telguarder.com/',
   'https://information.com/people/',
   'https://health.information.com/reverse-phone-lookup/',
-  'https://www.reverseaustralia.com/',
-  'https://unmask.com/',
-  'https://www.e-aidem.com/',
-  'https://phone-book.tw/',
-  'https://escorte.lol/',
-  'https://haisalut.ro/',
-  'https://tel-search.net/',
   'https://www.publi24.ro/cv?jobapplyid=',
+  'https://www.180.no/',
+  'https://www.thenile.co.nz/',
+  'https://www.awesomebooks.com/',
+  'https://www.abebooks.de/',
+  'https://www.thriftbooks.com/',
+  'https://booksrun.com/',
+  'https://junkcall.org/',
+];
+
+const BLACKLISTED_DOMAIN_SUFFIXES: string[] = [
+  'cloudfront.net',
+  'meiwakucheck.com',
+  'jpnumber.com',
+  'telefonforsaljare.nu',
+  '180.se',
+  '180.dk',
+  'eniro.se',
+  'canina101.es',
+  'denwam.com',
+  'cinetesuna.ro',
+  'france-inverse.com',
+  'zibadpl.blogfa.com',
+  'telephoneannuaire.fr',
+  'forschungsstelle-ordensgeschichte.de',
+  'echantillon-lipton.fr',
+  'thiasbarber.fr',
+  'leelam.af',
+  'kto-zvonil.com.ua',
+  'hitta.se',
+  'mobifone.vn',
+  'denwacho.net',
+  'sunat.ro',
+  'telefoncontact.online',
+  'telefonreclamatii.online',
+  'contact-telefon.online',
+  'inelenco.com',
+  'genealogic.review',
+  'merinfo.se',
+  'telefon-kontakte.ch',
+  'telnavi.jp',
+  'reverseau.com',
+  'telguarder.com',
+  'reverseaustralia.com',
+  'unmask.com',
+  'e-aidem.com',
+  'phone-book.tw',
+  'escorte.lol',
+  'haisalut.ro',
+  'tel-search.net',
+];
+
+const BLACKLISTED_DOMAIN_PATTERNS: RegExp[] = [
+  /^(?:[^.]+\.)*z\d+\.web\.core\.windows\.net$/,
 ];
 
 const PRIO_DOMAINS: string[] = [
@@ -150,6 +160,27 @@ function isGotoPath(gotoPath: string): boolean {
   }
 }
 
+function getDomain(value: string): string {
+  return value.trim().toLowerCase()
+    .replace(/^(?:https?:)?\/\//, '')
+    .split(/[/?#\s|]/, 1)[0]
+    .replace(/\.$/, '')
+    .replace(/^www\./, '');
+}
+
+function hasDomainSuffix(value: string, domainSuffixes: string[]): boolean {
+  const domain = getDomain(value);
+  return domainSuffixes.some((suffix: string) => {
+    const normalizedSuffix = getDomain(suffix).replace(/^\.+|\.+$/g, '');
+    return domain === normalizedSuffix || domain.endsWith(`.${normalizedSuffix}`);
+  });
+}
+
+function matchesDomainPattern(value: string, domainPatterns: RegExp[]): boolean {
+  const domain = getDomain(value);
+  return domainPatterns.some((pattern: RegExp) => pattern.test(domain));
+}
+
 export const linksFilter = {
   isAdUrl(url: ImageResult) {
     if (Array.isArray(url)) {
@@ -172,14 +203,18 @@ export const linksFilter = {
 
         if (Array.isArray(l)) {
           const name = l[0];
-          return !BLACKLISTED_LINKS.some(
-            (b: string) => name.startsWith(b
-              .replace(/^https?:\/\//, '')
-              .replace(/\/$/, '')
-            )
-          );
+          return !hasDomainSuffix(name, BLACKLISTED_DOMAIN_SUFFIXES)
+            && !matchesDomainPattern(name, BLACKLISTED_DOMAIN_PATTERNS)
+            && !BLACKLISTED_LINKS.some(
+              (b: string) => name.startsWith(b
+                .replace(/^https?:\/\//, '')
+                .replace(/\/$/, '')
+              )
+            );
         }
-        return !BLACKLISTED_LINKS.some((b: string) => l.indexOf(b) === 0)
+        return !hasDomainSuffix(l, BLACKLISTED_DOMAIN_SUFFIXES)
+          && !matchesDomainPattern(l, BLACKLISTED_DOMAIN_PATTERNS)
+          && !BLACKLISTED_LINKS.some((b: string) => l.indexOf(b) === 0)
           && !linksFilter.isUrlSameAd(l, itemUrl);
       });
   },
