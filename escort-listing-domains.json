@@ -263,7 +263,9 @@
   {
     "country": "at",
     "domain": "laufhausbraunau.at",
-    "siteNames": []
+    "siteNames": [
+      "Laufhaus Braunau"
+    ]
   },
   {
     "country": "at",
@@ -577,7 +579,9 @@
   {
     "country": "br",
     "domain": "hotters.com.br",
-    "siteNames": []
+    "siteNames": [
+      "Hotters"
+    ]
   },
   {
     "country": "br",
@@ -645,7 +649,8 @@
     "country": "ch",
     "domain": "6navi.ch",
     "siteNames": [
-      "6Navi"
+      "6Navi",
+      "SexNavi.ch"
     ]
   },
   {
@@ -3135,7 +3140,9 @@
   {
     "country": "it",
     "domain": "bacirosa.com",
-    "siteNames": []
+    "siteNames": [
+      "BaciRosa"
+    ]
   },
   {
     "country": "it",
@@ -3882,7 +3889,9 @@
   {
     "country": "ro",
     "domain": "escortero.net",
-    "siteNames": []
+    "siteNames": [
+      "EscorteRO.net"
+    ]
   },
   {
     "country": "ro",

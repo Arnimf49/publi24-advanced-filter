@@ -16,45 +16,59 @@ interface EscortDomainEntry {
   siteNames: string[];
 }
 
+interface LensLink {
+  href: string;
+  siteName: string;
+}
+
 /**
  * Collect domain + site name pairs from a Google Lens result page.
  * Called on each secondary Lens tab before it closes.
  */
 export async function collectFromLensPage(lensPage: Page): Promise<void> {
   try {
-    const entries = await lensPage.evaluate((): Array<{ domain: string; source: string; siteNames: string[] }> => {
-      const results: Array<{ domain: string; source: string; siteNames: string[] }> = [];
+    const links = await lensPage.evaluate((): LensLink[] => {
+      const linkEls = document.querySelectorAll<HTMLAnchorElement>(
+        '[id="rso"] [href][data-hveid], [id="rso"] a[href], li > a[href]'
+      );
 
-      const linkEls: NodeListOf<HTMLAnchorElement> = document.querySelectorAll<HTMLAnchorElement>('[id="rso"] [href][data-hveid]');
-      console.log(linkEls.length);
-
-      linkEls.forEach((linkEl) => {
+      return Array.from(linkEls).flatMap((linkEl): LensLink[] => {
         const href = linkEl.getAttribute('href');
-        if (!href) return;
-
-        let resolvedHref: string;
-        try {
-          resolvedHref = href.startsWith('/goto')
-            ? (new URLSearchParams(href.split('?')[1] || '').get('url') ?? href)
-            : href;
-        } catch (_) {
-          return;
-        }
-
-        let domain: string;
-        try {
-          domain = new URL(resolvedHref).hostname.replace(/^www\./, '');
-        } catch (_) {
-          return;
-        }
+        if (!href) return [];
 
         const siteNameEl = linkEl.querySelector('.wyccme div:last-child');
-        const siteName = siteNameEl?.textContent?.trim() || '';
-        results.push({ domain, source: resolvedHref, siteNames: siteName ? [siteName] : [] });
+        return [{href, siteName: siteNameEl?.textContent?.trim() || ''}];
       });
-
-      return results;
     });
+
+    const entries: Array<{ domain: string; source: string; siteNames: string[] }> = [];
+    for (const {href, siteName} of links) {
+      let source = new URL(href, 'https://www.google.com').href;
+
+      try {
+        const linkUrl = new URL(source);
+        if (linkUrl.hostname === 'www.google.com' && linkUrl.pathname === '/goto') {
+          const knownDomain = escortDomainBySiteName.get(siteName.toLowerCase());
+          if (knownDomain) {
+            entries.push({domain: knownDomain, source, siteNames: siteName ? [siteName] : []});
+            continue;
+          }
+
+          const response = await lensPage.context().request.get(source, {maxRedirects: 10});
+          source = response.url();
+        }
+
+        const resolvedUrl = new URL(source);
+        const domain = resolvedUrl.hostname.replace(/^www\./, '');
+        if (domain === 'google.com') {
+          continue;
+        }
+
+        entries.push({domain, source, siteNames: siteName ? [siteName] : []});
+      } catch (error) {
+        console.warn(`Failed to resolve Lens result link "${source}":`, error);
+      }
+    }
 
     if (entries.length > 0) {
       saveEntries(entries);
@@ -71,6 +85,12 @@ function loadJSON<T>(file: string, fallback: T): T {
     return fallback;
   }
 }
+
+const escortDomainBySiteName = new Map<string, string>(
+  loadJSON<EscortDomainEntry[]>(ESCORT_DOMAINS_FILE, []).flatMap(({domain, siteNames}) =>
+    siteNames.map(siteName => [siteName.trim().toLowerCase(), domain] as [string, string])
+  )
+);
 
 function saveEntries(newEntries: Array<{ domain: string; source: string; siteNames: string[] }>): void {
   const escortDomains: EscortDomainEntry[] = loadJSON(ESCORT_DOMAINS_FILE, []);
@@ -113,5 +133,3 @@ function saveEntries(newEntries: Array<{ domain: string; source: string; siteNam
     console.log(`🔍 Added ${unknownAdded} new unknown domains to unknown-domains.json`);
   }
 }
-
-
