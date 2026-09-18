@@ -8,6 +8,21 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.9',
+    releaseDate: '19 septembrie 2026',
+    changeNew: [
+      'Se afișează secțiunea de forum în care a fost publicat poza in modalul de poze lângă data acesteia.',
+    ],
+    changeImprove: [
+      'Când se atinge limita de pagini analizate pentru detalii escortă, se mai face o încercare între primele postări a escortei.',
+      'Tratare mai bună la afișarea modalului cu poze pe mobil.',
+      'Cazuri adiționale în care lista de servicii nu se extrăgeau corect.',
+    ],
+    changeFix: [
+      'Poza principală a topicului se schimba incorect la încărcarea a mai multor poze în modalul de poze.',
+    ]
+  },
+  {
     version: '3.8.3',
     releaseDate: '13 septembrie 2026',
     changeNew: [],
@@ -16,7 +31,7 @@ export const versionHistory: VersionData[] = [
       'Poza de profil nu se apăsa la partea de jos cănd topicul era ascuns pe mobil',
       'Inconsistență între alegerea pozei principale de profil și cele afișate in modalul cu poze',
       'Pozele postate în secțiunea de \'Servicii adiacente\' nu erau incluse',
-      'Cazuri adiționale în care lista de servicii nu se extrăgeau corect',
+      'Cazuri adiționale în care lista de servicii nu se extrăgeau corect.',
     ]
   },
   {
