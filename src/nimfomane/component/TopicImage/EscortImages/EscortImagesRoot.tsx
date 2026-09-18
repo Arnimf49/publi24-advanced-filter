@@ -34,7 +34,7 @@ export const EscortImagesRoot: FC<EscortImagesRootProps> = ({user, onClose, isMo
       while (loadedLength < 5) {
         const newImages = await escortActions.loadImages(user, currentPage, 200);
 
-        if (loadedLength === 0 && newImages && newImages.length > 0) {
+        if (loadedPages === 0 && loadedLength === 0 && newImages && newImages.length > 0) {
           escortActions.updatePreviewImage(user, newImages[0].url);
         }
 
