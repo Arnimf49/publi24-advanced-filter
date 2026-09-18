@@ -82,6 +82,23 @@ export const utils = {
     return utils.getScrollParent(node.parentNode, checkHeight);
   },
 
+  getScrollTop(scrollParent: HTMLElement | Window): number {
+    if (scrollParent instanceof HTMLElement) {
+      return scrollParent.scrollTop;
+    }
+
+    return window.scrollY;
+  },
+
+  scrollTo(scrollParent: HTMLElement | Window, top: number): void {
+    if (scrollParent instanceof HTMLElement) {
+      scrollParent.scrollTo({left: 0, top, behavior: 'instant'});
+      return;
+    }
+
+    window.scrollTo({left: 0, top, behavior: 'instant'});
+  },
+
   normalizeDigits(str: string): string {
     // Handle emoji keycap digits
     str = str.replace(/(\d)\uFE0F\u20E3/g, '$1');

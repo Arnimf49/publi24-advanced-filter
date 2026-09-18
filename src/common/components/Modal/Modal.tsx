@@ -1,6 +1,7 @@
-import React, {ReactNode, useEffect} from 'react';
+import React, {ReactNode, useEffect, useRef} from 'react';
 import styles from './Modal.module.scss';
 import * as ReactDOM from "react-dom";
+import {utils} from '../../utils';
 
 type ModalProps = {
   children: ReactNode,
@@ -24,23 +25,31 @@ const Modal: React.FC<ModalProps> =
   dataWwid,
   onCleanup,
 }) => {
+  const anchorRef = useRef<HTMLSpanElement>(null);
+
   useEffect(() => {
-    const currentModalIndex = inline ? MODALS_OPEN : ++MODALS_OPEN;
+    const currentModalIndex = ++MODALS_OPEN;
     const shouldResetScroll = !inline && mobileContentOverlay && document.body.classList.contains('onMobile');
-    const initialScrollY = shouldResetScroll ? window.scrollY : 0;
+    const parent = utils.getScrollParent(anchorRef.current, false);
+    const initialScrollY = shouldResetScroll ? utils.getScrollTop(parent) : 0;
+    let scrollRestoreTimeout: number | undefined;
 
     if (!inline) {
+      window.history.pushState({ modalIndex: currentModalIndex }, '');
+
       if (shouldResetScroll) {
-        window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
+        utils.scrollTo(parent, 0);
+        scrollRestoreTimeout = window.setTimeout(() => {
+          utils.scrollTo(parent, initialScrollY);
+        }, 10);
       }
 
       document.body.style.overflow = 'hidden';
-      window.history.pushState({ modalIndex: currentModalIndex }, '');
     }
     let closedByPopstate = false;
 
     const closeOnKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape' && (inline || currentModalIndex === MODALS_OPEN)) {
+      if (e.key === 'Escape' && currentModalIndex === MODALS_OPEN) {
         close();
       }
     };
@@ -59,22 +68,18 @@ const Modal: React.FC<ModalProps> =
       window.removeEventListener('keydown', closeOnKey);
       window.removeEventListener('popstate', handlePopState);
 
+      if (scrollRestoreTimeout !== undefined) {
+        window.clearTimeout(scrollRestoreTimeout);
+      }
+
       if (!inline && !closedByPopstate) {
         window.history.back();
       }
 
       setTimeout(() => {
-        if (inline) {
-          return;
-        }
-
         --MODALS_OPEN;
-        if (!MODALS_OPEN) {
+        if (!inline && !MODALS_OPEN) {
           document.body.style.overflow = 'initial';
-        }
-
-        if (shouldResetScroll) {
-          window.scrollTo({ left: 0, top: initialScrollY, behavior: 'instant' });
         }
 
         onCleanup?.()
@@ -96,7 +101,12 @@ const Modal: React.FC<ModalProps> =
     </div>
   );
 
-  return inline ? modal : ReactDOM.createPortal(modal, document.body);
+  return (
+    <>
+      <span ref={anchorRef} aria-hidden="true" style={{display: 'none'}} />
+      {inline ? modal : ReactDOM.createPortal(modal, document.body)}
+    </>
+  );
 };
 
 export default Modal;
