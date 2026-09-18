@@ -2124,6 +2124,31 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       },
     },
   },
+  {
+    file: "sample203.txt",
+    expected: {
+      baseRates: {'30m': 250, '1h': 450},
+    },
+  },
+  {
+    file: "sample204.txt",
+    expected: {
+      baseRates: {'30m': 250, '1h': 450},
+      services: {massage: true},
+    },
+  },
+  {
+    file: "sample205.txt",
+    expected: {
+      baseRates: {'30m': 250, '1h': 500},
+      outcallRates: {'1h': 600},
+      services: {
+        '69': true, op: true, np: true, facesitting: true, fk: {extraCost: 100}, fj: true,
+        massage: true, uro: {extraCost: 100}, squirt: {extraCost: 200},
+        facefuck: {extraCost: 100}, footfetish: true,
+      },
+    },
+  },
 ];
 
 for (const sample of samples) {

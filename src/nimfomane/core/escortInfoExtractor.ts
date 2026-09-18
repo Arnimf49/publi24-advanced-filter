@@ -1728,6 +1728,17 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
       baseCandidates['1h'] = [...(baseCandidates['1h'] || []), Number.parseInt(sampleStyleHourRate[1], 10)];
     }
   }
+  const compactGiftFinalizationHourRates = /\b(\d{2,5})\s+fin\b[\s\S]{0,40}?\b(\d{2,5})\s*[^a-z\d]{0,10}\s*(?:h|ora)\b/i.exec(rateText);
+  if (compactGiftFinalizationHourRates) {
+    const thirtyMinuteRate = Number.parseInt(compactGiftFinalizationHourRates[1], 10);
+    const hourRate = Number.parseInt(compactGiftFinalizationHourRates[2], 10);
+    if (isPriceAmount(thirtyMinuteRate)) {
+      baseCandidates['30m'] = [thirtyMinuteRate];
+    }
+    if (isPriceAmount(hourRate)) {
+      baseCandidates['1h'] = [hourRate];
+    }
+  }
   if (giftCompanyThirtyMinuteRate && isPriceAmount(Number.parseInt(giftCompanyThirtyMinuteRate[1], 10))) {
     baseCandidates['30m'] = [Number.parseInt(giftCompanyThirtyMinuteRate[1], 10)];
   }
@@ -2004,6 +2015,11 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
   if (finalizationThenHourRates) {
     baseCandidates['30m'] = [Number.parseInt(finalizationThenHourRates[1], 10)];
     baseCandidates['1h'] = [Number.parseInt(finalizationThenHourRates[2], 10)];
+  }
+  const currencyFinalizationThenHourRates = /\b(\d{2,5})\s*(?:lei|ron)\s+finaliz\w*\s*[,;/:-]?\s*(\d{2,5})\s*(?:lei|ron)\s+ora\b/i.exec(rateText);
+  if (currencyFinalizationThenHourRates) {
+    baseCandidates['30m'] = [Number.parseInt(currencyFinalizationThenHourRates[1], 10)];
+    baseCandidates['1h'] = [Number.parseInt(currencyFinalizationThenHourRates[2], 10)];
   }
   const simpleFinalizationHourRates = /\b(\d{2,5})\s+o\s+finaliz\w*\s*[/|-]\s*(\d{2,5})\s+o\s+ora\b/i.exec(rateText);
   if (simpleFinalizationHourRates) {
