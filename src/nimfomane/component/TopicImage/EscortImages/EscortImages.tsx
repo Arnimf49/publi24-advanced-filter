@@ -52,7 +52,10 @@ export const EscortImages: FC<EscortImagesProps> = ({
                   onClick={(event) => event.stopPropagation()}
                 />
                 <div className={classes.image_overlay}>
-                  <div className={classes.image_date}>{image.date}</div>
+                  <div className={classes.image_date}>
+                    {image.date}
+                    {image.city && ` · ${image.city}`}
+                  </div>
                   {image.topicUrl && (
                     <a
                       className={classes.image_topic}

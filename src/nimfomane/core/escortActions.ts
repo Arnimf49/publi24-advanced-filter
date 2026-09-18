@@ -8,6 +8,7 @@ export interface Image {
   url: string;
   date: string;
   topicUrl: string;
+  city: string | null;
 }
 
 const isCityImage = (imageElement: Element): boolean => {
@@ -137,10 +138,12 @@ export const escortActions = {
       }
 
       const streamItem = el.closest('.ipsStreamItem');
+      const sectionLink = streamItem?.querySelector<HTMLAnchorElement>('.ipsStreamItem_status a:last-child');
       return [{
         url: el.getAttribute('data-background-src')!,
         date: el.closest('.ipsStreamItem_container')!.querySelector('time')!.innerText,
         topicUrl: (streamItem?.querySelector<HTMLAnchorElement>('.ipsStreamItem_title a[data-linktype="link"]'))?.href ?? '',
+        city: sectionLink ? cityService.getCityFromForumUrl(sectionLink.href) : null,
       }];
     });
 
