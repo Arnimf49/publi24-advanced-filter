@@ -383,6 +383,44 @@ function collectPostContent(doc: Document, sourceUrl: string, user: string, deta
   return false;
 }
 
+function getLastActivityPageUrl(doc: Document, profileUrl: string): string | undefined {
+  const lastPageLink = doc.querySelector<HTMLAnchorElement>(
+    '.ipsPagination_last a, .ipsPagination_page:last-child a',
+  );
+  return lastPageLink
+    ? resolveUrl(lastPageLink.getAttribute('href')!, profileUrl)
+    : undefined;
+}
+
+function collectActivityContent(
+  doc: Document,
+  sourceUrl: string,
+  user: string,
+  details: CollectedDetails,
+): void {
+  const streamItems = doc.querySelectorAll<HTMLElement>('.ipsStreamItem');
+  for (const streamItem of streamItems) {
+    const content = streamItem.querySelector<HTMLElement>('.ipsStreamItem_snippet');
+    if (!content) {
+      continue;
+    }
+
+    const sourceLink = streamItem.querySelector<HTMLAnchorElement>('.ipsStreamItem_title a[href]');
+    const itemUrl = sourceLink?.getAttribute('href');
+    const itemSourceUrl = itemUrl ? resolveUrl(itemUrl, sourceUrl) : sourceUrl;
+    const contentDate = getPostDate(streamItem);
+    collectText(
+      content.textContent || '',
+      itemSourceUrl,
+      contentDate,
+      details,
+      COMMENT_SOURCE_PRIORITY,
+      'post',
+    );
+    saveCollectedDetails(user, details);
+  }
+}
+
 async function collectEscortDetails(user: string, profileUrl: string, priority: number): Promise<void> {
   const details: CollectedDetails = {
     personalDetailsSourceUrls: [],
@@ -478,6 +516,16 @@ async function collectEscortDetails(user: string, profileUrl: string, priority: 
     if (pageNumber === 1) {
       ({lastPage, pageTemplate, csrfKey} = getPostPages(postsPage, profileUrl));
     }
+  }
+
+  if (!details.serviceDetails || !details.personalDetails) {
+    const activityUrl = `${profileUrl}/content/?all_activity=1&listResort=1`;
+    const activityPage = await jsonPage.load(activityUrl, {priority});
+    const lastActivityPageUrl = getLastActivityPageUrl(activityPage, profileUrl);
+    const lastActivityPage = lastActivityPageUrl && lastActivityPageUrl !== activityUrl
+      ? await jsonPage.load(lastActivityPageUrl, {priority})
+      : activityPage;
+    collectActivityContent(lastActivityPage, lastActivityPageUrl || activityUrl, user, details);
   }
 
   saveCollectedDetails(user, details);

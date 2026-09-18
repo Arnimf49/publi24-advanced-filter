@@ -5,7 +5,7 @@ import {EscortItem} from "../../src/nimfomane/core/storage";
 const PERSONAL_TEXT = 'Am 28 ani, 170 cm si 58 kg.';
 const SERVICE_TEXT = '30 min 200 lei, 1 ora 300 lei. Oral protejat, normal protejat si masaj.';
 
-type DetailSource = 'interest' | 'about' | 'signature' | 'posts';
+type DetailSource = 'interest' | 'about' | 'signature' | 'posts' | 'activity';
 
 interface MockDetailsOptions {
   source?: DetailSource;
@@ -52,6 +52,31 @@ function postsBody(profileLink: string): string {
   </body></html>`;
 }
 
+function oldPostsBody(profileLink: string): string {
+  const oldTopic = `${sourceUrl(profileLink, 'topic/100-old/')}?do=findComment&comment=1`;
+  return `<html><body>
+    <div class="ipsPagination"><a data-page="1" href="${profileLink}/content/?type=forums_topic_post">1</a></div>
+    <div class="cPost" data-commentid="1"><time datetime="2020-08-01T12:00:00Z"></time>
+      <div data-role="commentContent"><a href="${oldTopic}">old post</a></div>
+    </div>
+  </body></html>`;
+}
+
+function activityBody(profileLink: string, lastPage: boolean): string {
+  const activityTopic = `${sourceUrl(profileLink, 'topic/301-activity/')}?do=findComment&comment=3`;
+  const pagination = lastPage
+    ? '<a class="ipsPagination_page" data-page="2" href="/forum/profile/test/content/page/2/?all_activity=1">2</a>'
+    : '<li class="ipsPagination_last"><a href="/forum/profile/test/content/page/2/?all_activity=1">last</a></li>';
+  const activity = lastPage
+    ? `<div class="ipsStreamItem">
+        <div class="ipsStreamItem_title"><a href="${activityTopic}">activity</a></div>
+        <div class="ipsStreamItem_snippet"><time datetime="2026-08-03T12:00:00Z"></time>${sourceText()}</div>
+      </div>`
+    : '';
+
+  return `<html><body>${pagination}${activity}</body></html>`;
+}
+
 async function mockEscortDetails(page: import("playwright-core").Page, profileLink: string, options: MockDetailsOptions = {}) {
   const source = options.source || 'interest';
   const activityUrl = 'https://nimfomane.com/forum/topic/999-test/?do=findComment&comment=7';
@@ -64,8 +89,18 @@ async function mockEscortDetails(page: import("playwright-core").Page, profileLi
 
     if (url.searchParams.get('tab') === 'field_core_pfield_11') {
       body = `<html><body><div id="elProfileTabs_content"><a href="${sourceUrl(profileLink, 'topic/201-about/')}">${PERSONAL_TEXT} ${SERVICE_TEXT}</a></div></body></html>`;
+    } else if (source === 'activity' && url.searchParams.get('all_activity') === '1') {
+      const lastPage = url.pathname.includes('/page/2/');
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({rows: activityBody(profileLink, lastPage)}),
+      });
+      return;
     } else if (url.pathname.endsWith('/content/')) {
-      body = postsBody(profileLink);
+      body = source === 'activity'
+        ? oldPostsBody(profileLink)
+        : postsBody(profileLink);
     }
 
     if (options.delay) {
@@ -87,10 +122,13 @@ async function mockEscortDetails(page: import("playwright-core").Page, profileLi
   });
 
   await page.route('**://nimfomane.com/forum/profile/**/content/page/**', async route => {
+    const body = source === 'activity'
+      ? activityBody(profileLink, true)
+      : postsBody(profileLink);
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({rows: postsBody(profileLink)}),
+      body: JSON.stringify({rows: body}),
     });
   });
 
@@ -166,6 +204,23 @@ test('Should find details in posts when profile fields and signature are empty.'
 
   await expect(page.locator('[data-wwid="personal-details-section"]')).toContainText('170 cm');
   await expect(page.locator('[data-wwid="service-details-meta"] a')).toHaveCount(1);
+});
+
+test('Should analyze the last activity page when details are missing from posts.', async ({page}) => {
+  await utilsNimfomane.open(page);
+  const {user} = await utilsNimfomane.waitForNthImage(page);
+  const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
+  await setEscort(page, user, {profileLink});
+  await mockEscortDetails(page, profileLink, {source: 'activity'});
+
+  await openDetails(page);
+
+  await expect(page.locator('[data-wwid="personal-details-section"]')).toContainText('170 cm');
+  await expect(page.locator('[data-wwid="service-details-section"]')).toContainText('masaj');
+  await expect(page.locator('[data-wwid="personal-details-meta"] a'))
+    .toHaveAttribute('href', /topic\/301-activity\/\?do=findComment&comment=3/);
+  await expect(page.locator('[data-wwid="service-details-meta"] a'))
+    .toHaveAttribute('href', /topic\/301-activity\/\?do=findComment&comment=3/);
 });
 
 test('Should reanalyze stale details on opening and refresh manually.', async ({page}) => {
