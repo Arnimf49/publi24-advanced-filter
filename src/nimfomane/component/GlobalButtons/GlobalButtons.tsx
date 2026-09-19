@@ -97,7 +97,11 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
   };
 
   return (
-    <div className={`${styles.globalButtonsContainer} ${isMobileViewport ? styles.mobileGlobalButtons : ''} ${isCollapsed ? styles.globalButtonsCollapsed : ''} ${isDemo ? styles.demoGlobalButtons : ''}`}>
+    <div
+      className={`${styles.globalButtonsContainer} ${isMobileViewport ? styles.mobileGlobalButtons : ''} ${isCollapsed ? styles.globalButtonsCollapsed : ''} ${isDemo ? styles.demoGlobalButtons : ''}`}
+      data-wwdemo-collapsed={isDemo ? isCollapsed : undefined}
+      data-wwdemo-mobile={isDemo ? isMobileViewport : undefined}
+    >
       <div className={styles.logoWrapper}>
         <button
           type="button"

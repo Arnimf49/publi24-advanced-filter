@@ -30,6 +30,7 @@ const SCROLL_BOTTOM_OFFSET = 100;
 
 const DEMO_SETTINGS: SettingsData = {
   whatsappMessageEnabled: true,
+  whatsappMessageRandomizationEnabled: false,
   whatsappMessage: 'Bună, mai este disponibil anunțul?',
   focusMode: false,
   adDeduplication: false,
@@ -334,6 +335,7 @@ const SettingsFeatureDemo: React.FC = () => {
               onClose={() => setIsSettingsOpen(false)}
               settings={DEMO_SETTINGS}
               onToggleWhatsappMessage={() => undefined}
+              onToggleWhatsappMessageRandomization={() => undefined}
               onWhatsappMessageChange={() => undefined}
               onToggleFocusMode={() => undefined}
               onToggleAdDeduplication={() => undefined}

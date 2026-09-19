@@ -32,7 +32,7 @@ function updateHiddenCountIndicator(list: HTMLElement, count: number) {
     list.appendChild(indicator);
   }
 
-  indicator.textContent = `${count} ${count === 1 ? 'topic ascuns' : 'topice ascunse'} de tot`;
+  indicator.textContent = `${count} ${count === 1 ? 'topic ascuns' : 'topicuri ascunse'} de tot`;
 }
 
 function getFocusModeTopicHiddenState(id: string) {

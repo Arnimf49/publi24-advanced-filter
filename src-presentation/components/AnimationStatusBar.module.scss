@@ -64,6 +64,30 @@
   transform: translate(-1px, -2px);
 }
 
+@media (max-width: 800px) {
+  .statusBar {
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .controlButton,
+  .restartButton {
+    flex-basis: 26px;
+    width: 26px;
+    height: 26px;
+  }
+
+  .controlButton svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .restartButton svg {
+    width: 17px;
+    height: 17px;
+  }
+}
+
 @keyframes fillStatusBar {
   to {
     transform: scaleX(1);

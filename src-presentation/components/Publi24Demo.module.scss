@@ -4,6 +4,11 @@
   padding: 16px;
 }
 
+:global([data-wwid="phone-help-modal"]),
+:global([data-wwid="image-help-modal"]) {
+  z-index: 20001;
+}
+
 .demoHeader {
   display: flex;
   align-items: center;
@@ -162,6 +167,21 @@
 }
 
 @media (max-width: 800px) {
+  .demoHeader {
+    min-height: 0;
+    padding-bottom: 4px;
+  }
+
+  .stateSwitch {
+    margin-bottom: 4px;
+  }
+
+  .stateSwitch button {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-size: 0.72rem;
+  }
+
   .mobileScrollThrough {
     :global([data-wwid="ads-modal"]),
     :global([data-wwid="favorites-modal"]),
@@ -201,6 +221,7 @@
   }
 
   .siteTopbar {
+    height: 33px;
     background: #1778bc;
   }
 
@@ -209,12 +230,7 @@
     opacity: 0.65;
   }
 
-  :global(.publi24-demo-site) .siteTopbar .text-logo .t1,
-  :global(.publi24-demo-site) .siteTopbar .text-logo .t3 {
-    color: #ffffff;
-  }
-
-  :global(.publi24-demo-site) .siteTopbar .text-logo .t2 {
-    color: #fbba10;
+  .siteTopbar :global(.text-logo)  {
+    font-size: 0.875rem !important;
   }
 }

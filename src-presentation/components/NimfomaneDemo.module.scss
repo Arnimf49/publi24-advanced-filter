@@ -90,6 +90,14 @@
   transform: none !important;
 }
 
+.demo .globalButtonsSlot > div[data-wwdemo-collapsed="true"] {
+  transform: translateY(var(--global-buttons-height)) !important;
+}
+
+.demo .globalButtonsSlot > div[data-wwdemo-mobile="true"][data-wwdemo-collapsed="true"] {
+  transform: translateX(calc(-100% + var(--global-buttons-toggle-width) + 5px - 6px)) !important;
+}
+
 .extensionFeature {
   animation: extensionFeatureFadeIn 420ms ease both;
 }
@@ -144,7 +152,13 @@
   }
 
   .siteHeader {
+    min-height: 41px;
     padding: 0 14px;
+  }
+
+  .siteHeaderLogo {
+    width: 98px;
+    height: 20px;
   }
 
   .siteHeader span {
