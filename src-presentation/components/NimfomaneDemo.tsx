@@ -51,6 +51,7 @@ const MOCK_ESCORT_DETAILS: EscortItem = {
       goldenShower: false,
     },
   },
+  visitedCities: ['Cluj-Napoca', 'București', 'Oradea', 'Timișoara'],
   serviceDetailsSourceUrl: '#nimfomane-demo-source',
   escortDetailsTime: Date.now(),
 };
@@ -152,9 +153,9 @@ const TOPICS: TopicFixture[] = [
 ];
 
 const MODAL_IMAGES: Image[] = [
-  {url: WOMAN_SILHOUETTE_IMAGE, date: 'azi, 12:14', topicUrl: '#nimfomane-topic-1', city: 'Cluj'},
-  {url: BIKINI_LINE_ART_ALT_IMAGE, date: 'ieri, 18:42', topicUrl: '#nimfomane-topic-2', city: 'București'},
-  {url: WOMAN_PORTRAIT_IMAGE, date: '12 august 2025', topicUrl: '#nimfomane-topic-3', city: null},
+  {url: WOMAN_SILHOUETTE_IMAGE, date: 'azi, 12:14', topicUrl: '#nimfomane-topic-1', section: null, city: 'Cluj'},
+  {url: BIKINI_LINE_ART_ALT_IMAGE, date: 'ieri, 18:42', topicUrl: '#nimfomane-topic-2', section: null, city: 'București'},
+  {url: WOMAN_PORTRAIT_IMAGE, date: '12 august 2025', topicUrl: '#nimfomane-topic-3', section: null, city: null},
 ];
 
 const getTopicUrl = (topic: TopicFixture) => topic.topicUrl;
@@ -183,6 +184,8 @@ const DemoEscortCard: React.FC<{
         reputation: 'activă',
         currentCity: {name: 'Cluj-Napoca', topicUrl: getTopicUrl(topic)},
       }}
+      personalDetails={MOCK_ESCORT_DETAILS.personalDetails}
+      serviceDetails={MOCK_ESCORT_DETAILS.serviceDetails}
       statsLoading={false}
       statsStale={false}
       lastVisitedLabel="acum 4 ore"

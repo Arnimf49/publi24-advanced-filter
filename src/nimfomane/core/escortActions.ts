@@ -9,6 +9,7 @@ export interface Image {
   date: string;
   topicUrl: string;
   section: string | null;
+  city?: string | null;
 }
 
 const isSectionImage = (imageElement: Element): boolean => {
