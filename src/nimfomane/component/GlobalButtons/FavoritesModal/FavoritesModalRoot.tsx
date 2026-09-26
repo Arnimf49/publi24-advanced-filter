@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import FavoritesModal from './FavoritesModal';
 import { NimfomaneStorage } from '../../../core/storage';
 import { favoritesAnalyzer } from '../../../core/favoritesAnalyzer';
-import { cityService } from '../../../core/cityService';
+import { sectionsService } from '../../../core/sectionsService';
 import { profileActions } from '../../../core/profileActions';
 import EscortCardRoot from './EscortCardRoot';
 
@@ -61,7 +61,7 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
     return () => favorites.forEach(user => NimfomaneStorage.removeOnEscortChanged(user, increment));
   }, [favorites]);
 
-  const currentCity = useMemo(() => cityService.getCurrentCity(), []);
+  const currentCity = useMemo(() => sectionsService.getCurrentCity(), []);
 
   const { activeFavorites, inactiveEscorts } = useMemo(() => {
     const active: string[] = [];

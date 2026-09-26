@@ -1,29 +1,77 @@
 import {elementHelpers} from "./elementHelpers";
 import {NimfomaneStorage, EscortItem} from "./storage";
-import {cityService} from "./cityService";
+import {sectionsService} from "./sectionsService";
 import {page, BrowserError} from "../../common/page";
 import {jsonPage} from "./jsonPage";
 import {NimfomaneMemoryStorage} from "./memoryStorage";
 
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
+type AvailabilityStatus = 'available' | 'unavailable';
+
+const UNAVAILABLE_PATTERN = /\b(?:indisponibil\w*|am\s+plecat|nu\s+(?:mai\s+)?(?:sunt\s+)?disponibil\w*)\b/;
+const AVAILABLE_PATTERN = /\b(?:am\s+ajuns|disponibil\w*|ma\s+gasiti|va\s+astept)\b/;
+
+function normalizeActivityText(text: string): string {
+  return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+}
+
+function getAvailabilityStatus(text: string): AvailabilityStatus | undefined {
+  const normalizedText = normalizeActivityText(text);
+
+  if (UNAVAILABLE_PATTERN.test(normalizedText)) {
+    return 'unavailable';
+  }
+
+  if (AVAILABLE_PATTERN.test(normalizedText)) {
+    return 'available';
+  }
+
+  return undefined;
+}
+
 function findCurrentCity(doc: Document): {name: string; topicUrl: string} | undefined {
   const streamItems = doc.querySelectorAll('.ipsStreamItem_status a:last-child');
   const cityLinks: Array<{url: string; city: string; topicUrl: string}> = [];
+  const citiesWithStatus = new Set<string>();
+  let hasAvailabilityStatus = false;
 
   for (const link of Array.from(streamItems)) {
     const href = (link as HTMLAnchorElement).href;
-    const city = cityService.getCityFromForumUrl(href);
+    const city = sectionsService.getCityFromForumUrl(href);
 
     if (city) {
       const streamItem = link.closest('.ipsStreamItem');
-      const topicLink = streamItem?.querySelector('.ipsStreamItem_title a') as HTMLAnchorElement;
+      const topicLink = streamItem?.querySelector<HTMLAnchorElement>('.ipsStreamItem_title a[data-linktype="link"]');
       const topicUrl = topicLink?.href;
 
       if (topicUrl) {
         cityLinks.push({url: href, city, topicUrl});
+
+        if (!citiesWithStatus.has(city)) {
+          const activityText = streamItem?.querySelector('.ipsStreamItem_snippet')?.textContent
+            || streamItem?.textContent
+            || '';
+          const status = getAvailabilityStatus(activityText);
+
+          if (status) {
+            hasAvailabilityStatus = true;
+            citiesWithStatus.add(city);
+
+            if (status === 'available') {
+              return {
+                name: city,
+                topicUrl,
+              };
+            }
+          }
+        }
       }
     }
+  }
+
+  if (hasAvailabilityStatus) {
+    return undefined;
   }
 
   for (let i = 0; i < cityLinks.length - 2; i++) {

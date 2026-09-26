@@ -12,6 +12,43 @@ async function expectFavoritesSectionHeaders(page: Page, visible: boolean, inLoc
   }
 }
 
+type ActivityItem = {
+  cityUrl: string;
+  topicUrl: string;
+  text: string;
+};
+
+async function interceptProfileActivity(page: Page, user: string, items: ActivityItem[]) {
+  const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
+  const body = items.map(({cityUrl, topicUrl, text}) => `
+    <div class="ipsStreamItem">
+      <div class="ipsStreamItem_status"><a href="${cityUrl}">secțiune</a></div>
+      <div class="ipsStreamItem_title"><a data-linktype="link" href="${topicUrl}">topic</a></div>
+      <div class="ipsStreamItem_snippet">${text}</div>
+    </div>
+  `).join('');
+
+  await page.route(/\/forum\/profile\/.*\/content\//, route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({rows: body}),
+  }));
+}
+
+async function interceptProfileStats(page: Page, user: string) {
+  const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
+
+  await page.route(profileLink, route => route.fulfill({
+    status: 200,
+    contentType: 'text/html',
+    body: `<html><body>
+      <div id="elProfileStats">
+        <ul><li>Posts 1</li><li>Joined</li><li><time datetime="2026-09-26T10:00:00Z"></time></li></ul>
+      </div>
+    </body></html>`,
+  }));
+}
+
 test('Should display escort stats in favorites.', async ({ page }) => {
   await utilsNimfomane.open(page);
   const {user, id} = await utilsNimfomane.waitForNthImage(page);
@@ -211,4 +248,104 @@ test('Should display location titles in various conditions.', async ({ page }) =
   await page.locator('[data-wwid="favs-button"]').click();
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
   await expectFavoritesSectionHeaders(page, false);
+});
+
+test('Should detect the current city from a positive availability post.', async ({ page }) => {
+  test.setTimeout(30000);
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'});
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
+  const clujUrl = 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/';
+
+  await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
+  await interceptProfileActivity(page, user, [{
+    cityUrl: clujUrl,
+    topicUrl: 'https://nimfomane.com/forum/topic/current-cluj/',
+    text: 'Vă aștept în Cluj pentru programări.',
+  }]);
+  await interceptProfileStats(page, user);
+
+  await page.locator('[data-wwid="favs-button"]').click();
+  await page.waitForFunction((user) => {
+    const escort = JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${user}`) || '{}');
+    return escort.profileStats?.currentCity?.name === 'Cluj'
+      && escort.profileStats.currentCity.topicUrl === 'https://nimfomane.com/forum/topic/current-cluj/';
+  }, user, {timeout: 15000});
+});
+
+test('Should reject a city when its newest availability post says unavailable.', async ({ page }) => {
+  test.setTimeout(30000);
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'});
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
+  const clujUrl = 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/';
+
+  await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
+  await interceptProfileActivity(page, user, [
+    {
+      cityUrl: clujUrl,
+      topicUrl: 'https://nimfomane.com/forum/topic/left-cluj/',
+      text: 'Am plecat din Cluj.',
+    },
+    {
+      cityUrl: clujUrl,
+      topicUrl: 'https://nimfomane.com/forum/topic/arrived-cluj/',
+      text: 'Am ajuns în Cluj și sunt disponibilă.',
+    },
+  ]);
+  await interceptProfileStats(page, user);
+
+  await page.locator('[data-wwid="favs-button"]').click();
+  await page.waitForTimeout(5000);
+
+  const escort = await utilsNimfomane.getEscortStorageProp(page, user, 'profileStats');
+  expect(escort?.currentCity).toBeUndefined();
+});
+
+test('Should use the newest positive availability post across cities.', async ({ page }) => {
+  test.setTimeout(30000);
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'});
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
+  const bucharestUrl = 'https://nimfomane.com/forum/forum/5-top-escorte-bucuresti/';
+  const clujUrl = 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/';
+
+  await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
+  await interceptProfileActivity(page, user, [
+    {
+      cityUrl: bucharestUrl,
+      topicUrl: 'https://nimfomane.com/forum/topic/current-bucharest/',
+      text: 'Am ajuns în București și mă găsiți pentru programări.',
+    },
+    {
+      cityUrl: clujUrl,
+      topicUrl: 'https://nimfomane.com/forum/topic/old-cluj/',
+      text: 'Sunt disponibilă în Cluj.',
+    },
+  ]);
+  await interceptProfileStats(page, user);
+
+  await page.locator('[data-wwid="favs-button"]').click();
+  await page.waitForFunction((user) => {
+    const escort = JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${user}`) || '{}');
+    return escort.profileStats?.currentCity?.name === 'București';
+  }, user, {timeout: 15000});
+});
+
+test('Should fall back to repeated city posts without availability status.', async ({ page }) => {
+  test.setTimeout(30000);
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'});
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
+  const clujUrl = 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/';
+
+  await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
+  await interceptProfileActivity(page, user, [1, 2, 3].map(index => ({
+    cityUrl: clujUrl,
+    topicUrl: `https://nimfomane.com/forum/topic/cluj-${index}/`,
+    text: `Postare obișnuită ${index}.`,
+  })));
+  await interceptProfileStats(page, user);
+
+  await page.locator('[data-wwid="favs-button"]').click();
+  await page.waitForFunction((user) => {
+    const escort = JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${user}`) || '{}');
+    return escort.profileStats?.currentCity?.name === 'Cluj';
+  }, user, {timeout: 15000});
 });

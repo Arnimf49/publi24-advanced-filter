@@ -89,10 +89,6 @@ const CITY_TO_LINKS: Record<string, string[]> = {
   'Sălaj': ['https://nimfomane.com/forum/forum/42-escorte-salaj/'],
   'Lugoj': ['https://nimfomane.com/forum/forum/416-escorte-lugoj/'],
   'Turda': ['https://nimfomane.com/forum/forum/417-escorte-turda/'],
-  'Alte orașe': [
-    'https://nimfomane.com/forum/forum/9-escorte-din-alte-orase/',
-    'https://nimfomane.com/forum/forum/186-dominare-stapane-fetish/',
-  ],
   'Vaslui': ['https://nimfomane.com/forum/forum/41-escorte-vaslui/'],
   'Teleorman': ['https://nimfomane.com/forum/forum/32-escorte-teleorman/'],
   'Petroșani': ['https://nimfomane.com/forum/forum/24-escorte-petrosani/'],
@@ -103,17 +99,42 @@ const CITY_TO_LINKS: Record<string, string[]> = {
   'Covasna': ['https://nimfomane.com/forum/forum/43-escorte-covasna/'],
 };
 
-const LINK_TO_CITY: Record<string, string> = {};
+const OTHER_SECTION_TO_LINKS: Record<string, string[]> = {
+  'Alte orașe': [
+    'https://nimfomane.com/forum/forum/9-escorte-din-alte-orase/',
+  ],
+  'Dominare': [
+    'https://nimfomane.com/forum/forum/186-dominare-stapane-fetish/',
+  ],
+};
+
+const CITY_LINK_TO_CITY: Record<string, string> = {};
 for (const [city, links] of Object.entries(CITY_TO_LINKS)) {
   for (const link of links) {
-    LINK_TO_CITY[link] = city;
+    CITY_LINK_TO_CITY[link] = city;
   }
 }
 
-export const cityService = {
+const SECTION_LINK_TO_SECTION: Record<string, string> = {...CITY_LINK_TO_CITY};
+for (const [section, links] of Object.entries(OTHER_SECTION_TO_LINKS)) {
+  for (const link of links) {
+    SECTION_LINK_TO_SECTION[link] = section;
+  }
+}
+
+function normalizeForumUrl(url: string): string {
+  return url.replace(/\/page\/\d+\/?$/, '/').replace(/([^/])$/, '$1/');
+}
+
+export const sectionsService = {
+  getSectionFromForumUrl(url: string): string | null {
+    const normalized = normalizeForumUrl(url);
+    return SECTION_LINK_TO_SECTION[normalized] || null;
+  },
+
   getCityFromForumUrl(url: string): string | null {
-    const normalized = url.replace(/\/page\/\d+\/?$/, '/').replace(/([^/])$/, '$1/');
-    return LINK_TO_CITY[normalized] || null;
+    const normalized = normalizeForumUrl(url);
+    return CITY_LINK_TO_CITY[normalized] || null;
   },
 
   getCurrentCity(): string | null {

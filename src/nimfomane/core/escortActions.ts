@@ -2,19 +2,19 @@ import {NimfomaneStorage} from "./storage";
 import {page} from "../../common/page";
 import {jsonPage} from "./jsonPage";
 import {utils} from "../../common/utils";
-import {cityService} from "./cityService";
+import {sectionsService} from "./sectionsService";
 
 export interface Image {
   url: string;
   date: string;
   topicUrl: string;
-  city: string | null;
+  section: string | null;
 }
 
-const isCityImage = (imageElement: Element): boolean => {
+const isSectionImage = (imageElement: Element): boolean => {
   const streamItem = imageElement.closest('.ipsStreamItem');
   const sectionLink = streamItem?.querySelector<HTMLAnchorElement>('.ipsStreamItem_status a:last-child');
-  return !sectionLink || !!cityService.getCityFromForumUrl(sectionLink.href);
+  return !sectionLink || !!sectionsService.getSectionFromForumUrl(sectionLink.href);
 };
 
 const extractPhoneFromElements = (elements: NodeListOf<HTMLElement> | HTMLElement[]): string | null => {
@@ -95,7 +95,7 @@ export const escortActions = {
       const pageData = await jsonPage.load(profileContentUrl, {priority});
 
       const image = [...pageData.querySelectorAll('.ipsStreamItem_snippet [data-background-src]')]
-        .find(isCityImage);
+        .find(isSectionImage);
       if (image) {
         NimfomaneStorage.setEscortProp(user, 'optimizedProfileImage', image.getAttribute('data-background-src'));
         NimfomaneStorage.setEscortProp(user, 'optimizedProfileImageTime', Date.now());
@@ -133,7 +133,7 @@ export const escortActions = {
     const imageElements = pageData.querySelectorAll('.ipsStreamItem_snippet [data-background-src]');
 
     const images = [...imageElements].flatMap(el => {
-      if (!isCityImage(el)) {
+      if (!isSectionImage(el)) {
         return [];
       }
 
@@ -143,7 +143,7 @@ export const escortActions = {
         url: el.getAttribute('data-background-src')!,
         date: el.closest('.ipsStreamItem_container')!.querySelector('time')!.innerText,
         topicUrl: (streamItem?.querySelector<HTMLAnchorElement>('.ipsStreamItem_title a[data-linktype="link"]'))?.href ?? '',
-        city: sectionLink ? cityService.getCityFromForumUrl(sectionLink.href) : null,
+        section: sectionLink ? sectionsService.getSectionFromForumUrl(sectionLink.href) : null,
       }];
     });
 

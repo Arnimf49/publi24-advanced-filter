@@ -54,7 +54,7 @@ export const EscortImages: FC<EscortImagesProps> = ({
                 <div className={classes.image_overlay}>
                   <div className={classes.image_date}>
                     {image.date}
-                    {image.city && ` · ${image.city}`}
+                    {image.section && ` · ${image.section}`}
                   </div>
                   {image.topicUrl && (
                     <a
