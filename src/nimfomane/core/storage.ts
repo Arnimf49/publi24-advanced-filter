@@ -185,6 +185,29 @@ export const NimfomaneStorage = {
     localStorage.setItem('p24fa:nimfo:global-buttons-collapsed', collapsed ? 'true' : 'false');
   },
 
+  exportData(): Record<string, string> {
+    const allItems: Record<string, string> = {...localStorage};
+
+    Object.keys(allItems).forEach(key => {
+      if (!key.startsWith('p24fa:nimfo:')) {
+        delete allItems[key];
+      }
+    });
+
+    return allItems;
+  },
+
+  async importData(data: Record<string, string>): Promise<void> {
+    Object.entries(data).forEach(([key, value]) => {
+      if (key.startsWith('p24fa:nimfo:')) {
+        localStorage.setItem(key, value);
+      }
+    });
+
+    STORAGE_CACHE.favs = null;
+    await NimfomaneStorage.upgrade();
+  },
+
   async upgrade(): Promise<void> {
     const version = NimfomaneStorage.getVersion();
     const currentVersion = 1;

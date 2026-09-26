@@ -11,7 +11,7 @@
   &:hover {
     background: rgba(47, 73, 121, 0.1);
     border-color: rgb(47, 73, 121);
-    cursor: pointer;
+    cursor: pointer !important;
   }
 }
 
@@ -72,6 +72,47 @@
   font-size: 14px;
   color: #555;
   line-height: 1.4;
+}
+
+.header {
+  font-size: 21px;
+  color: #333;
+  margin-bottom: 14px;
+}
+
+.button {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none !important;
+  border-radius: 3px !important;
+  margin-right: 10px;
+  padding: 10px 15px;
+  color: white;
+  background: rgb(47, 73, 121);
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(57, 88, 145);
+  }
+}
+
+.storageInfo {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.importMessage {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.errorMessage {
+  color: #b34c4c;
+}
+
+.successMessage {
+  color: #69875c;
 }
 
 @media screen and (max-width: 640px) {

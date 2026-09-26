@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import ContentModal from '../../../../common/components/Modal/ContentModal';
 import styles from './SettingsModal.module.scss';
 import {SettingsIcon} from '../../../../common/components/Icons/SettingsIcon';
@@ -53,24 +53,65 @@ type SettingsModalProps = {
   onClose: () => void;
   settings: NimfomaneSettingsData;
   onToggleFocusMode: () => void;
+  handleExport: () => void;
+  handleImport: () => Promise<void>;
+  storageUsagePercent: number | null;
 };
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, settings, onToggleFocusMode }) => (
-  <ContentModal
-    title={<><SettingsIcon fill="#fff"/> Setări</>}
-    onClose={onClose}
-    maxWidth={600}
-    color="rgb(47, 73, 121)"
-  >
-    <SettingControl
-      title="Mod focus"
-      description="Când este activat, topicele ascunse anterior nu se vor mai afișa deloc pe pagina de listare. Util pentru a vedea numai ceea ce este nou sau încă neascuns."
-      isOn={settings.focusMode}
-      onToggle={onToggleFocusMode}
-      dataWwid="focus-mode-switch"
-    />
+const SettingsModal: React.FC<SettingsModalProps> = ({
+  onClose,
+  settings,
+  onToggleFocusMode,
+  handleExport,
+  handleImport,
+  storageUsagePercent,
+}) => {
+  const [importMessage, setImportMessage] = useState<[string, string] | null>(null);
 
-  </ContentModal>
-);
+  const onImport = () => {
+    setImportMessage(null);
+    handleImport()
+      .then(() => {
+        setImportMessage([
+          styles.successMessage,
+          'Datele au fost importate cu succes. Reîncărcarea paginii imediat ..',
+        ]);
+        setTimeout(() => window.location.reload(), 4000);
+      })
+      .catch(error => {
+        setImportMessage([
+          styles.errorMessage,
+          `Probleme cu import-ul: ${error instanceof Error ? error.message : 'eroare necunoscută'}`,
+        ]);
+      });
+  };
+
+  return (
+    <ContentModal
+      title={<><SettingsIcon fill="#fff"/> Setări</>}
+      onClose={onClose}
+      maxWidth={600}
+      color="rgb(47, 73, 121)"
+    >
+      <SettingControl
+        title="Mod focus"
+        description="Când este activat, topicele ascunse anterior nu se vor mai afișa deloc pe pagina de listare. Util pentru a vedea numai ceea ce este nou sau încă neascuns."
+        isOn={settings.focusMode}
+        onToggle={onToggleFocusMode}
+        dataWwid="focus-mode-switch"
+      />
+
+      <hr style={{opacity: 0.2, marginTop: '25px', marginBottom: '20px'}} />
+
+      <h2 className={styles.header}>Transfer date</h2>
+      <p className={styles.storageInfo}>
+        Spațiu de stocare: <b>{storageUsagePercent === null ? 'n/a' : `${Math.floor(storageUsagePercent)}%`}</b> folosit.
+      </p>
+      {importMessage && <p className={`${importMessage[0]} ${styles.importMessage}`}>{importMessage[1]}</p>}
+      <button onClick={handleExport} className={styles.button}>↑ export</button>
+      <button onClick={onImport} className={styles.button}>↓ import</button>
+    </ContentModal>
+  );
+};
 
 export default SettingsModal;

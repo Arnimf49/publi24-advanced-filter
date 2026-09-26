@@ -35,6 +35,9 @@ test('Should open settings modal from menu.', async ({page}) => {
 
   const focusModeSwitch = page.locator('[data-wwid="focus-mode-switch"]');
   await expect(focusModeSwitch).toBeVisible();
+  await expect(page.getByText('Spațiu de stocare:', {exact: false})).toBeVisible();
+  await expect(page.getByRole('button', {name: '↑ export'})).toBeVisible();
+  await expect(page.getByRole('button', {name: '↓ import'})).toBeVisible();
 });
 
 test('Should toggle focus mode and hide previously hidden topics.', async ({page}) => {
