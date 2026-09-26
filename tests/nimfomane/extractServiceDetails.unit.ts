@@ -2149,6 +2149,27 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       },
     },
   },
+  {
+    file: "sample206.txt",
+    expected: {
+      baseRates: {'30m': 200, '1h': 400},
+      schedule: [{start: "09:00", end: "18:00"}],
+      services: {
+        op: true, on: true, np: true, deepthroat: true, facefuck: true,
+        cim: {extraCost: 50}, ani: {extraCost: 50},
+      },
+    },
+  },
+  {
+    file: "sample207.txt",
+    expected: {
+      baseRates: {'30m': 250, '1h': 450},
+      services: {
+        facefuck: true, cim: {extraCost: 100}, fk: {extraCost: 50},
+        ani: false, uro: false, domination: false,
+      },
+    },
+  },
 ];
 
 for (const sample of samples) {

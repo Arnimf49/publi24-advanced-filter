@@ -94,7 +94,7 @@ const SERVICE_PATTERNS: Record<EscortServiceName, RegExp> = {
   deepthroat: /\b(?:dt|deep\s*throat|deepthroat|deeptroath|deeptrhoat|deepthrot|deep)\b|\boral\s+adanc\b/g,
   facesitting: /\bface\s*sitting\b|\bfacesitting\b|\bfacesiting\b/g,
   facefuck: /\bface\s*fuck\b|\bfuck\s+face\b|\bfacefuck\b/g,
-  fk: /\b(?:f\.?\s*k\.?|french\s+kiss|fake\s+kiss)\b|\bsarut(?=\s+doar\s+daca\b)|(?<=fara\s)sarut(?:uri)?\b|\bsarut(?=\s*[+:-])|\bsarut(?=\s*\([^)]*(?:contra|extra|cost))/g,
+  fk: /\b(?:f\.?\s*k\.?|french\s+kiss|france\s+kiss|fake\s+kiss)\b|\bsarut(?=\s+doar\s+daca\b)|(?<=fara\s)sarut(?:uri)?\b|\bsarut(?=\s*[+:-])|\bsarut(?=\s*\([^)]*(?:contra|extra|cost))/g,
   fj: /\bfj\b|\bfoot\s*job\b/g,
   hardSex: /\b(?:hard\s+sex|hardcore\s+sex|sex\s+hard|hard\s*[-–]\s*brutal)\b/g,
   cim: /\bcim\b|\bfin(?:aliz\w*)?\.?\s+orala\b|\bfinalizarea\s*[-:]\s*orala\b(?=[^.\n]{0,20}(?:\+|extra))|\bejacul\w*\s+orala\b|\b(?:orala|faciala)\s+(?:orala|faciala)\b|\b(?:orala|faciala)\s*(?:\/|,|sau)\s*orala\b/g,
@@ -113,7 +113,7 @@ const SERVICE_PATTERNS: Record<EscortServiceName, RegExp> = {
   prostateMassage: /\bmasaj\s+prostatic\b|\bprostat(?:a|ic)\b/g,
   pse: /\bpse\b|porn\s+star\s+experience/g,
   cuni: /\bcunn?ilingus\b|\bcunni\b|\blimbut\w*\b|\blimb\w*\s+in\s+(?:p(?:a|ă)s(?:a|ă)ric(?:a|ă)|vagin)(?:\s+si\s+fund)?\b/g,
-  ani: /\ban{1,3}i{1,2}lingus\b|\banni\s+pasiv\w*\b(?![^\n.;]{0,180}\b(?:nu\s+m[aă]\s+pasion\w*|nu\s+fac|nu\s+accept)\b)|\baniligus\b|\banulingus\b|\brimming\b|\bcunni\s*\/\s*ani\b|\blimb\w*\s+in\s+(?:fund|(?:p(?:a|ă)s(?:a|ă)ric(?:a|ă)|vagin)\s+si\s+fund)\b/g,
+  ani: /\banalingus\b|\ban{1,3}i{1,2}lingus\b|\banni\s+pasiv\w*\b(?![^\n.;]{0,180}\b(?:nu\s+m[aă]\s+pasion\w*|nu\s+fac|nu\s+accept)\b)|\baniligus\b|\banulingus\b|\brimming\b|\bcunni\s*\/\s*ani\b|\blimb\w*\s+in\s+(?:fund|(?:p(?:a|ă)s(?:a|ă)ric(?:a|ă)|vagin)\s+si\s+fund)\b/g,
   '3some': /\b(?:sex|intalniri)\s+in\s+3\b|\b(?:mmf|mff|3some|threesome)\b|\btrio\s*\(\s*2\s+barbati\b|\bintalniri\s+cu\s+(?:o\s+)?colega\b/g,
   couples: /\bcupl(?:u|uri)\b/g,
   lesbyShow: /\b(?:show\s+lesb\w*|lesb\w*\s+show)\b/g,
@@ -440,6 +440,24 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
       return Number.parseInt(parenthesizedExtra[1], 10);
     }
   }
+  if (service === 'cim') {
+    const reversedCimExtra = /\b(\d{2,4})\s*(?:lei|ron)?\s*cim\b/i.exec(nearby);
+    if (reversedCimExtra && isPriceAmount(Number.parseInt(reversedCimExtra[1], 10))) {
+      return Number.parseInt(reversedCimExtra[1], 10);
+    }
+  }
+  if (service === 'fk') {
+    const reversedFrenchKissExtra = /\b(\d{2,4})\s*(?:lei|ron)?\s*(?:france|french)\s+kiss\b/i.exec(nearby);
+    if (reversedFrenchKissExtra && isPriceAmount(Number.parseInt(reversedFrenchKissExtra[1], 10))) {
+      return Number.parseInt(reversedFrenchKissExtra[1], 10);
+    }
+  }
+  if (service === 'cim') {
+    const throatFinalizationExtra = /\bfinaliz\w*\s+oral\w*\s*\/\s*in\s+gat\b[^\n]{0,20}?(\d{2,4})\b/i.exec(nearby);
+    if (throatFinalizationExtra && isPriceAmount(Number.parseInt(throatFinalizationExtra[1], 10))) {
+      return Number.parseInt(throatFinalizationExtra[1], 10);
+    }
+  }
   const extraSectionIndex = line.search(/\bservici(?:ile|i)\s+extra\b/i);
   if (extraSectionIndex !== -1 && start - lineStart > extraSectionIndex) {
     const sectionPrefix = line.slice(extraSectionIndex, start - lineStart);
@@ -716,6 +734,12 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
 }
 
 function extractOneService(text: string, service: EscortServiceName): ServiceAvailability | undefined {
+  if (service === 'fk' && /\b50\s*(?:lei|ron)?\s*(?:france|french)\s+kiss\b/i.test(text)) {
+    return {extraCost: 50};
+  }
+  if ((service === 'op' || service === 'on') && /\boral\s+cu\s+capul\s+in\s+jos\b/i.test(text)) {
+    return true;
+  }
   if ((service === 'op' || service === 'np') && /\boral\s*,\s*normal\s*,\s*(?:atingeri|mangai|handjob)\b/i.test(text)) {
     return true;
   }
@@ -1884,6 +1908,24 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
       baseCandidates['1h'] = [hourRate];
     }
   }
+  const compactShortAndHourRates = /\b(\d{2,5})\s*[-:]\s*30\s*m\b[\s\S]{0,30}?\b(\d{2,5})\s*[-:]\s*1\s*h\b/i.exec(rateText);
+  if (compactShortAndHourRates) {
+    const thirtyMinuteRate = Number.parseInt(compactShortAndHourRates[1], 10);
+    const hourRate = Number.parseInt(compactShortAndHourRates[2], 10);
+    if (isPriceAmount(thirtyMinuteRate) && isPriceAmount(hourRate)) {
+      baseCandidates['30m'] = [thirtyMinuteRate];
+      baseCandidates['1h'] = [hourRate];
+    }
+  }
+  const sessionDurationRates = /\b(\d{2,5})\s*(?:lei|ron)\s*\/\s*sedinta\s+de\s+30\s*minute?\b[\s\S]{0,80}?\b(\d{2,5})\s*(?:lei|ron)\s*\/\s*sedinta\s+de\s+60\s*minute?\b/i.exec(rateText);
+  if (sessionDurationRates) {
+    const thirtyMinuteRate = Number.parseInt(sessionDurationRates[1], 10);
+    const hourRate = Number.parseInt(sessionDurationRates[2], 10);
+    if (isPriceAmount(thirtyMinuteRate) && isPriceAmount(hourRate)) {
+      baseCandidates['30m'] = [thirtyMinuteRate];
+      baseCandidates['1h'] = [hourRate];
+    }
+  }
   const dashedShortAndHourRates = /\b(\d{2,5})\s*[-:]\s*30\s*(?:de\s*)?min\b[\s\S]{0,30}?\b(\d{2,5})\s*[-:]\s*1\s*h\b/i.exec(rateText);
   if (dashedShortAndHourRates) {
     const thirtyMinuteRate = Number.parseInt(dashedShortAndHourRates[1], 10);
@@ -2361,6 +2403,7 @@ function extractSchedule(text: string): EscortSchedule[] {
 
   for (const line of text.split('\n')) {
     const hasScheduleContext = /\b(?:program\w*|orar|interval)\b/i.test(line)
+      || /\bdisponib\w*\s+intre\s+orele?\b/i.test(line)
       || DAY_EXPRESSION_PATTERN.test(line)
       || (/⏰/u.test(line) && !/\b(?:lei|ron|finaliz\w*|taxa|examen)\b/i.test(line));
     DAY_EXPRESSION_PATTERN.lastIndex = 0;
