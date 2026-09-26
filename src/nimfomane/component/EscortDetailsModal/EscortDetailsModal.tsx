@@ -34,10 +34,32 @@ type SectionMetaProps = {
 };
 
 const PERSONAL_ROWS: Array<{key: keyof PersonalDetails; label: string; suffix: string}> = [
-  {key: 'age', label: 'Vârstă', suffix: ' ani'},
-  {key: 'height', label: 'Înălțime', suffix: ' cm'},
-  {key: 'weight', label: 'Greutate', suffix: ' kg'},
+  {key: 'age', label: 'Vârstă', suffix: 'ani'},
+  {key: 'height', label: 'Înălțime', suffix: 'cm'},
+  {key: 'weight', label: 'Greutate', suffix: 'kg'},
 ];
+
+function getServiceLabels(details: ServiceDetails): string[] {
+  const rows = serviceDisplay.getRateRows(details);
+  const schedules = details.schedule || [];
+  const serviceGroups = serviceDisplay.getServiceGroups(details.services);
+
+  return [
+    ...rows.map(row => row.label),
+    ...schedules.map(() => 'Program'),
+    ...serviceGroups.map(group => group.label),
+  ];
+}
+
+function getDetailsLabelMinWidth(personalDetails?: PersonalDetails, serviceDetails?: ServiceDetails): string {
+  const labels = [
+    ...(personalDetails ? PERSONAL_ROWS.filter(row => personalDetails[row.key] !== undefined).map(row => row.label) : []),
+    ...(serviceDetails ? getServiceLabels(serviceDetails) : []),
+  ];
+  const maxLabelLength = labels.reduce((maxLength, label) => Math.max(maxLength, label.length), 0);
+
+  return `${maxLabelLength + 2}ch`;
+}
 
 function formatRelativeTime(timestamp?: number): string | null {
   return timestamp ? dateLib.getRelativeTime(new Date(timestamp).toISOString()) : null;
@@ -83,7 +105,7 @@ const PersonalDetailsSection: React.FC<{details: PersonalDetails; escort: Escort
         />
       </div>
     </div>
-    <table className={styles.detailsTable}>
+    <table className={`${styles.detailsTable} ${styles.personalDetailsTable}`}>
       <tbody>
         {PERSONAL_ROWS.filter(row => details[row.key] !== undefined).map(row => (
           <tr key={row.key}>
@@ -105,7 +127,7 @@ const ServiceDetailsTable: React.FC<{details: ServiceDetails}> = ({details}) => 
   }
 
   return (
-    <table className={styles.detailsTable}>
+    <table className={`${styles.detailsTable} ${styles.serviceDetailsTable}`}>
       <tbody>
         {rows.map(row => (
           <tr key={`rate-${row.key}`}>
@@ -137,7 +159,13 @@ const ServiceDetailsTable: React.FC<{details: ServiceDetails}> = ({details}) => 
               {group.services.map((service, serviceIndex) => (
                 <React.Fragment key={service.service}>
                   {serviceIndex > 0 && ', '}
-                  <span className={service.isNotIncluded ? styles.notIncluded : ''}>
+                  <span className={
+                    service.isNotIncluded
+                      ? styles.notIncluded
+                      : service.extraCost !== undefined
+                        ? styles.extraCostService
+                        : ''
+                  }>
                     {service.label}
                     {service.extraCost !== undefined && (
                       <> (<em className={styles.extraCost}>+{service.extraCost} lei</em>)</>
@@ -184,6 +212,9 @@ const EscortDetailsModal: React.FC<EscortDetailsModalProps> = ({
 }) => {
   const profileUrl = escort.profileLink || `https://nimfomane.com/forum/profile/${encodeURIComponent(user)}/`;
   const {EscortProfileImage} = escortProfileImage;
+  const detailsRowsStyle: React.CSSProperties & {'--details-label-min-width': string} = {
+    '--details-label-min-width': getDetailsLabelMinWidth(escort.personalDetails, escort.serviceDetails),
+  };
 
   return (
     <Modal close={onClose} inline={inline} dataWwid="escort-details-modal">
@@ -242,8 +273,13 @@ const EscortDetailsModal: React.FC<EscortDetailsModalProps> = ({
             </div>
           )}
           {error && <p className={styles.error} data-wwid="escort-details-error">{error}</p>}
-          {escort.personalDetails && <PersonalDetailsSection details={escort.personalDetails} escort={escort} />}
-          {escort.serviceDetails && <ServiceDetailsSection details={escort.serviceDetails} escort={escort} />}
+          <div
+            className={styles.detailsRows}
+            style={detailsRowsStyle}
+          >
+            {escort.personalDetails && <PersonalDetailsSection details={escort.personalDetails} escort={escort} />}
+            {escort.serviceDetails && <ServiceDetailsSection details={escort.serviceDetails} escort={escort} />}
+          </div>
           {!isLoading && !escort.personalDetails && !escort.serviceDetails && (
             <p className={styles.noDetails}>Nu s-au găsit detalii personale sau despre servicii</p>
           )}

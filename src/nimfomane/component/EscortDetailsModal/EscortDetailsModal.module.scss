@@ -44,63 +44,70 @@
   color: #a33a3a;
 }
 
+.detailsRows {
+  --details-label-min-width: 70px;
+}
+
 .subsection {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.tableSectionStart th,
-.tableSectionStart td {
-  border-top: 9px solid #ececec !important;
-
-  :global(.dark) & {
-    border-top-color: #1f1f1f !important;
-  }
+.tableSectionStart {
+  margin-top: 6px;
 }
 
 .detailsTable {
   width: 100%;
-  border-collapse: collapse;
   color: #444;
   font-size: 13px;
 
-  th,
-  td {
-    padding: 6px 8px;
-    text-align: left;
-    vertical-align: top;
+  tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
   }
 
-  tbody th {
-    width: 1%;
-    padding-right: 20px;
-    background: rgb(229 231 235);
+  tr {
+    display: flex;
+    align-items: center;
+    min-height: 28px;
+    margin-bottom: 3px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #e2e3e5;
+  }
+
+  th {
+    min-width: var(--details-label-min-width, 80px);
+    flex-shrink: 0;
+    padding: 2px 8px;
+    text-align: right;
     color: rgb(104 105 117);
     font-size: 14px;
     font-weight: normal;
     white-space: nowrap;
   }
 
-  tbody td {
-    background: linear-gradient(90deg, #e8eaf0 0%, #f5f7fa 100%);
+  td {
+    min-width: 0;
+    flex: 1;
+    padding: 4px 8px;
+    text-align: left;
     color: #333;
     font-size: 14px;
-    font-weight: normal;
-  }
-
-  tbody tr:not(:last-child) th,
-  tbody tr:not(:last-child) td {
-    border-bottom: 1px solid #dfe2e8;
-  }
-
-  tbody tr:not(:last-child) th {
-    border-bottom-color: #d3d8e0;
+    font-weight: 600;
   }
 }
 
 .extraCost {
+  color: rgb(90 57 107);
   font-style: italic;
+}
+
+.extraCostService {
+  color: rgb(90 57 107);
 }
 
 .notIncluded {
@@ -273,6 +280,16 @@
     th,
     td {
       padding: 6px;
+    }
+  }
+
+  .detailsTable {
+    th {
+      padding: 2px 6px;
+    }
+
+    td {
+      padding: 4px 6px;
     }
   }
 }
