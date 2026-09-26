@@ -10,6 +10,7 @@ type DetailSource = 'interest' | 'about' | 'signature' | 'posts' | 'activity';
 interface MockDetailsOptions {
   source?: DetailSource;
   delay?: number;
+  visitedCities?: string[];
 }
 
 function sourceUrl(profileLink: string, suffix: string): string {
@@ -38,16 +39,27 @@ function profileBody(source: DetailSource): string {
   </body></html>`;
 }
 
-function postsBody(profileLink: string): string {
+function postsBody(profileLink: string, visitedCities: string[] = []): string {
   const firstTopic = `${sourceUrl(profileLink, 'topic/101-first/')}?do=findComment&comment=1`;
   const secondTopic = `${sourceUrl(profileLink, 'topic/102-second/')}?do=findComment&comment=2`;
+  const cityUrls = [
+    'https://nimfomane.com/forum/forum/35-escorte-din-cluj/',
+    'https://nimfomane.com/forum/forum/5-top-escorte-bucuresti/',
+    'https://nimfomane.com/forum/forum/17-escorte-brasov-si-imprejurimi/',
+  ];
+  const cityLink = (index: number) => visitedCities[index]
+    ? `<div class="ipsType_sectionHead"><a href="${cityUrls[index]}">${visitedCities[index]}</a></div>`
+    : '';
+
   return `<html><body>
     <div class="ipsPagination"><a data-page="1" href="${profileLink}/content/?type=forums_topic_post">1</a></div>
     <div class="cPost" data-commentid="1"><time datetime="2026-08-01T12:00:00Z"></time>
-      <div data-role="commentContent"><a href="${firstTopic}">${PERSONAL_TEXT}</a></div>
+      ${cityLink(0)}
+      <div data-role="commentContent"><a href="${firstTopic}">${PERSONAL_TEXT} locuri disponibile</a></div>
     </div>
     <div class="cPost" data-commentid="2"><time datetime="2026-08-02T12:00:00Z"></time>
-      <div data-role="commentContent"><a href="${secondTopic}">${SERVICE_TEXT}</a></div>
+      ${cityLink(1)}
+      <div data-role="commentContent"><a href="${secondTopic}">${SERVICE_TEXT} locuri disponibile</a></div>
     </div>
   </body></html>`;
 }
@@ -100,7 +112,7 @@ async function mockEscortDetails(page: import("playwright-core").Page, profileLi
     } else if (url.pathname.endsWith('/content/')) {
       body = source === 'activity'
         ? oldPostsBody(profileLink)
-        : postsBody(profileLink);
+        : postsBody(profileLink, options.visitedCities);
     }
 
     if (options.delay) {
@@ -124,7 +136,7 @@ async function mockEscortDetails(page: import("playwright-core").Page, profileLi
   await page.route('**://nimfomane.com/forum/profile/**/content/page/**', async route => {
     const body = source === 'activity'
       ? activityBody(profileLink, true)
-      : postsBody(profileLink);
+      : postsBody(profileLink, options.visitedCities);
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -134,8 +146,11 @@ async function mockEscortDetails(page: import("playwright-core").Page, profileLi
 
 }
 
-async function openDetails(page: import("playwright-core").Page) {
-  await page.locator('[data-wwid="escort-info-button"]').first().click();
+async function openDetails(page: import("playwright-core").Page, topicId?: string | null) {
+  const button = topicId
+    ? page.locator(`[data-wwtopic="${topicId}"] [data-wwid="escort-info-button"]`)
+    : page.locator('[data-wwid="escort-info-button"]').first();
+  await button.click();
   await expect(page.locator('[data-wwid="escort-details-modal"]')).toBeVisible();
   await expect(page.locator('[data-wwid="escort-details-loading"]')).toHaveCount(0, {timeout: 15000});
 }
@@ -148,7 +163,7 @@ async function setEscort(page: import("playwright-core").Page, user: string, esc
 
 test('Should show loading state and details when no details are stored.', async ({page}) => {
   await utilsNimfomane.open(page);
-  const {user} = await utilsNimfomane.waitForNthImage(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
   const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
   await setEscort(page, user, {profileLink});
   await mockEscortDetails(page, profileLink, {delay: 250});
@@ -252,9 +267,28 @@ test('Should show the no-details message when analysis finds nothing.', async ({
     body: '<html><body><input name="csrfKey" value="empty"></body></html>',
   }));
 
-  await openDetails(page, user);
+  await openDetails(page);
 
   await expect(page.locator('[data-wwid="escort-details-modal"]')
     .getByText('Nu s-au găsit detalii personale sau despre servicii', {exact: true})).toBeVisible();
   await expect(page.locator('[data-wwid="escort-details-refresh"]')).toBeVisible();
+  await expect(page.locator('[data-wwid="visited-cities-section"]')).toHaveCount(0);
+});
+
+test('Should display visited cities in reverse chronological order.', async ({page}) => {
+  await utilsNimfomane.open(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
+  const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
+  await mockEscortDetails(page, profileLink, {
+    visitedCities: ['Cluj', 'București'],
+  });
+
+  await setEscort(page, user, {
+    profileLink,
+  });
+  await openDetails(page, id);
+
+  await expect(page.locator('[data-wwid="visited-cities-section"]')).toContainText(
+    'Cluj<București<...',
+  );
 });

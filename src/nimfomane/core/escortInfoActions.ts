@@ -3,9 +3,11 @@ import {jsonPage} from './jsonPage';
 import {escortInfoExtractor, PersonalDetails, RateOverride, ServiceDetails} from './escortInfoExtractor';
 import {NimfomaneStorage} from './storage';
 import type {EscortItem} from './storage';
+import {cityDetection} from './cityDetection';
 
 const REFRESH_INTERVAL = 21 * 24 * 60 * 60 * 1000;
 const OLDEST_POST_DATE = 3 * 365 * 24 * 60 * 60 * 1000;
+const MAX_VISITED_CITIES = 32;
 const ACTIVE_COLLECTIONS = new Map<string, Promise<void>>();
 
 interface CollectedDetails {
@@ -21,6 +23,7 @@ interface CollectedDetails {
   serviceDetailsRank?: SourceRank;
   serviceProfileSourceSelected?: boolean;
   servicePostSourceSelected?: boolean;
+  visitedCities: string[];
 }
 
 interface SourceRank {
@@ -351,7 +354,14 @@ function getPostPages(doc: Document, profileUrl: string): {lastPage: number; pag
   };
 }
 
-function collectPostContent(doc: Document, sourceUrl: string, user: string, details: CollectedDetails, oldestPostDate: number): boolean {
+function collectPostContent(
+  doc: Document,
+  sourceUrl: string,
+  user: string,
+  details: CollectedDetails,
+  oldestPostDate: number,
+  collectAllPosts: boolean,
+): boolean {
   const commentContents = Array.from(doc.querySelectorAll<HTMLElement>('[data-role="commentContent"]'));
 
   for (const content of commentContents) {
@@ -364,18 +374,24 @@ function collectPostContent(doc: Document, sourceUrl: string, user: string, deta
       continue;
     }
 
+    const postSourceUrl = getTopicPostSourceUrl(post, sourceUrl);
+    const city = cityDetection.getAvailableCityFromElement(post, postSourceUrl);
+    if (city) {
+      appendVisitedCity(user, details, city);
+    }
+
     const contentCopy = content.cloneNode(true) as HTMLElement;
     contentCopy.querySelectorAll('.ipsQuote').forEach(quote => quote.remove());
     collectText(
       contentCopy.textContent || '',
-      getTopicPostSourceUrl(post, sourceUrl),
+      postSourceUrl,
       postDate,
       details,
       COMMENT_SOURCE_PRIORITY,
       'post',
     );
     saveCollectedDetails(user, details);
-    if (hasAllDetails(details)) {
+    if (hasAllDetails(details) && !collectAllPosts) {
       return true;
     }
   }
@@ -390,6 +406,22 @@ function getLastActivityPageUrl(doc: Document, profileUrl: string): string | und
   return lastPageLink
     ? resolveUrl(lastPageLink.getAttribute('href')!, profileUrl)
     : undefined;
+}
+
+function saveVisitedCities(user: string, visitedCities: string[]): void {
+  NimfomaneStorage.setEscortProp(user, 'visitedCities', [...visitedCities]);
+}
+
+function appendVisitedCity(user: string, details: CollectedDetails, city: string): void {
+  if (
+    details.visitedCities.length >= MAX_VISITED_CITIES
+    || details.visitedCities.at(-1) === city
+  ) {
+    return;
+  }
+
+  details.visitedCities.push(city);
+  saveVisitedCities(user, details.visitedCities);
 }
 
 function collectActivityContent(
@@ -408,6 +440,11 @@ function collectActivityContent(
     const sourceLink = streamItem.querySelector<HTMLAnchorElement>('.ipsStreamItem_title a[href]');
     const itemUrl = sourceLink?.getAttribute('href');
     const itemSourceUrl = itemUrl ? resolveUrl(itemUrl, sourceUrl) : sourceUrl;
+    const city = cityDetection.getAvailableCityFromElement(streamItem);
+    if (city) {
+      appendVisitedCity(user, details, city);
+    }
+
     const contentDate = getPostDate(streamItem);
     collectText(
       content.textContent || '',
@@ -422,10 +459,14 @@ function collectActivityContent(
 }
 
 async function collectEscortDetails(user: string, profileUrl: string, priority: number): Promise<void> {
+  const existingEscort = NimfomaneStorage.getEscort(user);
+  const collectVisitedCities = existingEscort.visitedCities === undefined;
   const details: CollectedDetails = {
     personalDetailsSourceUrls: [],
     serviceDetailsSourceUrls: [],
+    visitedCities: [],
   };
+  saveVisitedCities(user, details.visitedCities);
   const profilePage = await page.load(profileUrl, {priority});
 
   const lastestPostLink = profilePage?.querySelector<HTMLAnchorElement>('.ipsStreamItem_title [href][data-linktype="link"]');
@@ -451,7 +492,7 @@ async function collectEscortDetails(user: string, profileUrl: string, priority: 
 
   const sidebarDetails = profilePage.querySelectorAll('.cProfileSidebarBlock li:nth-child(3)');
   for (const sidebarDetail of sidebarDetails) {
-    if (hasAllDetails(details)) {
+    if (hasAllDetails(details) && !collectVisitedCities) {
       break;
     }
 
@@ -509,7 +550,7 @@ async function collectEscortDetails(user: string, profileUrl: string, priority: 
         : `${profileUrl}/content/page/${pageNumber}/?type=forums_topic_post&listResort=1${
           csrfKey ? `&csrfKey=${encodeURIComponent(csrfKey)}` : ''
         }`;
-    if (collectPostContent(postsPage, currentPageUrl, user, details, oldestPostDate)) {
+    if (collectPostContent(postsPage, currentPageUrl, user, details, oldestPostDate, collectVisitedCities)) {
       break;
     }
 
@@ -537,7 +578,8 @@ function startCollection(user: string, priority: number, force: boolean): Promis
   clearProfileContentDates(user, escort);
 
   const lastDetermination = escort.escortDetailsTime;
-  if (!force && lastDetermination && Date.now() - lastDetermination <= REFRESH_INTERVAL) {
+  const visitedCitiesAreStale = escort.visitedCities === undefined;
+  if (!force && !visitedCitiesAreStale && lastDetermination && Date.now() - lastDetermination <= REFRESH_INTERVAL) {
     return Promise.resolve();
   }
 

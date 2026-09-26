@@ -30,6 +30,7 @@ export interface EscortItem {
       topicUrl: string;
     };
   };
+  visitedCities?: string[];
   profileStatsTime?: number;
   profileNotFound?: true;
   isUnverified?: true;

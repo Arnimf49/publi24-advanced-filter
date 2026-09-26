@@ -293,6 +293,27 @@ test('Should detect the current city from a positive availability post.', async 
   }, user, {timeout: 15000});
 });
 
+test('Should detect the current city from a post mentioning available places.', async ({ page }) => {
+  test.setTimeout(30000);
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'});
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
+  const clujUrl = 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/';
+
+  await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
+  await interceptProfileActivity(page, user, [{
+    cityUrl: clujUrl,
+    topicUrl: 'https://nimfomane.com/forum/topic/available-cluj/',
+    text: 'Am locuri disponibile în Cluj pentru programări.',
+  }]);
+  await interceptProfileStats(page, user);
+
+  await page.locator('[data-wwid="favs-button"]').click();
+  await page.waitForFunction((user) => {
+    const escort = JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${user}`) || '{}');
+    return escort.profileStats?.currentCity?.name === 'Cluj';
+  }, user, {timeout: 15000});
+});
+
 test('Should reject a city when its newest availability post says unavailable.', async ({ page }) => {
   test.setTimeout(30000);
   await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'});

@@ -110,7 +110,7 @@ const PersonalDetailsSection: React.FC<{details: PersonalDetails; escort: Escort
         {PERSONAL_ROWS.filter(row => details[row.key] !== undefined).map(row => (
           <tr key={row.key}>
             <th>{row.label}</th>
-            <td>{details[row.key]}{row.suffix}</td>
+            <td>{details[row.key]} {row.suffix}</td>
           </tr>
         ))}
       </tbody>
@@ -198,6 +198,27 @@ const ServiceDetailsSection: React.FC<{details: ServiceDetails; escort: EscortIt
   </section>
 );
 
+const VisitedCitiesSection: React.FC<{visitedCities?: string[]}> = ({visitedCities}) => {
+  if (!visitedCities?.length) {
+    return null;
+  }
+
+  return (
+    <section className={styles.detailSection} data-wwid="visited-cities-section">
+      <h4 className={styles.sectionTitle}>Orase vizitate</h4>
+      <p className={styles.cityHistory}>
+        {visitedCities.map((city, index) => (
+          <React.Fragment key={`${city}-${index}`}>
+            <span className={styles.cityName}>{city}</span>
+            <span className={styles.citySeparator}>&lt;</span>
+          </React.Fragment>
+        ))}
+        <span className={styles.cityName}>...</span>
+      </p>
+    </section>
+  );
+};
+
 const EscortDetailsModal: React.FC<EscortDetailsModalProps> = ({
   user,
   escort,
@@ -279,6 +300,7 @@ const EscortDetailsModal: React.FC<EscortDetailsModalProps> = ({
           >
             {escort.personalDetails && <PersonalDetailsSection details={escort.personalDetails} escort={escort} />}
             {escort.serviceDetails && <ServiceDetailsSection details={escort.serviceDetails} escort={escort} />}
+            <VisitedCitiesSection visitedCities={escort.visitedCities} />
           </div>
           {!isLoading && !escort.personalDetails && !escort.serviceDetails && (
             <p className={styles.noDetails}>Nu s-au găsit detalii personale sau despre servicii</p>

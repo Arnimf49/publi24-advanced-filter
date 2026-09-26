@@ -8,6 +8,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 15px;
 }
 
 .sectionHeader {
@@ -216,6 +217,32 @@
   color: #777;
   font-size: 12px;
   font-style: italic;
+}
+
+.cityHistory {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  color: #444;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.citySeparator {
+  padding: 0 4px;
+  border-radius: 5px;
+  background: #d1d2d4;
+  color: #777;
+  font-family: Impact;
+  font-size: 14px;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.cityName {
+  font-weight: normal;
 }
 
 @media screen and (max-width: 640px) {
