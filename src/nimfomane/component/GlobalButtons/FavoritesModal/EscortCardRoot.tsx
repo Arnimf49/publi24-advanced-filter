@@ -59,6 +59,8 @@ export const EscortCardRoot: React.FC<EscortCardRootProps> = ({user, index}) => 
       imageLoadError={escortMemoryState.escortAnalysisError}
       onImageClick={() => setImageModalOpen(true)}
       profileStats={escort.profileStats}
+      personalDetails={escort.personalDetails}
+      serviceDetails={escort.serviceDetails}
       statsLoading={isStatsLoading}
       statsStale={isStatsStale}
       lastVisitedLabel={lastVisitedLabel}

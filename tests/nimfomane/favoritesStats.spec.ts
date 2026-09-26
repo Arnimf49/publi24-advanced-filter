@@ -85,6 +85,27 @@ test('Should display escort stats in favorites.', async ({ page }) => {
   await expect(escortCard.locator('[data-wwid="stat-reputation"]')).toContainText('567');
 });
 
+test('Should display extracted physical details and rates in favorites stats.', async ({ page }) => {
+  await utilsNimfomane.open(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
+
+  await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
+  await utilsNimfomane.setEscortStorageProp(page, user, 'personalDetails', {
+    height: 168,
+    weight: 58,
+    age: 27,
+  });
+  await utilsNimfomane.setEscortStorageProp(page, user, 'serviceDetails', {
+    baseRates: {'30m': 150, '1h': 250},
+  });
+
+  await page.locator('[data-wwid="favs-button"]').click();
+  const escortCard = page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-card"]');
+
+  await expect(escortCard.locator('[data-wwid="stat-posts"]')).toContainText('168cm, 58kg, 27ani');
+  await expect(escortCard.locator('[data-wwid="stat-reputation"]')).toContainText('150 30m, 250 1h');
+});
+
 test('Should refresh escort stats after a time in favorites.', async ({ page }) => {
   await utilsNimfomane.open(page);
   const {user, id} = await utilsNimfomane.waitForNthImage(page);

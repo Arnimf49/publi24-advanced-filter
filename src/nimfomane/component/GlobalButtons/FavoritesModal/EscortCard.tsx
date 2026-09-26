@@ -1,6 +1,7 @@
 import React, {RefObject} from 'react';
 import styles from './EscortCard.module.scss';
 import type {EscortItem} from '../../../core/storage';
+import type {PersonalDetails, ServiceDetails} from '../../../core/escortInfoExtractor';
 import {InlineLoader} from '../../../../common/components/InlineLoader/InlineLoader';
 import {escortProfileImage} from '../../EscortProfileImage/EscortProfileImage';
 
@@ -14,6 +15,8 @@ export type EscortCardProps = {
   imageLoadError?: string | null;
   onImageClick?: () => void;
   profileStats?: EscortItem['profileStats'];
+  personalDetails?: PersonalDetails;
+  serviceDetails?: ServiceDetails;
   statsLoading: boolean;
   statsStale: boolean;
   lastVisitedLabel?: string | null;
@@ -31,6 +34,8 @@ export const EscortCard: React.FC<EscortCardProps> = ({
   imageLoadError,
   onImageClick,
   profileStats,
+  personalDetails,
+  serviceDetails,
   statsLoading,
   statsStale,
   lastVisitedLabel,
@@ -38,6 +43,20 @@ export const EscortCard: React.FC<EscortCardProps> = ({
   imageModal,
 }) => {
   const {EscortProfileImage} = escortProfileImage;
+  const personalDetailsValue = personalDetails && Object.values(personalDetails).some(value => value !== undefined)
+    ? [
+        personalDetails.height !== undefined ? `${personalDetails.height}cm` : null,
+        personalDetails.weight !== undefined ? `${personalDetails.weight}kg` : null,
+        personalDetails.age !== undefined ? `${personalDetails.age}ani` : null,
+      ].filter((value): value is string => value !== null).join(', ')
+    : null;
+  const serviceRates = serviceDetails?.baseRates;
+  const serviceRatesValue = serviceRates && (serviceRates['30m'] !== undefined || serviceRates['1h'] !== undefined)
+    ? [
+        serviceRates['30m'] !== undefined ? `${serviceRates['30m']} 30m` : null,
+        serviceRates['1h'] !== undefined ? `${serviceRates['1h']} 1h` : null,
+      ].filter((value): value is string => value !== null).join(', ')
+    : null;
 
   return (
     <>
@@ -79,17 +98,17 @@ export const EscortCard: React.FC<EscortCardProps> = ({
                   </span>
                 </div>
                 <div className={styles.statItem}>
-                  <span className={styles.statLabel}>postări</span>
+                  <span className={styles.statLabel}>{personalDetailsValue ? 'fizic' : 'postări'}</span>
                   <span className={styles.statValue} data-wwid="stat-posts">
                     {(statsLoading || statsStale) && <InlineLoader color="#888" size={12} />}
-                    {profileStats?.posts || '-'}
+                    {personalDetailsValue || profileStats?.posts || '-'}
                   </span>
                 </div>
                 <div className={styles.statItem}>
-                  <span className={styles.statLabel}>reputație</span>
+                  <span className={styles.statLabel}>{serviceRatesValue ? 'rate' : 'reputație'}</span>
                   <span className={styles.statValue} data-wwid="stat-reputation">
                     {(statsLoading || statsStale) && <InlineLoader color="#888" size={12} />}
-                    {profileStats?.reputation || '-'}
+                    {serviceRatesValue || profileStats?.reputation || '-'}
                   </span>
                 </div>
               </div>
