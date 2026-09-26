@@ -32,16 +32,41 @@ const Modal: React.FC<ModalProps> =
     const shouldResetScroll = !inline && mobileContentOverlay && document.body.classList.contains('onMobile');
     const parent = utils.getScrollParent(anchorRef.current, false);
     const initialScrollY = shouldResetScroll ? utils.getScrollTop(parent) : 0;
-    let scrollRestoreTimeout: number | undefined;
+    let viewportResetTimeout: number | undefined;
+    let viewportRestoreTimeout: number | undefined;
+
+    const resetBrowserScrollState = (): void => {
+      if (viewportRestoreTimeout !== undefined) {
+        window.clearTimeout(viewportRestoreTimeout);
+      }
+
+      utils.scrollTo(parent, 0);
+      viewportRestoreTimeout = window.setTimeout(() => {
+        utils.scrollTo(parent, initialScrollY);
+        viewportRestoreTimeout = undefined;
+      }, 10);
+    };
+
+    const scheduleViewportScrollReset = (): void => {
+      if (viewportResetTimeout !== undefined) {
+        window.clearTimeout(viewportResetTimeout);
+      }
+
+      viewportResetTimeout = window.setTimeout(() => {
+        resetBrowserScrollState();
+        viewportResetTimeout = undefined;
+      }, 150);
+    };
+    const visualViewport = window.visualViewport;
 
     if (!inline) {
       window.history.pushState({ modalIndex: currentModalIndex }, '');
 
       if (shouldResetScroll) {
-        utils.scrollTo(parent, 0);
-        scrollRestoreTimeout = window.setTimeout(() => {
-          utils.scrollTo(parent, initialScrollY);
-        }, 10);
+        resetBrowserScrollState();
+
+        visualViewport?.addEventListener('resize', scheduleViewportScrollReset);
+        visualViewport?.addEventListener('scroll', scheduleViewportScrollReset);
       }
 
       document.body.style.overflow = 'hidden';
@@ -68,8 +93,17 @@ const Modal: React.FC<ModalProps> =
       window.removeEventListener('keydown', closeOnKey);
       window.removeEventListener('popstate', handlePopState);
 
-      if (scrollRestoreTimeout !== undefined) {
-        window.clearTimeout(scrollRestoreTimeout);
+      if (viewportResetTimeout !== undefined) {
+        window.clearTimeout(viewportResetTimeout);
+      }
+
+      if (viewportRestoreTimeout !== undefined) {
+        window.clearTimeout(viewportRestoreTimeout);
+      }
+
+      if (shouldResetScroll) {
+        visualViewport?.removeEventListener('resize', scheduleViewportScrollReset);
+        visualViewport?.removeEventListener('scroll', scheduleViewportScrollReset);
       }
 
       if (!inline && !closedByPopstate) {
