@@ -32,6 +32,72 @@ function buildGotoResultName(anchor: HTMLAnchorElement): string {
   return resultTitle.split(/\s+/)[0] || fullText.split(/\s+/)[0] || 'unknown';
 }
 
+function getGotoResultParts(result: SearchResult): {domain: string, title: string} | null {
+  if (!Array.isArray(result)) {
+    return null;
+  }
+
+  const separatorIndex = result[0].indexOf(' | ');
+  if (separatorIndex === -1) {
+    return null;
+  }
+
+  return {
+    domain: result[0].slice(0, separatorIndex).trim().toLowerCase().replace(/^www\./, ''),
+    title: result[0].slice(separatorIndex + 3).trim().replace(/\s+/g, ' ').toLowerCase(),
+  };
+}
+
+function isPubli24Domain(domain: string): boolean {
+  return domain === 'publi24' || domain === 'publi24.ro';
+}
+
+function isPubli24Result(result: SearchResult, parts: {domain: string, title: string} | null): boolean {
+  if (parts) {
+    return isPubli24Domain(parts.domain);
+  }
+
+  if (typeof result !== 'string') {
+    return false;
+  }
+
+  try {
+    return isPubli24Domain(new URL(result, 'https://www.google.com').hostname.replace(/^www\./, '').toLowerCase());
+  } catch (error) {
+    console.error(`Error parsing search result URL "${result}":`, error);
+    return false;
+  }
+}
+
+function deduplicateResults(results: SearchResult[]): SearchResult[] {
+  const seen = new Set<string>();
+  const seenDomainTitles = new Set<string>();
+
+  return results.filter((result) => {
+    const serializedResult = JSON.stringify(result);
+    if (seen.has(serializedResult)) {
+      return false;
+    }
+    seen.add(serializedResult);
+
+    const parts = getGotoResultParts(result);
+    if (!parts) {
+      return !isPubli24Result(result, parts);
+    }
+
+    if (isPubli24Result(result, parts)) {
+      return false;
+    }
+
+    const domainTitleKey = `${parts.domain}\u0000${parts.title}`;
+    if (seenDomainTitles.has(domainTitleKey)) {
+      return false;
+    }
+    seenDomainTitles.add(domainTitleKey);
+    return true;
+  });
+}
+
 function isGotoHref(href: string): boolean {
   try {
     return new URL(href, 'https://www.google.com').pathname === '/goto';
@@ -74,17 +140,9 @@ function extractResultLinks(wwid: string) {
           })
           .filter((r): r is SearchResult => r !== null);
 
-        const seen = new Set<string>();
-        const finalUrls: SearchResult[] = [...resultUrls, ...currentUrls].filter((r) => {
-          const key = JSON.stringify(r);
-          if (seen.has(key)) {
-            return false;
-          }
-          seen.add(key);
-          return true;
-        });
+        const deduplicatedUrls = deduplicateResults([...resultUrls, ...currentUrls]);
 
-        return WWBrowserStorage.set(storageKey, finalUrls);
+        return WWBrowserStorage.set(storageKey, deduplicatedUrls);
       })
       .then(() => {
         if (isSecondSearch) {
