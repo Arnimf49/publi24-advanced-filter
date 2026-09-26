@@ -8,6 +8,18 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.10',
+    releaseDate: '26 septembrie 2026',
+    changeNew: [
+      'Filtru \'Exclus\' pentru a ascunde anunțuri din anumite orașe/sectoare. Apare numai cănd filtrul de județ este selectat dar cel de oraș de la publi24 nu este selectat.',
+    ],
+    changeImprove: [
+      'Mai multe rezultate inutile filtrate la cautarea dupa telefon.',
+      'Mai multe domenii de listare escorte categorizate pentru cautarea dupa poze.'
+    ],
+    changeFix: []
+  },
+  {
     version: '3.9',
     releaseDate: '19 septembrie 2026',
     changeNew: [],

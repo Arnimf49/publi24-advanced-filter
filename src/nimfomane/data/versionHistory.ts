@@ -8,6 +8,23 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.10',
+    releaseDate: '26 septembrie 2026',
+    changeNew: [
+      'Orașe vizitate afișat în modalul de detalii escortă.',
+      'În favorite se afișează detaliile personale și ratele principale ale escortei dacă informația există.',
+      'Export si import de date în setări, plus procentul de stocare folosit.'
+    ],
+    changeImprove: [
+      'Detectare mai bună a locației curente în favorite.',
+      'Stil de afiș în favorite și in detalii escortă.',
+      'Afiș imbunătățit pe modalul cu poze pentru Yandex mobil.',
+    ],
+    changeFix: [
+      'Poza principală a topicului se schimba incorect la încărcarea a mai multor poze în modalul de poze.',
+    ]
+  },
+  {
     version: '3.9',
     releaseDate: '19 septembrie 2026',
     changeNew: [
