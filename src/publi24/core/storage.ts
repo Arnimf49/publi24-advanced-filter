@@ -566,6 +566,22 @@ export const WWStorage = {
     return localStorage.getItem('ww:default-manual-hide-reason') || 'aspect';
   },
 
+  getExcludedCities(): string[] {
+    const value = localStorage.getItem('ww:excluded-cities');
+    if (!value) {
+      return [];
+    }
+
+    const cities: unknown = JSON.parse(value);
+    return Array.isArray(cities) && cities.every((city) => typeof city === 'string')
+      ? cities
+      : [];
+  },
+
+  setExcludedCities(cities: string[]): void {
+    localStorage.setItem('ww:excluded-cities', JSON.stringify([...new Set(cities)]));
+  },
+
   setWhatsappMessageEnabled(enabled: boolean): void {
     localStorage.setItem('ww:whatsapp-message-enabled', enabled ? 'true' : 'false');
     WWStorage.triggerSettingsChanged();

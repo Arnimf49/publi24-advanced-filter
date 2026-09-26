@@ -10,6 +10,8 @@ import TutorialOverlay from "../component/TutorialOverlay/TutorialOverlay";
 import {IS_MOBILE_VIEW} from "../../common/globals";
 import {misc} from "./misc";
 import AdsModalRoot from "../component/Common/Partials/AdsModal/AdsModalRoot";
+import ExclusionFilter from "../component/ExclusionFilter/ExclusionFilter";
+import {exclusionFilter} from "./exclusionFilter";
 
 interface RenderOptions {
   showDuplicates?: boolean;
@@ -117,7 +119,7 @@ export const renderer = {
         hiddenIndicator.setAttribute('data-wwid', 'hidden-count-indicator');
         hiddenIndicator.className = 'article-item';
         hiddenIndicator.style.textAlign = 'center';
-        hiddenIndicator.style.padding = '20px';
+        hiddenIndicator.style.padding = '10px 20px';
         hiddenIndicator.style.color = '#666';
         hiddenIndicator.textContent = `${hiddenCount} anunțuri ascunse de tot`;
         list!.insertBefore(hiddenIndicator, pager!);
@@ -174,6 +176,55 @@ export const renderer = {
     if (siteSaveSearch && siteSaveSearch.parentNode) {
       siteSaveSearch.parentNode.removeChild(siteSaveSearch);
     }
+  },
+
+  renderExclusionFilters(): void {
+    if (!exclusionFilter.shouldRenderControl()) {
+      return;
+    }
+
+    const cities = exclusionFilter.getAvailableCities();
+    if (cities.length === 0) {
+      return;
+    }
+
+    const filterButtons = document.querySelectorAll<HTMLElement>('.filters-box .filter-button-wrap');
+    filterButtons.forEach((filterButton, index) => {
+      const parent = filterButton.parentElement;
+      if (!parent || parent.querySelector(`[data-wwid="exclusion-filter-${index}"]`)) {
+        return;
+      }
+
+      const element = document.createElement('div');
+      element.setAttribute('data-wwid', `exclusion-filter-${index}`);
+      element.style.display = 'inline-flex';
+      parent.appendChild(element);
+
+      const root = ReactDOM.createRoot(element);
+      root.render(<ExclusionFilter cities={cities}/>);
+    });
+  },
+
+  renderExcludedCountIndicator(excludedCount: number): void {
+    if (excludedCount <= 0) {
+      return;
+    }
+
+    const list = document.querySelector('.article-list');
+    const pager = document.querySelector('.article-list ul.pagination');
+    if (!list || !pager) {
+      console.warn('Failed to render excluded-count indicator. Missing article list or pager.');
+      return;
+    }
+
+    const excludedIndicator = document.createElement('div');
+    excludedIndicator.setAttribute('data-wwid', 'excluded-count-indicator');
+    excludedIndicator.className = 'article-item';
+    excludedIndicator.style.textAlign = 'center';
+    excludedIndicator.style.padding = '10px 20px';
+    excludedIndicator.style.color = '#666';
+    excludedIndicator.textContent = `${excludedCount} excluse prin filtru`;
+    list.insertBefore(excludedIndicator, pager);
   },
 
   renderNextVisibleAdButton() {

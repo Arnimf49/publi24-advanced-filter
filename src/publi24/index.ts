@@ -11,6 +11,7 @@ import {userId} from "../common/userId";
 import {modalState} from "../common/modalState";
 import {utils} from "../common/utils";
 import {storageCleanup} from "./core/storageCleanup";
+import {exclusionFilter} from "./core/exclusionFilter";
 
 const waitForSiteLoad = () => new Promise<void>(resolve => {
   const start = Date.now();
@@ -72,6 +73,14 @@ const initializeAdPage = async () => {
 
 const initializeListingPage = async () => {
   try {
+    exclusionFilter.removeUnavailableValues();
+    const excludedCount = exclusionFilter.removeExcludedAds(document.body);
+    renderer.renderExcludedCountIndicator(excludedCount);
+  } catch (error) {
+    console.error('Failed to apply city exclusions:', error);
+  }
+
+  try {
     renderer.registerAdsInContext(document.body, { applyFocusMode: true, isFromListing: true });
   } catch (error) {
     console.error('Failed to register listing ads:', error);
@@ -81,6 +90,7 @@ const initializeListingPage = async () => {
 
   if (location.pathname.startsWith('/anunturi/matrimoniale')) {
     renderer.renderGlobalButtons();
+    renderer.renderExclusionFilters();
   }
 
   favorites.optimizeFavorites().catch(console.error);
