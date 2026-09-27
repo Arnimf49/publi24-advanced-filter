@@ -7,6 +7,7 @@ import * as cheerio from "cheerio";
 import {CheerioAPI} from "cheerio";
 import {FingerprintGenerator} from "fingerprint-generator";
 import {FingerprintInjector} from "fingerprint-injector";
+import {execFile, execFileSync} from "node:child_process";
 import fs from 'node:fs';
 
 const EXTENSION_PATH = dirname(path.join(fileURLToPath(import.meta.url), '../..'));
@@ -33,6 +34,50 @@ function getProxyServers(): string[] {
 
 const PROXY_COUNTER_FILE = 'tests/data/.proxy-counter';
 
+function getActiveWindow(): string | undefined {
+  if (process.platform !== 'linux') {
+    return undefined;
+  }
+
+  try {
+    return execFileSync('xdotool', ['getactivewindow'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim() || undefined;
+  } catch (error) {
+    console.warn('Could not determine the active window. Install xdotool to preserve focus.', error);
+    return undefined;
+  }
+}
+
+function restoreWindowFocus(windowId: string | undefined): void {
+  if (!windowId) {
+    return;
+  }
+
+  execFile(
+    'xdotool',
+    ['windowactivate', '--sync', windowId],
+    { timeout: 500, windowsHide: true },
+    (error) => {
+      if (error) {
+        console.warn(`Could not restore focus to window ${windowId}.`, error);
+      }
+    },
+  );
+}
+
+async function restoreWindowFocusAfterTabChange(windowId: string | undefined): Promise<void> {
+  if (!windowId) {
+    return;
+  }
+
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  restoreWindowFocus(windowId);
+}
+
+const INITIAL_ACTIVE_WINDOW = process.env.CI ? undefined : getActiveWindow();
+
 function getProxyCounter(): number {
   try {
     if (fs.existsSync(PROXY_COUNTER_FILE)) {
@@ -51,7 +96,10 @@ function incrementProxyCounter(): void {
 }
 
 const utils = {
-  async makeContext(useProxy: boolean = false) {
+  async makeContext(useProxy: boolean = false, headless: boolean = false) {
+    const preserveFocus = !process.env.CI && !headless;
+    const activeWindow = preserveFocus ? INITIAL_ACTIVE_WINDOW : undefined;
+
     const { fingerprint, headers } = new FingerprintGenerator({
       locales: ['en-US']
     }).getFingerprint({
@@ -78,7 +126,7 @@ const utils = {
 
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',
-      headless: false,
+      headless,
       viewport: {
         width: Math.max(1550, Math.min(fingerprint.screen.width, 1920)),
         height: Math.max(700, Math.min(fingerprint.screen.height, 900)),
@@ -102,7 +150,18 @@ const utils = {
         : {}),
       ...(proxyConfig ? { proxy: proxyConfig } : {}),
     });
+
+    if (preserveFocus) {
+      context.on('page', () => {
+        void restoreWindowFocusAfterTabChange(activeWindow);
+      });
+    }
+
     await new FingerprintInjector().attachFingerprintToPlaywright(context, { fingerprint, headers });
+
+    if (preserveFocus) {
+      void restoreWindowFocusAfterTabChange(activeWindow);
+    }
 
     return context;
   },

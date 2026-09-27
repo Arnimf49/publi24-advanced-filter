@@ -51,6 +51,7 @@ test('Should search and focus ad in ads modal', async ({ page, context }) => {
 })
 
 test('Should search and focus ad in favorites', async ({ page, context }) => {
+  test.setTimeout(60000);
   await utilsPubli.open(context, page);
   await enableIosTesting(page);
 
@@ -68,6 +69,8 @@ test('Should search and focus ad in favorites', async ({ page, context }) => {
   const lastFavoriteAd = favoriteAds[favoriteAds.length - 1];
   const adId = await lastFavoriteAd.getAttribute('data-articleid');
 
+  // Let Publi24's favorite-page requests settle before image search triggers a reload.
+  await page.waitForTimeout(6000);
   await utilsPubli.resolveGooglePage(async () => await lastFavoriteAd.$('[data-wwid="investigate"]'), context, page);
   await page.waitForTimeout(800);
 

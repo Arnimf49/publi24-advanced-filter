@@ -5,9 +5,21 @@ import {expect} from "./fixture";
 import {EscortItem, TopicItem} from "../../src/nimfomane/core/storage";
 
 let atLoad = 0;
+const popupClearIntervals = new WeakMap<Page, ReturnType<typeof setInterval>>();
+const popupClearPages = new WeakSet<Page>();
+
+function stopPopupClearing(page: Page) {
+  const interval = popupClearIntervals.get(page);
+  if (interval) {
+    clearInterval(interval);
+    popupClearIntervals.delete(page);
+  }
+}
 
 export const utilsNimfomane = {
   async throttleNavigation<T>(page: Page, callback: () => Promise<T>) {
+    stopPopupClearing(page);
+
     if (atLoad !== 0 && !process.env.PROXY_SERVERS) {
       await page.goto('about:blank');
       if (process.env.CI === 'true') {
@@ -22,11 +34,15 @@ export const utilsNimfomane = {
 
   async throttleReload(page: Page) {
     const url = page.url();
+    stopPopupClearing(page);
+
     if (!process.env.PROXY_SERVERS) {
       await page.goto('about:blank');
       await page.waitForTimeout(4000);
     }
-    return page.goto(url);
+    const response = await page.goto(url);
+    utilsNimfomane.clearPopups(page);
+    return response;
   },
 
   async goto(page: Page, url: string) {
@@ -35,11 +51,14 @@ export const utilsNimfomane = {
       response = await utilsNimfomane.throttleReload(page);
     }
     expect(response.status()).toEqual(200);
+    utilsNimfomane.clearPopups(page);
     return response;
   },
 
   clearPopups(page: Page) {
-    setInterval(async () => {
+    stopPopupClearing(page);
+
+    const interval = setInterval(async () => {
       try {
         const consent = await page.$('[data-role="cookieConsentBar"] [type="submit"]');
         if (consent) {
@@ -49,6 +68,15 @@ export const utilsNimfomane = {
         // noop
       }
     }, 1000);
+
+    popupClearIntervals.set(page, interval);
+    if (!popupClearPages.has(page)) {
+      popupClearPages.add(page);
+      page.once('close', () => {
+        stopPopupClearing(page);
+        popupClearPages.delete(page);
+      });
+    }
   },
 
   async open(page: Page, config: {url?: string, loadStorage?: boolean} = {}) {
@@ -72,8 +100,6 @@ export const utilsNimfomane = {
 
     await utilsNimfomane.goto(page, url || `https://nimfomane.com/forum/forum/35-escorte-din-cluj/`);
     await page.waitForTimeout(600);
-
-    utilsNimfomane.clearPopups(page);
   },
 
   async waitForNthImage(page: Page, nth: number = 0) {

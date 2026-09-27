@@ -247,28 +247,32 @@ test('Should refresh favorites stats in background without opening the modal.', 
 test('Should display location titles in various conditions.', async ({ page }) => {
   await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'});
 
-  const addFav = async (nth: number, asLocation: string) => {
-    const esc = await utilsNimfomane.getNthTopic(page, nth);
-    await page.locator(`[data-wwtopic="${esc.id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
-    await utilsNimfomane.interceptEscortStats(page, esc.user, {
-      lastPostedSectionUrl: asLocation,
-    });
+  try {
+    const addFav = async (nth: number, asLocation: string) => {
+      const esc = await utilsNimfomane.getNthTopic(page, nth);
+      await page.locator(`[data-wwtopic="${esc.id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
+      await utilsNimfomane.interceptEscortStats(page, esc.user, {
+        lastPostedSectionUrl: asLocation,
+      });
+    };
+
+    await addFav(0, 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/');
+    await addFav(1, 'https://nimfomane.com/forum/forum/5-top-escorte-bucuresti/');
+    await addFav(2, 'https://nimfomane.com/forum/forum/21-escorte-timisoara/');
+
+    await utilsNimfomane.goto(page, 'https://nimfomane.com/forum/forum/201-discutii-generale-cluj/');
+    await page.locator('[data-wwid="favs-button"]').click();
+    await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
+
+    await expectFavoritesSectionHeaders(page, true, 1, 2, {timeout: 15000});
+
+    await utilsNimfomane.goto(page, 'https://nimfomane.com/forum/forum/3-discutii-si-dezbateri-despre-piata-escortelor-din-romania/');
+    await page.locator('[data-wwid="favs-button"]').click();
+    await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
+    await expectFavoritesSectionHeaders(page, false);
+  } finally {
+    await page.unrouteAll({behavior: 'ignoreErrors'});
   }
-
-  await addFav(0, 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/');
-  await addFav(1, 'https://nimfomane.com/forum/forum/5-top-escorte-bucuresti/');
-  await addFav(2, 'https://nimfomane.com/forum/forum/21-escorte-timisoara/');
-
-  await utilsNimfomane.goto(page, 'https://nimfomane.com/forum/forum/201-discutii-generale-cluj/');
-  await page.locator('[data-wwid="favs-button"]').click();
-  await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
-
-  await expectFavoritesSectionHeaders(page, true, 1, 2, {timeout: 15000});
-
-  await utilsNimfomane.goto(page, 'https://nimfomane.com/forum/forum/3-discutii-si-dezbateri-despre-piata-escortelor-din-romania/');
-  await page.locator('[data-wwid="favs-button"]').click();
-  await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
-  await expectFavoritesSectionHeaders(page, false);
 });
 
 test('Should detect the current city from a positive availability post.', async ({ page }) => {

@@ -188,7 +188,9 @@ export const utilsPubli = {
         return results;
       }
 
-      await ((await page.$$('.pagination .arrow'))[1]).click();
+      const nextPageArrow = page.locator('.pagination .arrow').nth(1);
+      await nextPageArrow.waitFor({state: 'visible'});
+      await nextPageArrow.click();
       await page.waitForTimeout(2000);
     }
 

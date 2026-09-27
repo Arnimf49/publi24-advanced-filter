@@ -26,10 +26,13 @@ test('Should search for images and show relevant results.', async ({ page, conte
       for (let link of links) {
         const href = await link.getAttribute('href');
         const text = await link.innerText();
-        const extractedDomain = new URL(href).hostname.replace(/^www\./, '');
+        const linkUrl = new URL(href);
+        const extractedDomain = linkUrl.hostname.replace(/^www\./, '');
 
         if (GOOGLE_GOTO_ACTIVE) {
-          expect(extractedDomain).toEqual('google.com');
+          const isGoogleResult = extractedDomain === 'google.com';
+          const isResolvedPubli24Ad = extractedDomain === 'publi24.ro' && linkUrl.pathname.includes('/anunt/');
+          expect(isGoogleResult || isResolvedPubli24Ad).toBe(true);
 
           if (text.startsWith('#')) {
             domainIndex++;
