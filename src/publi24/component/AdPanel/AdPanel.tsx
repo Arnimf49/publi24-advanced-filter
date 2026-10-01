@@ -49,6 +49,7 @@ interface AdPanelProps {
   imageInvestigateStale?: boolean;
   imageSearchDomains?: ImageSearchDomain[];
   imageResultsStatus?: 'green' | 'yellow' | 'red' | null;
+  hasImages?: boolean;
   hasImagesInOtherLocation?: boolean;
   phoneSearchJustCompleted?: boolean;
   imageSearchJustCompleted?: boolean;
@@ -94,6 +95,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     imageInvestigateStale,
     imageSearchDomains,
     imageResultsStatus,
+    hasImages = true,
     hasImagesInOtherLocation,
     phoneSearchJustCompleted,
     imageSearchJustCompleted,
@@ -174,15 +176,17 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
             <PhoneIcon/>
           </button>
         )}
-        <button
-          title="Analiză poze"
-          type="button"
-          className={`${styles.button} ${styles.mainBgRadius} ${styles.investigateImgButton} mainbg radius`}
-          data-wwid="investigate_img"
-          onClick={onInvestigateImgClick}
-        >
-          <ImageIcon/>
-        </button>
+        {hasImages && (
+          <button
+            title="Analiză poze"
+            type="button"
+            className={`${styles.button} ${styles.mainBgRadius} ${styles.investigateImgButton} mainbg radius`}
+            data-wwid="investigate_img"
+            onClick={onInvestigateImgClick}
+          >
+            <ImageIcon/>
+          </button>
+        )}
 
         {nimfomaneLink && (
           <a
@@ -324,7 +328,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
               </>
             )}
 
-            {!loading && (
+            {hasImages && !loading && (
               <>
                 <h5 className={styles.resultsHeader}>
                   <span

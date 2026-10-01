@@ -39,6 +39,9 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
 
   const itemUrl = adData.getItemUrl(item);
   const phone = WWStorage.getAdPhone(id) || '';
+  const hasImages = !!item.querySelector(
+    '[class="article-img-count"], [itemprop="image"], .detailViewImg, [itemprop="associatedMedia"] li',
+  );
 
   const filteredSearchLinks = linksFilter.sortLinks(linksFilter.filterLinks(search || [], itemUrl));
   const nimfomaneLink = filteredSearchLinks.reduce<string | undefined>((found, l) => {
@@ -93,17 +96,29 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
     const image = item.querySelector<HTMLAnchorElement>('.art-img a');
     const articleItem = item.className.indexOf('article-item') !== -1;
 
-    if (image && articleItem) {
-      image.addEventListener('click', async (event) => {
-        event.stopPropagation();
-        event.preventDefault();
-
-        const images = await adData.acquireSliderImages(item);
-
-        setSliderImages(images);
-        setShowImagesSlider(true);
-      });
+    if (!image || !articleItem) {
+      return;
     }
+
+    const onImageClick = async (event: MouseEvent): Promise<void> => {
+      event.stopPropagation();
+      event.preventDefault();
+
+      if (!hasImages) {
+        return;
+      }
+
+      const images = await adData.acquireSliderImages(item);
+
+      setSliderImages(images);
+      setShowImagesSlider(true);
+    };
+
+    image.addEventListener('click', onImageClick);
+
+    return () => {
+      image.removeEventListener('click', onImageClick);
+    };
   }, []);
 
   useEffect(() => {
@@ -283,6 +298,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         showDuplicates={renderOptions?.showDuplicates ?? true}
         hasDuplicateAdsWithSamePhone={hasDuplicateAdsWithSamePhone}
         hasImagesInOtherLocation={WWStorage.hasAdDuplicatesInOtherLocation(id)}
+        hasImages={hasImages}
         hideReason={hideReason}
         automaticHideReason={automaticHideReason}
         nimfomaneLink={nimfomaneLink}
