@@ -117,3 +117,10 @@
   border-radius: 5px;
   object-fit: contain;
 }
+
+:global(body.onMobile [data-wwid="images-slider"]) {
+  @media screen and (max-width: 640px) {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
