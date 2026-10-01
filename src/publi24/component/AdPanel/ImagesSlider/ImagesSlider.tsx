@@ -38,7 +38,14 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
 
     if (!splideElement) return;
 
-    const splide = new Splide( splideElement, { focus: 'center', type: 'loop', keyboard: 'global' });
+    const hasMultipleImages = images.length > 1;
+    const splide = new Splide(splideElement, {
+      focus: 'center',
+      type: 'loop',
+      keyboard: 'global',
+      arrows: hasMultipleImages,
+      drag: hasMultipleImages,
+    });
     splide.mount();
 
     const onKeyDown = function (event: KeyboardEvent): void {
