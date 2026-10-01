@@ -181,6 +181,24 @@ function matchesDomainPattern(value: string, domainPatterns: RegExp[]): boolean 
   return domainPatterns.some((pattern: RegExp) => pattern.test(domain));
 }
 
+function getSearchResultTitle(result: SearchResult): string {
+  if (!Array.isArray(result)) {
+    return '';
+  }
+
+  const separatorIndex = result[0].indexOf(' | ');
+  return (separatorIndex === -1 ? result[0] : result[0].slice(separatorIndex + 3))
+    .trim();
+}
+
+function hasPhoneNumberInSearchResultTitle(result: SearchResult): boolean {
+  return /07\d{8}/.test(getSearchResultTitle(result));
+}
+
+function isNimfomaneTopicUrl(result: SearchResult): boolean {
+  return typeof result === 'string' && result.startsWith('https://nimfomane.com/forum/topic/');
+}
+
 export const linksFilter = {
   isAdUrl(url: ImageResult) {
     if (Array.isArray(url)) {
@@ -260,6 +278,20 @@ export const linksFilter = {
 
   sortLinks(links: SearchResult[]): SearchResult[] {
     return links.sort((l1: SearchResult, l2: SearchResult): number => {
+      const isTopic1 = isNimfomaneTopicUrl(l1);
+      const isTopic2 = isNimfomaneTopicUrl(l2);
+
+      if (isTopic1 !== isTopic2) {
+        return isTopic1 ? -1 : 1;
+      }
+
+      const hasPhone1 = hasPhoneNumberInSearchResultTitle(l1);
+      const hasPhone2 = hasPhoneNumberInSearchResultTitle(l2);
+
+      if (hasPhone1 !== hasPhone2) {
+        return hasPhone1 ? -1 : 1;
+      }
+
       const u1 = Array.isArray(l1) ? l1[0] : l1;
       const u2 = Array.isArray(l2) ? l2[0] : l2;
       const d1: number = PRIO_DOMAINS.findIndex((d: string) => u1.includes('//' + d) || u1.startsWith(d + '/') || u1.startsWith(d + ' '));
@@ -280,6 +312,15 @@ export const linksFilter = {
 
       return u1.localeCompare(u2);
     });
+  },
+
+  isNimfomaneTopic(result: SearchResult): boolean {
+    if (!Array.isArray(result)) {
+      return result.startsWith('https://nimfomane.com/forum/topic/');
+    }
+
+    const displayName = result[0].toLowerCase();
+    return displayName.startsWith('nimfomane.com ') || displayName.startsWith('nimfomane.com | ');
   },
 
   processImageLinks(id: string, links: ImageResult[], itemUrl: string): ImageLinkDomainGroup[] {

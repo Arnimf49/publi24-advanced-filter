@@ -44,17 +44,11 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   );
 
   const filteredSearchLinks = linksFilter.sortLinks(linksFilter.filterLinks(search || [], itemUrl));
-  const nimfomaneLink = filteredSearchLinks.reduce<string | undefined>((found, l) => {
-    if (found) {
-      return found;
-    }
-
-    if (!Array.isArray(l)) {
-      return l.indexOf('https://nimfomane.com/forum/topic/') === 0 ? l : undefined;
-    }
-
-    return l[0].startsWith('nimfomane.com ') ? new URL(l[1], 'https://www.google.com').href : undefined;
-  }, undefined);
+  const nimfomaneLink = filteredSearchLinks
+    .find((link) => linksFilter.isNimfomaneTopic(link));
+  const nimfomaneHref = nimfomaneLink && Array.isArray(nimfomaneLink)
+    ? new URL(nimfomaneLink[1], 'https://www.google.com').href
+    : nimfomaneLink;
   const ddcLink = filteredSearchLinks.reduce<string | undefined>((found, l) => {
     if (found) {
       return found;
@@ -301,7 +295,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         hasImages={hasImages}
         hideReason={hideReason}
         automaticHideReason={automaticHideReason}
-        nimfomaneLink={nimfomaneLink}
+        nimfomaneLink={nimfomaneHref}
         ddcLink={ddcLink}
         imageSearchDomains={imageSearchDomains}
         imageResultsStatus={imageResultsStatus}
