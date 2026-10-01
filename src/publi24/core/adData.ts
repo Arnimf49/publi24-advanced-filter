@@ -36,6 +36,42 @@ export interface FavoritesData {
 
 const NOT_FOUND = Symbol('not_found');
 
+function parsePubli24Date(input: string): Date | null {
+  const dayFirstMatch = input.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+  if (dayFirstMatch) {
+    const [, dayText, monthText, yearText, hourText, minuteText, secondText = '0'] = dayFirstMatch;
+    const date = new Date(
+      Number(yearText),
+      Number(monthText) - 1,
+      Number(dayText),
+      Number(hourText),
+      Number(minuteText),
+      Number(secondText),
+    );
+
+    if (
+      date.getFullYear() === Number(yearText)
+      && date.getMonth() === Number(monthText) - 1
+      && date.getDate() === Number(dayText)
+      && date.getHours() === Number(hourText)
+      && date.getMinutes() === Number(minuteText)
+      && date.getSeconds() === Number(secondText)
+    ) {
+      return date;
+    }
+
+    return null;
+  }
+
+  const legacyMatch = input.match(/\d+\/\d+\/\d+\s+\d+:\d+:\d+\s+(?:AM|PM)/);
+  if (legacyMatch) {
+    const date = new Date(legacyMatch[0]);
+    return isNaN(date.getTime()) ? null : date;
+  }
+
+  return null;
+}
+
 async function loadInspectorEscorteAd(phone: string, ad: InspectorAd): Promise<AdUuid | typeof NOT_FOUND | null> {
   const publi24Url = ad.urls.publi24
     // Ensure caching works and we don't double load the page.
@@ -75,8 +111,7 @@ export const adData = {
     if (!dateText) {
       return new Date(0);
     }
-    const formattedDateText = dateText.replace(/.*(\d+\.)(\d+\.)(\d+ \d+:\d+:\d+)/, "$1$2$3");
-    return new Date(formattedDateText);
+    return parsePubli24Date(dateText) || new Date(0);
   },
 
   getPageImage(itemPage: Document): string | undefined {
@@ -103,13 +138,7 @@ export const adData = {
         return null;
       }
 
-      const isoMatch = dateText.match(/\d+\/\d+\/\d+\s+\d+:\d+:\d+\s+(?:AM|PM)/);
-      if (isoMatch) {
-        const parsed = new Date(isoMatch[0]);
-        return isNaN(parsed.getTime()) ? null : parsed;
-      }
-
-      return null;
+      return parsePubli24Date(dateText);
     } else {
       const dateEl = item.querySelector<HTMLElement>('[class="article-date"]');
       if (!dateEl) {
