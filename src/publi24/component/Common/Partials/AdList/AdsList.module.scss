@@ -81,6 +81,34 @@
   border-radius: 4px;
   flex-shrink: 0;
 
+  //:global(.article-img-count-wrap) {
+  //  position: absolute;
+  //  right: 8px;
+  //  bottom: 8px;
+  //  color: #fff;
+  //  text-shadow: 0 1px 2px #000;
+  //}
+  //
+  //:global(.article-img-count) {
+  //  display: inline-flex;
+  //  align-items: center;
+  //  gap: 3px;
+  //  font-size: 13px;
+  //  font-weight: 600;
+  //}
+  //
+  //:global(.article-img-count .svg-icon) {
+  //  display: inline-flex;
+  //  width: 16px;
+  //  height: 16px;
+  //}
+  //
+  //:global(.article-img-count svg) {
+  //  width: 16px;
+  //  height: 16px;
+  //  fill: currentColor;
+  //}
+
   img {
     object-fit: cover;
     width: 100%;

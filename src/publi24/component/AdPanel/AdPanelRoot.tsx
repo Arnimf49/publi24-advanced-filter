@@ -40,7 +40,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const itemUrl = adData.getItemUrl(item);
   const phone = WWStorage.getAdPhone(id) || '';
   const hasImages = !!item.querySelector(
-    '[class="article-img-count"], [itemprop="image"], .detailViewImg, [itemprop="associatedMedia"] li',
+    '.article-img-count, [itemprop="image"], .detailViewImg, [itemprop="associatedMedia"] li',
   );
 
   const filteredSearchLinks = linksFilter.sortLinks(linksFilter.filterLinks(search || [], itemUrl));

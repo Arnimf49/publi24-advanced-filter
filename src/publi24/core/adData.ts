@@ -16,6 +16,7 @@ export interface AdData {
   title: string;
   description: string;
   image: string | null | undefined;
+  imageCount: number;
   location: string | null | undefined;
   date: string;
   timestamp: number;
@@ -121,6 +122,13 @@ export const adData = {
     }
 
     return itemPage.querySelector<HTMLImageElement>('[itemprop="image"], .detailViewImg')?.src;
+  },
+
+  getPageImageCount(itemPage: Document): number {
+    const countText = itemPage.querySelector<HTMLElement>('.detailViewCountImages')?.textContent;
+    const countMatch = countText?.match(/\b\d+\s*\/\s*(\d+)\b/);
+
+    return countMatch ? Number(countMatch[1]) : 0;
   },
 
   getItemDate(item: Element) {
@@ -332,6 +340,7 @@ export const adData = {
           title: adData.getPageTitle(itemPage),
           description: adData.getPageDescription(itemPage).substring(0, 290),
           image: adData.getPageImage(itemPage),
+          imageCount: adData.getPageImageCount(itemPage),
           location: pageLocationText,
           date: dateLib.diffDaysToDisplay(dateDiffDays, date),
           timestamp: date.getTime(),
