@@ -84,26 +84,19 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
     return {activeFavorites: active, inactiveEscorts: inactive};
   }, [favorites, escortVersion]);
 
-  const { inLocationEscorts, otherLocationEscorts } = useMemo(() => {
-    if (!currentCity) {
-      return { inLocationEscorts: activeFavorites, otherLocationEscorts: [] };
-    }
-
-    const inLocation: string[] = [];
-    const otherLocation: string[] = [];
+  const citySections = useMemo(() => {
+    const sections = new Map<string, string[]>();
 
     activeFavorites.forEach((user) => {
       const escort = NimfomaneStorage.getEscort(user);
-      const escortCity = escort.profileStats?.currentCity?.name;
-
-      if (escortCity === currentCity) {
-        inLocation.push(user);
-      } else {
-        otherLocation.push(user);
-      }
+      const city = escort.profileStats?.currentCity?.name || 'Locație necunoscută';
+      const escorts = sections.get(city) || [];
+      escorts.push(user);
+      sections.set(city, escorts);
     });
 
-    return { inLocationEscorts: inLocation, otherLocationEscorts: otherLocation };
+    return Array.from(sections, ([city, escorts]) => ({city, escorts}))
+      .sort((a, b) => Number(b.city === currentCity) - Number(a.city === currentCity));
   }, [activeFavorites, currentCity, escortVersion]);
 
   const handleClearFavorites = useCallback(() => {
@@ -116,11 +109,9 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
       onClose={onClose}
       onClearFavorites={handleClearFavorites}
       favorites={favorites}
-      inLocationEscorts={inLocationEscorts}
-      otherLocationEscorts={otherLocationEscorts}
+      citySections={citySections}
       inactiveEscorts={inactiveEscorts}
-      currentCity={currentCity}
-       renderEscort={(user, index) => <EscortCardRoot user={user} index={index} />}
+      renderEscort={(user, index) => <EscortCardRoot user={user} index={index} />}
     />
   );
 };

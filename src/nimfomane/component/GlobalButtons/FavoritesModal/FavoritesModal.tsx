@@ -9,10 +9,8 @@ type FavoritesModalProps = {
   inline?: boolean;
   onClearFavorites: () => void;
   favorites: string[];
-  inLocationEscorts: string[];
-  otherLocationEscorts: string[];
+  citySections: Array<{city: string; escorts: string[]}>;
   inactiveEscorts: string[];
-  currentCity: string | null;
   renderEscort: (user: string, index: number) => React.ReactNode;
 };
 
@@ -21,17 +19,15 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
   inline = false,
   onClearFavorites,
   favorites = [],
-  inLocationEscorts,
-  otherLocationEscorts,
+  citySections,
   inactiveEscorts,
-  currentCity,
   renderEscort,
 }) => {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const deleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const isEmpty = favorites.length === 0;
-  const activeCount = inLocationEscorts.length + otherLocationEscorts.length;
+  const activeCount = citySections.reduce((count, section) => count + section.escorts.length, 0);
   const inactiveCount = inactiveEscorts.length;
   const [activeTab, setActiveTab] = useState<'active' | 'inactive'>('active');
   const isActiveEmpty = activeCount === 0;
@@ -70,7 +66,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
         </button>}
         onClose={onClose}
         color="rgb(137, 71, 97)"
-        maxWidth={650}
+        maxWidth={700}
       >
         {!isEmpty && (
           <div className={styles.toggleButtons}>
@@ -114,40 +110,21 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
           )
         ) : isActiveEmpty ? (
           <p className={styles.emptyMessage}>Nu ai escorte active favorite.</p>
-        ) : currentCity ? (
-          <>
-            {inLocationEscorts.length > 0 && (
-              <div className={styles.section}>
-                <h4 className={styles.favoritesSectionHeader} data-wwid="section-in-location">
-                  În locație <span className={styles.count}>({inLocationEscorts.length})</span>
-                </h4>
-                <div className={styles.escortsList}>
-                  {inLocationEscorts.map((user, index) => (
-                    <React.Fragment key={user}>{renderEscort(user, index)}</React.Fragment>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {otherLocationEscorts.length > 0 && (
-              <div className={styles.section}>
-                <h4 className={styles.favoritesSectionHeader} data-wwid="section-other-locations">
-                  În alte locații <span className={styles.count}>({otherLocationEscorts.length})</span>
-                </h4>
-                <div className={styles.escortsList}>
-                  {otherLocationEscorts.map((user, index) => (
-                    <React.Fragment key={user}>{renderEscort(user, index)}</React.Fragment>
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
         ) : (
-          <div className={styles.escortsList}>
-            {inLocationEscorts.map((user, index) => (
-              <React.Fragment key={user}>{renderEscort(user, index)}</React.Fragment>
+          <>
+            {citySections.map(({city, escorts}) => (
+              <div className={styles.section} key={city}>
+                <h4 className={styles.favoritesSectionHeader} data-wwid="section-city">
+                  {city} <span className={styles.count}>({escorts.length})</span>
+                </h4>
+                <div className={styles.escortsList}>
+                  {escorts.map((user, index) => (
+                    <React.Fragment key={user}>{renderEscort(user, index)}</React.Fragment>
+                  ))}
+                </div>
+              </div>
             ))}
-          </div>
+          </>
         )}
       </ContentModal>
     </Modal>

@@ -38,7 +38,8 @@ test('Should display favorites in a modal.', async ({ page }) => {
   await expect(firstCard.locator('[data-wwid="escort-name"]')).toHaveAttribute('href', profileLink);
   await expect(firstCard.locator('img')).toBeVisible();
 
-  await expect(page.locator('[data-wwid="favorites-modal"] .favoritesSectionHeader')).toHaveCount(0);
+  await expect(page.locator('[data-wwid="favorites-modal"] [data-wwid="section-city"]')).not.toHaveCount(0);
+  await expect(page.locator('[data-wwid="favorites-modal"]')).not.toContainText('În alte locații');
 
   await firstCard.locator('img').click();
   await expect(page.locator('[data-wwid="escort-image-modal"]')).toBeVisible();
