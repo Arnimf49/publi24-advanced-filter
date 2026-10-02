@@ -8,6 +8,22 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.11',
+    releaseDate: '2 octombrie 2026',
+    changeNew: [
+      'Zoom pentru poze din slider.',
+    ],
+    changeImprove: [
+      'Poze mai mari în slider pe mobil.',
+      'Afișare îmbunătățită a sliderului când există o singură imagine.',
+      'Rezultatele pozelor și butonul de căutare după imagini sunt ascunse când anunțul nu are poze.',
+    ],
+    changeFix: [
+      'Prioritizarea incorectă a linkurilor nimfomane când rezultatele conțin linkuri de redirecționare.',
+      'Datele anunțurilor nu erau interpretate corect după schimbări facute de publi24.',
+    ]
+  },
+  {
     version: '3.10',
     releaseDate: '26 septembrie 2026',
     changeNew: [
