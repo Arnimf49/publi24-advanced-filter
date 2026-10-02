@@ -8,6 +8,7 @@ import type {
   PersonalDetails,
   ServiceDetails,
 } from '../../core/escortInfoExtractor';
+import type {VisitedCity} from '../../core/storage';
 import {nimfomaneUtils} from '../../core/nimfomaneUtils';
 import {escortProfileImage} from '../EscortProfileImage/EscortProfileImage';
 import {serviceDisplay} from './serviceDisplay';
@@ -198,7 +199,7 @@ const ServiceDetailsSection: React.FC<{details: ServiceDetails; escort: EscortIt
   </section>
 );
 
-const VisitedCitiesSection: React.FC<{visitedCities?: string[]}> = ({visitedCities}) => {
+const VisitedCitiesSection: React.FC<{visitedCities?: VisitedCity[]}> = ({visitedCities}) => {
   if (!visitedCities?.length) {
     return null;
   }
@@ -208,12 +209,23 @@ const VisitedCitiesSection: React.FC<{visitedCities?: string[]}> = ({visitedCiti
       <h4 className={styles.sectionTitle}>Orase vizitate</h4>
       <p className={styles.cityHistory}>
         {visitedCities.map((city, index) => (
-          <React.Fragment key={`${city}-${index}`}>
-            <span className={styles.cityName}>{city}</span>
-            <span className={styles.citySeparator}>&lt;</span>
-          </React.Fragment>
+          <span className={styles.cityNode} key={`${Array.isArray(city) ? city[0] : city}-${index}`}>
+            <span
+              className={`${styles.cityName} ${Array.isArray(city) ? styles.cityNameWithDays : ''}`}
+              data-wwid="visited-city"
+            >
+              <span className={styles.cityLabel} data-wwid="visited-city-label">
+                {Array.isArray(city) ? city[0] : city}
+              </span>
+              {Array.isArray(city) && (
+                <span className={styles.cityDays} data-wwid="visited-city-days">{city[1]} zile</span>
+              )}
+            </span>
+          </span>
         ))}
-        <span className={styles.cityName}>...</span>
+        <span className={styles.cityNode}>
+          <span className={styles.cityName} data-wwid="visited-city">...</span>
+        </span>
       </p>
     </section>
   );

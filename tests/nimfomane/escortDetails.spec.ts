@@ -1,6 +1,6 @@
 import {expect, test} from "../helpers/fixture";
 import {utilsNimfomane} from "../helpers/utilsNimfomane";
-import {EscortItem} from "../../src/nimfomane/core/storage";
+import {EscortItem, VisitedCity} from "../../src/nimfomane/core/storage";
 
 const PERSONAL_TEXT = 'Am 28 ani, 170 cm si 58 kg.';
 const SERVICE_TEXT = '30 min 200 lei, 1 ora 300 lei. Oral protejat, normal protejat si masaj.';
@@ -10,7 +10,7 @@ type DetailSource = 'interest' | 'about' | 'signature' | 'posts' | 'activity';
 interface MockDetailsOptions {
   source?: DetailSource;
   delay?: number;
-  visitedCities?: string[];
+  visitedCities?: VisitedCity[];
 }
 
 function sourceUrl(profileLink: string, suffix: string): string {
@@ -288,7 +288,25 @@ test('Should display visited cities in reverse chronological order.', async ({pa
   });
   await openDetails(page, id);
 
-  await expect(page.locator('[data-wwid="visited-cities-section"]')).toContainText(
-    'Cluj<București<...',
-  );
+  const cities = page.locator('[data-wwid="visited-city"]');
+  await expect(cities).toHaveCount(3);
+  await expect(cities.nth(0).locator('[data-wwid="visited-city-label"]')).toHaveText('Cluj');
+  await expect(cities.nth(1).locator('[data-wwid="visited-city-label"]')).toHaveText('București');
+  await expect(cities.nth(1).locator('[data-wwid="visited-city-days"]')).toHaveText('1 zile');
+});
+
+test('Should display durations in the updated visited city format and support legacy entries.', async ({page}) => {
+  await utilsNimfomane.open(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
+
+  await setEscort(page, user, {
+    visitedCities: ['Cluj', ['București', 4] as VisitedCity],
+    escortDetailsTime: Date.now(),
+  });
+  await openDetails(page, id);
+
+  const cities = page.locator('[data-wwid="visited-city"]');
+  await expect(cities.nth(0).locator('[data-wwid="visited-city-label"]')).toHaveText('Cluj');
+  await expect(cities.nth(1).locator('[data-wwid="visited-city-label"]')).toHaveText('București');
+  await expect(cities.nth(1).locator('[data-wwid="visited-city-days"]')).toHaveText('4 zile');
 });

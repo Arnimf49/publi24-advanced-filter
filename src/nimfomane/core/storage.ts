@@ -12,6 +12,8 @@ export interface TopicItem {
   hiddenReason?: string;
 }
 
+export type VisitedCity = string | [city: string, days: number];
+
 export interface EscortItem {
   optimizedProfileImage?: string | null;
   optimizedProfileImageTime?: number;
@@ -30,7 +32,7 @@ export interface EscortItem {
       topicUrl: string;
     };
   };
-  visitedCities?: string[];
+  visitedCities?: VisitedCity[];
   profileStatsTime?: number;
   profileNotFound?: true;
   isUnverified?: true;

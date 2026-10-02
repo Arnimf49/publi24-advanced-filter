@@ -109,8 +109,12 @@ export const cityDetection = {
     return fallbackUrl ? sectionsService.getCityFromForumUrl(fallbackUrl) || undefined : undefined;
   },
 
-  getAvailableCityFromElement(element: Element, fallbackUrl?: string): string | undefined {
-    if (getAvailabilityStatus(element.textContent || '') !== 'available') {
+  getAvailableCityFromElement(
+    element: Element,
+    fallbackUrl?: string,
+    availabilityElement: Element = element,
+  ): string | undefined {
+    if (getAvailabilityStatus(availabilityElement.textContent || '') !== 'available') {
       return undefined;
     }
 
