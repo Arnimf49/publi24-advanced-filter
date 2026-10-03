@@ -209,6 +209,10 @@ function findAge(text: string): number | undefined {
       continue;
     }
 
+    if (/\baproape\s*$/i.test(beforeAge)) {
+      continue;
+    }
+
     if (/\b\d{1,2}\s*[-–—]\s*$/i.test(beforeAge)) {
       continue;
     }
@@ -680,6 +684,10 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
   }
 
   if (service === 'uro') {
+    const directUroExtra = /\buro\b\s+(?:de\s+)?(\d{2,4})\s*(?:de\s+)?(?:lei|ron)\b/i.exec(nearby);
+    if (directUroExtra && isPriceAmount(Number.parseInt(directUroExtra[1], 10))) {
+      return Number.parseInt(directUroExtra[1], 10);
+    }
     const uroSymbolDashExtra = /\buro\b(?!\s*\()[^\n]{0,12}?-\s*(\d{2,4})\s*(?:lei|ron)?\b/i.exec(nearby);
     if (uroSymbolDashExtra && isPriceAmount(Number.parseInt(uroSymbolDashExtra[1], 10))) {
       return Number.parseInt(uroSymbolDashExtra[1], 10);
@@ -734,6 +742,14 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
 }
 
 function extractOneService(text: string, service: EscortServiceName): ServiceAvailability | undefined {
+  const lines = text.split('\n');
+  const hasProtectedPair = lines.some(line =>
+    /\b(?:sex\s+)?oral\b[^\n.;]{0,100}\bambele\s+protejat\w*\b/i.test(line),
+  );
+  if (service === 'on' && hasProtectedPair) {
+    return false;
+  }
+
   if (service === 'fk' && /\b50\s*(?:lei|ron)?\s*(?:france|french)\s+kiss\b/i.test(text)) {
     return {extraCost: 50};
   }
@@ -1641,13 +1657,26 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
         && /\bextra\b/i.test(baseRateLine.slice(Math.max(0, money.index - 30), money.index + 40))) {
         continue;
       }
+      if (/\b(?:avans|depozit)\b/i.test(baseRateLine.slice(Math.max(0, money.index - 35), money.index))) {
+        continue;
+      }
+      if (/\bredus\s+cu\b/i.test(baseRateLine.slice(Math.max(0, money.index - 35), money.index))) {
+        continue;
+      }
       if (explicitHalfHourRate
         && money.amount === Number.parseInt(explicitHalfHourRate[1], 10)
         && money.index <= (explicitHalfHourRate.index ?? 0) + explicitHalfHourRate[0].length) {
         continue;
       }
       const finalizationIndex = line.search(/\b(?:finalizare|fin)\w*/i);
-      if (!duration && finalizationIndex !== -1 && money.index <= finalizationIndex + 40 && !isOutcall) {
+      if (!duration
+        && finalizationIndex !== -1
+        && money.index <= finalizationIndex + 40
+        && !/\bfinalizare\s+rapida\b/i.test(line)
+        && !/\b(?:30|60|90|120)\s*(?:min(?:ute)?s?|h(?:r)?|ore?|ora)\b/i.test(
+          line.slice(Math.max(0, money.index - 40), money.index + 40),
+        )
+        && !isOutcall) {
         duration = '30m';
       }
       if (!duration && /\d{2,5}\s*nr\b/i.test(line) && !isOutcall) {
@@ -2178,6 +2207,11 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
     baseCandidates['30m'] = [Number.parseInt(finalizationAndHourDotRates[1], 10)];
     baseCandidates['1h'] = [Number.parseInt(finalizationAndHourDotRates[2], 10)];
   }
+  if (!/\b(?:30\s*(?:de\s*)?min(?:ute)?s?|jumat\w*\s+(?:de\s+)?(?:ora|h))\b/i.test(rateText)
+    && /\b(?:clienți|clienti)\s+vechi\b|\bfideli\b/i.test(rateText)
+    && /\b(?:1|2)\s*(?:h|ora|ore)\b[^\n]*\b(?:1|2)\s+finaliz\w*/i.test(rateText)) {
+    delete baseCandidates['30m'];
+  }
 
   for (const duration of ['30m', '1h', '1.5h', '2h'] as Array<keyof EscortRates>) {
     const base = baseCandidates[duration];
@@ -2401,7 +2435,15 @@ function scheduleDaysNearRange(line: string, rangeStart: number, rangeEnd: numbe
 function extractSchedule(text: string): EscortSchedule[] {
   const schedules: EscortSchedule[] = [];
 
-  for (const line of text.split('\n')) {
+  const scheduleText = text.replace(
+    /(\d)(?=(?:luni|marti|miercuri|joi|vineri|sambata|duminica)\b)/gi,
+    '$1 ',
+  );
+  for (const line of scheduleText.split('\n')) {
+    if (/\btelefonic\b[^.\n]{0,80}\bintre\s+orele?\b/i.test(line)) {
+      continue;
+    }
+
     const hasScheduleContext = /\b(?:program\w*|orar|interval)\b/i.test(line)
       || /\bdisponib\w*\s+intre\s+orele?\b/i.test(line)
       || DAY_EXPRESSION_PATTERN.test(line)
@@ -2417,6 +2459,16 @@ function extractSchedule(text: string): EscortSchedule[] {
         start: `${separatedDailySchedule[1].padStart(2, '0')}:${separatedDailySchedule[2] || '00'}`,
         end: `${separatedDailySchedule[3].padStart(2, '0')}:${separatedDailySchedule[4] || '00'}`,
         days: /\bzilnic\b/i.test(line) ? 'zilnic' : undefined,
+      });
+      continue;
+    }
+
+    const abbreviatedDaySchedule = /\b(l-d|luni-duminica)\s+(\d{1,2})(?::(\d{2}))?\s*-\s*(\d{1,2})(?::(\d{2}))?/i.exec(line);
+    if (abbreviatedDaySchedule) {
+      schedules.push({
+        days: normalizeScheduleDays(abbreviatedDaySchedule[1]),
+        start: `${abbreviatedDaySchedule[2].padStart(2, '0')}:${abbreviatedDaySchedule[3] || '00'}`,
+        end: `${abbreviatedDaySchedule[4].padStart(2, '0')}:${abbreviatedDaySchedule[5] || '00'}`,
       });
       continue;
     }
@@ -2537,7 +2589,9 @@ export const escortInfoExtractor = {
     if (!hasServiceContext && !hasRecognizedService && !hasRateContext) {
       return null;
     }
-    if (!Object.keys(rates.baseRates).length && !Object.keys(rates.outcallRates).length && !rateOverrides.length && !hasServiceContext) {
+    const isDiscountOnlySchedule = /\bredus\s+cu\b/i.test(normalizedText) && schedule.length > 0;
+    if (!Object.keys(rates.baseRates).length && !Object.keys(rates.outcallRates).length
+      && !rateOverrides.length && !hasServiceContext && !isDiscountOnlySchedule) {
       return null;
     }
 
@@ -2547,7 +2601,7 @@ export const escortInfoExtractor = {
       return null;
     }
 
-    if (Object.keys(rates.baseRates).length) {
+    if (Object.keys(rates.baseRates).length || isDiscountOnlySchedule) {
       for (const service of SERVICE_NAMES.filter(service => service !== 'anal')) {
         const details = extractOneService(normalizedText, service);
         if (details !== undefined) {
@@ -2578,7 +2632,8 @@ export const escortInfoExtractor = {
       }
     }
 
-    if (!Object.keys(rates.baseRates).length && !Object.keys(rates.outcallRates).length) {
+    if (!Object.keys(rates.baseRates).length && !Object.keys(rates.outcallRates).length
+      && !isDiscountOnlySchedule) {
       return null;
     }
 

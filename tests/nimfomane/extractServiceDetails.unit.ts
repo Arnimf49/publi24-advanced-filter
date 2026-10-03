@@ -2170,6 +2170,104 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       },
     },
   },
+  {
+    file: "sample208.txt",
+    expected: {
+      baseRates: {'1h': 300, '1.5h': 400, '2h': 500},
+      schedule: [
+        {days: "luni-vineri", start: "12:00", end: "19:00"},
+        {days: "sambata", start: "11:00", end: "16:00"},
+      ],
+      services: {69: true, domSoft: true, fk: true, massage: true, np: true, on: false, op: true},
+    },
+  },
+  {
+    file: "sample212.txt",
+    expected: {
+      baseRates: {'1h': 300, '1.5h': 400, '2h': 500},
+      schedule: [
+        {days: "luni-vineri", start: "12:00", end: "19:00"},
+        {days: "sambata", start: "11:00", end: "16:00"},
+      ],
+      services: {69: true, domSoft: true, fk: true, massage: true, np: true, on: false, op: true},
+    },
+  },
+  {
+    file: "sample213.txt",
+    expected: {
+      baseRates: {'1h': 300, '1.5h': 400, '2h': 500},
+      schedule: [
+        {days: "luni-vineri", start: "12:00", end: "19:00"},
+        {days: "sambata", start: "11:00", end: "16:00"},
+      ],
+      services: {massage: true, domSoft: true},
+    },
+  },
+  {
+    file: "sample214.txt",
+    expected: {
+      baseRates: {},
+      schedule: [{start: "09:00", end: "12:00"}],
+      services: {massage: true},
+    },
+  },
+  {
+    file: "sample215.txt",
+    expected: {
+      baseRates: {'1h': 250, '1.5h': 350, '2h': 450},
+      schedule: [
+        {days: "luni-vineri", start: "11:00", end: "18:00"},
+        {days: "sambata", start: "11:00", end: "16:00"},
+      ],
+      services: {massage: true},
+    },
+  },
+  {
+    file: "sample216.txt",
+    expected: {
+      baseRates: {'30m': 300, '1h': 500},
+      services: {
+        op: true, on: true, np: true, deepthroat: true, facesitting: true,
+        cim: {extraCost: 100}, cob: true, massage: true, uro: {extraCost: 100},
+        hj: true, cuni: true, ani: true, footfetish: true, ap: false,
+      },
+    },
+  },
+  {
+    file: "sample209.txt",
+    expected: {
+      baseRates: {'30m': 250, '1h': 450},
+      services: {
+        on: {extraCost: 50}, cim: {extraCost: 100},
+        massage: true, uro: {extraCost: 100}, ap: false, facesitting: true,
+        cob: true, hj: true, cuni: true, ani: true, footfetish: true,
+      },
+    },
+  },
+  {
+    file: "sample210.txt",
+    expected: {
+      baseRates: {'30m': 300, '1h': 500},
+      services: {
+        op: true, on: true, np: true, cim: {extraCost: 100},
+        massage: true, uro: {extraCost: 100}, ap: false, facesitting: true,
+        cob: true, hj: true, cuni: true, ani: true, footfetish: true,
+      },
+    },
+  },
+  {
+    file: "sample211.txt",
+    expected: {
+      baseRates: {'30m': 250, '1h': 450},
+      outcallRates: {'1h': 800},
+      services: {
+        on: {extraCost: 50}, cim: {extraCost: 100}, uro: {extraCost: 100},
+        massage: true,
+        ap: false, facesitting: true, cob: true, hj: true, cuni: true,
+        ani: true, footfetish: true,
+      },
+    },
+  },
 ];
 
 for (const sample of samples) {

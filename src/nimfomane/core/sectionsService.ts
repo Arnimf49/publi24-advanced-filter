@@ -127,6 +127,12 @@ function normalizeForumUrl(url: string): string {
 }
 
 export const sectionsService = {
+  getCitySections(): Array<{city: string; url: string}> {
+    return Object.entries(CITY_TO_LINKS).flatMap(([city, urls]) =>
+      urls.map(url => ({city, url})),
+    );
+  },
+
   getSectionFromForumUrl(url: string): string | null {
     const normalized = normalizeForumUrl(url);
     return SECTION_LINK_TO_SECTION[normalized] || null;

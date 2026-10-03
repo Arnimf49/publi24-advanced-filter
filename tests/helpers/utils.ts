@@ -1,5 +1,5 @@
 import {Page} from "playwright-core";
-import { chromium } from 'playwright';
+import { chromium, request, type APIRequestContext } from 'playwright';
 import {dirname} from "node:path";
 import path from "path";
 import {fileURLToPath} from "node:url";
@@ -96,6 +96,49 @@ function incrementProxyCounter(): void {
 }
 
 const utils = {
+  async makeApiRequestContext(
+    useProxy: boolean = false,
+  ): Promise<{context: APIRequestContext; proxyIndex: number | null}> {
+    const proxyServers = getProxyServers();
+    let proxyConfig: { server: string; username?: string; password?: string } | undefined;
+    let proxyIndex: number | null = null;
+
+    if (useProxy) {
+      if (proxyServers.length === 0) {
+        throw new Error('Proxy requested, but no active servers are configured in PROXY_SERVERS.');
+      }
+
+      const counter = getProxyCounter();
+      proxyIndex = counter % proxyServers.length;
+      incrementProxyCounter();
+      proxyConfig = {
+        server: proxyServers[proxyIndex],
+        ...(process.env.PROXY_USERNAME ? { username: process.env.PROXY_USERNAME } : {}),
+        ...(process.env.PROXY_PASSWORD ? { password: process.env.PROXY_PASSWORD } : {}),
+      };
+      console.info(`Using API proxy ${proxyIndex}`);
+    }
+
+    const {fingerprint, headers} = new FingerprintGenerator({
+      locales: ['en-US'],
+    }).getFingerprint({
+      devices: ['desktop'],
+      operatingSystems: ['windows'],
+      browserListQuery: 'last 5 Chrome versions',
+    });
+
+    return {
+      context: await request.newContext({
+        userAgent: fingerprint.navigator.userAgent,
+        extraHTTPHeaders: {
+          'accept-language': headers['accept-language'],
+        },
+        ...(proxyConfig ? {proxy: proxyConfig} : {}),
+      }),
+      proxyIndex,
+    };
+  },
+
   async makeContext(useProxy: boolean = false, headless: boolean = false) {
     const preserveFocus = !process.env.CI && !headless;
     const activeWindow = preserveFocus ? INITIAL_ACTIVE_WINDOW : undefined;
@@ -225,7 +268,9 @@ const utils = {
       const data: any = {};
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        data[key] = localStorage.getItem(key);
+        if (key !== null) {
+          data[key] = localStorage.getItem(key);
+        }
       }
       return data;
     });
