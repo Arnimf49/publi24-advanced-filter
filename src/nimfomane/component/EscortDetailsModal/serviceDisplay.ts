@@ -48,6 +48,8 @@ const SERVICE_LABELS: Record<EscortServiceName, string> = {
   swallow: 'swallow',
   massage: 'masaj',
   uro: 'URO',
+  uroActive: 'URO activ',
+  uroPassive: 'URO pasiv',
   squirt: 'squirt',
   rolePlay: 'role play',
   ap: 'AP',
@@ -87,12 +89,12 @@ const SERVICE_GROUPS: Array<{label: string; services: EscortServiceName[]}> = [
   {label: 'Comportament', services: ['gfe', 'pse', 'rolePlay']},
   {label: 'Masaj', services: ['massage', 'prostateMassage']},
   {label: 'Domniare', services: ['dom', 'domSoft', 'domHard', 'domination', 'verbalHum', 'dirtyTalk', 'whipping', 'spitting', 'strapOn']},
-  {label: 'Altele', services: ['hj', 'fj', '3some', 'couples', 'lesbyShow', 'shower', 'footfetish', 'fingering', 'uro', 'goldenShower', 'fisting', 'squirt']},
+  {label: 'Altele', services: ['hj', 'fj', '3some', 'couples', 'lesbyShow', 'shower', 'footfetish', 'fingering', 'uro', 'uroActive', 'uroPassive', 'goldenShower', 'fisting', 'squirt']},
 ];
 
 function formatService(service: EscortServiceName, value: ServiceAvailability): DisplayedService {
   if (value === true) {
-    return {service, label: SERVICE_LABELS[service], isNotIncluded: false};
+    return {service, label: service === 'uro' ? 'URO pasiv' : SERVICE_LABELS[service], isNotIncluded: false};
   }
   if (value === false) {
     return {service, label: `${SERVICE_LABELS[service]} (nu)`, isNotIncluded: true};
@@ -100,7 +102,7 @@ function formatService(service: EscortServiceName, value: ServiceAvailability): 
 
   return {
     service,
-    label: SERVICE_LABELS[service],
+    label: service === 'uro' ? 'URO pasiv' : SERVICE_LABELS[service],
     isNotIncluded: false,
     extraCost: value.extraCost,
   };
@@ -146,6 +148,9 @@ function getServiceGroups(services?: Partial<Record<EscortServiceName, ServiceAv
 
   return SERVICE_GROUPS.flatMap(group => {
     const serviceNames = group.services.filter(service => {
+      if (service === 'uro' && (services.uroActive !== undefined || services.uroPassive !== undefined)) {
+        return false;
+      }
       if (group.label === 'Anal' && service === 'anal') {
         return false;
       }

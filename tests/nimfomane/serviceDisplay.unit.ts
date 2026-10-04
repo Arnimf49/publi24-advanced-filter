@@ -69,6 +69,30 @@ test("shows hard sex in the Sex group", () => {
   ]);
 });
 
+test("displays uro variants and defaults generic uro to passive", () => {
+  expect(serviceDisplay.getServiceGroups({
+    uro: {extraCost: 50},
+  })).toEqual([
+    {
+      label: "Altele",
+      services: [{service: "uro", label: "URO pasiv", isNotIncluded: false, extraCost: 50}],
+    },
+  ]);
+  expect(serviceDisplay.getServiceGroups({
+    uro: {extraCost: 50},
+    uroActive: {extraCost: 50},
+    uroPassive: {extraCost: 100},
+  })).toEqual([
+    {
+      label: "Altele",
+      services: [
+        {service: "uroActive", label: "URO activ", isNotIncluded: false, extraCost: 50},
+        {service: "uroPassive", label: "URO pasiv", isNotIncluded: false, extraCost: 100},
+      ],
+    },
+  ]);
+});
+
 test("formats all applicable rate sources in display order", () => {
   expect(serviceDisplay.getRateRows({
     baseRates: {"30m": 300, "1h": 500},
