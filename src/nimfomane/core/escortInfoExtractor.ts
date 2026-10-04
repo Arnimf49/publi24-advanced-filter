@@ -19,6 +19,7 @@ export type EscortServiceName =
   | 'np'
   | 'nn'
   | 'showerSex'
+  | 'tj'
   | 'deepthroat'
   | 'facesitting'
   | 'facefuck'
@@ -93,6 +94,7 @@ const SERVICE_PATTERNS: Record<EscortServiceName, RegExp> = {
   np: /\bnp\b|\b(?:sex(?:ul)?\s+)?normal(?:ul)?\b(?!\s+neprotejat)(?:\s*\(\s*(?:(?:obligatoriu|doar|strict)\s+)?(?:protejat|potejat)\w*\s*[!.,;]?\s*\)|\s+(?:(?:obligatoriu|doar|strict)\s+)?(?:protejat|potejat)\w*\b|\s+in\s+diferite\s+pozitii\b)|\bnormal\b[^\n.;]{0,30}\b(?:protejat|potejat)\w*\b|\bsex\s*\(\s*(?:(?:obligatoriu|doar|strict)\s+)?(?:protejat|potejat)\w*\s*\)|\bact(?:ul)?\s+sexual\s+(?:protejat|potejat)\w*\b|\bsex(?:ul)?\s+normal\b(?!\s+neprotejat)\b|\bsex\b[^\n.;]{0,30}\bdoar\s+protejat\w*\b/g,
   nn: /\b(?:sex\s+)?normal(?:ul)?\s+neprotejat\b|\bact(?:ul)?\s+sexual\s+neprotejat\b/g,
   showerSex: /\b(?:sex|partid[ăa])\s+(?:la|sub|in)\s+duș\b|\b(?:sex|partid[ăa])\s+(?:la|sub|in)\s+dus\b|\bduș\s+(?:cu\s+sex|sex)\b|\bdus\s+(?:cu\s+sex|sex)\b|\bshower\s+together\b/g,
+  tj: /\btj\b|\btits?\s*(?:job|fuck)\b|\bsex\s+intre\s+sani\b/g,
   deepthroat: /\b(?:dt|deep\s*throat|deepthroat|deeptroath|deeptrhoat|deepthrot|deep)\b|\boral\s+adanc\b/g,
   facesitting: /\bface\s*sitting\b|\bfacesitting\b|\bfacesiting\b/g,
   facefuck: /\bface\s*fuck\b|\bfuck\s+face\b|\bfacefuck\b/g,

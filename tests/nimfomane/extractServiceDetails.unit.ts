@@ -26,7 +26,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       baseRates: {'30m': 250, '1h': 400, '1.5h': 650, '2h': 800},
       rateOverrides: [{after: "21:00", rates: {'1h': 500}}],
       schedule: [{start: '10:00', end: '21:00'}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, cim: {extraCost: 50}, cob: true, massage: true,
         hj: true, '69': true, '3some': true, couples: true, rolePlay: true,
          shower: true, domination: {extraCost: 100}, uro: {extraCost: 100}, footfetish: true,
@@ -141,7 +141,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample16.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 300},
-      services: {op: true, on: true, np: true, fk: false, cim: false, cof: false, cob: true, massage: true, ap: false, '69': true, shower: true, facesitting: true, domination: true, footfetish: true},
+      services: {tj: true, op: true, on: true, np: true, fk: false, cim: false, cof: false, cob: true, massage: true, ap: false, '69': true, shower: true, facesitting: true, domination: true, footfetish: true},
     },
   },
   {
@@ -149,7 +149,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 300},
       schedule: [{days: 'luni-vineri', start: '10:00', end: '20:00'}],
-      services: {op: true, on: true, np: true, fk: false, cim: false, cof: false, cob: true, massage: true, ap: false, '69': true, shower: true, facesitting: true, domination: {extraCost: 100}, footfetish: true},
+      services: {tj: true, op: true, on: true, np: true, fk: false, cim: false, cof: false, cob: true, massage: true, ap: false, '69': true, shower: true, facesitting: true, domination: {extraCost: 100}, footfetish: true},
     },
   },
   {
@@ -197,7 +197,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample22.txt",
     expected: {
       baseRates: {'30m': 250, '1h': 450},
-      services: {'69': true, op: true, on: true, np: true, fk: {extraCost: 100}, fj: true, massage: true, gfe: true, cuni: true, ani: true, couples: true, footfetish: true},
+      services: {tj: true, '69': true, op: true, on: true, np: true, fk: {extraCost: 100}, fj: true, massage: true, gfe: true, cuni: true, ani: true, couples: true, footfetish: true},
     },
   },
   {
@@ -258,7 +258,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       baseRates: {'30m': 150, '1h': 300, '1.5h': 400, '2h': 500},
       outcallRates: {'1h': 450},
       schedule: [{start: "17:00", end: "07:00", days: "zilnic"}, {start: "07:00", end: "11:00"}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, showerSex: true, deepthroat: false, facesitting: true,
         facefuck: false, fk: true, fj: true, cim: true, cof: {extraCost: 100}, cob: true,
         uro: false, ap: true, hj: true, gfe: true, cuni: true, ani: true,
@@ -270,7 +270,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample31.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-        services: {op: true, on: true, np: true, deepthroat: true, fk: {extraCost: 50}, cim: false, cof: false, cob: true, ap: false, '69': false, gfe: true, uro: false, footfetish: true},
+        services: {tj: true, op: true, on: true, np: true, deepthroat: true, fk: {extraCost: 50}, cim: false, cof: false, cob: true, ap: false, '69': false, gfe: true, uro: false, footfetish: true},
     },
   },
   {
@@ -290,7 +290,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       baseRates: {'30m': 200, '1h': 400},
       rateOverrides: [{after: "22:00", rates: {'30m': 300, '1h': 500}}],
       schedule: [{start: '10:00', end: '24:00'}],
-      services: {on: true, np: true, ani: true, deepthroat: true, cim: {extraCost: 50}, massage: true, '69': true},
+      services: {tj: true, on: true, np: true, ani: true, deepthroat: true, cim: {extraCost: 50}, massage: true, '69': true},
     },
   },
   {
@@ -363,7 +363,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample43.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, nn: false,
         facefuck: false, cim: {extraCost: 50}, cof: {extraCost: 50},
         massage: true, ap: false, footfetish: {extraCost: 50}, swallow: false,
@@ -391,7 +391,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 300, '1.5h': 500, '2h': 600},
       schedule: [{start: '11:00', end: '22:00'}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, cob: true, '69': true, shower: true,
         footfetish: true, hj: true, rolePlay: true, massage: true, uro: true, domination: {extraCost: 100},
       },
@@ -428,7 +428,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       baseRates: {'30m': 150, '1h': 300, '1.5h': 400, '2h': 500},
       outcallRates: {'1h': 450},
       schedule: [{start: "17:00", end: "07:00", days: "zilnic"}, {start: "07:00", end: "11:00"}],
-      services: {op: true, on: true, np: true, showerSex: true, deepthroat: false, facesitting: true, facefuck: false, fk: true, fj: true, cim: true, cof: {extraCost: 100}, cob: true, uro: false, ap: true, hj: true, gfe: true, cuni: true, ani: true, '3some': true, couples: true, domination: false, footfetish: true, swallow: {extraCost: 50}},
+      services: {tj: true, op: true, on: true, np: true, showerSex: true, deepthroat: false, facesitting: true, facefuck: false, fk: true, fj: true, cim: true, cof: {extraCost: 100}, cob: true, uro: false, ap: true, hj: true, gfe: true, cuni: true, ani: true, '3some': true, couples: true, domination: false, footfetish: true, swallow: {extraCost: 50}},
     },
   },
   {
@@ -439,7 +439,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
         {start: '12:00', end: '21:00', days: 'luni-sambata'},
         {start: '12:00', end: '18:00', days: 'duminica'},
       ],
-      services: {
+      services: {tj: true,
         ap: {extraCost: 100}, ani: true, cim: {extraCost: 100}, cob: true, cof: {extraCost: 100}, cuni: true,
         deepthroat: true, domSoft: true, facefuck: {extraCost: 100}, fj: true, footfetish: true,
         gfe: true, hardSex: false, hj: true, massage: true, np: true, on: true, op: true,
@@ -471,7 +471,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 300, '1h': 450},
       schedule: [{start: "11:00", end: "21:00"}],
-      services: {'69': true, op: true, on: true, np: true, deepthroat: true, fk: {extraCost: 50}, cim: {extraCost: 50}, massage: true, gfe: true, cuni: true, ani: true},
+      services: {tj: true, '69': true, op: true, on: true, np: true, deepthroat: true, fk: {extraCost: 50}, cim: {extraCost: 50}, massage: true, gfe: true, cuni: true, ani: true},
     },
   },
   {
@@ -496,7 +496,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample57.txt",
     expected: {
       baseRates: {'30m': 250, '1h': 500},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, facesitting: true,
         fk: {extraCost: 100}, cim: false, cof: false,
         massage: true, ap: false, hj: true, gfe: true, footfetish: true,
@@ -532,7 +532,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample61.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 350},
-      services: {
+      services: {tj: true,
         np: true, '69': true, footfetish: true, hj: true, cob: true, massage: true,
       },
     },
@@ -610,7 +610,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 450},
       outcallRates: {'1h': 800},
-      services: {
+      services: {tj: true,
         '69': true, op: true, np: true, facesitting: true, cim: false,
         cof: false, cob: true, massage: true, hj: true,
         cuni: true, ani: true, footfetish: true,
@@ -709,7 +709,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample76.txt",
     expected: {
       baseRates: {'30m': 250, '1h': 450},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, fj: {extraCost: 50},
         cim: {extraCost: 100}, cob: true, massage: true, uro: {extraCost: 50},
         rolePlay: true, cuni: true,
@@ -836,7 +836,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample88.txt",
     expected: {
       baseRates: {'30m': 250, '1h': 400},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, deepthroat: true,
         fk: false, fj: true, cim: false, cof: false, cob: false,
         massage: true, ap: false, hj: true, footfetish: true,
@@ -879,7 +879,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 400},
       rateOverrides: [{after: "22:00", rates: {'30m': 250, '1h': 500}}],
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: {extraCost: 50}, np: true, fk: true,
         cim: false, cof: false, cob: {extraCost: 50}, massage: true,
         uro: {extraCost: 50}, ap: false, gfe: {extraCost: 50},
@@ -903,7 +903,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample94.txt",
     expected: {
       baseRates: {'30m': 150, '1h': 300, '1.5h': 400},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, deepthroat: true,
         fk: {extraCost: 50}, cim: {extraCost: 50}, cof: {extraCost: 50},
         swallow: {extraCost: 50}, massage: true, uro: true, ani: {extraCost: 50}, shower: true,
@@ -948,7 +948,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 400},
       outcallRates: {'1h': 600},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, facesitting: true, cob: true, massage: true,
         uro: {extraCost: 100}, ap: {extraCost: 100}, cuni: true, ani: true,
         spitting: true, domination: true, strapOn: true, footfetish: true,
@@ -969,7 +969,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample100.txt",
     expected: {
       baseRates: {'30m': 150, '1h': 300},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, nn: false, fj: true,
         cim: false, cof: false, cob: {extraCost: 50}, massage: true,
         ap: false, hj: true, gfe: true, shower: {extraCost: 50}, domination: false,
@@ -998,7 +998,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'1h': 550, '1.5h': 820, '2h': 1100},
       outcallRates: {'1h': 650},
-      services: {
+      services: {tj: true,
         '69': true, deepthroat: true, facesitting: true, fk: true, cim: true, cob: true,
         massage: true, uro: {extraCost: 50}, squirt: {extraCost: 50},
         ap: {extraCost: 100}, cuni: true, ani: false, shower: true,
@@ -1071,7 +1071,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 150, '1h': 300},
       schedule: [{start: "10:00", end: "00:00"}],
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, deepthroat: true, fk: true,
         fj: true, cim: true, uro: true, ap: {extraCost: 100},
         hj: true, gfe: true, couples: false,
@@ -1082,7 +1082,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample110.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, deepthroat: true,
         facesitting: true, cim: false, cof: false, cob: true,
         massage: true, ap: false, hj: true, cuni: true, ani: true,
@@ -1160,7 +1160,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample117.txt",
     expected: {
       baseRates: {'30m': 150, '1h': 300, '1.5h': 450},
-      services: {
+      services: {tj: true,
         '69': false, op: true, on: true, np: true, facefuck: true, fk: true,
         cob: true, ap: false, ani: {extraCost: 50}, swallow: {extraCost: 100},
       },
@@ -1193,7 +1193,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample120.txt",
     expected: {
       baseRates: {'30m': 150, '1h': 300},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, nn: false,
         massage: true, ap: false, hj: true, cuni: true, footfetish: true,
         domination: false,
@@ -1227,7 +1227,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample123.txt",
     expected: {
       baseRates: {'30m': 150, '1h': 300},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, fk: true, cim: false,
         cof: false, cob: true, massage: true, ap: {extraCost: 100},
         gfe: true, shower: true,
@@ -1238,7 +1238,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample124.txt",
     expected: {
       baseRates: {'30m': 150, '1h': 300},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, nn: false, fj: true,
         cim: false, cof: {extraCost: 100}, cob: {extraCost: 50},
         massage: true, ap: false, hj: true, cuni: true, ani: true,
@@ -1318,7 +1318,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 400},
       schedule: [{start: "09:00", end: "19:00"}],
-      services: {
+      services: {tj: false,
         '69': true, op: true, on: true, facesitting: true, fk: false, fj: true,
         cim: false, cof: false, massage: true, uro: {extraCost: 50},
         hj: true, cuni: true, ani: true, domSoft: true, domHard: true,
@@ -1331,7 +1331,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 250, '1h': 400},
       schedule: [{start: "10:00", end: "22:00", days: "luni-sambata"}],
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, fk: {extraCost: 50},
         cim: {extraCost: 50}, cof: {extraCost: 50}, gfe: true,
         pse: true, cuni: true, ani: true, ap: false,
@@ -1353,7 +1353,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample134.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 350, '1.5h': 500},
-      services: {
+      services: {tj: true,
         '69': false, op: true, on: true, np: true, fk: {extraCost: 100},
         fj: false, cim: {extraCost: 100}, cof: {extraCost: 50}, cob: false,
         massage: false, hj: false, ani: true, shower: true,
@@ -1364,7 +1364,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample135.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, fj: true,
         cob: {extraCost: 50}, massage: true, prostateMassage: true,
         cuni: true, domSoft: true,
@@ -1442,7 +1442,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample139.txt",
     expected: {
       baseRates: {'30m': 200},
-      services: {
+      services: {tj: true,
         '69': true, op: true, np: true, facesitting: true,
         cob: {extraCost: 50}, massage: true,
       },
@@ -1562,7 +1562,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 300},
       schedule: [{start: "08:00", end: "20:00", days: "luni-vineri"}],
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, fk: {extraCost: 50},
         cim: true, cof: {extraCost: 50}, cob: true, massage: true,
         uro: {extraCost: 50}, gfe: true, cuni: true, domSoft: true,
@@ -1585,7 +1585,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample151.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true,
         massage: true,
       },
@@ -1595,7 +1595,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample152.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, fj: true,
         footfetish: {extraCost: 50}, cob: {extraCost: 50},
         massage: true, hj: true, ani: true,
@@ -1626,7 +1626,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample155.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, deepthroat: true,
         fk: false, fj: true, cim: false, cof: false, cob: true,
         massage: true, cuni: true, ani: true, shower: true,
@@ -1638,7 +1638,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample156.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-      services: {
+      services: {tj: true,
         '69': true, np: true, deepthroat: true, fk: false, cim: false, cof: false,
         cob: true, massage: true, cuni: true, ani: true, shower: true,
         footfetish: true, fingering: false, ap: false,
@@ -1650,7 +1650,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 400},
       outcallRates: {'1h': 600},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, fk: true,
         cim: {extraCost: 50}, cob: true, massage: true,
         gfe: true, cuni: true, deepthroat: true,
@@ -1674,7 +1674,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 300, '1h': 500, '2h': 900},
       outcallRates: {'1h': 600, '2h': 1100},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, nn: false,
         showerSex: true, deepthroat: true, facesitting: true, fk: true,
         fj: true, cob: true, massage: true,
@@ -1879,7 +1879,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample177.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, '69': true, cob: true,
         massage: true, footfetish: true, deepthroat: true,
         cuni: true, ani: true, ap: false, cim: false, fk: false,
@@ -1891,7 +1891,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 350, '1.5h': 550, '2h': 700},
       schedule: [{start: "11:00", end: "23:00"}],
-      services: {
+      services: {tj: true,
         fk: true, gfe: true, pse: true, dirtyTalk: true, op: true, on: true,
         deepthroat: true, facefuck: true, np: true, cob: true,
         cuni: true, ani: true, facesitting: true, massage: true,
@@ -1996,7 +1996,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 300, '1h': 500},
       schedule: [{start: "10:00", end: "00:00", days: "zilnic"}],
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true,
         fk: {extraCost: 50}, fj: true, cim: {extraCost: 100},
         massage: true, uro: {extraCost: 100}, hj: true, gfe: true,
@@ -2017,7 +2017,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       baseRates: {'30m': 200, '1h': 400},
       rateOverrides: [{after: "22:00", rates: {'30m': 300, '1h': 500}}],
       schedule: [{start: "10:00", end: "24:00"}],
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, deepthroat: true,
         fk: true, cim: {extraCost: 50}, massage: true, cuni: true,
       },
@@ -2141,7 +2141,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample201.txt",
     expected: {
       baseRates: {'30m': 250, '1h': 500},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, cob: true,
         facesitting: true, footfetish: true, hj: true, cuni: true, ani: true,
         massage: true, prostateMassage: {extraCost: 50}, domSoft: {extraCost: 50},
@@ -2266,7 +2266,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample216.txt",
     expected: {
       baseRates: {'30m': 300, '1h': 500},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true, facesitting: true,
         cim: {extraCost: 100}, cob: true, massage: true, uro: {extraCost: 100},
         hj: true, cuni: true, ani: true, footfetish: true, ap: false,
@@ -2277,7 +2277,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample209.txt",
     expected: {
       baseRates: {'30m': 250, '1h': 450},
-      services: {
+      services: {tj: true,
         on: {extraCost: 50}, cim: {extraCost: 100},
         massage: true, uro: {extraCost: 100}, ap: false, facesitting: true,
         cob: true, hj: true, cuni: true, ani: true, footfetish: true,
@@ -2288,7 +2288,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample210.txt",
     expected: {
       baseRates: {'30m': 300, '1h': 500},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, cim: {extraCost: 100},
         massage: true, uro: {extraCost: 100}, ap: false, facesitting: true,
         cob: true, hj: true, cuni: true, ani: true, footfetish: true,
@@ -2300,7 +2300,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 250, '1h': 450},
       outcallRates: {'1h': 800},
-      services: {
+      services: {tj: true,
         on: {extraCost: 50}, cim: {extraCost: 100}, uro: {extraCost: 100},
         massage: true,
         ap: false, facesitting: true, cob: true, hj: true, cuni: true,
@@ -2351,7 +2351,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 300, '1h': 500, '2h': 900},
       outcallRates: {'1h': 600, '2h': 1100},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, nn: false,
         showerSex: true, deepthroat: true, facesitting: true, fk: true,
         fj: true, cob: true, massage: true,
@@ -2366,7 +2366,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 500, '1h': 1000},
       outcallRates: {'1h': 300},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, fj: true, cim: false,
         massage: true, uro: true, gfe: true, cuni: true, couples: true,
         domSoft: true, footfetish: true, ap: false,
@@ -2418,7 +2418,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 400, '1.5h': 600},
       schedule: [{start: "11:00", end: "23:00", days: "miercuri-vineri"}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true, facesitting: true,
         facefuck: true, fk: true, hardSex: true, cim: {extraCost: 50},
         cob: true, swallow: {extraCost: 50}, massage: true, ap: true,
@@ -2447,7 +2447,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 450},
       outcallRates: {'1h': 800},
-      services: {
+      services: {tj: true,
         op: true, np: true, facesitting: true, cim: false, cof: false, cob: true,
         massage: true, hj: true, '69': true, cuni: true, ani: true, footfetish: true,
       },
@@ -2457,7 +2457,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample234.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-      services: {
+      services: {tj: true,
         '69': true, op: true, np: true, facesitting: true, fk: false,
         cim: false, cof: {extraCost: 50}, cob: true, massage: true,
         hj: true, gfe: false, cuni: true, ani: true, footfetish: true,
@@ -2514,7 +2514,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample239.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, facefuck: {extraCost: 100},
         fk: true, cim: {extraCost: 50}, cof: {extraCost: 50}, cob: true,
         massage: true, gfe: true, prostateMassage: true, ani: true,
@@ -2526,7 +2526,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample240.txt",
     expected: {
       baseRates: {'30m': 450, '1h': 850},
-      services: {
+      services: {tj: true,
         '69': true, deepthroat: true, facesitting: true, cob: true, uro: true,
         cuni: true, ani: true, '3some': true, spitting: true,
         domination: {extraCost: 300}, strapOn: true, footfetish: true,
@@ -2599,7 +2599,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 500, '1h': 1000},
       outcallRates: {'1h': 300},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, fj: true,
         cim: false, massage: true, uro: true, gfe: true, cuni: true,
         couples: true, domSoft: true, footfetish: true, ap: false,
@@ -2624,7 +2624,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 350, '1.5h': 550, '2h': 700},
       schedule: [{start: "11:00", end: "23:00", days: "zilnic"}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         facesitting: true, facefuck: true, fk: true, hardSex: true,
         cim: {extraCost: 50}, cob: true,
@@ -2641,7 +2641,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
         {start: "17:00", end: "23:00"},
         {start: "11:00", end: "23:00", days: "miercuri"},
       ],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         facesitting: true, facefuck: true, fk: true, hardSex: true,
         cim: {extraCost: 50}, cob: true,
@@ -2655,7 +2655,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 350, '1.5h': 550, '2h': 700},
       schedule: [{start: "11:00", end: "23:00"}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         facesitting: true, facefuck: true, fk: true, hardSex: true,
         cim: {extraCost: 50}, cob: true,
@@ -2668,7 +2668,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample250.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 350, '1.5h': 550, '2h': 700},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         facesitting: true, facefuck: true, fk: true, hardSex: true,
         cim: {extraCost: 50}, cob: true,
@@ -2682,7 +2682,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 350, '1.5h': 550, '2h': 700},
       schedule: [{start: "18:00", end: "23:00"}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         facesitting: true, facefuck: true, fk: true, hardSex: true,
         cim: {extraCost: 50}, cob: true,
@@ -2696,7 +2696,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 350, '1.5h': 550, '2h': 700},
       schedule: [{days: "joi-vineri", start: "11:00", end: "23:00"}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         facesitting: true, facefuck: true, fk: true, hardSex: true,
         cim: {extraCost: 50}, cob: true,
@@ -2710,7 +2710,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 350, '1.5h': 550, '2h': 700},
       schedule: [{days: "luni", start: "11:00", end: "23:00"}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         facesitting: true, facefuck: true, fk: true, hardSex: true,
         cim: {extraCost: 50}, cob: true,
@@ -2723,7 +2723,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample254.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 350, '1.5h': 550, '2h': 700},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         facesitting: true, facefuck: true, fk: true, hardSex: true,
         cim: {extraCost: 50}, cob: true,
@@ -2737,7 +2737,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 350, '1.5h': 550, '2h': 700},
       schedule: [{start: "11:00", end: "23:00"}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         facesitting: true, facefuck: true, fk: true, hardSex: true,
         cim: {extraCost: 50}, cob: true,
@@ -2754,7 +2754,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
         {days: "sambata", start: "11:00", end: "23:00"},
         {start: "20:00", end: "23:00"},
       ],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         facesitting: true, facefuck: true, fk: true, hardSex: true,
         cim: {extraCost: 50}, cob: true,
@@ -2810,7 +2810,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 350, '1.5h': 550, '2h': 700},
       schedule: [{start: "11:00", end: "23:00"}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         facesitting: true, facefuck: true, fk: true, hardSex: true,
         cim: {extraCost: 50}, cob: true,
@@ -2824,7 +2824,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 200, '1h': 350, '1.5h': 550, '2h': 700},
       schedule: [{start: "11:00", end: "23:00"}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         facesitting: true, facefuck: true, fk: true, hardSex: true,
         cim: {extraCost: 50}, cob: true,
@@ -2872,7 +2872,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample266.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         fk: {extraCost: 50}, fj: true, cim: {extraCost: 50},
         massage: true, gfe: true,
@@ -2883,7 +2883,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample267.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         cim: {extraCost: 50}, cob: true, massage: true, gfe: true,
       },
@@ -2893,7 +2893,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample268.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         fk: true, cim: {extraCost: 50}, massage: true, gfe: true,
       },
@@ -2903,7 +2903,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample269.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 400},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         fk: true, cim: {extraCost: 50}, massage: true, gfe: true,
       },
@@ -2913,7 +2913,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample270.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 350},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         fk: {extraCost: 50}, cim: {extraCost: 50}, cob: true, massage: true, gfe: true,
       },
@@ -2923,7 +2923,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample271.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 300},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         fk: {extraCost: 50}, fj: true, cim: {extraCost: 50},
         cob: true, massage: true, gfe: true,
@@ -2934,7 +2934,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample272.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 300},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         cim: {extraCost: 50}, cob: true, massage: true, gfe: true,
         footfetish: true,
@@ -2945,7 +2945,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample273.txt",
     expected: {
       baseRates: {'30m': 200, '1h': 300},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         fk: {extraCost: 50}, cim: {extraCost: 50}, cob: true, massage: true,
         gfe: true, footfetish: true,
@@ -2956,7 +2956,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample274.txt",
     expected: {
       baseRates: {'30m': 150, '1h': 300},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         fk: {extraCost: 50}, cob: true, massage: true, footfetish: true,
       },
@@ -2967,7 +2967,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 150, '1h': 300},
       schedule: [{days: "luni-duminica", start: "09:00", end: "21:00"}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         facesitting: true, fk: {extraCost: 50}, cob: true,
         massage: true, footfetish: true,
@@ -2979,7 +2979,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 150, '1h': 300},
       schedule: [{days: "luni-duminica", start: "10:00", end: "23:00"}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         facesitting: true, fk: {extraCost: 50}, cim: {extraCost: 50},
         cob: true, massage: true, footfetish: true,
@@ -2991,7 +2991,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 150, '1h': 300},
       outcallRates: {'1h': 500},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         fk: {extraCost: 50}, massage: true,
       },
@@ -3001,7 +3001,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample280.txt",
     expected: {
       baseRates: {'30m': 150, '1h': 300},
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         fk: {extraCost: 50}, massage: true,
       },
@@ -3011,7 +3011,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     file: "sample281.txt",
     expected: {
       baseRates: {'30m': 150, '1h': 300},
-      services: {
+      services: {tj: true,
         '69': true, op: true, on: true, np: true, massage: true,
       },
     },
@@ -3021,7 +3021,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
     expected: {
       baseRates: {'30m': 150, '1h': 300},
       schedule: [{days: "luni-duminica", start: "11:00", end: "22:00"}],
-      services: {
+      services: {tj: true,
         op: true, on: true, np: true, deepthroat: true,
         fk: {extraCost: 50}, massage: true,
       },

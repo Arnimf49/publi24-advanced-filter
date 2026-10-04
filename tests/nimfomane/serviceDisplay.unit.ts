@@ -69,6 +69,15 @@ test("shows hard sex in the Sex group", () => {
   ]);
 });
 
+test("displays tits job by its Romanian label", () => {
+  expect(serviceDisplay.getServiceGroups({tj: true})).toEqual([
+    {
+      label: "Sex",
+      services: [{service: "tj", label: "sex între sâni", isNotIncluded: false}],
+    },
+  ]);
+});
+
 test("displays uro variants and defaults generic uro to passive", () => {
   expect(serviceDisplay.getServiceGroups({
     uro: {extraCost: 50},

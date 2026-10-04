@@ -36,6 +36,7 @@ const SERVICE_LABELS: Record<EscortServiceName, string> = {
   np: 'NP',
   nn: 'NN',
   showerSex: 'sex la duș',
+  tj: 'sex între sâni',
   deepthroat: 'deepthroat',
   facesitting: 'facesitting',
   facefuck: 'facefuck',
@@ -81,7 +82,7 @@ const SERVICE_LABELS: Record<EscortServiceName, string> = {
 };
 
 const SERVICE_GROUPS: Array<{label: string; services: EscortServiceName[]}> = [
-  {label: 'Sex', services: ['np', 'nn', 'showerSex', 'hardSex']},
+  {label: 'Sex', services: ['np', 'nn', 'showerSex', 'tj', 'hardSex']},
   {label: 'Oral', services: ['op', 'on', 'deepthroat', 'facefuck']},
   {label: 'Limbi', services: ['fk', 'cuni', 'ani', 'facesitting', '69']},
   {label: 'Finalizare', services: ['cim', 'cob', 'cof', 'swallow']},
