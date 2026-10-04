@@ -34,11 +34,15 @@ Flagged source references and reasons are written to
 results are cached in `output/flagger-cache.json`; a cached result is reused
 when the source text and extracted personal/service details have not changed.
 Source references use a stable ID derived from the source kind and URL, so they
-do not depend on source ordering. Use `--no-cache` to recompute every source:
+do not depend on source ordering. Use `--no-cache` to delete the cache before
+running the normal flagger command again:
 
 ```sh
 npx tsx tests/nimfomane/mass-details-analyzer/flagger.ts --no-cache
+npx tsx tests/nimfomane/mass-details-analyzer/flagger.ts
 ```
+
+The cache-clearing command does not modify `output/flagged-extractions.json`.
 
 Each flagged item identifies its profile file, stable `sourceId`, and the
 zero-based `sourceIndex` within that file's `sources` array.

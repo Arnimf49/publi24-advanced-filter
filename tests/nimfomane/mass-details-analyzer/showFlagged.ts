@@ -1,7 +1,9 @@
 import 'dotenv/config';
+import {diffJson, type Change} from 'diff';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {escortInfoExtractor} from '../../../src/nimfomane/core/escortInfoExtractor';
 
 const OUTPUT_DIRECTORY = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -26,6 +28,11 @@ interface FlaggedExtraction {
   reason: string;
 }
 
+interface ExtractedDetails {
+  extractedPersonalDetails: unknown;
+  extractedServiceDetails: unknown;
+}
+
 function parseIndex(value: string | undefined): number {
   const index = value === undefined ? Number.NaN : Number(value);
   if (!Number.isSafeInteger(index) || index < 0) {
@@ -44,6 +51,34 @@ function cleanSourceText(text: string): string {
     .replace(/\r\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
+}
+
+function getCurrentDetails(text: string): ExtractedDetails {
+  return {
+    extractedPersonalDetails: escortInfoExtractor.extractPersonalDetails(text),
+    extractedServiceDetails: escortInfoExtractor.extractServiceDetails(text),
+  };
+}
+
+function formatJsonDiff(
+  storedDetails: ExtractedDetails,
+  currentDetails: ExtractedDetails,
+): string | null {
+  const changes = diffJson(storedDetails, currentDetails);
+  if (!changes.some(change => change.added || change.removed)) {
+    return null;
+  }
+
+  return changes
+    .filter(change => change.added || change.removed)
+    .map((change: Change) => {
+      const prefix = change.added ? '+' : change.removed ? '-' : ' ';
+      return change.value
+        .split('\n')
+        .map(line => `${prefix}${line}`)
+        .join('\n');
+    })
+    .join('');
 }
 
 async function run(): Promise<void> {
@@ -81,6 +116,15 @@ async function run(): Promise<void> {
   }
 
   console.log(`\nFlagged reason: ${flaggedExtraction.reason}`);
+
+  const currentDetails = getCurrentDetails(source.text);
+  const jsonDiff = formatJsonDiff({
+    extractedPersonalDetails: source.extractedPersonalDetails,
+    extractedServiceDetails: source.extractedServiceDetails,
+  }, currentDetails);
+  if (jsonDiff) {
+    console.log(`\nRecent changes on extractor code results in:\n${jsonDiff}`);
+  }
 }
 
 export const showFlagged = {

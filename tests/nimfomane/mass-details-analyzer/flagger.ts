@@ -9,7 +9,7 @@ import {flaggerPrompt} from './flaggerPrompt';
 dotenv.config({override: true});
 
 const MODEL = 'gpt-5-mini';
-const REQUEST_CONCURRENCY = 4;
+const REQUEST_CONCURRENCY = 10;
 const OUTPUT_DIRECTORY = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   'output',
@@ -171,7 +171,12 @@ function isNodeError(error: unknown): error is NodeJS.ErrnoException {
 async function loadSourceTasks(): Promise<SourceTask[]> {
   const entries = await fs.readdir(OUTPUT_DIRECTORY, {withFileTypes: true});
   const profileFiles = entries
-    .filter(entry => entry.isFile() && entry.name.endsWith('.json') && entry.name !== path.basename(FLAGGED_OUTPUT_PATH))
+    .filter(entry =>
+      entry.isFile()
+      && entry.name.endsWith('.json')
+      && entry.name !== path.basename(FLAGGED_OUTPUT_PATH)
+      && entry.name !== path.basename(CACHE_OUTPUT_PATH)
+    )
     .map(entry => entry.name)
     .sort();
   const tasks: SourceTask[] = [];
@@ -256,15 +261,19 @@ function getNoCache(args: string[]): boolean {
 }
 
 async function run(noCache = getNoCache(process.argv.slice(2))): Promise<void> {
+  if (noCache) {
+    await fs.rm(CACHE_OUTPUT_PATH, {force: true});
+    console.info(`Deleted flagger cache at ${CACHE_OUTPUT_PATH}.`);
+    return;
+  }
+
   const tasks = await loadSourceTasks();
-  const cache = noCache ? new Map<string, CacheRecord>() : await loadCache();
+  const cache = await loadCache();
   const analyses: AnalysisResult[] = new Array(tasks.length);
-  const tasksToAnalyze = noCache
-    ? tasks
-    : tasks.filter(task => {
-        const cached = cache.get(task.sourceId);
-        return !cached || cached.inputHash !== getInputHash(task.source);
-      });
+  const tasksToAnalyze = tasks.filter(task => {
+    const cached = cache.get(task.sourceId);
+    return !cached || cached.inputHash !== getInputHash(task.source);
+  });
 
   let client: OpenAI | undefined;
   if (tasksToAnalyze.length > 0) {
@@ -280,34 +289,10 @@ async function run(noCache = getNoCache(process.argv.slice(2))): Promise<void> {
   console.info(
     `Analyzing ${tasks.length} sources with ${MODEL}; `
     + `${tasks.length - tasksToAnalyze.length} cached, ${tasksToAnalyze.length} to analyze`
-    + `${noCache ? ' (cache disabled)' : ''}.`,
-  );
-  await Promise.all(
-    Array.from({length: Math.min(REQUEST_CONCURRENCY, tasks.length)}, async () => {
-      while (nextTask < tasks.length) {
-        const index = nextTask++;
-        const task = tasks[index];
-        const inputHash = getInputHash(task.source);
-        const cached = cache.get(task.sourceId);
-        if (!noCache && cached && cached.inputHash === inputHash) {
-          analyses[index] = {flagged: cached.flagged, reason: cached.reason};
-        } else {
-          if (!client) {
-            throw new Error('OpenAI client was not initialized for an uncached source.');
-          }
-          analyses[index] = await analyzeSource(client, task);
-          cache.set(task.sourceId, {
-            sourceId: task.sourceId,
-            inputHash,
-            ...analyses[index],
-          });
-        }
-        console.info(`Analyzed ${index + 1}/${tasks.length} sources.`);
-      }
-    }),
+    + '.',
   );
 
-  const flagged = analyses.flatMap((result, index): FlaggedExtraction[] =>
+  const getFlagged = (): FlaggedExtraction[] => analyses.flatMap((result, index): FlaggedExtraction[] =>
     result.flagged
       ? [{
           profileName: tasks[index].profileName,
@@ -319,13 +304,50 @@ async function run(noCache = getNoCache(process.argv.slice(2))): Promise<void> {
           reason: result.reason,
         }]
       : []);
-  await fs.writeFile(
-    CACHE_OUTPUT_PATH,
-    `${JSON.stringify({records: [...cache.values()]}, null, 2)}\n`,
-    'utf8',
+  const writeResults = async (): Promise<void> => {
+    await fs.writeFile(
+      CACHE_OUTPUT_PATH,
+      `${JSON.stringify({records: [...cache.values()]}, null, 2)}\n`,
+      'utf8',
+    );
+    const flagged = getFlagged();
+    await fs.writeFile(FLAGGED_OUTPUT_PATH, `${JSON.stringify(flagged, null, 2)}\n`, 'utf8');
+    console.info(`Saved ${flagged.length} flagged sources to ${FLAGGED_OUTPUT_PATH}.`);
+  };
+  let saveQueue: Promise<void> = Promise.resolve();
+  const saveProgress = async (): Promise<void> => {
+    const pendingSave = saveQueue.then(writeResults);
+    saveQueue = pendingSave;
+    await pendingSave;
+  };
+
+  await Promise.all(
+    Array.from({length: Math.min(REQUEST_CONCURRENCY, tasks.length)}, async () => {
+      while (nextTask < tasks.length) {
+        const index = nextTask++;
+        const task = tasks[index];
+        const inputHash = getInputHash(task.source);
+        const cached = cache.get(task.sourceId);
+        if (cached && cached.inputHash === inputHash) {
+          analyses[index] = {flagged: cached.flagged, reason: cached.reason};
+        } else {
+          if (!client) {
+            throw new Error('OpenAI client was not initialized for an uncached source.');
+          }
+          analyses[index] = await analyzeSource(client, task);
+          cache.set(task.sourceId, {
+            sourceId: task.sourceId,
+            inputHash,
+            ...analyses[index],
+          });
+          await saveProgress();
+        }
+        console.info(`Analyzed ${index + 1}/${tasks.length} sources.`);
+      }
+    }),
   );
-  await fs.writeFile(FLAGGED_OUTPUT_PATH, `${JSON.stringify(flagged, null, 2)}\n`, 'utf8');
-  console.info(`Saved ${flagged.length} flagged sources to ${FLAGGED_OUTPUT_PATH}.`);
+
+  await saveProgress();
 }
 
 export const flagger = {

@@ -14,7 +14,9 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
-  globalSetup: './tests/helpers/globalSetup.ts',
+  globalSetup: process.env.SKIP_GLOBAL_SETUP === '1'
+    ? undefined
+    : './tests/helpers/globalSetup.ts',
 
   projects: [
     {

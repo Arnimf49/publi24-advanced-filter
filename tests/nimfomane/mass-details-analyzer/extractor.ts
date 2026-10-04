@@ -283,6 +283,10 @@ function addSource(
     return;
   }
 
+  if ([...sources.values()].some(source => source.text === sourceText)) {
+    return;
+  }
+
   const key = `${kind}\n${url}`;
   const existing = sources.get(key);
   if (existing) {
