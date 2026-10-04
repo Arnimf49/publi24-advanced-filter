@@ -20,7 +20,7 @@ Each profile is saved as `output/<sanitized-name>-<stable-id>.json`; reruns
 overwrite the same profile file. Sources without extracted details are omitted.
 
 Set `OPENAI_API_KEY` in `.env` and run the flagger to check each extracted source
-with a separate `gpt-4o-mini` request:
+with a separate `gpt-5.6-luna` request using low reasoning effort:
 
 ```sh
 npx tsx tests/nimfomane/mass-details-analyzer/flagger.ts

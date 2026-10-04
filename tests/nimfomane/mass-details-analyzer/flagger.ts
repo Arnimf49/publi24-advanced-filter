@@ -8,7 +8,7 @@ import {flaggerPrompt} from './flaggerPrompt';
 
 dotenv.config({override: true});
 
-const MODEL = 'gpt-5-mini';
+const MODEL = 'gpt-5.6-luna';
 const REQUEST_CONCURRENCY = 10;
 const OUTPUT_DIRECTORY = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -229,6 +229,7 @@ function parseAnalysisResult(content: string | null): AnalysisResult {
 async function analyzeSource(client: OpenAI, task: SourceTask): Promise<AnalysisResult> {
   const completion = await client.chat.completions.create({
     model: MODEL,
+    reasoning_effort: 'low',
     ...(MODEL.startsWith('gpt-5') ? {} : {temperature: 0}),
     response_format: {type: 'json_object'},
     messages: [
@@ -328,7 +329,8 @@ async function run(noCache = getNoCache(process.argv.slice(2))): Promise<void> {
         const task = tasks[index];
         const inputHash = getInputHash(task.source);
         const cached = cache.get(task.sourceId);
-        if (cached && cached.inputHash === inputHash) {
+        const isCached = cached?.inputHash === inputHash;
+        if (isCached) {
           analyses[index] = {flagged: cached.flagged, reason: cached.reason};
         } else {
           if (!client) {
@@ -342,7 +344,7 @@ async function run(noCache = getNoCache(process.argv.slice(2))): Promise<void> {
           });
           await saveProgress();
         }
-        console.info(`Analyzed ${index + 1}/${tasks.length} sources.`);
+        console.info(`${isCached ? 'Used cached result for' : 'Analyzed'} ${index + 1}/${tasks.length} sources.`);
       }
     }),
   );
