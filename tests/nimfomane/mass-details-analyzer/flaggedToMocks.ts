@@ -63,6 +63,29 @@ async function nextMockNumber(directory: string, prefix: string): Promise<number
   return numbers.length ? Math.max(...numbers) + 1 : 1;
 }
 
+function normalizeMockText(text: string): string {
+  return text.replace(/\s+/g, ' ').trim();
+}
+
+async function findExistingMocks(directory: string, text: string): Promise<string[]> {
+  const normalizedText = normalizeMockText(text);
+  const entries = await fs.readdir(directory, {withFileTypes: true});
+  const matches: string[] = [];
+
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith('.txt')) {
+      continue;
+    }
+
+    const existingText = await fs.readFile(path.join(directory, entry.name), 'utf8');
+    if (normalizeMockText(existingText) === normalizedText) {
+      matches.push(entry.name);
+    }
+  }
+
+  return matches.sort();
+}
+
 async function run(): Promise<void> {
   const {index, kind, falsePositive} = parseArguments(process.argv.slice(2));
   const flagged = await readJson<FlaggedExtraction[]>(FLAGGED_OUTPUT_PATH);
@@ -88,6 +111,14 @@ async function run(): Promise<void> {
     MOCKS_DIRECTORY,
     kind === 'personal' ? 'personal-details-texts' : 'service-texts',
   );
+  const existingMocks = await findExistingMocks(directory, source.text);
+
+  if (existingMocks.length > 0) {
+    throw new Error(
+      `Mock already exists in ${path.basename(directory)}: ${existingMocks.join(', ')}`,
+    );
+  }
+
   const prefix = falsePositive ? 'false-sample' : 'sample';
   const fileName = `${prefix}${await nextMockNumber(directory, prefix)}.txt`;
   await fs.writeFile(path.join(directory, fileName), `${source.text.trim()}\n`, 'utf8');

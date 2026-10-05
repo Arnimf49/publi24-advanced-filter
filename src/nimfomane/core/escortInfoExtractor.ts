@@ -107,6 +107,8 @@ const SERVICE_PATTERNS: Record<EscortServiceName, RegExp> = {
   swallow: /\bswallow\b|\bthroatpie\b|\binghiț\w*\b|\binghit\w*\b|\binghiere\b/g,
   massage: /\bmasaj(?:e|ul)?\b|\bmassage\b/g,
   uro: /\buro(?=\d|\b)|\burin\w*\b/g,
+  uroActive: /(?!x)x/g,
+  uroPassive: /(?!x)x/g,
   squirt: /\bsquirt\w*\b/g,
   rolePlay: /\brole\s*play\b|\bjoc\s+de\s+rol\b/g,
   ap: /\bap\b|\banal\s+protejat\w*\b/g,
@@ -866,15 +868,15 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
   if (service === 'verbalHum' && /\bdominare\b[\s\S]{0,100}\bpalet[ăa]\b/i.test(text)) {
     return undefined;
   }
+  if (service === 'ap'
+    && /\bfaci\s+anal\b/i.test(text)
+    && !/\b(?:ofer|accept|fac)\s+(?:si\s+)?anal\b/i.test(text)) {
+    return undefined;
+  }
   if (service === 'on') {
     const prefixedOralUnprotectedPrice = /\b(\d{2,4})\s*(?:lei|ron)\s+oral\s+neprotejat\b/i.exec(line);
     if (prefixedOralUnprotectedPrice && isPriceAmount(Number.parseInt(prefixedOralUnprotectedPrice[1], 10))) {
       return Number.parseInt(prefixedOralUnprotectedPrice[1], 10);
-    }
-    if (service === 'ap'
-      && /\bfaci\s+anal\b/i.test(text)
-      && !/\b(?:ofer|accept|fac)\s+(?:si\s+)?anal\b/i.test(text)) {
-      return undefined;
     }
     const oralUnprotectedExtra = /\b(?:oral|sex\s+oral)\s+neprotejat\b[^.!?]{0,100}\bfunctie\s+de\s+igiena\b[^.!?]{0,100}?(\d{2,4})\s*(?:lei|ron)?\s+extra\b/i.exec(text);
     if (oralUnprotectedExtra && !/\bstrap[-\s]?on\b/i.test(oralUnprotectedExtra[0])) {
