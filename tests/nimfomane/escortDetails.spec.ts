@@ -11,6 +11,8 @@ interface MockDetailsOptions {
   source?: DetailSource;
   delay?: number;
   visitedCities?: VisitedCity[];
+  birthday?: string;
+  personalText?: string;
 }
 
 function sourceUrl(profileLink: string, suffix: string): string {
@@ -19,13 +21,21 @@ function sourceUrl(profileLink: string, suffix: string): string {
   return `${profileUrl.origin}${forumPath}/${suffix}`;
 }
 
-function sourceText(): string {
-  return `${PERSONAL_TEXT} ${SERVICE_TEXT}`;
+function sourceText(personalText: string = PERSONAL_TEXT): string {
+  return `${personalText} ${SERVICE_TEXT}`;
 }
 
-function profileBody(source: DetailSource): string {
+function profileBody(source: DetailSource, birthday?: string, personalText: string = PERSONAL_TEXT): string {
   const sidebar = source === 'interest'
-    ? `<div class="cProfileSidebarBlock"><ul><li>interes</li><li>despre</li><li>${sourceText()}</li></ul></div>`
+    ? `<div class="cProfileSidebarBlock"><ul><li>interes</li><li>despre</li><li>${sourceText(personalText)}</li></ul></div>`
+    : '';
+  const birthdayField = birthday
+    ? `<ul class="ipsDataList ipsDataList_reducedSpacing cProfileFields">
+        <li class="ipsDataItem">
+          <span class="ipsDataItem_generic ipsDataItem_size3 ipsType_break"><strong>Birthday</strong></span>
+          <span class="ipsDataItem_generic">${birthday}</span>
+        </li>
+      </ul>`
     : '';
   const servicesTab = source === 'about' || source === 'interest'
     ? '<a href="/forum/profile/test/?tab=field_core_pfield_11">servicii</a><div id="elProfileTabs_content"></div>'
@@ -34,12 +44,12 @@ function profileBody(source: DetailSource): string {
     ? '<div class="ipsStreamItem_title"><a data-linktype="link" href="https://nimfomane.com/forum/topic/999-test/?do=findComment&comment=7">activitate</a></div>'
     : '';
 
-  return `<html><body>${sidebar}${servicesTab}${activity}
+  return `<html><body>${birthdayField}${sidebar}${servicesTab}${activity}
     <input name="csrfKey" value="test-csrf">
   </body></html>`;
 }
 
-function postsBody(profileLink: string, visitedCities: string[] = []): string {
+function postsBody(profileLink: string, visitedCities: string[] = [], personalText: string = PERSONAL_TEXT): string {
   const firstTopic = `${sourceUrl(profileLink, 'topic/101-first/')}?do=findComment&comment=1`;
   const secondTopic = `${sourceUrl(profileLink, 'topic/102-second/')}?do=findComment&comment=2`;
   const cityUrls = [
@@ -55,7 +65,7 @@ function postsBody(profileLink: string, visitedCities: string[] = []): string {
     <div class="ipsPagination"><a data-page="1" href="${profileLink}/content/?type=forums_topic_post">1</a></div>
     <div class="cPost" data-commentid="1"><time datetime="2026-08-01T12:00:00Z"></time>
       ${cityLink(0)}
-      <div data-role="commentContent"><a href="${firstTopic}">${PERSONAL_TEXT} locuri disponibile</a></div>
+      <div data-role="commentContent"><a href="${firstTopic}">${personalText} locuri disponibile</a></div>
     </div>
     <div class="cPost" data-commentid="2"><time datetime="2026-08-02T12:00:00Z"></time>
       ${cityLink(1)}
@@ -74,7 +84,7 @@ function oldPostsBody(profileLink: string): string {
   </body></html>`;
 }
 
-function activityBody(profileLink: string, lastPage: boolean): string {
+function activityBody(profileLink: string, lastPage: boolean, personalText: string = PERSONAL_TEXT): string {
   const activityTopic = `${sourceUrl(profileLink, 'topic/301-activity/')}?do=findComment&comment=3`;
   const pagination = lastPage
     ? '<a class="ipsPagination_page" data-page="2" href="/forum/profile/test/content/page/2/?all_activity=1">2</a>'
@@ -82,7 +92,7 @@ function activityBody(profileLink: string, lastPage: boolean): string {
   const activity = lastPage
     ? `<div class="ipsStreamItem">
         <div class="ipsStreamItem_title"><a href="${activityTopic}">activity</a></div>
-        <div class="ipsStreamItem_snippet"><time datetime="2026-08-03T12:00:00Z"></time>${sourceText()}</div>
+        <div class="ipsStreamItem_snippet"><time datetime="2026-08-03T12:00:00Z"></time>${sourceText(personalText)}</div>
       </div>`
     : '';
 
@@ -91,28 +101,29 @@ function activityBody(profileLink: string, lastPage: boolean): string {
 
 async function mockEscortDetails(page: import("playwright-core").Page, profileLink: string, options: MockDetailsOptions = {}) {
   const source = options.source || 'interest';
+  const personalText = options.personalText || PERSONAL_TEXT;
   const activityUrl = 'https://nimfomane.com/forum/topic/999-test/?do=findComment&comment=7';
 
   await page.route('**://nimfomane.com/forum/**', route => route.abort());
 
   await page.route('**://nimfomane.com/forum/profile/**', async route => {
     const url = new URL(route.request().url());
-    let body = profileBody(source);
+    let body = profileBody(source, options.birthday, personalText);
 
     if (url.searchParams.get('tab') === 'field_core_pfield_11') {
-      body = `<html><body><div id="elProfileTabs_content"><a href="${sourceUrl(profileLink, 'topic/201-about/')}">${PERSONAL_TEXT} ${SERVICE_TEXT}</a></div></body></html>`;
+      body = `<html><body><div id="elProfileTabs_content"><a href="${sourceUrl(profileLink, 'topic/201-about/')}">${sourceText(personalText)}</a></div></body></html>`;
     } else if (source === 'activity' && url.searchParams.get('all_activity') === '1') {
       const lastPage = url.pathname.includes('/page/2/');
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({rows: activityBody(profileLink, lastPage)}),
+        body: JSON.stringify({rows: activityBody(profileLink, lastPage, personalText)}),
       });
       return;
     } else if (url.pathname.endsWith('/content/')) {
       body = source === 'activity'
         ? oldPostsBody(profileLink)
-        : postsBody(profileLink, options.visitedCities);
+        : postsBody(profileLink, options.visitedCities, personalText);
     }
 
     if (options.delay) {
@@ -127,7 +138,7 @@ async function mockEscortDetails(page: import("playwright-core").Page, profileLi
       <div id="comment-7_wrap" class="cPost" data-commentid="7"><article>
         <div data-role="commentContent"></div>
           <a href="${activityUrl}">topic</a>
-          <div data-role="memberSignature">${sourceText()}</div>
+          <div data-role="memberSignature">${sourceText(personalText)}</div>
       </article></div>
     </body></html>`;
     await route.fulfill({status: 200, contentType: 'text/html', body});
@@ -135,8 +146,8 @@ async function mockEscortDetails(page: import("playwright-core").Page, profileLi
 
   await page.route('**://nimfomane.com/forum/profile/**/content/page/**', async route => {
     const body = source === 'activity'
-      ? activityBody(profileLink, true)
-      : postsBody(profileLink, options.visitedCities);
+      ? activityBody(profileLink, true, personalText)
+      : postsBody(profileLink, options.visitedCities, personalText);
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -173,6 +184,23 @@ test('Should show loading state and details when no details are stored.', async 
   await expect(page.locator('[data-wwid="personal-details-section"]')).toBeVisible({timeout: 15000});
   await expect(page.locator('[data-wwid="service-details-section"]')).toBeVisible();
   await expect(page.locator('[data-wwid="personal-details-section"]')).toContainText('28 ani');
+});
+
+test('Should extract age from the birthday field on the profile page.', async ({page}) => {
+  await utilsNimfomane.open(page);
+  const {user} = await utilsNimfomane.waitForNthImage(page);
+  const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
+  await setEscort(page, user, {profileLink});
+  await mockEscortDetails(page, profileLink, {
+    birthday: '11/18/2000',
+    personalText: '170 cm si 58 kg.',
+  });
+
+  await openDetails(page);
+
+  await expect(page.locator('[data-wwid="personal-details-section"]')).toContainText(
+    `${new Date().getFullYear() - 2000} ani`,
+  );
 });
 
 test('Should display multiple sources and details found in profile interest and about fields.', async ({page}) => {

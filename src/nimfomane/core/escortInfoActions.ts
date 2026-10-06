@@ -102,6 +102,35 @@ function normalizePersonalDetails(details: PersonalDetails, contentDate?: number
     : {...details, age: adjustAgeToCurrentYear(details.age, contentDate)};
 }
 
+function getProfileBirthdayAge(profilePage: Document): number | undefined {
+  for (const field of profilePage.querySelectorAll('.cProfileFields .ipsDataItem')) {
+    const label = field.querySelector('.ipsDataItem_generic strong')?.textContent?.trim();
+    if (label?.toLocaleLowerCase() !== 'birthday') {
+      continue;
+    }
+
+    const value = field.querySelectorAll('.ipsDataItem_generic')[1]?.textContent?.trim() || '';
+    const match = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(value);
+    if (!match) {
+      return undefined;
+    }
+
+    const month = Number.parseInt(match[1], 10);
+    const day = Number.parseInt(match[2], 10);
+    const year = Number.parseInt(match[3], 10);
+    const birthday = new Date(Date.UTC(year, month - 1, day));
+    if (birthday.getUTCFullYear() !== year
+      || birthday.getUTCMonth() !== month - 1
+      || birthday.getUTCDate() !== day) {
+      return undefined;
+    }
+
+    return new Date().getFullYear() - year;
+  }
+
+  return undefined;
+}
+
 function bringsNewPersonalInformation(existing: PersonalDetails | undefined, incoming: PersonalDetails): boolean {
   if (!existing) {
     return true;
@@ -215,26 +244,14 @@ function collectText(
   const sourceRank = {sourcePriority, contentDate: effectiveContentDate};
 
   const extractedPersonalDetails = escortInfoExtractor.extractPersonalDetails(text);
-  const personalDetails = extractedPersonalDetails
+  collectPersonalDetails(
+    extractedPersonalDetails
     ? normalizePersonalDetails(extractedPersonalDetails, effectiveContentDate)
-    : null;
-  if (personalDetails) {
-    const bringsNewInformation = bringsNewPersonalInformation(details.personalDetails, personalDetails);
-    const isPrimary = !details.personalDetailsRank
-      || comparePersonalRanks(sourceRank, details.personalDetailsRank) > 0;
-    if (bringsNewInformation || isPrimary) {
-      recordSource(details.personalDetailsSourceUrls, sourceUrl, isPrimary);
-      details.personalDetails = mergeDetails(details.personalDetails, personalDetails, isPrimary);
-      if (isPrimary) {
-        details.personalDetailsSourceUrl = sourceUrl;
-        details.personalDetailsRank = sourceRank;
-      }
-      details.personalDetailsContentDate = Math.max(
-        details.personalDetailsContentDate || 0,
-        effectiveContentDate || 0,
-      ) || undefined;
-    }
-  }
+      : null,
+    sourceUrl,
+    sourceRank,
+    details,
+  );
 
   const serviceDetails = escortInfoExtractor.extractServiceDetails(text);
   if (serviceDetails) {
@@ -267,6 +284,31 @@ function collectText(
       details.serviceDetailsContentDate || 0,
       effectiveContentDate || 0,
     ) || undefined;
+  }
+}
+
+function collectPersonalDetails(
+  personalDetails: PersonalDetails | null,
+  sourceUrl: string,
+  sourceRank: SourceRank,
+  details: CollectedDetails,
+): void {
+  if (personalDetails) {
+    const bringsNewInformation = bringsNewPersonalInformation(details.personalDetails, personalDetails);
+    const isPrimary = !details.personalDetailsRank
+      || comparePersonalRanks(sourceRank, details.personalDetailsRank) > 0;
+    if (bringsNewInformation || isPrimary) {
+      recordSource(details.personalDetailsSourceUrls, sourceUrl, isPrimary);
+      details.personalDetails = mergeDetails(details.personalDetails, personalDetails, isPrimary);
+      if (isPrimary) {
+        details.personalDetailsSourceUrl = sourceUrl;
+        details.personalDetailsRank = sourceRank;
+      }
+      details.personalDetailsContentDate = Math.max(
+        details.personalDetailsContentDate || 0,
+        sourceRank.contentDate || 0,
+      ) || undefined;
+    }
   }
 }
 
@@ -504,6 +546,16 @@ async function collectEscortDetails(user: string, profileUrl: string, priority: 
   };
   saveVisitedCities(user, details.visitedCities);
   const profilePage = await page.load(profileUrl, {priority});
+  const birthdayAge = profilePage && getProfileBirthdayAge(profilePage);
+  if (birthdayAge !== undefined) {
+    collectPersonalDetails(
+      {age: birthdayAge},
+      profileUrl,
+      {sourcePriority: INTEREST_SOURCE_PRIORITY},
+      details,
+    );
+    saveCollectedDetails(user, details);
+  }
 
   const lastestPostLink = profilePage?.querySelector<HTMLAnchorElement>('.ipsStreamItem_title [href][data-linktype="link"]');
   if (lastestPostLink) {
