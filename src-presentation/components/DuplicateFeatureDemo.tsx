@@ -37,6 +37,7 @@ const DUPLICATE_ADS: AdData[] = DUPLICATE_IDS.map((id, index) => ({
   title: index === 0 ? 'Anunț demonstrativ pentru testarea extensiei' : 'Anunț similar cu același număr',
   description: 'Același număr de telefon apare într-un alt anunț. Compară fotografiile și detaliile într-un singur loc.',
   image: null,
+  imageCount: 0,
   location: index === 0 ? 'Cluj-Napoca, Cluj' : 'Oradea, Bihor',
   date: index === 0 ? 'azi 21:20' : 'ieri 18:05',
   timestamp: Date.now() - index * 24 * 60 * 60 * 1000,

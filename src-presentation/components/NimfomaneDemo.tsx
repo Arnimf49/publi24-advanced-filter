@@ -504,10 +504,8 @@ const NimfomaneSite: React.FC<{
           onClose={onFavoritesClose}
           onClearFavorites={() => undefined}
           favorites={favoriteUsers}
-          inLocationEscorts={favoriteUsers}
-          otherLocationEscorts={[]}
+          citySections={[{city: 'Cluj-Napoca', escorts: favoriteUsers}]}
           inactiveEscorts={[]}
-          currentCity="Cluj-Napoca"
           renderEscort={(user, index) => {
             const topic = TOPICS.find((candidate) => candidate.user === user);
             return topic ? <DemoEscortCard topic={topic} index={index} isFavorite={true} onFavorite={() => onFavorite(topic.id)} onDetails={onDetails} /> : null;

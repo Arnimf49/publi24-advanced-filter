@@ -36,6 +36,7 @@ const FAVORITE_AD: AdData = {
   title: 'Anunț demonstrativ pentru testarea extensiei',
   description: 'Text fictiv folosit pentru a demonstra lista de favorite.',
   image: null,
+  imageCount: 0,
   location: 'Cluj-Napoca, Cluj',
   date: 'azi 21:20',
   timestamp: Date.now(),

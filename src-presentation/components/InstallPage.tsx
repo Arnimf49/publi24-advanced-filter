@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {presentationAsset} from '../presentationAsset';
 import styles from './InstallPage.module.scss';
 
 type Device = 'desktop' | 'android' | 'iphone';
@@ -25,6 +26,12 @@ interface InstallStep {
 interface ActionLabelProps {
   english: string;
   romanian: string;
+}
+
+interface InstallationVideo {
+  src: string;
+  title: string;
+  description: string;
 }
 
 const DEVICES: DeviceOption[] = [
@@ -70,6 +77,24 @@ const STORE_LINKS = {
   firefox: 'https://addons.mozilla.org/ro/firefox/addon/publi24-filtru-avansat/',
 };
 
+const INSTALLATION_VIDEOS: Record<string, InstallationVideo> = {
+  firefox: {
+    src: 'install-videos/install_firefox.mp4',
+    title: 'Instalare în Firefox',
+    description: 'Urmărește pașii în loc să îi parcurgi din instrucțiunile de mai sus.',
+  },
+  yandex: {
+    src: 'install-videos/install_yandex.mp4',
+    title: 'Instalare în Yandex Browser',
+    description: 'Ghid video pentru instalarea extensiei pe Android.',
+  },
+  iphone: {
+    src: 'install-videos/install_iphone.mp4',
+    title: 'Instalare pe iPhone și iPad',
+    description: 'Ghid video pentru activarea extensiilor Chrome în Orion Browser.',
+  },
+};
+
 const getInitialDevice = (): Device => {
   if (typeof navigator === 'undefined') {
     return 'desktop';
@@ -100,15 +125,46 @@ const ActionLabel: React.FC<ActionLabelProps> = ({english, romanian}) => (
 const InstallPage: React.FC = () => {
   const [device, setDevice] = useState<Device>(getInitialDevice);
   const [browser, setBrowser] = useState<Browser>(() => BROWSERS[getInitialDevice()][0].id);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
   const browserOptions = BROWSERS[device];
   const selectedBrowser = browserOptions.find((option) => option.id === browser) ?? browserOptions[0];
   const isFirefox = selectedBrowser.id === 'firefox';
   const storeLink = isFirefox ? STORE_LINKS.firefox : STORE_LINKS.chrome;
   const storeName = isFirefox ? 'Firefox Add-ons' : 'Chrome Web Store';
+  const installationVideo = device === 'iphone'
+    ? INSTALLATION_VIDEOS.iphone
+    : device === 'android'
+      ? INSTALLATION_VIDEOS[selectedBrowser.id]
+      : undefined;
 
   const handleDeviceChange = (nextDevice: Device) => {
     setDevice(nextDevice);
     setBrowser(BROWSERS[nextDevice][0].id);
+  };
+
+  const handleVideoPlay = async () => {
+    const video = videoRef.current;
+
+    if (!video) {
+      console.error('Installation video is not available');
+      return;
+    }
+
+    const playPromise = video.play();
+
+    if (document.fullscreenElement !== video && typeof video.requestFullscreen === 'function') {
+      try {
+        await video.requestFullscreen();
+      } catch (error) {
+        console.error('Failed to open installation video in fullscreen', error);
+      }
+    }
+
+    try {
+      await playPromise;
+    } catch (error) {
+      console.error('Failed to play installation video', error);
+    }
   };
 
   const getSteps = (): InstallStep[] => {
@@ -241,6 +297,19 @@ const InstallPage: React.FC = () => {
         </div>
 
         <ol className={styles.steps}>
+          {installationVideo && (
+            <li className={`${styles.step} ${styles.videoStep}`}>
+              <span className={styles.stepNumber}>00</span>
+              <div>
+                <strong>
+                  <button className={styles.videoButton} type="button" onClick={handleVideoPlay}>
+                    Vezi video
+                  </button>
+                  {' '}sau urmărește pașii de mai jos.
+                </strong>
+              </div>
+            </li>
+          )}
           {steps.map((step, index) => (
             <li className={styles.step} key={index}>
               <span className={styles.stepNumber}>{String(index + 1).padStart(2, '0')}</span>
@@ -251,6 +320,28 @@ const InstallPage: React.FC = () => {
             </li>
           ))}
         </ol>
+
+        {installationVideo && (
+          <aside className={styles.videoGuide} aria-labelledby="installation-video-title">
+            <div className={styles.videoGuideCopy}>
+              <p className={styles.selectorLabel}>Alternativă la pași</p>
+              <h3 id="installation-video-title">{installationVideo.title}</h3>
+              <p>{installationVideo.description}</p>
+            </div>
+            <video
+              key={installationVideo.src}
+              ref={videoRef}
+              className={styles.video}
+              controls
+              autoPlay={false}
+              playsInline
+              preload="metadata"
+              src={presentationAsset.getUrl(installationVideo.src)}
+            >
+              Browserul tău nu poate reda acest video.
+            </video>
+          </aside>
+        )}
 
       </div>
     </section>

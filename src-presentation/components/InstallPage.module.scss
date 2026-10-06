@@ -203,6 +203,65 @@
   background: #eaf5fb;
 }
 
+.videoButton {
+  padding: 6px 12px;
+  border: 1px solid #1177bb;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #1177bb;
+  font: inherit;
+  font-size: 0.88em;
+  font-weight: 750;
+  vertical-align: middle;
+}
+
+.videoButton:hover {
+  color: #1177bb;
+  background: transparent;
+}
+
+.videoGuide {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.75fr) minmax(280px, 1.25fr);
+  gap: clamp(24px, 4vw, 72px);
+  align-items: center;
+  margin-top: clamp(44px, 5vw, 76px);
+  padding: clamp(24px, 3vw, 42px) 0 0;
+  border-top: 1px solid #d8d8d4;
+}
+
+.videoGuideCopy {
+  align-self: start;
+}
+
+.videoGuideCopy .selectorLabel {
+  margin-bottom: 16px;
+  color: #1177bb;
+}
+
+.videoGuide h3 {
+  margin: 0 0 14px;
+  font-size: clamp(1.45rem, 2.2vw, 2.35rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.videoGuide p:not(.selectorLabel) {
+  margin: 0;
+  color: #5d5d59;
+  font-size: clamp(0.9rem, 0.95vw, 1.05rem);
+  line-height: 1.55;
+}
+
+.video {
+  display: block;
+  width: 100%;
+  max-height: min(65vh, 620px);
+  border-radius: 6px;
+  background: #111111;
+  object-fit: contain;
+}
+
 .action {
   display: inline-block;
   padding: 4px 8px;
@@ -259,6 +318,14 @@
 
   .instructions {
     padding: 32px 0 42px;
+  }
+
+  .videoGuide {
+    display: block;
+  }
+
+  .videoGuideCopy {
+    margin-bottom: 24px;
   }
 }
 
