@@ -22,6 +22,27 @@ interface AdPanelRootProps {
   };
 }
 
+const IMAGE_RESULTS_FRESHNESS_DAYS = 10;
+
+function getImageCount(item: Element, hasImages: boolean): number {
+  const countText = item.querySelector<HTMLElement>('.article-img-count-number')?.textContent;
+  const count = countText ? Number.parseInt(countText, 10) : 0;
+
+  if (Number.isFinite(count) && count > 0) {
+    return count;
+  }
+
+  const detailCountText = item.querySelector<HTMLElement>('.detailViewCountImages')?.textContent;
+  const detailCount = detailCountText?.match(/\b\d+\s*\/\s*(\d+)\b/);
+
+  if (detailCount) {
+    return Number.parseInt(detailCount[1], 10);
+  }
+
+  const associatedMediaCount = item.querySelectorAll('[itemprop="associatedMedia"] li').length;
+  return associatedMediaCount > 0 ? associatedMediaCount : (hasImages ? 1 : 0);
+}
+
 const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const [renderCycle, setRenderCycle] = useState(0);
   const [{search, images, imageSearchErrors}, setSearches] = useState<{
@@ -46,6 +67,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const hasImages = !!item.querySelector(
     '.article-img-count, [itemprop="image"], .detailViewImg, [itemprop="associatedMedia"] li',
   );
+  const imageCount = getImageCount(item, hasImages);
 
   const filteredSearchLinks = linksFilter.sortLinks(linksFilter.filterLinks(search || [], itemUrl));
   const nimfomaneLink = filteredSearchLinks
@@ -70,6 +92,11 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const imageTime = WWStorage.getAdImagesInvestigatedTime(id);
   const {daysString: phoneInvestigatedSinceDays, stale: phoneInvestigateStale} = dateLib.calculateTimeSince(phoneTime);
   const {daysString: imageInvestigatedSinceDays, stale: imageInvestigateStale} = dateLib.calculateTimeSince(imageTime);
+  const imageResultsAreFresh = imageTime !== undefined
+    && Date.now() - imageTime <= IMAGE_RESULTS_FRESHNESS_DAYS * 24 * 60 * 60 * 1000;
+  const allImageSearchesFailed = imageResultsAreFresh
+    && imageCount > 0
+    && imageSearchErrors?.length === imageCount;
 
   const imageResultsStatus = linksFilter.getImageResultsStatus(imageSearchDomains, imageInvestigateStale);
 
@@ -303,6 +330,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         ddcLink={ddcLink}
         imageSearchDomains={imageSearchDomains}
         imageSearchErrorCount={imageSearchErrors?.length ?? 0}
+        allImageSearchesFailed={allImageSearchesFailed}
         imageResultsStatus={imageResultsStatus}
         searchLinks={search}
         filteredSearchLinks={filteredSearchLinks}

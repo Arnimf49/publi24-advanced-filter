@@ -49,6 +49,7 @@ interface AdPanelProps {
   imageInvestigateStale?: boolean;
   imageSearchDomains?: ImageSearchDomain[];
   imageSearchErrorCount?: number;
+  allImageSearchesFailed?: boolean;
   imageResultsStatus?: 'green' | 'yellow' | 'red' | null;
   hasImages?: boolean;
   hasImagesInOtherLocation?: boolean;
@@ -96,6 +97,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     imageInvestigateStale,
     imageSearchDomains,
     imageSearchErrorCount = 0,
+    allImageSearchesFailed = false,
     imageResultsStatus,
     hasImages = true,
     hasImagesInOtherLocation,
@@ -368,7 +370,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                     )
                   ) : (
                     <>
-                      {imageSearchDomains.length === 0 ? (
+                      {imageSearchDomains.length === 0 && !allImageSearchesFailed ? (
                         <p className={`${styles.noResults} ${styles.noResultsFound}`}>nu au fost găsite linkuri
                           relevante</p>
                       ) : (

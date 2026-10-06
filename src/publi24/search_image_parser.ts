@@ -64,11 +64,25 @@ function releaseStorageLock(): Promise<void> {
 function deduplicateResults<T>(results: T[]): T[] {
   const seen = new Set<string>();
   return results.filter(item => {
+    if (isImageSearchError(item)) {
+      return true;
+    }
+
     const key = JSON.stringify(item);
-    if (seen.has(key)) return false;
+    if (seen.has(key)) {
+      return false;
+    }
+
     seen.add(key);
     return true;
   });
+}
+
+function isImageSearchError(item: unknown): item is ImageSearchError {
+  return typeof item === 'object'
+    && item !== null
+    && !Array.isArray(item)
+    && (item as ImageSearchError).type === 'err';
 }
 
 function getDesktopExactLink(): HTMLElement | null {
