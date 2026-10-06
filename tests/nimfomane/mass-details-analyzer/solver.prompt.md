@@ -12,7 +12,12 @@ Do the following in the loop:
      - An **extraction false positive error** means the extractor produced details from text that is not talking about services or personal details at all. These are the only cases that use a `false-sampleN.txt` mock: the entire source must produce `null`, and the file must be added to the relevant false-sample loop. Fix the extractor so it stops extracting from that non-service/non-personal text.
      - Do not use a false sample for a service-related source that has valid extracted fields but one incorrect or over-inferred field. That remains an **extraction error** and uses a regular `sampleN.txt` fixture with the valid fields preserved.
      - A **flagger invalid claim** means the flagger's allegation is wrong and the current extraction is supported by the source. This needs no mock and no extractor change. Propose and, once accepted, apply a flagger fix (usually in flaggerPrompt.ts) that prevents the valid extraction from being flagged again.
-6. For each unresolved extraction error or extraction false positive error, confirm with the user that it is a valid issue that needs to be handled. Do not treat the entire item as valid or invalid when it contains mixed claims.
+6. For each unresolved claim that needs user confirmation, use the ask tool with exactly these four choices:
+     1. **Approve proposed handling** — approve the handling described in the question.
+     2. **[Alternative classification 1]** — the first of the other two classifications: extraction false positive error (false sample), extraction error (regular sample), or flagger invalid claim.
+     3. **[Alternative classification 2]** — the second of the other two classifications.
+     4. **Other** — the user must provide details; stop processing and wait for new user input.
+   Replace the bracketed labels with the exact applicable classifications, and do not add, remove, or combine choices. For example, when proposing an extraction false positive error, choices 2 and 3 are **Normal extraction error** and **Flagger invalid claim**. When proposing an extraction error, they are **False-positive extraction error** and **Flagger invalid claim**. When proposing a flagger invalid claim, they are **False-positive extraction error** and **Normal extraction error**. Do not treat the entire item as valid or invalid when it contains mixed claims.
 7. Once the user approves an unresolved extraction error or extraction false positive error, apply only the approved fixes.
      - For an **extraction error**, run `npx tsx tests/nimfomane/mass-details-analyzer/flaggedToMocks.ts {index} --kind {kind} --false-positive false`.
      - For an **extraction false positive error** involving non-service/non-personal text, run `npx tsx tests/nimfomane/mass-details-analyzer/flaggedToMocks.ts {index} --kind {kind} --false-positive true`.
@@ -34,3 +39,4 @@ Do the following in the loop:
 
 - Do not run the flagger again in any case. This costs money as it uses AI.
 - Treat `op=true` as valid whenever `on=true`: the extractor intentionally assumes oral availability as a pair, even when the source only names unprotected oral. Do not create a fixture or extractor change for that distinction.
+- Treat `sărutări pe gură` (kissing on the mouth) as French kissing (`fk`) for extraction auditing, including when it appears in a refusal list; do not flag `fk:false` for that wording.

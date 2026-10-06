@@ -36,6 +36,11 @@ const samples: Array<{file: string; expected: PersonalDetails}> = [
   {file: "sample31.txt", expected: {age: 30}},
   {file: "sample32.txt", expected: {age: 27, height: 165}},
   {file: "sample33.txt", expected: null},
+  {file: "sample34.txt", expected: null},
+  {file: "sample35.txt", expected: null},
+  {file: "sample36.txt", expected: {height: 160}},
+  {file: "sample37.txt", expected: null},
+  {file: "sample38.txt", expected: null},
 ];
 
 for (const sample of samples) {
@@ -44,7 +49,7 @@ for (const sample of samples) {
   });
 }
 
-for (const file of ["false-sample1.txt", "false-sample.txt", "false-sample2.txt", "false-sample3.txt", "false-sample4.txt", "false-sample5.txt", "false-sample6.txt", "false-sample7.txt", "false-sample8.txt", "false-sample9.txt", "false-sample10.txt", "false-sample12.txt", "false-sample13.txt", "false-sample15.txt", "false-sample16.txt", "false-sample17.txt", "false-sample18.txt", "false-sample19.txt", "sample24.txt", "sample25.txt", "sample29.txt"]) {
+for (const file of ["false-sample1.txt", "false-sample.txt", "false-sample2.txt", "false-sample3.txt", "false-sample4.txt", "false-sample5.txt", "false-sample6.txt", "false-sample7.txt", "false-sample8.txt", "false-sample9.txt", "false-sample10.txt", "false-sample12.txt", "false-sample13.txt", "false-sample15.txt", "false-sample16.txt", "false-sample17.txt", "false-sample18.txt", "false-sample19.txt", "false-sample20.txt", "false-sample21.txt", "false-sample22.txt", "false-sample23.txt", "false-sample24.txt", "false-sample25.txt", "false-sample26.txt", "false-sample27.txt", "false-sample28.txt", "false-sample29.txt", "false-sample30.txt", "false-sample31.txt", "false-sample32.txt", "sample24.txt", "sample25.txt", "sample29.txt"]) {
   test(`does not extract personal details from ${file}`, () => {
     expect(escortInfoExtractor.extractPersonalDetails(readSample(file))).toBeNull();
   });
