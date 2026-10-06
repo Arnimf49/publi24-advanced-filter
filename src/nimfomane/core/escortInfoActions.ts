@@ -7,6 +7,7 @@ import {cityDetection} from './cityDetection';
 
 const REFRESH_INTERVAL = 21 * 24 * 60 * 60 * 1000;
 const OLDEST_POST_DATE = 3 * 365 * 24 * 60 * 60 * 1000;
+const MIN_VISITED_CITIES = 20;
 const MAX_VISITED_CITIES = 32;
 const ACTIVE_COLLECTIONS = new Map<string, Promise<void>>();
 
@@ -297,7 +298,8 @@ function clearProfileContentDates(user: string, escort: EscortItem): void {
 function hasAllDetails(details: CollectedDetails): boolean {
   return hasCompletePersonalDetails(details)
     && !!details.serviceDetails
-    && !!details.servicePostSourceSelected;
+    && !!details.servicePostSourceSelected
+    && details.visitedCities.length >= MIN_VISITED_CITIES;
 }
 
 function hasCompletePersonalDetails(details: CollectedDetails): boolean {
