@@ -68,7 +68,7 @@ test('Should search for images and show relevant results.', async ({ page, conte
         return false;
       }
 
-      expect(await warning.innerText()).toEqual('anunțuri active găsite în alte locații !');
+      expect(await warning.innerText()).toEqual('Anunțuri active găsite în alte locații !');
       return true;
     },
     'safe links': async (ad) => {
@@ -209,6 +209,58 @@ test('Should show "date șterse, caută din nou" when image search results are c
   const messageElement = await imageResultsContainer.$('p');
   const className = await messageElement.getAttribute('class');
   expect(className).toContain('missingResults');
+});
+
+test('Should display error message for failed image search results', async ({ page, context }) => {
+  await utilsPubli.open(context, page, {loadStorage: false});
+
+  const ad = await utilsPubli.findAdWithConditionNoLoader(page, async () => {
+    for (const candidate of await page.$$('[data-articleid]')) {
+      if (await candidate.$('.article-img-count, [itemprop="image"], .detailViewImg, [itemprop="associatedMedia"] li')) {
+        return candidate;
+      }
+    }
+
+    return null;
+  });
+  const adId = await ad.getAttribute('data-articleid');
+  const imageResults = [
+    {type: 'err'},
+    'https://example.com/success-one',
+    {type: 'err'},
+    'https://example.org/success-two',
+  ];
+
+  await page.evaluate((id) => {
+    const timestamp = Date.now();
+    localStorage.setItem(`ww2:${id.toUpperCase()}`, JSON.stringify({
+      lastSeen: timestamp,
+      phone: '0700000000',
+      analyzedAt: timestamp,
+      phoneTime: timestamp,
+      imagesTime: timestamp,
+      visibility: 1,
+    }));
+  }, adId);
+
+  const background = context.serviceWorkers()[0];
+  await background.evaluate(
+    async ({id, imageResults}) => {
+      await chrome.storage.local.clear();
+      await chrome.storage.local.set({
+        [`ww:search_results:${id}`]: [],
+        [`ww:image_results:${id}`]: imageResults,
+      });
+    },
+    {id: adId, imageResults},
+  );
+
+  await page.reload();
+
+  const adAfterReload = await page.waitForSelector(`[data-articleid="${adId}"]`);
+  const errorMessage = await adAfterReload.waitForSelector('[data-wwid="image-search-error"]');
+  expect(await errorMessage.innerText()).toEqual('Căutare eșuată pentru 2 poze !');
+  expect(await adAfterReload.$$('[data-wwid="image-results"] a[target="_blank"][href]')).toHaveLength(2);
 });
 
 

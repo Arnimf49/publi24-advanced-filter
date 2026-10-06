@@ -48,6 +48,7 @@ interface AdPanelProps {
   imageInvestigatedSinceDays?: string | null;
   imageInvestigateStale?: boolean;
   imageSearchDomains?: ImageSearchDomain[];
+  imageSearchErrorCount?: number;
   imageResultsStatus?: 'green' | 'yellow' | 'red' | null;
   hasImages?: boolean;
   hasImagesInOtherLocation?: boolean;
@@ -94,6 +95,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     imageInvestigatedSinceDays,
     imageInvestigateStale,
     imageSearchDomains,
+    imageSearchErrorCount = 0,
     imageResultsStatus,
     hasImages = true,
     hasImagesInOtherLocation,
@@ -350,6 +352,11 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                 </span>
                   )}
                 </h5>
+                {imageSearchErrorCount > 0 && (
+                  <p className={styles.imageSearchError} data-wwid="image-search-error">
+                    Căutare eșuată pentru {imageSearchErrorCount === 1 ? 'o poză' : `${imageSearchErrorCount} poze`} !
+                  </p>
+                )}
                 <div data-wwid="image-results">
                   {imageSearchDomains === undefined ? (
                     isImageSearchLoading ? (
@@ -368,7 +375,7 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                         <>
                           {hasImagesInOtherLocation && (
                             <p className={styles.imagesWarning} data-wwid="images-warning">
-                              anunțuri active găsite în alte locații !
+                              Anunțuri active găsite în alte locații !
                             </p>
                           )}
                           <div className={styles.imageResultsContainer}>

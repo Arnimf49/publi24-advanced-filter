@@ -2,7 +2,7 @@ import {WWBrowserStorage} from "./core/browserStorage";
 import {IS_MOBILE_VIEW} from "../common/globals";
 import {utils} from "../common/utils";
 import {addSearchLoader, addContinueButton, withRetry} from "./core/searchUI";
-import {ImageResult} from "./core/linksFilter";
+import {ImageResult, ImageSearchError} from "./core/linksFilter";
 
 interface ImageSearchData {
   wwid: string;
@@ -61,7 +61,7 @@ function releaseStorageLock(): Promise<void> {
 }
 
 
-function deduplicateResults(results: ImageResult[]): ImageResult[] {
+function deduplicateResults<T>(results: T[]): T[] {
   const seen = new Set<string>();
   return results.filter(item => {
     const key = JSON.stringify(item);
@@ -71,14 +71,19 @@ function deduplicateResults(results: ImageResult[]): ImageResult[] {
   });
 }
 
-function getDesktopExactLink(): HTMLButtonElement | null {
-  return document.body.querySelector<HTMLButtonElement>('[aria-describedby="reverse-image-search-button-tooltip"]');
+function getDesktopExactLink(): HTMLElement | null {
+  return document.body.querySelector<HTMLElement>('[aria-describedby="reverse-image-search-button-tooltip"]')
+    ?? getExactMatchTextElement();
 }
 
-function getMobileExactLink(): Node | null {
-  const xpath = "//*[text()='Potriviri exacte']";
+function getExactMatchTextElement(): HTMLElement | null {
+  const xpath = "//span[normalize-space(.)='Potriviri exacte' or normalize-space(.)='Exact matches']";
   const matchingElement = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-  return matchingElement;
+  return matchingElement instanceof HTMLElement ? matchingElement : null;
+}
+
+function getMobileExactLink(): HTMLElement | null {
+  return getExactMatchTextElement();
 }
 
 function wait(ms: number): Promise<void> {
@@ -117,6 +122,18 @@ function hasNoResults(): boolean {
   return Array.from(document.querySelectorAll<HTMLElement>('[role="heading"]')).some(element => {
     const text = element.textContent?.replace(/\s+/g, ' ').trim() ?? '';
     return noExactMatchesTexts.some(noExactMatchesText => text.includes(noExactMatchesText));
+  });
+}
+
+function hasSearchError(): boolean {
+  const searchErrorTexts = [
+    'Something went wrong',
+    'A apărut o eroare',
+  ];
+
+  return Array.from(document.querySelectorAll<HTMLElement>('[role="heading"]')).some(element => {
+    const text = element.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+    return searchErrorTexts.includes(text);
   });
 }
 
@@ -262,18 +279,18 @@ async function readImageLinks(isMobile: boolean, done: (results: ImageResult[]) 
 
     utils.debugLog( 'Waiting for links to be fully loaded (none start with /)...');
     await waitForCondition(
-      () => hasNoResults() || areLinksFullyLoaded(isMobile),
+      () => hasSearchError() || hasNoResults() || areLinksFullyLoaded(isMobile),
       50
     );
 
-    if (hasNoResults()) {
+    if (hasSearchError() && hasNoResults()) {
       done([]);
       return;
     }
 
     const results = await waitForStableResults(isMobile, 150);
 
-    if (hasNoResults()) {
+    if (hasSearchError() || hasNoResults()) {
       done([]);
       return;
     }
@@ -291,9 +308,14 @@ async function parseResults(wwid: string): Promise<void> {
     getStorageLock().then(() => {
       const imageResultsKey = `ww:image_results:${wwid}`;
 
-      WWBrowserStorage.get(imageResultsKey).then((data: { [key: string]: any }) => {
-        let currentImageResults: ImageResult[] = (data[imageResultsKey] as ImageResult[] | undefined) || [];
-        let combinedData = deduplicateResults([...currentImageResults, ...results]);
+      WWBrowserStorage.get([imageResultsKey, STORAGE_KEY_IMG_SEARCH]).then((data: { [key: string]: any }) => {
+        let currentImageResults: Array<ImageResult | ImageSearchError> =
+          (data[imageResultsKey] as Array<ImageResult | ImageSearchError> | undefined) || [];
+        let resultEntries: Array<ImageResult | ImageSearchError> = results;
+        if (hasSearchError()) {
+          resultEntries = [{type: 'err'}];
+        }
+        let combinedData = deduplicateResults([...currentImageResults, ...resultEntries]);
 
         WWBrowserStorage.set(imageResultsKey, combinedData).then(() => {
           releaseStorageLock();

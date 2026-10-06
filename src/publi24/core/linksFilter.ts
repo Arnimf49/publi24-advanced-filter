@@ -103,6 +103,10 @@ for (const [key, countries] of escortSiteNameCountries) {
 // when the absolute URL could not be determined (Google Lens /goto redirect).
 export type ImageResult = string | [string, string];
 
+export interface ImageSearchError {
+  type: 'err';
+}
+
 // A raw search result: either an absolute URL string, or a [displayName, gotoPath] tuple
 // when Google renders a /goto redirect hiding the real destination URL.
 export type SearchResult = string | [string, string];

@@ -1,7 +1,7 @@
 import {WWBrowserStorage} from "./browserStorage";
 import {IS_MOBILE_VIEW, IS_PROMOTER} from "../../common/globals";
 import {dataCompression} from "./dataCompression";
-import {ImageResult} from "./linksFilter";
+import {ImageResult, ImageSearchError} from "./linksFilter";
 
 export interface AdUuid {
   id: string;
@@ -42,6 +42,12 @@ interface WwStoreCache {
   item: Record<string, AdItem>;
   phone: Record<string, PhoneItem>;
   save: string[] | null;
+}
+
+function isImageSearchError(result: ImageResult | ImageSearchError): result is ImageSearchError {
+  return typeof result === 'object'
+    && !Array.isArray(result)
+    && result.type === 'err';
 }
 
 export interface AutoHideCriterias {
@@ -278,10 +284,22 @@ export const WWStorage = {
     return WWStorage.getAdProp(id, 'age');
   },
 
-  async getAdSearchResults(id: string): Promise<{search?: string[], images?: ImageResult[]}> {
+  async getAdSearchResults(id: string): Promise<{
+    search?: string[];
+    images?: ImageResult[];
+    imageSearchErrors?: ImageSearchError[];
+  }> {
     return WWBrowserStorage.get([`ww:search_results:${id}`, `ww:image_results:${id}`])
       .then((results) => {
-        return {search: results[`ww:search_results:${id}`], images: results[`ww:image_results:${id}`]};
+        const imageResults = results[`ww:image_results:${id}`] as Array<ImageResult | ImageSearchError> | undefined;
+        const images = imageResults?.filter((result): result is ImageResult => !isImageSearchError(result));
+        const imageSearchErrors = imageResults?.filter(isImageSearchError);
+
+        return {
+          search: results[`ww:search_results:${id}`],
+          images,
+          imageSearchErrors,
+        };
       })
   },
 

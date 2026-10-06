@@ -357,7 +357,10 @@ export const adActions = {
     WWStorage.clearAdDuplicatesInOtherLocation(id);
 
     const results: { [key: string]: ImageResult[] } = await WWBrowserStorage.get(`ww:image_results:${id}`);
-    const rawImageLinks: ImageResult[] = results[`ww:image_results:${id}`] || [];
+    const rawImageLinks: ImageResult[] = (results[`ww:image_results:${id}`] || [])
+      .filter((result: ImageResult | {type?: string}): result is ImageResult => {
+        return typeof result !== 'object' || Array.isArray(result) || result.type !== 'err';
+      });
 
     if (!rawImageLinks.some(linksFilter.isAdUrl)) {
       return;

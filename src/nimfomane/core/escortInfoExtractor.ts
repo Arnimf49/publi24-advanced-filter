@@ -5279,9 +5279,9 @@ export const escortInfoExtractor = {
         && rates.baseRates['1h'] !== undefined
         && services.ap !== false) {
         const thirtyMinuteSurcharge = Number.parseInt(analInclusiveFinalizationRates[1], 10)
-          - rates.baseRates['30m'];
+          - numericRateAmount(rates.baseRates['30m']);
         const hourlySurcharge = Number.parseInt(analInclusiveFinalizationRates[2], 10)
-          - rates.baseRates['1h'];
+          - numericRateAmount(rates.baseRates['1h']);
         if (thirtyMinuteSurcharge > 0 || hourlySurcharge > 0) {
           services.ap = {extraCost: Math.max(thirtyMinuteSurcharge, hourlySurcharge)};
         }

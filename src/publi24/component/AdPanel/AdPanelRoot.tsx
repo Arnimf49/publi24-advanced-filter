@@ -1,7 +1,7 @@
 import React, {FC, MouseEventHandler, useCallback, useEffect, useState} from "react";
 import {adData} from "../../core/adData";
 import {WWStorage} from "../../core/storage";
-import {ImageResult, SearchResult, linksFilter} from "../../core/linksFilter";
+import {ImageResult, ImageSearchError, SearchResult, linksFilter} from "../../core/linksFilter";
 import {dateLib} from "../../core/dateLib";
 import AdPanel from "./AdPanel";
 import {adActions} from "../../core/adActions";
@@ -24,7 +24,11 @@ interface AdPanelRootProps {
 
 const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const [renderCycle, setRenderCycle] = useState(0);
-  const [{search, images}, setSearches] = useState<{search?: SearchResult[], images?: ImageResult[]}>({});
+  const [{search, images, imageSearchErrors}, setSearches] = useState<{
+    search?: SearchResult[];
+    images?: ImageResult[];
+    imageSearchErrors?: ImageSearchError[];
+  }>({});
   const [showHideReason, setShowHideReason] = useState(false);
   const [showImagesSlider, setShowImagesSlider] = useState(false);
   const [showDuplicates, setShowDuplicates] = useState(false);
@@ -298,6 +302,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         nimfomaneLink={nimfomaneHref}
         ddcLink={ddcLink}
         imageSearchDomains={imageSearchDomains}
+        imageSearchErrorCount={imageSearchErrors?.length ?? 0}
         imageResultsStatus={imageResultsStatus}
         searchLinks={search}
         filteredSearchLinks={filteredSearchLinks}

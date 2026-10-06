@@ -646,6 +646,16 @@
   }
 }
 
+.imageSearchError {
+  color: #8b5454;
+  font-size: .8125rem;
+  margin: 0 0 5px;
+
+  :global(.dark) & {
+    color: rgb(207 161 161);
+  }
+}
+
 .imageResultLink {
   display: inline-block;
   padding: 5px;
