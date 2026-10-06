@@ -8,6 +8,15 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.12',
+    releaseDate: '6 octombrie 2026',
+    changeNew: [
+      'Cănd cautarea după poze eșuează pe parte de Google Lens, nu se mai blochează, și acest aspect este afișat sub \'Rezultate poze\'.'
+    ],
+    changeImprove: [],
+    changeFix: []
+  },
+  {
     version: '3.11',
     releaseDate: '2 octombrie 2026',
     changeNew: [
