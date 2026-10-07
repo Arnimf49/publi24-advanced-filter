@@ -79,6 +79,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     midpoint: Point;
     position: Point;
     zoom: number;
+    center: Point;
   } | null>(null);
   const zoomRef = useRef(MIN_ZOOM);
   const positionRef = useRef<Point>({x: 0, y: 0});
@@ -158,11 +159,17 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
 
     if (pointersRef.current.size === 2) {
       const [first, second] = [...pointersRef.current.values()];
+      const rect = event.currentTarget.getBoundingClientRect();
+      const center = {
+        x: rect.left + rect.width / 2 - positionRef.current.x,
+        y: rect.top + rect.height / 2 - positionRef.current.y,
+      };
       pinchStartRef.current = {
         distance: getDistance(first, second),
         midpoint: getMidpoint(first, second),
         position: positionRef.current,
         zoom: zoomRef.current,
+        center,
       };
       gestureDraggingRef.current = true;
       setSplideDragDisabled(true);
@@ -181,21 +188,28 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
       const [first, second] = [...pointersRef.current.values()];
       const distance = getDistance(first, second);
       const midpoint = getMidpoint(first, second);
+      const pinchStart = pinchStartRef.current;
       const nextZoom = clamp(
-        pinchStartRef.current.zoom * (distance / pinchStartRef.current.distance),
+        pinchStart.zoom * (distance / pinchStart.distance),
         MIN_ZOOM,
         MAX_ZOOM,
       );
+
+      // Anchor the zoom at the pinch midpoint: keep the image point that sits
+      // under the pinch midpoint pinned there while the scale changes.
+      const scaleRatio = nextZoom / pinchStart.zoom;
+      const anchorX = pinchStart.midpoint.x - pinchStart.center.x;
+      const anchorY = pinchStart.midpoint.y - pinchStart.center.y;
       const nextPosition = getBoundedPosition(
         imageDimensions(event.currentTarget),
         nextZoom,
         {
-          x: pinchStartRef.current.position.x
-            + midpoint.x
-            - pinchStartRef.current.midpoint.x,
-          y: pinchStartRef.current.position.y
-            + midpoint.y
-            - pinchStartRef.current.midpoint.y,
+          x: pinchStart.position.x * scaleRatio
+            + midpoint.x - pinchStart.midpoint.x
+            + anchorX * (1 - scaleRatio),
+          y: pinchStart.position.y * scaleRatio
+            + midpoint.y - pinchStart.midpoint.y
+            + anchorY * (1 - scaleRatio),
         },
       );
 
