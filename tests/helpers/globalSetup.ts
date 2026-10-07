@@ -31,7 +31,10 @@ async function setupPubli24() {
 
   await utilsPubli.open(context, page, {loadStorage: false});
   utilsPubli.clearPopups(page);
-  const article = await utilsPubli.findAdWithDuplicates(page, true);
+  const articleWithDuplicates = await utilsPubli.findAdWithDuplicates(page, true);
+  const article = (await articleWithDuplicates.$('[data-wwid="investigate_img"]'))
+    ? articleWithDuplicates
+    : await utilsPubli.findFirstAdWithImageSearch(page);
 
   if (!process.env.MANUAL_PRIME) {
     await utilsPubli.resolveGooglePage(await article.waitForSelector('[data-wwid="investigate_img"]'), context, page);

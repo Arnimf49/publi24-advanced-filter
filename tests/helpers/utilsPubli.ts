@@ -319,6 +319,23 @@ export const utilsPubli = {
     });
   },
 
+  async findFirstAdWithImageSearch(page: Page) {
+    return await utilsPubli.findAdWithCondition(page, async () => {
+      for (let article of await page.$$('[data-articleid]')) {
+        while (await article.$('[data-wwid="loader"]')) {
+          await page.waitForTimeout(1000);
+        }
+
+        const button = await article.$('[data-wwid="investigate_img"]');
+        if (button && await button.isVisible()) {
+          await article.scrollIntoViewIfNeeded();
+          return article;
+        }
+      }
+      return null;
+    });
+  },
+
   async selectAd(page: Page, articleId?: string) {
     let article;
 
@@ -381,12 +398,15 @@ export const utilsPubli = {
     }, {phone, key, value});
   },
 
-  async forceAdNewAnalyze(page: Page, id: string): Promise<void> {
-    await page.evaluate((innerId) => {
-      const data = JSON.parse(window.localStorage.getItem(`ww2:${innerId.toUpperCase()}`));
+  async forceAdNewAnalyze(page: Page, id: string, removeKeys: string[] = []): Promise<void> {
+    await page.evaluate(({innerId, keys}) => {
+      const data = JSON.parse(window.localStorage.getItem(`ww2:${innerId.toUpperCase()}`) || '{}');
+      for (const key of keys) {
+        delete data[key];
+      }
       data.analyzedAt = Date.now() - (1.296e+9 + 1000 * 60);
       window.localStorage.setItem(`ww2:${innerId.toUpperCase()}`, JSON.stringify(data));
-    }, id);
+    }, {innerId: id, keys: removeKeys});
   },
 
   async mockAdContentResponse(page: Page, url: string, {title, description, delay}: {title: string, description: string, delay?: number}) {

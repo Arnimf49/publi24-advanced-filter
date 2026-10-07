@@ -1,5 +1,6 @@
 import {expect, test} from "../helpers/fixture";
 import {utilsPubli} from "../helpers/utilsPubli";
+import {utils} from "../helpers/utils";
 
 test('Should show age, height, weight and bmi from description.', async ({ page, context }) => {
   await utilsPubli.open(context, page, {loadStorage: false});
@@ -130,5 +131,32 @@ test('Should re-analyze after 15 days.', async ({ page, context }) => {
 
   ad =  await utilsPubli.mockAdContent(page, ad, 'Hai sa ne vedem, 50 de ani', 'Matter not.');
   expect(await (await ad.waitForSelector('[data-wwid="age"]')).innerText()).toEqual('50ani');
+});
+
+test('Should fallback to phone number parsed from description when standard source is missing.', async ({ page, context }) => {
+  await utilsPubli.open(context, page, {loadStorage: false});
+
+  const ad = await utilsPubli.findFirstAdWithPhone(page);
+  const id = await ad.getAttribute('data-articleid');
+  const url = await ad.$eval('.article-title a', (el: HTMLAnchorElement) => el.href);
+
+  const description = 'buna! suna ma (07 cinci patru noua 51 noua 8 noua) pentru o programare';
+
+  await utils.modifyRouteBody(page, url, ($) => {
+    $('.detail-title h1, [itemprop="name"]').text('Anunt test telefon in descriere');
+    $('.article-description, [itemprop="description"]').text(description);
+    $('#EncryptedPhone').remove();
+    $('script').each((_, el) => {
+      if ($(el).text().includes('var cnt')) {
+        $(el).remove();
+      }
+    });
+  });
+
+  await utilsPubli.forceAdNewAnalyze(page, id, ['phone']);
+
+  await page.goto(url);
+
+  await expect(page.locator(`[data-articleid="${id}"] [data-wwid="phone-number"]`)).toHaveText('0754951989', {timeout: 25000});
 });
 

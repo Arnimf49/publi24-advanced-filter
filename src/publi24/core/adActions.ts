@@ -12,8 +12,9 @@ import {iosUtils} from "./iosUtils";
 import {ImageResult, linksFilter} from "./linksFilter";
 import {dataCompression} from "./dataCompression";
 import {WWMemoryStorage} from "./memoryStorage";
+import {textParser, type AdContentTuple} from "./textParser";
 
-export type AdContentTuple = [string, number | boolean];
+export type {AdContentTuple} from "./textParser";
 
 async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
   const page = await adData.loadInAdPage(item);
@@ -22,76 +23,7 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
 
   utils.debugLog('Analyzing content', {content: content.trim().substring(0, 200) + '...'});
 
-  const data: AdContentTuple[] = [];
-  let match: RegExpMatchArray | null;
-
-  const attemptApplyHeight = (height: number): void => {
-    if (height >= 135 && height <= 200) {
-      data.push(['height', height]);
-    }
-  }
-  const attemptApplyWeight = (weight: number): void => {
-    if (weight >= 35 && weight <= 145) {
-      data.push(['weight', weight]);
-    }
-  }
-
-  if ((match = content.match(/(1[.,'" ] ?[3-9]\d)/))) {
-    const str: string = match[1].replace(/[,'" ]/, '.').replace(' ', '');
-    attemptApplyHeight(Number.parseFloat(str) * 100);
-  }
-  if (!data.find(d => d[0] === 'height') && (match = content.match(/[^\d%](1[3-9]\d) ?[^\d%]/))) {
-    attemptApplyHeight(Number.parseInt(match[1], 10));
-  }
-  if (!data.find(d => d[0] === 'height') && (match = content.match(/inaltimea? (1[3-9]\d)/i))) {
-    attemptApplyHeight(Number.parseInt(match[1], 10));
-  }
-
-  if ((match = content.match(/(\d+) ?(de )?(kg|kilo)/i))) {
-    attemptApplyWeight(Number.parseInt(match[1], 10));
-  }
-  if ((match = content.match(/kg ?(\d+)/i))) {
-    attemptApplyWeight(Number.parseInt(match[1], 10));
-  }
-
-  if ((match = content.match(/(\d+) ?(de )?ani(?! de)/i))
-    || (match = content.match(/anca (\d+)/i))
-    || (match = content.match(/matura (\d+)/i))
-    || (match = content.match(/(\d+) ?(yrs|years)/i))) {
-    const age = Number.parseInt(match[1], 10);
-    if (age >= 17 && age <= 70) {
-      data.push(['age', age]);
-    }
-  }
-
-  if (content.match(/(\W|^)(show\s+web|web\s+show|show\s+la\s+web|show\s+(a-zA-Z)+\s+web|si\s+webb?)(\W|$)/i)) {
-    data.push(['showWeb', true]);
-  }
-  if (content.match(/(\W|^)(botox|siliconata|silicoane)(\W|$)/i)) {
-    data.push(['botox', true]);
-  }
-  if (content.match(/(\W|^)(party)(\W|$)/i)) {
-    data.push(['party', true]);
-  }
-  if (content.match(/(\W|^)(cu sau fara(?!\s+jucarii)|cum\s+vrei\s+tu|cum\s+te\s+simti\s+mai\s+bine|totale\s+fara[,.;]|cu\s+tot\s+ce\s+vrei)(\W|$)/i)) {
-    data.push(['btsRisc', true]);
-  }
-  if (
-    (
-      content.match(/(\W|^)(out\s*call|(doa?r|numai|decat)\s+(deplasar|depalsar|deplsar)(i{1,4}|e)|ma deplasez|nu (am|detin) locatie)(\W|$)/i)
-      || title.match(/(\W|^)(out\s*call|(deplasar|depalsar|deplsar)(i{1,4}|e))(\W|$)/i)
-    )
-    && !content.match(/(\W|^)(in\s*call|la\s+mine|locatie\s+proprie|si\s+deplasar[ie]|si\s+locatie|locatia\s+mea|in\s+locatie|nu\s+fac\s+deplasari)(\W|$)/i)) {
-    data.push(['onlyTrips', true]);
-  }
-  if (content.match(/(\W|^)(ts|trans|transs?exuala?)(\W|$)/i)) {
-    data.push(['trans', true]);
-  }
-  if (content.match(/(\W|^)(matura)(\W|$)/i)) {
-    data.push(['mature', true]);
-  }
-
-  return data;
+  return textParser.extractAdContentDataFromText(title, content);
 }
 
 
@@ -129,6 +61,11 @@ async function acquirePhoneNumber(item: Element, id: string): Promise<string | f
       const phoneNumberImgBase64 = await response.text();
       phone = await misc.readNumbersFromBase64Png(phoneNumberImgBase64);
     }
+  }
+
+  if (!phone || !phone.trim()) {
+    const text = adData.getPageTitle(adPage) + ' ' + adData.getPageDescription(adPage);
+    phone = textParser.extractPhoneFromText(text);
   }
 
   if (!phone || !phone.trim()) {
