@@ -15,8 +15,18 @@ type Point = {
   y: number;
 };
 
+type GestureEvent = {
+  currentTarget: HTMLImageElement;
+  pointerId: number;
+  clientX: number;
+  clientY: number;
+  preventDefault: () => void;
+  stopPropagation: () => void;
+};
+
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 4;
+const GESTURE_START_THRESHOLD = 8;
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max);
@@ -62,6 +72,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   const [zoom, setZoom] = useState(MIN_ZOOM);
   const [position, setPosition] = useState<Point>({x: 0, y: 0});
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+  const hasMultipleImages = images.length > 1;
   const pointersRef = useRef(new Map<number, Point>());
   const pinchStartRef = useRef<{
     distance: number;
@@ -72,7 +83,6 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   const zoomRef = useRef(MIN_ZOOM);
   const positionRef = useRef<Point>({x: 0, y: 0});
   const splideRef = useRef<any>(null);
-  const splideHasMultipleImagesRef = useRef(false);
   const singlePointerStartRef = useRef<Point | null>(null);
   const slideHandoffRef = useRef(false);
   const pendingSlideRef = useRef<'-1' | '+1' | null>(null);
@@ -82,6 +92,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   const snapBackTimeoutRef = useRef<number | null>(null);
   const expectedSlideMoveRef = useRef(false);
   const slideTransitionActiveRef = useRef(false);
+  const gestureDraggingRef = useRef(false);
 
   const setSplideDragDisabled = (disabled: boolean): void => {
     splideRef.current?.Components.Drag.disable(disabled);
@@ -113,16 +124,14 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     positionRef.current = {x: 0, y: 0};
     setZoom(MIN_ZOOM);
     setPosition({x: 0, y: 0});
-    setSplideDragDisabled(!splideHasMultipleImagesRef.current);
+    setSplideDragDisabled(!hasMultipleImages);
   };
 
   const handleImageClick = (event: React.MouseEvent<HTMLImageElement>) => {
     event.stopPropagation();
   };
 
-  const handlePointerDown = (event: PointerEvent<HTMLImageElement>): void => {
-    const image = event.currentTarget;
-
+  const handleGestureDown = (event: GestureEvent): void => {
     if (
       slideTransitionActiveRef.current
       || splideRef.current?.Components.Controller.isBusy()
@@ -134,32 +143,20 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
 
     pointersRef.current.set(event.pointerId, {x: event.clientX, y: event.clientY});
 
-    if (pointersRef.current.size === 1 && zoomRef.current > MIN_ZOOM) {
-      singlePointerStartRef.current = {x: event.clientX, y: event.clientY};
-      slideHandoffRef.current = false;
-      pendingSlideRef.current = null;
-      edgeDragDistanceRef.current = 0;
-      edgeDragDirectionRef.current = null;
-      previewBasePositionRef.current = splideRef.current?.Components.Move.getPosition() ?? null;
+    if (pointersRef.current.size === 1) {
+      if (zoomRef.current > MIN_ZOOM) {
+        singlePointerStartRef.current = {x: event.clientX, y: event.clientY};
+        slideHandoffRef.current = false;
+        pendingSlideRef.current = null;
+        edgeDragDistanceRef.current = 0;
+        edgeDragDirectionRef.current = null;
+        previewBasePositionRef.current = splideRef.current?.Components.Move.getPosition() ?? null;
+      }
 
-      image.setPointerCapture(event.pointerId);
-      setSplideDragDisabled(true);
-      event.stopPropagation();
-    }
-
-    if (pointersRef.current.size === 1 && zoomRef.current === MIN_ZOOM) {
-      singlePointerStartRef.current = {x: event.clientX, y: event.clientY};
-      slideHandoffRef.current = false;
-      pendingSlideRef.current = null;
-      edgeDragDistanceRef.current = 0;
-      edgeDragDirectionRef.current = null;
-      previewBasePositionRef.current = splideRef.current?.Components.Move.getPosition() ?? null;
-      image.setPointerCapture(event.pointerId);
-      event.stopPropagation();
+      gestureDraggingRef.current = false;
     }
 
     if (pointersRef.current.size === 2) {
-      const pointerIds = [...pointersRef.current.keys()];
       const [first, second] = [...pointersRef.current.values()];
       pinchStartRef.current = {
         distance: getDistance(first, second),
@@ -167,14 +164,12 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
         position: positionRef.current,
         zoom: zoomRef.current,
       };
-      image.setPointerCapture(pointerIds[0]);
-      image.setPointerCapture(event.pointerId);
+      gestureDraggingRef.current = true;
       setSplideDragDisabled(true);
-      event.stopPropagation();
     }
   };
 
-  const handlePointerMove = (event: PointerEvent<HTMLImageElement>): void => {
+  const handleGestureMove = (event: GestureEvent): void => {
     if (!pointersRef.current.has(event.pointerId)) {
       return;
     }
@@ -208,13 +203,15 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
       positionRef.current = nextPosition;
       setZoom(nextZoom);
       setPosition(nextPosition);
-      setSplideDragDisabled(nextZoom > MIN_ZOOM || pointersRef.current.size >= 2);
       event.preventDefault();
-      event.stopPropagation();
       return;
     }
 
     if (pointersRef.current.size === 1) {
+      if (zoomRef.current === MIN_ZOOM) {
+        return;
+      }
+
       const start = singlePointerStartRef.current;
       const deltaX = start ? event.clientX - start.x : 0;
       const deltaY = start ? event.clientY - start.y : 0;
@@ -222,6 +219,18 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
         || event.currentTarget.clientWidth;
       const handoffThreshold = sliderWidth * (zoomRef.current === MIN_ZOOM ? 0.15 : 0.4);
       const isHorizontalDrag = Math.abs(deltaX) > Math.abs(deltaY);
+
+      if (!gestureDraggingRef.current) {
+        const hasStartedGesture = zoomRef.current === MIN_ZOOM
+          ? isHorizontalDrag && Math.abs(deltaX) >= GESTURE_START_THRESHOLD
+          : Math.hypot(deltaX, deltaY) >= GESTURE_START_THRESHOLD;
+
+        if (!hasStartedGesture) {
+          return;
+        }
+
+        gestureDraggingRef.current = true;
+      }
 
       if (zoomRef.current === MIN_ZOOM) {
         if (isHorizontalDrag && previewBasePositionRef.current !== null) {
@@ -245,9 +254,9 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
         const isAtLeftEdge = positionRef.current.x >= maxPosition - 2;
         const isAtRightEdge = positionRef.current.x <= minPosition + 2;
 
-        if (!edgeDragDirectionRef.current && isAtLeftEdge && deltaX > 0) {
+        if (hasMultipleImages && !edgeDragDirectionRef.current && isAtLeftEdge && deltaX > 0) {
           edgeDragDirectionRef.current = 'previous';
-        } else if (!edgeDragDirectionRef.current && isAtRightEdge && deltaX < 0) {
+        } else if (hasMultipleImages && !edgeDragDirectionRef.current && isAtRightEdge && deltaX < 0) {
           edgeDragDirectionRef.current = 'next';
         }
 
@@ -307,19 +316,15 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
         }
       }
 
-      event.preventDefault();
-      event.stopPropagation();
+      if (gestureDraggingRef.current) {
+        event.preventDefault();
+      }
     }
   };
 
-  const handlePointerUp = (event: PointerEvent<HTMLImageElement>): void => {
-    const image = event.currentTarget;
+  const handleGestureUp = (event: GestureEvent): void => {
     pointersRef.current.delete(event.pointerId);
     pinchStartRef.current = null;
-
-    if (image.hasPointerCapture(event.pointerId)) {
-      image.releasePointerCapture(event.pointerId);
-    }
 
     if (pointersRef.current.size === 0) {
       const pendingSlide = pendingSlideRef.current;
@@ -348,15 +353,50 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
           splideRef.current?.go(pendingSlide);
         });
       }
+
+      gestureDraggingRef.current = false;
     }
 
-    if (zoomRef.current === MIN_ZOOM && pointersRef.current.size === 0) {
-      setSplideDragDisabled(!splideHasMultipleImagesRef.current);
+    if (pointersRef.current.size === 0 && zoomRef.current === MIN_ZOOM) {
+      setSplideDragDisabled(!hasMultipleImages);
     }
 
     if (zoomRef.current > MIN_ZOOM) {
       event.stopPropagation();
     }
+  };
+
+  const handleGestureCancel = (_event: GestureEvent): void => {
+    pointersRef.current.clear();
+    pinchStartRef.current = null;
+    singlePointerStartRef.current = null;
+    slideHandoffRef.current = false;
+    pendingSlideRef.current = null;
+    edgeDragDistanceRef.current = 0;
+    edgeDragDirectionRef.current = null;
+    gestureDraggingRef.current = false;
+
+    if (previewBasePositionRef.current !== null) {
+      snapPreviewBack(previewBasePositionRef.current);
+    }
+
+    previewBasePositionRef.current = null;
+  };
+
+  const handlePointerDown = (event: PointerEvent<HTMLImageElement>): void => {
+    handleGestureDown(event);
+  };
+
+  const handlePointerMove = (event: PointerEvent<HTMLImageElement>): void => {
+    handleGestureMove(event);
+  };
+
+  const handlePointerUp = (event: PointerEvent<HTMLImageElement>): void => {
+    handleGestureUp(event);
+  };
+
+  const handlePointerCancel = (event: PointerEvent<HTMLImageElement>): void => {
+    handleGestureCancel(event);
   };
 
   const handleDoubleClick = (event: React.MouseEvent<HTMLImageElement>): void => {
@@ -378,14 +418,13 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   const investigateImgClickHandler: MouseEventHandler = (event) => {
     onInvestigateImgClick(event);
     close();
-  }
+  };
 
   useEffect(() => {
     const splideElement = document.querySelector<HTMLElement>('.splide');
 
     if (!splideElement) return;
 
-    const hasMultipleImages = images.length > 1;
     const splide = new Splide(splideElement, {
       focus: 'center',
       type: 'loop',
@@ -394,11 +433,10 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
       drag: hasMultipleImages,
       gap: '10px',
       speed: 250,
-      noDrag: `.${styles.slideImage}`,
+      noDrag: `.${styles.zoomedImage}`,
     });
     splide.mount();
     splideRef.current = splide;
-    splideHasMultipleImagesRef.current = hasMultipleImages;
     splide.on('moved', (newIndex: number) => {
       setActiveSlideIndex(newIndex);
       if (expectedSlideMoveRef.current) {
@@ -507,7 +545,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
                   onPointerDown={handlePointerDown}
                   onPointerMove={handlePointerMove}
                   onPointerUp={handlePointerUp}
-                  onPointerCancel={handlePointerUp}
+                  onPointerCancel={handlePointerCancel}
                   className={`${styles.slideImage} ${
                     index === activeSlideIndex && zoom > MIN_ZOOM ? styles.zoomedImage : ''
                   }`}

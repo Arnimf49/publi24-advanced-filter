@@ -20,6 +20,7 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  touch-action: manipulation;
   background-color: #4a4a4a;
   color: white;
   vertical-align: middle;
@@ -116,7 +117,7 @@
   box-shadow: 5px 5px 15px 3px rgba(0, 0, 0, 0.3);
   border-radius: 5px;
   object-fit: contain;
-  touch-action: none;
+  touch-action: pan-y;
   user-select: none;
   -webkit-user-drag: none;
   will-change: transform;
@@ -124,6 +125,7 @@
 
 .zoomedImage {
   cursor: grab;
+  touch-action: none;
 }
 
 
