@@ -9,7 +9,7 @@ import {bgApi} from "../../common/background/bgApi";
 import {AUTO_HIDE_CRITERIA} from "./hideReasons";
 import {utils} from "../../common/utils";
 import {iosUtils} from "./iosUtils";
-import {ImageResult, linksFilter} from "./linksFilter";
+import {ImageResult, ImageSearchError, linksFilter} from "./linksFilter";
 import {dataCompression} from "./dataCompression";
 import {WWMemoryStorage} from "./memoryStorage";
 import {textParser, type AdContentTuple} from "./textParser";
@@ -175,19 +175,23 @@ async function searchPhoneResults(id: string, phoneNumber: string, item: HTMLEle
   }
 }
 
-async function resolveGotoFinalUrls(id: string, imageLinks: ImageResult[]): Promise<ImageResult[]> {
-  const publi24GotoEntries = imageLinks
+function isImageResult(result: ImageResult | ImageSearchError): result is ImageResult {
+  return typeof result === 'string' || Array.isArray(result);
+}
+
+async function resolveGotoFinalUrls(id: string, allResults: Array<ImageResult | ImageSearchError>): Promise<Array<ImageResult | ImageSearchError>> {
+  const publi24GotoEntries = allResults
     .map((entry, i) => ({ entry, i }))
     .filter(({ entry }) => Array.isArray(entry) && (entry as [string, string])[0].toLowerCase() === 'publi24');
 
   if (publi24GotoEntries.length === 0) {
-    return imageLinks;
+    return allResults;
   }
 
   const gotoPaths = publi24GotoEntries.map(({ entry }) => (entry as [string, string])[1]);
   const locations = await bgApi.resolveGotoUrls(gotoPaths);
 
-  const result = [...imageLinks];
+  const result = [...allResults];
   let changed = false;
 
   publi24GotoEntries.forEach(({ i }, j) => {
@@ -202,7 +206,7 @@ async function resolveGotoFinalUrls(id: string, imageLinks: ImageResult[]): Prom
     await WWBrowserStorage.set(`ww:image_results:${id}`, result);
   }
 
-  return changed ? result : imageLinks;
+  return changed ? result : allResults;
 }
 
 export const adActions = {
@@ -293,11 +297,9 @@ export const adActions = {
     WWStorage.clearAdDeadLinks(id);
     WWStorage.clearAdDuplicatesInOtherLocation(id);
 
-    const results: { [key: string]: ImageResult[] } = await WWBrowserStorage.get(`ww:image_results:${id}`);
-    const rawImageLinks: ImageResult[] = (results[`ww:image_results:${id}`] || [])
-      .filter((result: ImageResult | {type?: string}): result is ImageResult => {
-        return typeof result !== 'object' || Array.isArray(result) || result.type !== 'err';
-      });
+    const stored: { [key: string]: Array<ImageResult | ImageSearchError> } = await WWBrowserStorage.get(`ww:image_results:${id}`);
+    const storedResults: Array<ImageResult | ImageSearchError> = stored[`ww:image_results:${id}`] || [];
+    const rawImageLinks: ImageResult[] = storedResults.filter(isImageResult);
 
     if (!rawImageLinks.some(linksFilter.isAdUrl)) {
       return;
@@ -305,10 +307,13 @@ export const adActions = {
 
     try {
       WWMemoryStorage.setAnalyzeImagesLoading(id, true);
-      const imageLinks: ImageResult[] = await resolveGotoFinalUrls(id, rawImageLinks);
+      const imageLinks: Array<ImageResult | ImageSearchError> = await resolveGotoFinalUrls(id, storedResults);
 
-      const publi24AdLinks: string[] = imageLinks.flatMap((item: ImageResult): string[] => {
-        if (typeof item === 'string' && linksFilter.isAdUrl(item)) return [item];
+      const publi24AdLinks: string[] = imageLinks.flatMap((item: ImageResult | ImageSearchError): string[] => {
+        if (typeof item === 'string' && linksFilter.isAdUrl(item)) {
+          return [item];
+        }
+
         return [];
       });
 

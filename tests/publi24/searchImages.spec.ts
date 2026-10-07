@@ -211,56 +211,46 @@ test('Should show "date șterse, caută din nou" when image search results are c
   expect(className).toContain('missingResults');
 });
 
-test('Should display error message for failed image search results', async ({ page, context }) => {
+test('Should keep image search errors after post-search analysis resolves results', async ({ page, context }, testInfo) => {
+  testInfo.setTimeout(60000);
+
   await utilsPubli.open(context, page, {loadStorage: false});
 
-  const ad = await utilsPubli.findAdWithConditionNoLoader(page, async () => {
-    for (const candidate of await page.$$('[data-articleid]')) {
-      if (await candidate.$('.article-img-count, [itemprop="image"], .detailViewImg, [itemprop="associatedMedia"] li')) {
-        return candidate;
-      }
-    }
-
-    return null;
-  });
+  const ad = await utilsPubli.findFirstAdWithImageSearch(page);
   const adId = await ad.getAttribute('data-articleid');
-  const imageResults = [
-    {type: 'err'},
-    'https://example.com/success-one',
-    {type: 'err'},
-    'https://example.org/success-two',
-  ];
 
-  await page.evaluate((id) => {
-    const timestamp = Date.now();
-    localStorage.setItem(`ww2:${id.toUpperCase()}`, JSON.stringify({
-      lastSeen: timestamp,
-      phone: '0700000000',
-      analyzedAt: timestamp,
-      phoneTime: timestamp,
-      imagesTime: timestamp,
-      visibility: 1,
-    }));
-  }, adId);
+  // Resolve the publi24 /goto result deterministically instead of hitting the network.
+  await utilsPubli.mockServiceWorkerFetchRedirects(context, [
+    {urlPrefix: 'https://www.google.com/goto/', finalUrl: 'https://example.com/resolved-image-result'},
+  ]);
 
+  // Close the Lens tabs right away so the real parser never writes results.
+  context.on('page', (openedPage) => {
+    openedPage.close().catch((error) => console.debug('Lens tab was already closed.', error));
+  });
+
+  await (await ad.waitForSelector('[data-wwid="investigate_img"]')).click();
+  await page.waitForTimeout(1000);
+
+  // Replace whatever the (closed) Lens tabs would have produced: two failures and one
+  // successful publi24 /goto result. Clearing the search count lets post-search analysis run.
   const background = context.serviceWorkers()[0];
-  await background.evaluate(
-    async ({id, imageResults}) => {
-      await chrome.storage.local.clear();
-      await chrome.storage.local.set({
-        [`ww:search_results:${id}`]: [],
-        [`ww:image_results:${id}`]: imageResults,
-      });
-    },
-    {id: adId, imageResults},
-  );
+  await background.evaluate(async ({id}) => {
+    await chrome.storage.local.set({
+      [`ww:image_results:${id}`]: [
+        {type: 'err'},
+        {type: 'err'},
+        ['publi24', '/goto/publi24.ro/anunt/test-image-search-ad/abc123.html'],
+      ],
+      'ww:img_search_started_for': null,
+    });
+  }, {id: adId});
 
-  await page.reload();
+  await page.waitForTimeout(1000);
 
-  const adAfterReload = await page.waitForSelector(`[data-articleid="${adId}"]`);
-  const errorMessage = await adAfterReload.waitForSelector('[data-wwid="image-search-error"]');
+  const errorMessage = await ad.waitForSelector('[data-wwid="image-search-error"]');
   expect(await errorMessage.innerText()).toEqual('Căutare eșuată pentru 2 poze !');
-  expect(await adAfterReload.$$('[data-wwid="image-results"] a[target="_blank"][href]')).toHaveLength(2);
+  expect(await ad.$$('[data-wwid="image-results"] a[target="_blank"][href]')).toHaveLength(1);
 });
 
 

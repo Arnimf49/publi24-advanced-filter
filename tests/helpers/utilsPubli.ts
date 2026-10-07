@@ -171,6 +171,34 @@ export const utilsPubli = {
     }
   },
 
+  // Service Worker requests are not interceptable via context.route, so stub the worker's fetch instead.
+  async mockServiceWorkerFetchRedirects(
+    context: BrowserContext,
+    redirects: Array<{urlPrefix: string; finalUrl: string}>,
+  ): Promise<void> {
+    let [background] = context.serviceWorkers();
+
+    if (!background) {
+      background = await context.waitForEvent('serviceworker');
+    }
+
+    await background.evaluate((rules: Array<{urlPrefix: string; finalUrl: string}>) => {
+      const originalFetch = (self as any).fetch.bind(self);
+      (self as any).fetch = async (input: any, init?: any) => {
+        const url = typeof input === 'string' ? input : (input?.url ?? String(input));
+        const rule = rules.find((candidate) => url.startsWith(candidate.urlPrefix));
+
+        if (rule) {
+          const response = new Response('', {status: 200});
+          Object.defineProperty(response, 'url', {value: rule.finalUrl});
+          return response;
+        }
+
+        return originalFetch(input, init);
+      };
+    }, redirects);
+  },
+
   async findAdWithCondition<T>(page: Page, conditionFn: (...args: any) => Promise<T>): Promise<T> {
     let results;
 
