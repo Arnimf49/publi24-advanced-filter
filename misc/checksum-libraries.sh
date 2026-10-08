@@ -37,9 +37,9 @@ check_file node_modules/qrcode/build/qrcode.js library/qrcode.js "qrcode" || sta
 # jimp
 check_file node_modules/jimp/browser/lib/jimp.js library/jimp.js "jimp" || status=1
 
-# splide
-check_file node_modules/@splidejs/splide/dist/css/splide.min.css library/splide/splide.min.css "splide.min.css" || status=1
-check_file node_modules/@splidejs/splide/dist/js/splide.min.js library/splide/splide.min.js "splide.min.js" || status=1
+# swiper
+check_file node_modules/swiper/swiper-bundle.min.css library/swiper/swiper-bundle.min.css "swiper-bundle.min.css" || status=1
+check_file node_modules/swiper/swiper-bundle.min.js library/swiper/swiper-bundle.min.js "swiper-bundle.min.js" || status=1
 
 # react
 check_file node_modules/react/umd/react.production.min.js library/react/react.production.min.js "react.production.min.js" || status=1

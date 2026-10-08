@@ -41,12 +41,12 @@
         "library/jimp.js",
         "library/react/react.production.min.js",
         "library/react/react-dom.production.min.js",
-        "library/splide/splide.min.js",
+        "library/swiper/swiper-bundle.min.js",
         "library/qrcode.js",
         "dist/publi24/index.js"
       ],
       "css": [
-        "library/splide/splide.min.css",
+        "library/swiper/swiper-bundle.min.css",
         "dist/publi24/styles.css"
       ],
       "run_at": "document_start"

@@ -5,26 +5,22 @@ import {utils} from "../helpers/utils";
 test('Should open images slider and display all images.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
-  let adWithMultiple;
-  for (let ad of await page.$$('[data-articleid]')) {
-    const imageCount = +(await (await ad.$('[class="article-img-count-number"]')).innerText());
-    if (imageCount > 1) {
-      adWithMultiple = ad;
-      break;
-    }
-  }
-
-  await (await adWithMultiple.$('[class="art-img"]')).click();
+  const adWithMultiple = await utilsPubli.findFirstAdWithMultipleImages(page);
   const imageCount = +(await (await adWithMultiple.$('[class="article-img-count-number"]')).innerText());
 
+  await (await adWithMultiple.$('[class="art-img"]')).click();
+
   await expect(page.locator('[data-wwid="images-slider"]')).toBeVisible();
-  await expect(page.locator('[data-wwid="images-slider"] .splide__slide:not(.splide__slide--clone)'))
+  await expect(page.locator('[data-wwid="images-slider"] .swiper-slide'))
     .toHaveCount(imageCount);
 
-  await page.locator('.splide__arrow.splide__arrow--next').click();
-  await expect(page.locator('.splide__slide.is-active.is-visible')).toHaveAttribute('aria-label', `2 of ${imageCount}`);
-  await page.locator('.splide__arrow.splide__arrow--prev').click();
-  await expect(page.locator('.splide__slide.is-active.is-visible')).toHaveAttribute('aria-label', `1 of ${imageCount}`);
+  await page.locator('.swiper-button-next').click();
+  await expect(page.locator('.swiper-slide-active')).toHaveAttribute('aria-label', `2 / ${imageCount}`);
+  // Loop mode ignores navigation while animating (loopPreventsSliding), so let
+  // the next transition settle before navigating back.
+  await page.waitForTimeout(500);
+  await page.locator('.swiper-button-prev').click();
+  await expect(page.locator('.swiper-slide-active')).toHaveAttribute('aria-label', `1 / ${imageCount}`);
 
   await page.locator('[data-wwid="images-slider"] [data-wwid="close"]').click();
   await expect(page.locator('[data-wwid="images-slider"]')).not.toBeVisible();
@@ -32,7 +28,7 @@ test('Should open images slider and display all images.', async ({ page, context
 
 test('Should toggle visibility from slider.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
-  let firstAd =  await utilsPubli.selectAd(page);
+  let firstAd =  await utilsPubli.findFirstAdWithImageSearch(page);
   const firstAdId = await firstAd.getAttribute('data-articleid');
   await (await firstAd.$('[class="art-img"]')).click();
 
@@ -54,7 +50,7 @@ test('Should toggle visibility from slider.', async ({ page, context }) => {
 
 test('Should search images from slider.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
-  const firstAd =  await utilsPubli.selectAd(page);
+  const firstAd =  await utilsPubli.findFirstAdWithImageSearch(page);
 
   await utilsPubli.resolveGooglePage(async () => {
     await (await firstAd.$('[class="art-img"]')).click()

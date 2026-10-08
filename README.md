@@ -43,7 +43,7 @@ example being Tesseract, which otherwise is quite large.
 |---------|---------|------|--------|
 | qrcode | 1.3.4 | [qrcode.js](library/qrcode.js) | npm |
 | jimp | 0.22.10 | [jimp.js](library/jimp.js) | npm |
-| splide | 4.1.4 | [splide.min.css](library/splide/splide.min.css), [splide.min.js](library/splide/splide.min.js) | npm |
+| swiper | 14.3.0 | [swiper-bundle.min.css](library/swiper/swiper-bundle.min.css), [swiper-bundle.min.js](library/swiper/swiper-bundle.min.js) | npm |
 | react | 18.3.1 | [react.production.min.js](library/react/react.production.min.js) | npm |
 | react-dom | 18.3.1 | [react-dom.production.min.js](library/react/react-dom.production.min.js) | npm |
 | tesseract.js | 6.0.1 | [tesseract.min.js](library/tesseract/tesseract.min.js), [worker.min.js](library/tesseract/worker.min.js) | npm |

@@ -364,6 +364,24 @@ export const utilsPubli = {
     });
   },
 
+  async findFirstAdWithMultipleImages(page: Page) {
+    return await utilsPubli.findAdWithCondition(page, async () => {
+      for (let article of await page.$$('[data-articleid]')) {
+        while (await article.$('[data-wwid="loader"]')) {
+          await page.waitForTimeout(1000);
+        }
+
+        const count = await article.$('[class="article-img-count-number"]');
+        const imageCount = count ? +(await count.innerText()) : 0;
+        if (imageCount > 1) {
+          await article.scrollIntoViewIfNeeded();
+          return article;
+        }
+      }
+      return null;
+    });
+  },
+
   async selectAd(page: Page, articleId?: string) {
     let article;
 

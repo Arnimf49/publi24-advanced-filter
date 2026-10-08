@@ -7,10 +7,10 @@ cp node_modules/qrcode/build/qrcode.js library/qrcode.js
 # jimp
 cp node_modules/jimp/browser/lib/jimp.js library/jimp.js
 
-# splide
-mkdir -p library/splide
-cp node_modules/@splidejs/splide/dist/css/splide.min.css library/splide/splide.min.css
-cp node_modules/@splidejs/splide/dist/js/splide.min.js library/splide/splide.min.js
+# swiper
+mkdir -p library/swiper
+cp node_modules/swiper/swiper-bundle.min.css library/swiper/swiper-bundle.min.css
+cp node_modules/swiper/swiper-bundle.min.js library/swiper/swiper-bundle.min.js
 
 # react
 mkdir -p library/react

@@ -1,57 +1,13 @@
 import React, {
   MouseEventHandler,
-  PointerEvent,
   useEffect,
+  useMemo,
   useRef,
-  useState,
 } from 'react';
 import styles from './ImagesSlider.module.scss';
 import Modal from "../../../../common/components/Modal/Modal";
 
-declare const Splide: any;
-
-type Point = {
-  x: number;
-  y: number;
-};
-
-type GestureEvent = {
-  currentTarget: HTMLImageElement;
-  pointerId: number;
-  clientX: number;
-  clientY: number;
-  preventDefault: () => void;
-  stopPropagation: () => void;
-};
-
-const MIN_ZOOM = 1;
-const MAX_ZOOM = 4;
-const GESTURE_START_THRESHOLD = 8;
-
-const clamp = (value: number, min: number, max: number): number =>
-  Math.min(Math.max(value, min), max);
-
-const getDistance = (first: Point, second: Point): number =>
-  Math.hypot(second.x - first.x, second.y - first.y);
-
-const getMidpoint = (first: Point, second: Point): Point => ({
-  x: (first.x + second.x) / 2,
-  y: (first.y + second.y) / 2,
-});
-
-const imageDimensions = (image: HTMLImageElement): Point => ({
-  x: image.clientWidth,
-  y: image.clientHeight,
-});
-
-const getBoundedPosition = (
-  dimensions: Point,
-  zoom: number,
-  nextPosition: Point,
-): Point => ({
-  x: clamp(nextPosition.x, -(dimensions.x * (zoom - 1)) / 2, (dimensions.x * (zoom - 1)) / 2),
-  y: clamp(nextPosition.y, -(dimensions.y * (zoom - 1)) / 2, (dimensions.y * (zoom - 1)) / 2),
-});
+declare const Swiper: any;
 
 type ImageSliderProps = {
   images: string[];
@@ -69,362 +25,9 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   onInvestigateImgClick,
 }) => {
   const toggleButtonClasses = `${styles.visibilityButton} ${visible ? styles.isVisible : ''}`;
-  const [zoom, setZoom] = useState(MIN_ZOOM);
-  const [position, setPosition] = useState<Point>({x: 0, y: 0});
-  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const hasMultipleImages = images.length > 1;
-  const pointersRef = useRef(new Map<number, Point>());
-  const pinchStartRef = useRef<{
-    distance: number;
-    midpoint: Point;
-    position: Point;
-    zoom: number;
-    center: Point;
-  } | null>(null);
-  const zoomRef = useRef(MIN_ZOOM);
-  const positionRef = useRef<Point>({x: 0, y: 0});
-  const splideRef = useRef<any>(null);
-  const singlePointerStartRef = useRef<Point | null>(null);
-  const slideHandoffRef = useRef(false);
-  const pendingSlideRef = useRef<'-1' | '+1' | null>(null);
-  const edgeDragDistanceRef = useRef(0);
-  const edgeDragDirectionRef = useRef<'previous' | 'next' | null>(null);
-  const previewBasePositionRef = useRef<number | null>(null);
-  const snapBackTimeoutRef = useRef<number | null>(null);
-  const expectedSlideMoveRef = useRef(false);
-  const slideTransitionActiveRef = useRef(false);
-  const gestureDraggingRef = useRef(false);
+  const swiperElementRef = useRef<HTMLElement>(null);
 
-  const setSplideDragDisabled = (disabled: boolean): void => {
-    splideRef.current?.Components.Drag.disable(disabled);
-  };
-
-  const snapPreviewBack = (position: number): void => {
-    const list = splideRef.current?.Components.Elements.list as HTMLElement | undefined;
-    if (!list) {
-      splideRef.current?.Components.Move.translate(position, true);
-      return;
-    }
-
-    if (snapBackTimeoutRef.current !== null) {
-      window.clearTimeout(snapBackTimeoutRef.current);
-    }
-
-    list.style.transition = 'transform 180ms ease-out';
-    requestAnimationFrame(() => {
-      splideRef.current?.Components.Move.translate(position, true);
-      snapBackTimeoutRef.current = window.setTimeout(() => {
-        list.style.transition = '';
-        snapBackTimeoutRef.current = null;
-      }, 180);
-    });
-  };
-
-  const resetZoom = (): void => {
-    zoomRef.current = MIN_ZOOM;
-    positionRef.current = {x: 0, y: 0};
-    setZoom(MIN_ZOOM);
-    setPosition({x: 0, y: 0});
-    setSplideDragDisabled(!hasMultipleImages);
-  };
-
-  const handleImageClick = (event: React.MouseEvent<HTMLImageElement>) => {
-    event.stopPropagation();
-  };
-
-  const handleGestureDown = (event: GestureEvent): void => {
-    if (
-      slideTransitionActiveRef.current
-      || splideRef.current?.Components.Controller.isBusy()
-    ) {
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
-
-    pointersRef.current.set(event.pointerId, {x: event.clientX, y: event.clientY});
-
-    if (pointersRef.current.size === 1) {
-      if (zoomRef.current > MIN_ZOOM) {
-        singlePointerStartRef.current = {x: event.clientX, y: event.clientY};
-        slideHandoffRef.current = false;
-        pendingSlideRef.current = null;
-        edgeDragDistanceRef.current = 0;
-        edgeDragDirectionRef.current = null;
-        previewBasePositionRef.current = splideRef.current?.Components.Move.getPosition() ?? null;
-      }
-
-      gestureDraggingRef.current = false;
-    }
-
-    if (pointersRef.current.size === 2) {
-      const [first, second] = [...pointersRef.current.values()];
-      const rect = event.currentTarget.getBoundingClientRect();
-      const center = {
-        x: rect.left + rect.width / 2 - positionRef.current.x,
-        y: rect.top + rect.height / 2 - positionRef.current.y,
-      };
-      pinchStartRef.current = {
-        distance: getDistance(first, second),
-        midpoint: getMidpoint(first, second),
-        position: positionRef.current,
-        zoom: zoomRef.current,
-        center,
-      };
-      gestureDraggingRef.current = true;
-      setSplideDragDisabled(true);
-    }
-  };
-
-  const handleGestureMove = (event: GestureEvent): void => {
-    if (!pointersRef.current.has(event.pointerId)) {
-      return;
-    }
-
-    const previousPointer = pointersRef.current.get(event.pointerId);
-    pointersRef.current.set(event.pointerId, {x: event.clientX, y: event.clientY});
-
-    if (pointersRef.current.size >= 2 && pinchStartRef.current) {
-      const [first, second] = [...pointersRef.current.values()];
-      const distance = getDistance(first, second);
-      const midpoint = getMidpoint(first, second);
-      const pinchStart = pinchStartRef.current;
-      const nextZoom = clamp(
-        pinchStart.zoom * (distance / pinchStart.distance),
-        MIN_ZOOM,
-        MAX_ZOOM,
-      );
-
-      // Anchor the zoom at the pinch midpoint: keep the image point that sits
-      // under the pinch midpoint pinned there while the scale changes.
-      const scaleRatio = nextZoom / pinchStart.zoom;
-      const anchorX = pinchStart.midpoint.x - pinchStart.center.x;
-      const anchorY = pinchStart.midpoint.y - pinchStart.center.y;
-      const nextPosition = getBoundedPosition(
-        imageDimensions(event.currentTarget),
-        nextZoom,
-        {
-          x: pinchStart.position.x * scaleRatio
-            + midpoint.x - pinchStart.midpoint.x
-            + anchorX * (1 - scaleRatio),
-          y: pinchStart.position.y * scaleRatio
-            + midpoint.y - pinchStart.midpoint.y
-            + anchorY * (1 - scaleRatio),
-        },
-      );
-
-      zoomRef.current = nextZoom;
-      positionRef.current = nextPosition;
-      setZoom(nextZoom);
-      setPosition(nextPosition);
-      event.preventDefault();
-      return;
-    }
-
-    if (pointersRef.current.size === 1) {
-      if (zoomRef.current === MIN_ZOOM) {
-        return;
-      }
-
-      const start = singlePointerStartRef.current;
-      const deltaX = start ? event.clientX - start.x : 0;
-      const deltaY = start ? event.clientY - start.y : 0;
-      const sliderWidth = event.currentTarget.closest<HTMLElement>('.splide__track')?.clientWidth
-        || event.currentTarget.clientWidth;
-      const handoffThreshold = sliderWidth * (zoomRef.current === MIN_ZOOM ? 0.15 : 0.4);
-      const isHorizontalDrag = Math.abs(deltaX) > Math.abs(deltaY);
-
-      if (!gestureDraggingRef.current) {
-        const hasStartedGesture = zoomRef.current === MIN_ZOOM
-          ? isHorizontalDrag && Math.abs(deltaX) >= GESTURE_START_THRESHOLD
-          : Math.hypot(deltaX, deltaY) >= GESTURE_START_THRESHOLD;
-
-        if (!hasStartedGesture) {
-          return;
-        }
-
-        gestureDraggingRef.current = true;
-      }
-
-      if (zoomRef.current === MIN_ZOOM) {
-        if (isHorizontalDrag && previewBasePositionRef.current !== null) {
-          splideRef.current?.Components.Move.translate(
-            previewBasePositionRef.current + deltaX,
-            true,
-          );
-        }
-
-        if (!slideHandoffRef.current && isHorizontalDrag && Math.abs(deltaX) >= handoffThreshold) {
-          slideHandoffRef.current = true;
-          pendingSlideRef.current = deltaX > 0 ? '-1' : '+1';
-        }
-      } else {
-        const dimensions = imageDimensions(event.currentTarget);
-        const horizontalLimit = (dimensions.x * (zoomRef.current - 1)) / 2;
-        const minPosition = -horizontalLimit;
-        const maxPosition = horizontalLimit;
-
-        const deltaX = previousPointer ? event.clientX - previousPointer.x : 0;
-        const isAtLeftEdge = positionRef.current.x >= maxPosition - 2;
-        const isAtRightEdge = positionRef.current.x <= minPosition + 2;
-
-        if (hasMultipleImages && !edgeDragDirectionRef.current && isAtLeftEdge && deltaX > 0) {
-          edgeDragDirectionRef.current = 'previous';
-        } else if (hasMultipleImages && !edgeDragDirectionRef.current && isAtRightEdge && deltaX < 0) {
-          edgeDragDirectionRef.current = 'next';
-        }
-
-        if (edgeDragDirectionRef.current === 'previous') {
-          edgeDragDistanceRef.current = Math.max(0, edgeDragDistanceRef.current + deltaX);
-        } else if (edgeDragDirectionRef.current === 'next') {
-          edgeDragDistanceRef.current = Math.max(0, edgeDragDistanceRef.current - deltaX);
-        }
-
-        if (edgeDragDirectionRef.current && edgeDragDistanceRef.current > 0) {
-          if (previewBasePositionRef.current !== null) {
-            const previewDirection = edgeDragDirectionRef.current === 'previous' ? 1 : -1;
-            splideRef.current?.Components.Move.translate(
-              previewBasePositionRef.current
-                + previewDirection * edgeDragDistanceRef.current,
-              true,
-            );
-          }
-        } else {
-          edgeDragDirectionRef.current = null;
-          if (previewBasePositionRef.current !== null) {
-            splideRef.current?.Components.Move.translate(
-              previewBasePositionRef.current,
-              true,
-            );
-          }
-        }
-
-        const draggingToPrevious = edgeDragDirectionRef.current === 'previous'
-          && edgeDragDistanceRef.current >= handoffThreshold;
-        const draggingToNext = edgeDragDirectionRef.current === 'next'
-          && edgeDragDistanceRef.current >= handoffThreshold;
-
-        if (
-          pendingSlideRef.current
-          && edgeDragDistanceRef.current < handoffThreshold
-        ) {
-          slideHandoffRef.current = false;
-          pendingSlideRef.current = null;
-        }
-
-        if (!slideHandoffRef.current && (draggingToPrevious || draggingToNext)) {
-          slideHandoffRef.current = true;
-          pendingSlideRef.current = draggingToPrevious ? '-1' : '+1';
-        } else if (!slideHandoffRef.current && previousPointer) {
-          const nextPosition = getBoundedPosition(
-            dimensions,
-            zoomRef.current,
-            {
-              x: positionRef.current.x + event.clientX - previousPointer.x,
-              y: positionRef.current.y + event.clientY - previousPointer.y,
-            },
-          );
-
-          positionRef.current = nextPosition;
-          setPosition(nextPosition);
-        }
-      }
-
-      if (gestureDraggingRef.current) {
-        event.preventDefault();
-      }
-    }
-  };
-
-  const handleGestureUp = (event: GestureEvent): void => {
-    pointersRef.current.delete(event.pointerId);
-    pinchStartRef.current = null;
-
-    if (pointersRef.current.size === 0) {
-      const pendingSlide = pendingSlideRef.current;
-      const previewBasePosition = previewBasePositionRef.current;
-      singlePointerStartRef.current = null;
-      slideHandoffRef.current = false;
-      pendingSlideRef.current = null;
-      edgeDragDistanceRef.current = 0;
-      edgeDragDirectionRef.current = null;
-      previewBasePositionRef.current = null;
-
-      if (previewBasePosition !== null && !pendingSlide) {
-        snapPreviewBack(previewBasePosition);
-      }
-
-      if (pendingSlide) {
-        expectedSlideMoveRef.current = true;
-        slideTransitionActiveRef.current = true;
-
-        if (previewBasePosition !== null) {
-          splideRef.current?.Components.Move.translate(previewBasePosition, true);
-        }
-
-        resetZoom();
-        window.requestAnimationFrame(() => {
-          splideRef.current?.go(pendingSlide);
-        });
-      }
-
-      gestureDraggingRef.current = false;
-    }
-
-    if (pointersRef.current.size === 0 && zoomRef.current === MIN_ZOOM) {
-      setSplideDragDisabled(!hasMultipleImages);
-    }
-
-    if (zoomRef.current > MIN_ZOOM) {
-      event.stopPropagation();
-    }
-  };
-
-  const handleGestureCancel = (_event: GestureEvent): void => {
-    pointersRef.current.clear();
-    pinchStartRef.current = null;
-    singlePointerStartRef.current = null;
-    slideHandoffRef.current = false;
-    pendingSlideRef.current = null;
-    edgeDragDistanceRef.current = 0;
-    edgeDragDirectionRef.current = null;
-    gestureDraggingRef.current = false;
-
-    if (previewBasePositionRef.current !== null) {
-      snapPreviewBack(previewBasePositionRef.current);
-    }
-
-    previewBasePositionRef.current = null;
-  };
-
-  const handlePointerDown = (event: PointerEvent<HTMLImageElement>): void => {
-    handleGestureDown(event);
-  };
-
-  const handlePointerMove = (event: PointerEvent<HTMLImageElement>): void => {
-    handleGestureMove(event);
-  };
-
-  const handlePointerUp = (event: PointerEvent<HTMLImageElement>): void => {
-    handleGestureUp(event);
-  };
-
-  const handlePointerCancel = (event: PointerEvent<HTMLImageElement>): void => {
-    handleGestureCancel(event);
-  };
-
-  const handleDoubleClick = (event: React.MouseEvent<HTMLImageElement>): void => {
-    event.stopPropagation();
-
-    const nextZoom = zoomRef.current === MIN_ZOOM ? 2 : MIN_ZOOM;
-    if (nextZoom === MIN_ZOOM) {
-      resetZoom();
-      return;
-    }
-
-    zoomRef.current = nextZoom;
-    setZoom(nextZoom);
-  };
   const visibilityClickHandler: MouseEventHandler = (event) => {
     onVisibilityClick(event);
     close();
@@ -434,58 +37,109 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     close();
   };
 
+  // Memoize the slides so React never reconciles this subtree. Swiper rearranges
+  // the slide DOM itself (e.g. for loop mode), and a re-render would fight it.
+  const slides = useMemo(() => images.map((imageUrl, index) => (
+    <div key={index} className={`swiper-slide ${styles.sliderSlide}`}>
+      <div className="swiper-zoom-container">
+        <img
+          className={styles.slideImage}
+          src={imageUrl}
+          alt={`Slide ${index + 1}`}
+          draggable={false}
+        />
+      </div>
+    </div>
+  )), [images]);
+
   useEffect(() => {
-    const splideElement = document.querySelector<HTMLElement>('.splide');
+    const swiperElement = swiperElementRef.current;
+    if (!swiperElement) {
+      return;
+    }
 
-    if (!splideElement) return;
-
-    const splide = new Splide(splideElement, {
-      focus: 'center',
-      type: 'loop',
-      keyboard: 'global',
-      arrows: hasMultipleImages,
-      drag: hasMultipleImages,
-      gap: '10px',
+    const swiper = new Swiper(swiperElement, {
+      slidesPerView: 1,
+      centeredSlides: true,
+      spaceBetween: 10,
+      loop: hasMultipleImages,
       speed: 250,
-      noDrag: `.${styles.zoomedImage}`,
-    });
-    splide.mount();
-    splideRef.current = splide;
-    splide.on('moved', (newIndex: number) => {
-      setActiveSlideIndex(newIndex);
-      if (expectedSlideMoveRef.current) {
-        expectedSlideMoveRef.current = false;
-        resetZoom();
-      }
-      slideTransitionActiveRef.current = false;
+      keyboard: { enabled: true, onlyInViewport: false },
+      navigation: hasMultipleImages
+        ? { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }
+        : false,
+      pagination: hasMultipleImages
+        ? { el: '.swiper-pagination', clickable: true }
+        : false,
+      zoom: { maxRatio: 4, minRatio: 1, toggle: true },
+      watchOverflow: true,
     });
 
-    const onKeyDown = function (event: KeyboardEvent): void {
-      if (event.key.toLowerCase() === 'a') {
-        expectedSlideMoveRef.current = true;
-        slideTransitionActiveRef.current = true;
-        splide.go('-1');
-      } else if (event.key.toLowerCase() === 'd') {
-        expectedSlideMoveRef.current = true;
-        slideTransitionActiveRef.current = true;
-        splide.go('+1');
+    // Swiper's Zoom module only takes swipe control away from the slider once
+    // the image is already zoomed (`image.isTouched`). During the initial pinch
+    // the core slider still owns the first pointer, so it keeps dragging the
+    // carousel while zooming, and the following slide transition resets the
+    // zoom. While two or more pointers are down we therefore take swipe control
+    // away ourselves and snap back any drag that had already started.
+    const activePointers = new Set<number>();
+
+    const releaseSwipeShortly = (): void => {
+      if (activePointers.size === 0 && swiper.zoom.scale === 1) {
+        swiper.allowTouchMove = true;
       }
     };
-    window.addEventListener("keydown", onKeyDown);
 
-    document.querySelectorAll<HTMLElement>('.splide__arrow')
-      .forEach((el) => el.addEventListener('click', (e: MouseEvent) => {
-        expectedSlideMoveRef.current = true;
-        slideTransitionActiveRef.current = true;
-        e.stopPropagation();
-      }));
+    const handlePointerDown = (event: PointerEvent): void => {
+      activePointers.add(event.pointerId);
+      if (activePointers.size < 2) {
+        return;
+      }
+
+      const touchData = swiper.touchEventsData;
+      if (touchData && touchData.isMoved) {
+        swiper.slideToClosest(0, false);
+      }
+      if (touchData) {
+        touchData.isTouched = false;
+        touchData.isMoved = false;
+      }
+      swiper.allowTouchMove = false;
+    };
+    const handlePointerEnd = (event: PointerEvent): void => {
+      activePointers.delete(event.pointerId);
+      releaseSwipeShortly();
+    };
+
+    swiperElement.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointerup', handlePointerEnd);
+    window.addEventListener('pointercancel', handlePointerEnd);
+    swiper.on('zoomChange', (_swiper: unknown, scale: number) => {
+      if (scale === 1) {
+        releaseSwipeShortly();
+      }
+    });
+
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key.toLowerCase() === 'a') {
+        swiper.slidePrev();
+      } else if (event.key.toLowerCase() === 'd') {
+        swiper.slideNext();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      splide.destroy();
-      splideRef.current = null;
-    }
+      window.removeEventListener('keydown', handleKeyDown);
+      swiperElement.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointerup', handlePointerEnd);
+      window.removeEventListener('pointercancel', handlePointerEnd);
+      swiper.destroy(true, true);
+    };
   }, []);
+
+  const stopPropagation = (event: React.MouseEvent): void => {
+    event.stopPropagation();
+  };
 
   return (
     <Modal
@@ -495,7 +149,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     >
       <div
         className={styles.buttonContainer}
-        onClick={(event) => event.stopPropagation()}
+        onClick={stopPropagation}
       >
         <button
           type="button"
@@ -546,33 +200,21 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
       </div>
 
       <section
-        className={`${styles.sliderSection} splide`}
+        ref={swiperElementRef}
+        className={`${styles.sliderSection} swiper`}
         aria-label="Image Slider Content"
+        onClick={stopPropagation}
       >
-        <div className={`${styles.sliderTrack} splide__track`}>
-          <ul className={`${styles.sliderList} splide__list`}>
-            {images.map((imageUrl, index) => (
-              <li key={index} className={`${styles.sliderSlide} splide__slide`}>
-                <img
-                  onClick={handleImageClick}
-                  onDoubleClick={handleDoubleClick}
-                  onPointerDown={handlePointerDown}
-                  onPointerMove={handlePointerMove}
-                  onPointerUp={handlePointerUp}
-                  onPointerCancel={handlePointerCancel}
-                  className={`${styles.slideImage} ${
-                    index === activeSlideIndex && zoom > MIN_ZOOM ? styles.zoomedImage : ''
-                  }`}
-                  src={imageUrl}
-                  alt={`Slide ${index + 1}`}
-                  style={index === activeSlideIndex ? {
-                    transform: `translate3d(${position.x}px, ${position.y}px, 0) scale(${zoom})`,
-                  } : undefined}
-                />
-              </li>
-            ))}
-          </ul>
+        <div className="swiper-wrapper">
+          {slides}
         </div>
+        {hasMultipleImages && (
+          <>
+            <div className="swiper-pagination" />
+            <div className="swiper-button-prev" />
+            <div className="swiper-button-next" />
+          </>
+        )}
       </section>
     </Modal>
   );

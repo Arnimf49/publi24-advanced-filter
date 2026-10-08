@@ -6,6 +6,7 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  z-index: 2;
 
   :global(.onMobile) & {
     left: auto;
@@ -86,19 +87,26 @@
 
 .sliderSection {
   height: 100%;
-}
+  width: 100%;
+  touch-action: pan-y;
 
-.sliderTrack {
-  height: 100%;
-  overflow-y: visible !important;
-}
+  :global(.swiper-wrapper) {
+    height: 100%;
+  }
 
-.sliderList {
-  height: 100%;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
+  :global(.swiper-button-prev),
+  :global(.swiper-button-next) {
+    --swiper-navigation-color: #fff;
+    --swiper-navigation-size: 30px;
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.6));
+  }
+
+  :global(.swiper-pagination) {
+    --swiper-pagination-color: #c59b2f;
+    --swiper-pagination-bullet-inactive-color: #fff;
+    --swiper-pagination-bullet-inactive-opacity: 0.5;
+    bottom: 8px;
+  }
 }
 
 .sliderSlide {
@@ -106,7 +114,6 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  flex-shrink: 0;
 }
 
 .slideImage {
@@ -117,17 +124,9 @@
   box-shadow: 5px 5px 15px 3px rgba(0, 0, 0, 0.3);
   border-radius: 5px;
   object-fit: contain;
-  touch-action: pan-y;
   user-select: none;
   -webkit-user-drag: none;
-  will-change: transform;
 }
-
-.zoomedImage {
-  cursor: grab;
-  touch-action: none;
-}
-
 
 :global(body.onMobile [data-wwid="images-slider"]) {
   @media screen and (max-width: 640px) {
