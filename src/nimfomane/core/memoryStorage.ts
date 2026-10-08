@@ -1,5 +1,6 @@
 export interface TopicMemoryState {
   topicAnalysisError: string | null;
+  topicAnalysisLoading: boolean;
 }
 
 export interface EscortMemoryState {
@@ -14,6 +15,7 @@ const _NIMFO_ESCORT_MEMORY_CALLBACKS: Record<string, Array<() => void>> = {};
 
 const getEmptyTopicState = (): TopicMemoryState => ({
   topicAnalysisError: null,
+  topicAnalysisLoading: false,
 });
 
 const getEmptyEscortState = (): EscortMemoryState => ({
@@ -39,6 +41,12 @@ export const NimfomaneMemoryStorage = {
   setTopicAnalysisError(id: string, error: string | null): void {
     const state = NimfomaneMemoryStorage.getTopicState(id);
     state.topicAnalysisError = error;
+    NimfomaneMemoryStorage.triggerTopicMemoryChanged(id);
+  },
+
+  setTopicAnalysisLoading(id: string, loading: boolean): void {
+    const state = NimfomaneMemoryStorage.getTopicState(id);
+    state.topicAnalysisLoading = loading;
     NimfomaneMemoryStorage.triggerTopicMemoryChanged(id);
   },
 

@@ -17,6 +17,7 @@ export const analyzer = {
   async analyzeTopic(container: HTMLDivElement, id: string, priority: number) {
     let topic = NimfomaneStorage.getTopic(id);
     NimfomaneMemoryStorage.setTopicAnalysisError(id, null);
+    NimfomaneMemoryStorage.setTopicAnalysisLoading(id, true);
 
     try {
       if (isCacheExpired(topic.escortDeterminationTime, ESCORT_DETERMINATION_CACHE_DAYS)) {
@@ -53,6 +54,8 @@ export const analyzer = {
     } catch (error) {
       NimfomaneMemoryStorage.setTopicAnalysisError(id, "Eroare analiză topic: " + utils.formatError(error));
       console.error(error);
+    } finally {
+      NimfomaneMemoryStorage.setTopicAnalysisLoading(id, false);
     }
   },
 

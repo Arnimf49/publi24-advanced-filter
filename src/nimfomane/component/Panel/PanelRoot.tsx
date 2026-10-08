@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import * as ReactDOM from 'react-dom';
 import {NimfomaneStorage} from '../../core/storage';
+import {NimfomaneMemoryStorage} from '../../core/memoryStorage';
 import {Panel} from './Panel';
 import HideReasonRoot from './HideReason/HideReasonRoot';
 import {escortDetailsModalRoot} from '../EscortDetailsModal/EscortDetailsModalRoot';
@@ -31,12 +32,14 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container,
   const hiddenReason = isOfEscort ? escort?.hiddenReason : topic?.hiddenReason;
   const visible = !hidden;
   const isFav = isOfEscort && effectiveEscortUser ? NimfomaneStorage.isFavorite(effectiveEscortUser) : false;
+  const analysisLoading = id ? NimfomaneMemoryStorage.getTopicState(id).topicAnalysisLoading : false;
 
   useEffect(() => {
     const incrementRender = () => setRenderCycle(v => ++v);
 
     if (id) {
       NimfomaneStorage.onTopicChanged(id, incrementRender);
+      NimfomaneMemoryStorage.onTopicMemoryChanged(id, incrementRender);
     }
     if (effectiveEscortUser) {
       NimfomaneStorage.onEscortChanged(effectiveEscortUser, incrementRender);
@@ -45,6 +48,7 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container,
     return () => {
       if (id) {
         NimfomaneStorage.removeOnTopicChanged(id, incrementRender);
+        NimfomaneMemoryStorage.removeOnTopicMemoryChanged(id, incrementRender);
       }
       if (effectiveEscortUser) {
         NimfomaneStorage.removeOnEscortChanged(effectiveEscortUser, incrementRender);
@@ -156,6 +160,7 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container,
         hiddenReason={hiddenReason}
         isEscort={isOfEscort}
         isFav={isFav}
+        loading={analysisLoading}
         onHideClick={onHideClick}
         onFavClick={onFavClick}
         onEscortInfoClick={isOfEscort ? onEscortInfoClick : undefined}

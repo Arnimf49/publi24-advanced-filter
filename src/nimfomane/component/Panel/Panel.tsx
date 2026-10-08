@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './Panel.module.scss';
 import {WhatsAppButton} from './Button/WhatsAppButton';
 import {HideButton} from '../../../common/components/Button/HideButton';
+import {InlineLoader} from '../../../common/components/InlineLoader/InlineLoader';
 import {StarIcon} from '../../../common/components/Icons/StarIcon';
 import InfoIcon from '../../../publi24/component/Common/Icons/InfoIcon';
 
@@ -11,6 +12,7 @@ type PanelProps = {
   hiddenReason?: string;
   isEscort?: boolean;
   isFav?: boolean;
+  loading?: boolean;
   onHideClick: () => void;
   onFavClick?: () => void;
   onEscortInfoClick?: () => void;
@@ -18,7 +20,7 @@ type PanelProps = {
   fullWidth?: boolean;
 };
 
-export const Panel: React.FC<PanelProps> = ({ phone, visible, hiddenReason, isEscort, isFav, onHideClick, onFavClick, onEscortInfoClick, onShowImages, fullWidth }) => {
+export const Panel: React.FC<PanelProps> = ({ phone, visible, hiddenReason, isEscort, isFav, loading, onHideClick, onFavClick, onEscortInfoClick, onShowImages, fullWidth }) => {
   return (
     <div className={`${styles.panel} ${fullWidth ? styles.panelFullWidth : ''}`} data-wwid="panel">
       <div className={styles.buttons}>
@@ -67,6 +69,11 @@ export const Panel: React.FC<PanelProps> = ({ phone, visible, hiddenReason, isEs
           >
             Deschide pozele
           </button>
+        )}
+        {loading && (
+          <span className={styles.loadingIndicator} data-wwid="analysis-loading">
+            <InlineLoader color="#555" size={16} />
+          </span>
         )}
       </div>
       {!visible && hiddenReason && (
