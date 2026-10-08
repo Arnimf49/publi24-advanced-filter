@@ -8,6 +8,20 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.13',
+    releaseDate: '8 octombrie 2026',
+    changeNew: [
+      'Numărul de telefon din anunț se extrage și din descriere, chiar și din formate criptate.'
+    ],
+    changeImprove: [
+      'Schimbat libraria de slider pentru a rezolva varii probleme și inconsistențe în modalul cu poze.'
+    ],
+    changeFix: [
+      'În anumite cazuri numarul de căutrare eșuată pentru poze nu se afișa corect.',
+      'Mici probleme de stil.',
+    ]
+  },
+  {
     version: '3.12',
     releaseDate: '6 octombrie 2026',
     changeNew: [
