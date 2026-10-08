@@ -37,8 +37,9 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     close();
   };
 
-  // Memoize the slides so React never reconciles this subtree. Swiper rearranges
-  // the slide DOM itself (e.g. for loop mode), and a re-render would fight it.
+  // Memoize the slides so React never reconciles this subtree. Swiper writes
+  // inline styles/classes onto the slide elements, and a re-render could fight
+  // that.
   const slides = useMemo(() => images.map((imageUrl, index) => (
     <div key={index} className={`swiper-slide ${styles.sliderSlide}`}>
       <div className="swiper-zoom-container">
@@ -62,7 +63,12 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
       slidesPerView: 1,
       centeredSlides: true,
       spaceBetween: 10,
-      loop: hasMultipleImages,
+      // Loop mode is intentionally disabled: combined with centeredSlides it
+      // rearranges the slide DOM during a drag (loopFix with setTranslate),
+      // which makes the tapped image jump/vanish and skips slides when the
+      // gallery has few images. `rewind` wraps to the first/last image at the
+      // ends instead, without touching the slide DOM.
+      rewind: true,
       speed: 250,
       keyboard: { enabled: true, onlyInViewport: false },
       navigation: hasMultipleImages

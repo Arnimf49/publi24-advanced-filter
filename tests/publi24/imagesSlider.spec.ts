@@ -16,8 +16,7 @@ test('Should open images slider and display all images.', async ({ page, context
 
   await page.locator('.swiper-button-next').click();
   await expect(page.locator('.swiper-slide-active')).toHaveAttribute('aria-label', `2 / ${imageCount}`);
-  // Loop mode ignores navigation while animating (loopPreventsSliding), so let
-  // the next transition settle before navigating back.
+  // Let the transition settle before navigating back.
   await page.waitForTimeout(500);
   await page.locator('.swiper-button-prev').click();
   await expect(page.locator('.swiper-slide-active')).toHaveAttribute('aria-label', `1 / ${imageCount}`);
