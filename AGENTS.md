@@ -1,5 +1,10 @@
 # Agents Instructions
 
+## Building
+
+Don't build the rollup bundle, unless the user specifically asks for it. Assume the user
+is running in a separate terminal the rollup watcher.
+
 ## Module exports
 
 All public functions in a module must be exported through a single named object whose name matches the filename (camelCase). No bare `export function` / `export const` for individual functions.

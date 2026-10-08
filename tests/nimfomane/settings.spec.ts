@@ -107,3 +107,27 @@ test('Should show hidden count indicator when focus mode is active.', async ({pa
   await page.locator('[data-wwid="focus-mode-switch"]').click();
   await page.waitForTimeout(1500);
 });
+
+test('Should still analyze topics hidden by focus mode.', async ({page}) => {
+  await utilsNimfomane.open(page);
+
+  const {id: topicId} = await utilsNimfomane.waitForNthImage(page);
+
+  // Store the topic as hidden at topic level and with no analysis result yet.
+  await utilsNimfomane.deleteTopicInfoStorage(page, topicId);
+  await utilsNimfomane.setTopicStorageProp(page, topicId, 'isOfEscort', false);
+  await utilsNimfomane.setTopicStorageProp(page, topicId, 'escortDeterminationTime', Date.now());
+  await utilsNimfomane.setTopicStorageProp(page, topicId, 'hidden', true);
+
+  await page.evaluate(() => localStorage.setItem('p24fa:nimfo:focus_mode', 'true'));
+  await utilsNimfomane.throttleReload(page);
+
+  const topic = page.locator(`[data-rowid="${topicId}"]`);
+  await expect(topic).toBeHidden();
+
+  // Even though the topic is hidden in focus mode, it must still be analyzed and its storage updated.
+  await expect.poll(
+    () => utilsNimfomane.getTopicStorageProp(page, topicId, 'url'),
+    {timeout: 15000}
+  ).not.toBeUndefined();
+});

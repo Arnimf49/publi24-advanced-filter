@@ -74,7 +74,7 @@ export const renderer = {
     container.appendChild(panelContainer);
   },
 
-  registerTopicItem(container: HTMLDivElement, id: string, index: number) {
+  registerTopicItem(container: HTMLDivElement, id: string, index: number, render = true) {
     let priority = 90 - index * 2;
 
     const isTestMode = window.localStorage.getItem('_pw_init_nimfo') === 'true';
@@ -89,6 +89,20 @@ export const renderer = {
     container.setAttribute('data-wwtopic', id);
 
     analyzer.analyzeTopic(container, id, priority).catch(console.error);
+
+    if (!render) {
+      return () => {};
+    }
+
+    return renderer.renderTopicItem(container, id);
+  },
+
+  renderTopicItem(container: HTMLDivElement, id: string): () => void {
+    if (container.hasAttribute('data-wwrendered')) {
+      return () => {};
+    }
+
+    container.setAttribute('data-wwrendered', 'true');
 
     const unmountImage = renderer.renderTopicImage(container, id);
     const unmountPanel = renderer.renderTopicPanel(container, id);
@@ -114,39 +128,35 @@ export const renderer = {
   ): Array<() => void> {
     const list = context.querySelector<HTMLElement>('.ipsDataList.cForumTopicTable');
     const topicContainers = Array.from(context.querySelectorAll<HTMLDivElement>('[data-rowid]'));
+    const focusModeActive = applyFocusMode && NimfomaneStorage.isFocusMode();
+
+    const visibleTopicContainers: HTMLDivElement[] = [];
+    const hiddenTopicContainers: HTMLDivElement[] = [];
     let hiddenCount = 0;
 
-    const visibleTopicContainers = topicContainers.filter((container) => {
-      if (!applyFocusMode || !NimfomaneStorage.isFocusMode()) {
-        container.style.display = '';
-        return true;
-      }
-
+    for (const container of topicContainers) {
       const id = container.getAttribute('data-rowid');
       if (!id) {
         console.error('Topic container missing data-rowid', container);
-        return false;
+        continue;
       }
 
-      if (getFocusModeTopicHiddenState(id)) {
+      if (focusModeActive && getFocusModeTopicHiddenState(id)) {
         container.style.display = 'none';
+        hiddenTopicContainers.push(container);
         hiddenCount++;
-        return false;
+        continue;
       }
 
       container.style.display = '';
-      return true;
-    });
+      visibleTopicContainers.push(container);
+    }
 
     if (list && isFromListing) {
       updateHiddenCountIndicator(list, hiddenCount);
     }
 
-    return visibleTopicContainers.map((container, index) => {
-      if (container.hasAttribute('data-wwtopic')) {
-        return () => {};
-      }
-
+    const registerOne = (container: HTMLDivElement, index: number, render: boolean) => {
       const id = container.getAttribute('data-rowid');
       if (!id) {
         console.error('Topic container missing data-rowid', container);
@@ -154,12 +164,28 @@ export const renderer = {
       }
 
       try {
-        return renderer.registerTopicItem(container, id, index);
+        if (!container.hasAttribute('data-wwtopic')) {
+          return renderer.registerTopicItem(container, id, index, render);
+        }
+
+        // Already analyzed while hidden, but has since become visible: render it now.
+        if (render) {
+          return renderer.renderTopicItem(container, id);
+        }
+
+        return () => {};
       } catch (error) {
         console.error(`Failed to register topic item ${id}:`, error);
         return () => {};
       }
-    });
+    };
+
+    // Visible topics are registered first so they get the highest analysis priority.
+    // Hidden topics are still analyzed (so their stored data stays fresh) but not rendered.
+    return [
+      ...visibleTopicContainers.map((container, index) => registerOne(container, index, true)),
+      ...hiddenTopicContainers.map((container, index) => registerOne(container, visibleTopicContainers.length + index, false)),
+    ];
   },
 
   renderTopicImage(container: HTMLDivElement, id: string): () => void {
