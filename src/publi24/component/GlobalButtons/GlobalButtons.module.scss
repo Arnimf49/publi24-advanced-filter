@@ -7,16 +7,25 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  pointer-events: none;
+
+  & > * {
+    pointer-events: auto;
+  }
 
   :global(.onMobile) & {
     position: absolute;
     bottom: 66px;
     left: 6px;
+    right: 6px;
     transform: translateX(0%);
+    justify-content: space-between;
   }
 }
 
 .globalButtonsContainer {
+  --global-buttons-height: 48px;
+  position: relative;
   display: flex;
   align-items: center;
   gap: 3px;
@@ -25,8 +34,12 @@
   border-radius: 9999px;
   background: #f8f8f8;
   box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.2);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 
   :global(.onMobile) & {
+    --global-buttons-height: 42px;
+    --global-buttons-toggle-width: 21.6px;
+    --global-buttons-toggle-extra-width: 5px;
     box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.15);
 
     :global(.dark) & {
@@ -38,6 +51,138 @@
   :global(.dark) & {
     background: rgb(40 41 42);
   }
+}
+
+.globalButtonsContainer.globalButtonsCollapsed {
+  transform: translateY(var(--global-buttons-height));
+}
+
+:global(.onMobile) .globalButtonsContainer.globalButtonsCollapsed {
+  transform: translateX(calc(-100% + var(--global-buttons-toggle-width) + var(--global-buttons-toggle-extra-width) - 2px));
+}
+
+:global(.onMobile) .globalButtonsContainer.globalButtonsCollapsed .globalButtonsToggle {
+  width: calc(var(--global-buttons-toggle-width) + var(--global-buttons-toggle-extra-width));
+}
+
+:global(.onMobile) .globalButtonsToggle {
+  position: relative;
+  top: auto;
+  right: auto;
+  left: auto;
+  width: var(--global-buttons-toggle-width);
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 0 18px 18px 0;
+  box-shadow: none;
+  transform: none;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:global(.onMobile) .globalButtonsToggleIcon {
+  width: 10px;
+  height: 16px;
+  transform: rotate(90deg);
+}
+
+.globalButtonsToggleIconCollapsed {
+  transform: rotate(180deg);
+}
+
+:global(.onMobile) .globalButtonsToggleIconCollapsed {
+  transform: rotate(270deg);
+}
+
+.globalButtonsToggle {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  width: 44px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 22px 22px 0 0 / 9px 9px 0 0;
+  background: #f8f8f8;
+  box-shadow: 2px -1px 5px 1px rgba(0, 0, 0, 0.14);
+  color: rgb(150 150 150);
+  cursor: pointer;
+  transform: translateX(-50%);
+  z-index: 2;
+
+  &:hover {
+    background: rgb(245 245 245);
+  }
+
+  :global(.dark) & {
+    background: rgb(40 41 42);
+    color: rgb(170 170 170);
+
+    &:hover {
+      background: rgb(50 51 52);
+    }
+  }
+}
+
+.globalButtonsContainer.globalButtonsCollapsed .globalButtonsToggle {
+  background: #3a7bd5;
+  color: #fff;
+
+  &:hover {
+    background: #2f6bbf;
+  }
+
+  :global(.dark) & {
+    background: #8ab4f8;
+    color: #111;
+
+    &:hover {
+      background: #7aa3e8;
+    }
+  }
+}
+
+.globalButtonsContainer.globalButtonsCollapsed .globalButtonsToggle.globalButtonsToggleNewVersion {
+  background: linear-gradient(45deg, #3a7bd5, #6ea1ea, #3a7bd5);
+  background-size: 200% 200%;
+  animation: globalButtonsToggleVersionGradient 2.4s ease-in-out infinite;
+
+  &:hover {
+    background: linear-gradient(45deg, #3a7bd5, #6ea1ea, #3a7bd5);
+    background-size: 200% 200%;
+  }
+
+  :global(.dark) & {
+    background: linear-gradient(45deg, #8ab4f8, #5b8ddb, #8ab4f8);
+    background-size: 200% 200%;
+
+    &:hover {
+      background: linear-gradient(45deg, #8ab4f8, #5b8ddb, #8ab4f8);
+      background-size: 200% 200%;
+    }
+  }
+}
+
+@keyframes globalButtonsToggleVersionGradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.globalButtonsToggleIcon {
+  width: 12.8px;
+  height: 8px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .demoGlobalButtons {

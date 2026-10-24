@@ -52,7 +52,7 @@ const NextVisibleAdButton: React.FC = () => {
           trackColor="rgb(223 223 223 / 30%)"
         />
       )}
-      {noMore ? 'Niciun anunț ✓' : 'Următorul >'}
+      {noMore ? 'Final listă ✓' : 'Următorul >'}
     </button>
   );
 };

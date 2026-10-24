@@ -18,6 +18,7 @@
   :global(.onMobile) &, &.mobileGlobalButtons {
     --global-buttons-height: 42px;
     --global-buttons-toggle-width: 21.6px;
+    --global-buttons-toggle-extra-width: 5px;
     position: absolute;
     bottom: 66px;
     left: 6px;
@@ -32,7 +33,12 @@
 
 .globalButtonsContainer.mobileGlobalButtons.globalButtonsCollapsed,
 :global(.onMobile) .globalButtonsContainer.globalButtonsCollapsed {
-  transform: translateX(calc(-100% + var(--global-buttons-toggle-width) + 5px - 6px));
+  transform: translateX(calc(-100% + var(--global-buttons-toggle-width) + var(--global-buttons-toggle-extra-width) - 2px));
+}
+
+.globalButtonsContainer.mobileGlobalButtons.globalButtonsCollapsed .globalButtonsToggle,
+:global(.onMobile) .globalButtonsContainer.globalButtonsCollapsed .globalButtonsToggle {
+  width: calc(var(--global-buttons-toggle-width) + var(--global-buttons-toggle-extra-width));
 }
 
 :global(.onMobile) .globalButtonsToggle,
@@ -47,6 +53,7 @@
   border-radius: 0 18px 18px 0;
   box-shadow: none;
   transform: none;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 :global(.onMobile) .globalButtonsToggleIcon,

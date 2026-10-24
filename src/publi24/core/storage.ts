@@ -679,6 +679,14 @@ export const WWStorage = {
     localStorage.setItem('ww:version-seen', version);
   },
 
+  isGlobalButtonsCollapsed(): boolean {
+    return localStorage.getItem('ww:global-buttons-collapsed') === 'true';
+  },
+
+  setGlobalButtonsCollapsed(collapsed: boolean): void {
+    localStorage.setItem('ww:global-buttons-collapsed', collapsed ? 'true' : 'false');
+  },
+
   setAdTutorial(id: string, enabled: boolean): void {
     WWStorage.setAdProp(id, 'tutorial', enabled);
   },

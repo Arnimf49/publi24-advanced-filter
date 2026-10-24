@@ -9,6 +9,7 @@ import {P24faLogoDark} from "../../../common/components/Logo/P24faLogoDark";
 import {P24faLogoLight} from "../../../common/components/Logo/P24faLogoLight";
 import {HistoryIcon} from "../../../common/components/Icons/HistoryIcon";
 import {FeedbackIcon} from "../../../common/components/Icons/FeedbackIcon";
+import {WWStorage} from "../../core/storage";
 
 type GlobalButtonsProps = {
   favsCount: number | null;
@@ -51,6 +52,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
   isDemo = false,
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => WWStorage.isGlobalButtonsCollapsed());
   const prevCountRef = useRef<null | number>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -89,10 +91,17 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen, onMenuClose]);
 
+  const onCollapseToggle = () => {
+    const nextIsCollapsed = !isCollapsed;
+
+    setIsCollapsed(nextIsCollapsed);
+    WWStorage.setGlobalButtonsCollapsed(nextIsCollapsed);
+  };
+
   const LogoComponent = isDark ? P24faLogoDark : P24faLogoLight;
 
   return (
-    <div className={`${styles.globalButtonsContainer} ${isDemo ? styles.demoGlobalButtons : ''}`}>
+    <div className={`${styles.globalButtonsContainer} ${isCollapsed ? styles.globalButtonsCollapsed : ''} ${isDemo ? styles.demoGlobalButtons : ''}`}>
       <div className={styles.logoWrapper}>
         <button
           type="button"
@@ -203,6 +212,19 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
             : <>Favorite {favsCount || 0}<span>{favsWithNoAdsCount ? '+' + favsWithNoAdsCount : ''}</span></>
           }
         </span>
+      </button>
+
+      <button
+        type="button"
+        className={`${styles.globalButtonsToggle} ${hasNewVersion && isCollapsed ? styles.globalButtonsToggleNewVersion : ''}`}
+        onClick={onCollapseToggle}
+        aria-expanded={!isCollapsed}
+        aria-label={isCollapsed ? 'Afișează butoanele globale' : 'Ascunde butoanele globale'}
+        title={isCollapsed ? 'Afișează butoanele globale' : 'Ascunde butoanele globale'}
+      >
+        <svg className={`${styles.globalButtonsToggleIcon} ${isCollapsed ? styles.globalButtonsToggleIconCollapsed : ''}`} viewBox="0 0 24 14" aria-hidden="true">
+          <path d="M4 3L12 11L20 3" />
+        </svg>
       </button>
     </div>
   );
