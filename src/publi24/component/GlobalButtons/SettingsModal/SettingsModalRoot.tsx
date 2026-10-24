@@ -4,6 +4,7 @@ import SettingsModal, {SettingsData} from "./SettingsModal";
 import React, {useCallback, useEffect, useState} from "react";
 import {utils} from '../../../../common/utils';
 import {misc} from '../../../core/misc';
+import {IS_MOBILE_VIEW} from '../../../../common/globals';
 
 type SettingsModalRootProps = {
   onClose: () => void;
@@ -26,6 +27,7 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
     const whatsappMessage = WWStorage.getWhatsappMessage();
     const focusMode = WWStorage.isFocusMode();
     const adDeduplication = WWStorage.isAdDeduplicationEnabled();
+    const compactMode = WWStorage.isCompactMode();
     const autoHide = WWStorage.isAutoHideEnabled();
     const nextOnlyVisible = WWStorage.isNextOnlyVisibleEnabled();
     const defaultManualHideReasonEnabled = WWStorage.isDefaultManualHideReasonEnabled();
@@ -40,6 +42,7 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
       whatsappMessage,
       focusMode,
       adDeduplication,
+      compactMode,
       autoHide,
       nextOnlyVisible,
       defaultManualHideReasonEnabled,
@@ -90,6 +93,16 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
     const current = WWStorage.isAdDeduplicationEnabled();
     WWStorage.setAdDeduplication(!current);
     setSettings(prev => prev ? { ...prev, adDeduplication: !current } : null);
+    setTimeout(() => {
+      window.scrollTo({ left: 0, top: 0 });
+      window.location.reload();
+    }, 400);
+  }, []);
+
+  const handleToggleCompactMode = useCallback(() => {
+    const currentValue = WWStorage.isCompactMode();
+    WWStorage.setCompactMode(!currentValue);
+    setSettings(prev => prev ? { ...prev, compactMode: !currentValue } : null);
     setTimeout(() => {
       window.scrollTo({ left: 0, top: 0 });
       window.location.reload();
@@ -208,6 +221,7 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
         onWhatsappMessageChange={handleWhatsappMessageChange}
         onToggleFocusMode={handleToggleFocusMode}
         onToggleAdDeduplication={handleToggleAdDeduplication}
+        onToggleCompactMode={handleToggleCompactMode}
         onToggleAutoHide={handleToggleAutoHide}
         onToggleNextOnlyVisible={handleToggleNextOnlyVisible}
         onToggleDefaultManualHideReason={handleToggleDefaultManualHideReason}
@@ -220,6 +234,7 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
         handleImport={handleImport}
         storageUsagePercent={storageUsagePercent}
         isDark={misc.getPubliTheme() === 'dark'}
+        isMobile={IS_MOBILE_VIEW}
       />
     </Modal>
   );

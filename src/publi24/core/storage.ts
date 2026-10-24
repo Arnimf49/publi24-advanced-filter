@@ -508,6 +508,14 @@ export const WWStorage = {
     return localStorage.getItem('ww:ad_deduplication') === 'true';
   },
 
+  setCompactMode(enabled: boolean): void {
+    localStorage.setItem('ww:compact-mode', enabled ? 'true' : 'false');
+  },
+
+  isCompactMode(): boolean {
+    return localStorage.getItem('ww:compact-mode') === 'true';
+  },
+
   setAutoHideEnabled(enabled: boolean): void {
     localStorage.setItem('ww:auto-hide', enabled ? 'true' : 'false');
   },

@@ -20,6 +20,10 @@
   color: inherit;
   font: inherit;
   padding: 0;
+
+  :global(.onMobile.wwCompact) & {
+    padding: 4px 10px;
+  }
 }
 
 .button:hover {

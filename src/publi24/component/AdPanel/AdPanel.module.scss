@@ -191,6 +191,10 @@
   margin-right: 5px;
   transition: background 0.2s ease 0s;
 
+  :global(.onMobile.wwCompact) & {
+    padding: 6px 9px;
+  }
+
   :global(.dark) & {
     background: rgb(60 84 123);
 

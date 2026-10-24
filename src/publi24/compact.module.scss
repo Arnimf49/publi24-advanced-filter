@@ -1,0 +1,17 @@
+:global(.onMobile.wwCompact .section-bottom-nav .container) {
+  display: none;
+}
+
+:global(.onMobile.wwCompact .link-filter .lf-count) {
+  display: none;
+}
+
+:global(.onMobile.wwCompact .link-filter),
+:global(.onMobile.wwCompact .btn-filters) {
+  padding: 4px 10px;
+}
+
+:global(.onMobile.wwCompact .filters-container-mobile .filters-box) {
+  padding: 0;
+  height: 45px;
+}

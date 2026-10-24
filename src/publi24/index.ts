@@ -13,6 +13,7 @@ import {utils} from "../common/utils";
 import {storageCleanup} from "./core/storageCleanup";
 import {exclusionFilter} from "./core/exclusionFilter";
 import {hostPermissions} from "./core/hostPermissions";
+import './compact.module.scss';
 
 const waitForSiteLoad = () => new Promise<void>(resolve => {
   const start = Date.now();
@@ -136,6 +137,11 @@ WWStorage.upgrade()
 
     if (IS_MOBILE_VIEW) {
       document.body.classList.add('onMobile');
+    }
+
+    if (WWStorage.isCompactMode() && IS_MOBILE_VIEW) {
+      document.body.classList.add('wwCompact');
+      document.querySelector('.section-bottom-nav .container')?.remove();
     }
 
     if (utils.getBrowserType() === 'Firefox') {

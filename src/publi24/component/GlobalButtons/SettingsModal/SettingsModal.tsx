@@ -82,6 +82,7 @@ export type SettingsData = {
   whatsappMessage: string;
   focusMode: boolean;
   adDeduplication: boolean;
+  compactMode: boolean;
   autoHide: boolean;
   nextOnlyVisible: boolean;
   defaultManualHideReasonEnabled: boolean;
@@ -98,6 +99,7 @@ type SettingsModalProps = {
   onWhatsappMessageChange: (message: string) => void;
   onToggleFocusMode: () => void;
   onToggleAdDeduplication: () => void;
+  onToggleCompactMode: () => void;
   onToggleAutoHide: () => void;
   onToggleNextOnlyVisible: () => void;
   onToggleDefaultManualHideReason: () => void;
@@ -110,6 +112,7 @@ type SettingsModalProps = {
   handleImport: () => Promise<void>;
   storageUsagePercent: number | null;
   isDark: boolean;
+  isMobile: boolean;
 };
 
 const SettingsModal: React.FC<SettingsModalProps> =
@@ -121,6 +124,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
   onWhatsappMessageChange,
   onToggleFocusMode,
   onToggleAdDeduplication,
+  onToggleCompactMode,
   onToggleAutoHide,
   onToggleNextOnlyVisible,
   onToggleDefaultManualHideReason,
@@ -133,6 +137,7 @@ const SettingsModal: React.FC<SettingsModalProps> =
   handleImport,
   storageUsagePercent,
   isDark,
+  isMobile,
 }) => {
   const [importMessage, setImportMessage] = useState<[string, string]|null>(null);
 
@@ -238,6 +243,15 @@ const SettingsModal: React.FC<SettingsModalProps> =
         onToggle={onToggleAdDeduplication}
         dataWwid="ad-deduplication-switch"
       />
+      {isMobile && (
+        <SettingControl
+          title="Stil compact listă pe mobil"
+          description="Când este activat, lista de anunțuri folosește un stil compact pe mobil, cu filtre și navigare mai înguste."
+          isOn={settings.compactMode}
+          onToggle={onToggleCompactMode}
+          dataWwid="compact-mode-switch"
+        />
+      )}
 
       <hr style={{ opacity: 0.2, marginTop: '25px', marginBottom: '25px' }} />
 
