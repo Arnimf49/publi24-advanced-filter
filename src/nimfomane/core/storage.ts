@@ -180,6 +180,22 @@ export const NimfomaneStorage = {
     localStorage.setItem('p24fa:nimfo:version-seen', version);
   },
 
+  getAnalytics(): { lastChecked: number | null } {
+    try {
+      const raw = localStorage.getItem('p24fa:nimfo:analytics');
+      if (raw) {
+        return JSON.parse(raw);
+      }
+    } catch (e) {
+      console.error('Error reading analytics data:', e);
+    }
+    return { lastChecked: null };
+  },
+
+  setAnalytics(data: { lastChecked: number | null }): void {
+    localStorage.setItem('p24fa:nimfo:analytics', JSON.stringify(data));
+  },
+
   isGlobalButtonsCollapsed(): boolean {
     return localStorage.getItem('p24fa:nimfo:global-buttons-collapsed') === 'true';
   },

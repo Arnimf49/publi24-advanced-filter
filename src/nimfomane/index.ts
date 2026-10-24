@@ -5,6 +5,7 @@ import {elementHelpers} from "./core/elementHelpers";
 import {utils} from "../common/utils";
 import {userId} from "../common/userId";
 import {profileActions} from "./core/profileActions";
+import {analytics} from "./core/analytics";
 
 const IS_TOPIC_PAGE = window.location.pathname.match(/^\/forum\/topic\//);
 const IS_PROFILE_PAGE = window.location.pathname.match(/^\/forum\/profile\//);
@@ -60,6 +61,8 @@ NimfomaneStorage.upgrade()
     if (IS_PROMOTER) {
       return;
     }
+
+    analytics.sendEvent().catch(console.error);
 
     console.log('Booting publi24-advanced-filter');
 
