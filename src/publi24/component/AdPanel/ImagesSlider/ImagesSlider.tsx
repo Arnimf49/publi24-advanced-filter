@@ -9,6 +9,9 @@ import Modal from "../../../../common/components/Modal/Modal";
 
 declare const Swiper: any;
 
+const CLOSE_ON_BACKGROUND_DELAY_MS = 320;
+const DRAG_THRESHOLD_PX = 10;
+
 type ImageSliderProps = {
   images: string[];
   visible: boolean;
@@ -27,6 +30,26 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   const toggleButtonClasses = `${styles.visibilityButton} ${visible ? styles.isVisible : ''}`;
   const hasMultipleImages = images.length > 1;
   const swiperElementRef = useRef<HTMLElement>(null);
+  const closeTimeoutRef = useRef<number | undefined>(undefined);
+  const pointerStartRef = useRef<{ x: number, y: number } | null>(null);
+
+  const clearPendingClose = (): boolean => {
+    if (closeTimeoutRef.current === undefined) {
+      return false;
+    }
+
+    window.clearTimeout(closeTimeoutRef.current);
+    closeTimeoutRef.current = undefined;
+    return true;
+  };
+
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current !== undefined) {
+        window.clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const visibilityClickHandler: MouseEventHandler = (event) => {
     onVisibilityClick(event);
@@ -35,6 +58,47 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   const investigateImgClickHandler: MouseEventHandler = (event) => {
     onInvestigateImgClick(event);
     close();
+  };
+
+  const sliderPointerDownHandler = (event: React.PointerEvent<HTMLElement>): void => {
+    pointerStartRef.current = { x: event.clientX, y: event.clientY };
+  };
+
+  const sliderClickHandler = (event: React.MouseEvent<HTMLElement>): void => {
+    event.stopPropagation();
+
+    // Controls and the image itself keep their own behaviour (image clicks are
+    // the first half of Swiper's double-tap zoom).
+    const target = event.target as HTMLElement;
+    const isImageOrControl = !!target.closest(
+      'img, button, a, .swiper-button-prev, .swiper-button-next, .swiper-pagination'
+    );
+    if (isImageOrControl) {
+      clearPendingClose();
+      return;
+    }
+
+    // A swipe/drag can still produce a trailing click. Swiper ignores it, so
+    // must we.
+    const pointerStart = pointerStartRef.current;
+    pointerStartRef.current = null;
+    const wasDrag = !!pointerStart
+      && Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y) > DRAG_THRESHOLD_PX;
+    if (wasDrag) {
+      clearPendingClose();
+      return;
+    }
+
+    // A second click inside the double-tap window means the user wants Swiper
+    // to zoom, not to close the modal.
+    if (clearPendingClose()) {
+      return;
+    }
+
+    closeTimeoutRef.current = window.setTimeout(() => {
+      closeTimeoutRef.current = undefined;
+      close();
+    }, CLOSE_ON_BACKGROUND_DELAY_MS);
   };
 
   // Memoize the slides so React never reconciles this subtree. Swiper writes
@@ -209,7 +273,8 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
         ref={swiperElementRef}
         className={`${styles.sliderSection} swiper`}
         aria-label="Image Slider Content"
-        onClick={stopPropagation}
+        onClick={sliderClickHandler}
+        onPointerDown={sliderPointerDownHandler}
       >
         <div className="swiper-wrapper">
           {slides}
