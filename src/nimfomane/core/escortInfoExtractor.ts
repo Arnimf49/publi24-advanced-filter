@@ -90,7 +90,7 @@ const SMALL_CAPS = {
 
 const SERVICE_PATTERNS: Record<EscortServiceName, RegExp> = {
   op: /\b(?:op|bj|bj\s+p\s*\/\s*n|p\s*\/\s*n|oral\s*(?:sex\s+)?(?:protejat|prottejat|pro)|sex\s+oral\s*(?:protejat|prottejat|pro)|oral\s*\(\s*pro\b|sex\s+oral\s*\(\s*pro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:protejat|prottejat|pro)\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\bfunctie\s+de\s+igiena\b|\boral\s*(?:si\s+normal|cu\s+sau\s+fara)\b|(?<!cu\s)\bsex\s+oral\b(?!\s+(?:neprotejat|nepro|protejat|prottejat|pro))\b/g,
-  on: /\b(?:on|bj|bj\s+p\s*\/\s*n|p\s*\/\s*n|oral\s*(?:sex\s+)?(?:neprotejat|nepro|nep)|sex\s+oral\s*(?:neprotejat|nepro|nep)|oral\s*\(\s*pro\s*\/\s*nepro\b|oral\s*\(\s*nepro\b|sex\s+oral\s*\(\s*nepro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:neprotejat|nepro|nep|fara\s+prezervativ)\b|\b(?:sex\s+oral|oral)\b[^\n.;]{0,35}\bfunctie\s+de\s+igiena\b|\boral\s*(?:si\s+normal|cu\s+sau\s+fara)\b|(?<!cu\s)\bsex\s+oral\b(?!\s+(?:neprotejat|nepro|protejat|pro))\b/g,
+  on: /\b(?:on|bj|bj\s+p\s*\/\s*n|p\s*\/\s*n|oral\s*(?:sex\s+)?(?:neprotejat|nepreotejat|nepro|nep)|sex\s+oral\s*(?:neprotejat|nepreotejat|nepro|nep)|oral\s*\(\s*pro\s*\/\s*nepro\b|oral\s*\(\s*nepro\b|sex\s+oral\s*\(\s*nepro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:neprotejat|nepreotejat|nepro|nep|fara\s+prezervativ)\b|\b(?:sex\s+oral|oral)\b[^\n.;]{0,35}\bfunctie\s+de\s+igiena\b|\boral\s*(?:si\s+normal|cu\s+sau\s+fara)\b|(?<!cu\s)\bsex\s+oral\b(?!\s+(?:neprotejat|nepro|protejat|pro))\b/g,
   np: /\bnp\b|\b(?:sex(?:ul)?\s+)?normal(?:ul)?\b(?!\s+neprotejat)(?:\s*\(\s*(?:(?:obligatoriu|doar|strict)\s+)?(?:protejat|potejat)\w*\s*[!.,;]?\s*\)|\s+(?:(?:obligatoriu|doar|strict)\s+)?(?:protejat|potejat)\w*\b|\s+in\s+diferite\s+pozitii\b)|\bnormal\b[^\n.;]{0,30}\b(?:protejat|potejat)\w*\b|\bsex\s*\(\s*(?:(?:obligatoriu|doar|strict)\s+)?(?:protejat|potejat)\w*\s*\)|\bact(?:ul)?\s+sexual\s+(?:protejat|potejat)\w*\b|\bsex(?:ul)?\s+normal\b(?!\s+neprotejat)\b|\bsex\b[^\n.;]{0,30}\bdoar\s+protejat\w*\b/g,
   nn: /\b(?:sex\s+)?normal(?:ul)?\s+neprotejat\b|\bact(?:ul)?\s+sexual\s+neprotejat\b|\bsex(?:ul)?\s+neprotejat\b/g,
   showerSex: /\b(?:sex|partid[ăa])\s+(?:la|sub|in)\s+duș\b|\b(?:sex|partid[ăa])\s+(?:la|sub|in)\s+dus\b|\b(?:sex|partid[ăa])\s*\([^)]{0,60}\b(?:în|in)\s+(?:duș|dus)\b[^)]*\)|\bduș\s+(?:cu\s+sex|sex)\b|\bdus\s+(?:cu\s+sex|sex)\b|\bshower\s+together\b/g,
@@ -1939,6 +1939,31 @@ function durationFromText(text: string, amountIndex: number, otherAmountIndexes:
 
   const uniqueDurations = [...new Set(durations.map(duration => duration.duration))];
   return uniqueDurations.length === 1 && !otherAmountIndexes.length ? uniqueDurations[0] : undefined;
+}
+
+function durationFromParenthesizedDescription(description: string): keyof EscortRates | undefined {
+  const half = 'jum(?:[aă]t(?:a|ă)te?|ate)';
+  const oneAndHalfHours = new RegExp(
+    `\\b(?:o\\s+)?(?:or[aă]|h)(?:\\s*(?:[șs]i|si)\\s*)?\\s*${half}`
+    + `|\\b1\\s*[.,]5\\s*(?:h|or[aă])`
+    + `|\\b1\\s*(?:h|or[aă])\\b(?:\\s*(?:[șs]i)\\s*)?(?:30|${half})`
+    + `|\\b90\\s*(?:de\\s*)?min`,
+    'i',
+  );
+  if (oneAndHalfHours.test(description)) {
+    return '1.5h';
+  }
+  if (/\b(?:dou[aă]|2)\s*(?:de\s*)?(?:ore|h)\b|\b120\s*(?:de\s*)?min/i.test(description)) {
+    return '2h';
+  }
+  if (/\b30\s*(?:de\s*)?min(?:ute)?s?\b/i.test(description)) {
+    return '30m';
+  }
+  if (/\b(?:o\s+)?or[aă]\b|\b1\s*h\b|\b60\s*(?:de\s*)?min/i.test(description)) {
+    return '1h';
+  }
+
+  return undefined;
 }
 
 function amountMatches(line: string): Array<{amount: number; index: number}> {
@@ -3815,6 +3840,24 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
       baseRates['1h'] = Number.parseInt(separatedLocalDurationRates[2], 10);
     }
     outcallRates['1h'] = Number.parseInt(separatedOutcallHourRate[1], 10);
+  }
+  const parenthesizedDurationRates: Array<{duration: keyof EscortRates; amount: number}> = [];
+  for (const line of rateText.split('\n')) {
+    if (/\b(?:deplasar\w*|hotel|out\s*call|extra)\b/i.test(line)) {
+      continue;
+    }
+    for (const match of line.matchAll(/(\d{2,5})\s*\(([^)]*)\)/g)) {
+      const amount = Number.parseInt(match[1], 10);
+      const duration = durationFromParenthesizedDescription(match[2]);
+      if (duration && isPriceAmount(amount)) {
+        parenthesizedDurationRates.push({duration, amount});
+      }
+    }
+  }
+  if (new Set(parenthesizedDurationRates.map(entry => entry.duration)).size >= 2) {
+    for (const entry of parenthesizedDurationRates) {
+      baseRates[entry.duration] = entry.amount;
+    }
   }
   for (const rates of [baseRates, outcallRates, dominationRates]) {
     for (const duration of Object.keys(rates) as Array<keyof EscortRates>) {

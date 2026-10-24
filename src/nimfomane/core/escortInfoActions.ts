@@ -24,6 +24,7 @@ interface CollectedDetails {
   serviceDetailsRank?: SourceRank;
   serviceProfileSourceSelected?: boolean;
   servicePostSourceSelected?: boolean;
+  servicePostSourceCount?: number;
   visitedCities: VisitedCity[];
   currentVisitedCity?: {
     city: string;
@@ -43,6 +44,7 @@ const COMMENT_SOURCE_PRIORITY = 3;
 const SIGNATURE_SOURCE_PRIORITY = 4;
 const SERVICE_POST_OVERRIDE_PRIORITY = 5;
 const SIGNATURE_SERVICE_PRIORITY = 6;
+const MAX_POST_SERVICE_SOURCES = 2;
 
 function normalizeProfileUrl(url: string): string {
   return url.replace(/\/$/, '').replace(/\?.*$/, '');
@@ -258,8 +260,11 @@ function collectText(
     if (serviceSourceType === 'profile' && details.serviceProfileSourceSelected) {
       return;
     }
-    if (serviceSourceType === 'post' && details.servicePostSourceSelected) {
-      return;
+    if (serviceSourceType === 'post') {
+      const maxPostSources = details.serviceProfileSourceSelected ? 1 : MAX_POST_SERVICE_SOURCES;
+      if ((details.servicePostSourceCount || 0) >= maxPostSources) {
+        return;
+      }
     }
 
     const isPostOverride = serviceSourceType === 'post';
@@ -280,6 +285,9 @@ function collectText(
     }
     details.serviceProfileSourceSelected = details.serviceProfileSourceSelected || serviceSourceType === 'profile';
     details.servicePostSourceSelected = details.servicePostSourceSelected || isPostOverride;
+    if (isPostOverride) {
+      details.servicePostSourceCount = (details.servicePostSourceCount || 0) + 1;
+    }
     details.serviceDetailsContentDate = Math.max(
       details.serviceDetailsContentDate || 0,
       effectiveContentDate || 0,
