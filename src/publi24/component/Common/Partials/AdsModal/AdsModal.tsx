@@ -3,6 +3,7 @@ import GeneralModal from '../../../../../common/components/Modal/GeneralModal';
 import styles from './AdsModal.module.scss';
 import type {AdData} from "../../../../core/adData";
 import ErrorDisplay from "../../ErrorDisplay/ErrorDisplay";
+import MissingPermissionsMessage from "../MissingPermissions/MissingPermissionsMessage";
 
 type AdsModalProps = {
   close: () => void;
@@ -23,6 +24,7 @@ type AdsModalProps = {
   sectionBreaks?: number[];
   renderAds: (adsData: AdData[], sectionBreaks?: number[]) => React.ReactNode;
   inline?: boolean;
+  showInspectorPermissionWarning?: boolean;
 };
 
 const useLoadingDots = (isLoading: boolean | undefined) => {
@@ -72,6 +74,7 @@ const AdsModal: React.FC<AdsModalProps> = ({
   sectionBreaks,
   renderAds,
   inline = false,
+  showInspectorPermissionWarning = false,
 }) => {
   const removedCount = removed ?? 0;
   const displayCount = totalCount != null
@@ -123,6 +126,12 @@ const AdsModal: React.FC<AdsModalProps> = ({
           ) : 'Pot să fie mai multe care încă nu au fost analizate.'}
         </span>
       </p>
+
+      {showInspectorPermissionWarning && (
+        <div className={styles.permissionsWarning}>
+          <MissingPermissionsMessage dataWwid="inspector-permissions-missing" />
+        </div>
+      )}
 
       <div className={styles.contentContainer} data-wwid="content">
         {adsData && renderAds(adsData, sectionBreaks)}

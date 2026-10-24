@@ -12,6 +12,7 @@ import {modalState} from "../common/modalState";
 import {utils} from "../common/utils";
 import {storageCleanup} from "./core/storageCleanup";
 import {exclusionFilter} from "./core/exclusionFilter";
+import {hostPermissions} from "./core/hostPermissions";
 
 const waitForSiteLoad = () => new Promise<void>(resolve => {
   const start = Date.now();
@@ -105,7 +106,9 @@ const initializeListingPage = async () => {
 
 WWStorage.upgrade()
   .then(waitForSiteLoad)
-  .then(() => {
+  .then(async () => {
+    await hostPermissions.acquire();
+
     console.log('Booting publi24-advanced-filter');
 
     storageCleanup.shouldRun()

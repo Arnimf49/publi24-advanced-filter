@@ -13,6 +13,7 @@ import {WWMemoryStorage} from "../../core/memoryStorage";
 import {inspectorEscorteApi, InspectorAd} from "../../core/inspectorEscorteApi";
 import PhoneAndTagsRoot from "../Common/Partials/PhoneAndTags/PhoneAndTagsRoot";
 import {misc} from "../../core/misc";
+import {hostPermissions} from "../../core/hostPermissions";
 
 interface AdPanelRootProps {
   id: string;
@@ -99,6 +100,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
     && imageSearchErrors?.length === imageCount;
 
   const imageResultsStatus = linksFilter.getImageResultsStatus(imageSearchDomains, imageInvestigateStale);
+  const hostPermissionState = hostPermissions.get();
 
   const isInTutorial = WWStorage.isAdTutorial(id);
   const visible = isInTutorial || adData.getItemVisibility(id);
@@ -332,6 +334,8 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         imageSearchErrorCount={imageSearchErrors?.length ?? 0}
         allImageSearchesFailed={allImageSearchesFailed}
         imageResultsStatus={imageResultsStatus}
+        hasGooglePermission={hostPermissionState.google}
+        hasLensPermission={hostPermissionState.lens}
         searchLinks={search}
         filteredSearchLinks={filteredSearchLinks}
         phoneInvestigatedSinceDays={phoneInvestigatedSinceDays}

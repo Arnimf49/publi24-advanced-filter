@@ -4,6 +4,26 @@ interface PermissionsResponse {
   data_collection: string[] | undefined;
 }
 
+interface HostPermissionsResponse {
+  google: boolean;
+  lens: boolean;
+  inspectorEscorte: boolean;
+}
+
+const GOOGLE_ORIGIN = 'https://www.google.com/*';
+const LENS_ORIGIN = 'https://lens.google.com/*';
+const INSPECTOR_ESCORTE_ORIGIN = 'https://api.inspector-escorte.com/*';
+
+async function getHostPermissions(): Promise<HostPermissionsResponse> {
+  const [google, lens, inspectorEscorte] = await Promise.all([
+    browserApi.permissions.contains({ origins: [GOOGLE_ORIGIN] }),
+    browserApi.permissions.contains({ origins: [LENS_ORIGIN] }),
+    browserApi.permissions.contains({ origins: [INSPECTOR_ESCORTE_ORIGIN] }),
+  ]);
+
+  return { google, lens, inspectorEscorte };
+}
+
 async function batchThrottle<T>(items: T[], batchSize: number, delayMs: number, fn: (item: T) => Promise<unknown>): Promise<unknown[]> {
   const results: unknown[] = [];
 
@@ -31,6 +51,21 @@ browserApi.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         data_collection: undefined,
       });
     });
+
+    return true;
+  }
+
+  if (message.type === 'GET_HOST_PERMISSIONS') {
+    getHostPermissions()
+      .then((response) => sendResponse(response))
+      .catch((error) => {
+        console.error('Error getting host permissions:', error);
+        sendResponse({
+          google: true,
+          lens: true,
+          inspectorEscorte: true,
+        });
+      });
 
     return true;
   }

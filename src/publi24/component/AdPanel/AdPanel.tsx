@@ -12,6 +12,7 @@ import ErrorDisplay from "../Common/ErrorDisplay/ErrorDisplay";
 import InfoIcon from "../Common/Icons/InfoIcon";
 import PhoneSearchResultsHelp from "./Help/PhoneSearchResultsHelp";
 import ImageSearchResultsHelp from "./Help/ImageSearchResultsHelp";
+import MissingPermissionsMessage from "../Common/Partials/MissingPermissions/MissingPermissionsMessage";
 import type {SearchResult} from "../../core/linksFilter";
 
 interface ImageLink {
@@ -51,6 +52,8 @@ interface AdPanelProps {
   imageSearchErrorCount?: number;
   allImageSearchesFailed?: boolean;
   imageResultsStatus?: 'green' | 'yellow' | 'red' | null;
+  hasGooglePermission: boolean;
+  hasLensPermission: boolean;
   hasImages?: boolean;
   hasImagesInOtherLocation?: boolean;
   phoneSearchJustCompleted?: boolean;
@@ -99,6 +102,8 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
     imageSearchErrorCount = 0,
     allImageSearchesFailed = false,
     imageResultsStatus,
+    hasGooglePermission,
+    hasLensPermission,
     hasImages = true,
     hasImagesInOtherLocation,
     phoneSearchJustCompleted,
@@ -291,7 +296,9 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                   )}
                 </h5>
                 <div data-wwid="search-results">
-                  {isPhoneSearchLoading ? (
+                  {!hasGooglePermission ? (
+                    <MissingPermissionsMessage dataWwid="phone-permissions-missing" />
+                  ) : isPhoneSearchLoading ? (
                     inlineLoader
                   ) : searchLinks === undefined ? (
                     phoneInvestigatedSinceDays ? (
@@ -354,13 +361,15 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                 </span>
                   )}
                 </h5>
-                {imageSearchErrorCount > 0 && (
+                {imageSearchErrorCount > 0 && hasGooglePermission && hasLensPermission && (
                   <p className={styles.imageSearchError} data-wwid="image-search-error">
                     Căutare eșuată pentru {imageSearchErrorCount === 1 ? 'o poză' : `${imageSearchErrorCount} poze`} !
                   </p>
                 )}
                 <div data-wwid="image-results">
-                  {imageSearchDomains === undefined ? (
+                  {!hasGooglePermission || !hasLensPermission ? (
+                    <MissingPermissionsMessage dataWwid="image-permissions-missing" />
+                  ) : imageSearchDomains === undefined ? (
                     isImageSearchLoading ? (
                       inlineLoader
                     ) : imageInvestigatedSinceDays ? (

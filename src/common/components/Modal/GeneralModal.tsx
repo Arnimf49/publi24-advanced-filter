@@ -13,6 +13,7 @@ type GeneralModalProps = {
   onCleanup?: () => void;
   prose?: boolean;
   inline?: boolean;
+  color?: string;
 };
 
 const GeneralModal: React.FC<GeneralModalProps> =
@@ -26,6 +27,7 @@ const GeneralModal: React.FC<GeneralModalProps> =
   onCleanup,
   prose = true,
   inline = false,
+  color,
 }) => {
   return (
     <Modal close={onClose} dataWwid={dataWwid} inline={inline} onCleanup={onCleanup}>
@@ -34,6 +36,7 @@ const GeneralModal: React.FC<GeneralModalProps> =
         onClose={onClose}
         maxWidth={maxWidth}
         headerActions={headerActions}
+        color={color}
       >
         <div className={prose ? `${styles.generalModal} ${styles.prose}` : styles.generalModal}>
           {children}

@@ -8,6 +8,7 @@ import {inspectorEscorteApi, InspectorAd} from "../../../../core/inspectorEscort
 import AdsList from "../AdList/AdsList";
 import {renderer} from "../../../../core/renderer";
 import {IS_MOBILE_VIEW} from "../../../../../common/globals";
+import {hostPermissions} from "../../../../core/hostPermissions";
 
 const PAGE_SIZE = 15;
 
@@ -124,6 +125,7 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
   }, [phone]);
 
   const hasPendingMore = pendingInspectorAdsRef.current.length > 0 || pendingUuidsRef.current.length > 0;
+  const showInspectorPermissionWarning = !hostPermissions.get().inspectorEscorte;
 
   useLayoutEffect(() => {
     if (savedScrollRef.current) {
@@ -161,6 +163,7 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
       onLoadMore={loadNextPage}
       sectionBreaks={listState.breaks}
       renderAds={renderAds}
+      showInspectorPermissionWarning={showInspectorPermissionWarning}
     />
   );
 };

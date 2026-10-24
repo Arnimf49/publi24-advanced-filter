@@ -123,6 +123,19 @@ input[type="text"].phoneInput {
   align-self: center;
 }
 
+.permissionsWarning {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-bottom: 8px;
+
+  p {
+    width: auto;
+    max-width: 100%;
+    margin: 0;
+  }
+}
+
 .contentContainer {
   padding-top: 8px;
 }
