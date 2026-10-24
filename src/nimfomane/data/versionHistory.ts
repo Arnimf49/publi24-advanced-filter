@@ -8,6 +8,20 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.14',
+    releaseDate: '25 octombrie 2026',
+    changeNew: [
+      'Setare pentru temă întunecată. Se aplică și pe forum.',
+      'Culegere date analitice: tip browser, sistem de operare, icognito pornit sau nu, marime spațiu de stocare folosit, număr favorite, număr ascunse, număr analiză detalii escortă.'
+    ],
+    changeImprove: [
+      'Cazuri adiționale în care lista de servicii și detaliile personale nu se extrăgeau corect.'
+    ],
+    changeFix: [
+      'Butoanele pe topic nu se afișau corect când lista se afișa in mod \'previzualizare postare\'.',
+    ]
+  },
+  {
     version: '3.13',
     releaseDate: '8 octombrie 2026',
     changeNew: [],

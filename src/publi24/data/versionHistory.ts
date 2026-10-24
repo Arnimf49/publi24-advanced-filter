@@ -8,6 +8,22 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.14',
+    releaseDate: '25 octombrie 2026',
+    changeNew: [
+      'Setare mod compact pe mobile, pentru salvare spațiu vertical.',
+      'Posibilitatea de a închide butoanele globale.',
+      'Mesaj de eroare când se detectează lipsă permisiuni la extensie.',
+    ],
+    changeImprove: [
+      'Închidere modal cu poze mai ușoară.',
+      'Mici ajustări de stil.',
+    ],
+    changeFix: [
+      'La încărcare lentă nu se înregistra extensia pe anunțuri pe pagina de listă.',
+    ]
+  },
+  {
     version: '3.13.1',
     releaseDate: '8 octombrie 2026',
     changeFix: [
