@@ -39,8 +39,7 @@
 
 // Expanded view.
 :global(.ww_topic_image_registered .ipsTopicSnippet__top){
-  margin-left: 80px;
-  min-height: 85px;
+  margin-left: 110px;
 }
 :global(.ww_topic_image_registered .ipsTopicSnippet__bottom),
 :global(.ww_topic_image_registered .ipsTopicSnippet__snippet) {
@@ -48,6 +47,16 @@
   :global(.onMobile) & {
     margin-left: initial;
   }
+}
+:global(.ww_topic_image_registered .ipsTopicSnippet__snippet),
+:global(.ww_topic_image_registered .ipsTopicSnippet__bottom) {
+  padding-left: 0;
+  padding-inline-start: 0;
+}
+:global(body:not(.onMobile) .ww_topic_image_registered.ipsTopicSnippet > [data-wwid="panel-container"]) {
+  display: flow-root;
+  margin-left: 110px;
+  margin-bottom: 8px;
 }
 :global(.ww_topic_image_registered.ipsTopicSnippet) {
   .container {

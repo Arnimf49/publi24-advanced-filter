@@ -221,7 +221,11 @@ export const renderer = {
     } else {
       const mainDataContainer = container.querySelector('.ipsDataItem_main, .ipsTopicSnippet__top');
       if (mainDataContainer) {
-        mainDataContainer.appendChild(panelContainer);
+        if (mainDataContainer.classList.contains('ipsTopicSnippet__top')) {
+          mainDataContainer.insertAdjacentElement('afterend', panelContainer);
+        } else {
+          mainDataContainer.appendChild(panelContainer);
+        }
       } else {
         console.error('Main data container not found');
       }
