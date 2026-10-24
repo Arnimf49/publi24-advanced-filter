@@ -97,6 +97,7 @@ export default [
   makeSimpleSource('publi24', 'search_image_parser.ts'),
 
   makeStyledSource('nimfomane', 'index.ts'),
+  makeSimpleSource('nimfomane', 'embed.ts'),
 
   makeSimpleSource('common', 'background/background.ts'),
 ];

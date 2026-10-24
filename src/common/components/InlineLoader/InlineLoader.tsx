@@ -11,12 +11,15 @@ interface InlineLoaderProps {
 
 export const InlineLoader: FC<InlineLoaderProps> =
 ({
-  color = "#888",
+  color,
   trackColor,
   size = 12,
   spinning = true,
   style,
 }) => {
+  const spinnerTrackColor = trackColor ?? 'var(--ww-inline-loader-track, rgba(0, 0, 0, 0.1))';
+  const spinnerColor = color ?? 'var(--ww-inline-loader-color, #888)';
+
   return (
     <div
       className={`${styles.spinner} ${!spinning ? styles.idle : ''}`}
@@ -25,8 +28,8 @@ export const InlineLoader: FC<InlineLoaderProps> =
       style={{
         width: size,
         height: size,
-        borderColor: trackColor ?? `rgba(0,0,0,0.1)`,
-        borderTopColor: spinning ? color : (trackColor ?? `rgba(0,0,0,0.1)`),
+        borderColor: spinnerTrackColor,
+        borderTopColor: spinning ? spinnerColor : spinnerTrackColor,
         ...style,
       }}
     ></div>

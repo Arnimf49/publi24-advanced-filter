@@ -57,19 +57,23 @@ export const PanelRoot: React.FC<PanelRootProps> = ({ id, escortUser, container,
   }, [id, effectiveEscortUser]);
 
   useEffect(() => {
-    const parentContainer = container.getAttribute('data-wwid') === 'escort-card'
+    const isEscortCard = container.getAttribute('data-wwid') === 'escort-card';
+    const parentContainer = isEscortCard
       ? container
       : container.closest('[data-wwtopic]') as HTMLElement;
     if (!parentContainer) return;
 
     if (visible) {
       container.style.isolation = 'initial';
-      container.style.background = 'initial';
+      container.style.background = '';
     } else {
       // Fixes performance issues. The background on body causes full rerenders
-      // due to mix-blend-mode.
+      // due to mix-blend-mode. CSS variables let the colour follow the theme
+      // without re-running this effect when dark mode is toggled.
       container.style.isolation = 'isolate';
-      container.style.background = 'white';
+      container.style.background = isEscortCard
+        ? 'var(--ww-hidden-card-background, white)'
+        : 'var(--ww-hidden-row-background, white)';
     }
 
     const hideReasonContainer = parentContainer.querySelector('[data-wwid="hide-reason-container"]') as HTMLElement;

@@ -387,3 +387,97 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+:global(.dark) {
+  .sectionTitle {
+    color: #e8ecf3;
+  }
+
+  .sectionMeta {
+    color: #aab1bd;
+
+    a {
+      color: #8fb3ef;
+    }
+  }
+
+  .outdated,
+  .notIncluded,
+  .error {
+    color: #e58b8b;
+  }
+
+  .detailsTable {
+    color: #c4c9d2;
+
+    tr {
+      background: #2c3038;
+    }
+
+    th {
+      color: #8f96a3;
+    }
+
+    td {
+      color: #e0e5ee;
+    }
+  }
+
+  .extraCost,
+  .extraCostService {
+    color: #c79adb;
+  }
+
+  .userName {
+    color: #e8ecf3;
+
+    a:hover {
+      color: #a9c7f7;
+    }
+  }
+
+  .statusRow {
+    color: #aab1bd;
+  }
+
+  .collectionMeta,
+  .disclaimer {
+    color: #8f96a3;
+  }
+
+  .noDetails {
+    color: #aab1bd;
+  }
+
+  .loadingState {
+    background: #181b21;
+  }
+
+  .refreshButton {
+    background: #3f639e;
+
+    &:hover {
+      background: #4a71b3;
+    }
+  }
+
+  .cityHistory {
+    color: #c4c9d2;
+  }
+
+  .cityName {
+    background: #2c3038;
+  }
+
+  .cityNode:first-child .cityName {
+    background: #363b45;
+  }
+
+  .cityNode:not(:first-child) .cityName {
+    background: linear-gradient(to right, #25282f 0%, #2c3038 24%, #2c3038 100%);
+  }
+
+  .cityDays {
+    color: #8f96a3;
+  }
+}

@@ -86,28 +86,28 @@ export const EscortCard: React.FC<EscortCardProps> = ({
                 <div className={styles.statItem}>
                   <span className={styles.statLabel}>locație</span>
                   <span className={styles.statValue} data-wwid="stat-location">
-                    {(statsLoading || statsStale) && <InlineLoader color="#888" size={12} />}
+                    {(statsLoading || statsStale) && <InlineLoader size={12} />}
                     {profileStats?.currentCity ? <a href={profileStats.currentCity.topicUrl} target="_blank" rel="noopener noreferrer">{profileStats.currentCity.name}</a> : '-'}
                   </span>
                 </div>
                 <div className={styles.statItem}>
                   <span className={styles.statLabel}>pe site</span>
                   <span className={styles.statValue} data-wwid="stat-last-visited" data-wwlastvisited={profileStats?.lastVisited || ''}>
-                    {(statsLoading || statsStale) && <InlineLoader color="#888" size={12} />}
+                    {(statsLoading || statsStale) && <InlineLoader size={12} />}
                     {lastVisitedLabel || '-'}
                   </span>
                 </div>
                 <div className={styles.statItem}>
                   <span className={styles.statLabel}>{personalDetailsValue ? 'fizic' : 'postări'}</span>
                   <span className={styles.statValue} data-wwid="stat-posts">
-                    {(statsLoading || statsStale) && <InlineLoader color="#888" size={12} />}
+                    {(statsLoading || statsStale) && <InlineLoader size={12} />}
                     {personalDetailsValue || profileStats?.posts || '-'}
                   </span>
                 </div>
                 <div className={styles.statItem}>
                   <span className={styles.statLabel}>{serviceRatesValue ? 'rate' : 'reputație'}</span>
                   <span className={styles.statValue} data-wwid="stat-reputation">
-                    {(statsLoading || statsStale) && <InlineLoader color="#888" size={12} />}
+                    {(statsLoading || statsStale) && <InlineLoader size={12} />}
                     {serviceRatesValue || profileStats?.reputation || '-'}
                   </span>
                 </div>

@@ -147,3 +147,39 @@
     padding: 4px 6px;
   }
 }
+
+:global(.dark) {
+  .escortCard {
+    background: #24272e;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+
+    a {
+      color: #8fb3ef;
+
+      &:hover {
+        color: #a9c7f7;
+      }
+    }
+  }
+
+  .escortIndex {
+    background: #2c3038;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.45);
+  }
+
+  .indexText {
+    color: #aab1bd;
+  }
+
+  .statItem {
+    background: #2c3038;
+  }
+
+  .statLabel {
+    color: #8f96a3;
+  }
+
+  .statValue {
+    color: #d4d9e2;
+  }
+}

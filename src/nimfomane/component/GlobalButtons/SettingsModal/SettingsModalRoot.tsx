@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import Modal from '../../../../common/components/Modal/Modal';
 import SettingsModal, {NimfomaneSettingsData} from './SettingsModal';
 import {NimfomaneStorage} from '../../../core/storage';
+import {darkTheme} from '../../../core/darkTheme';
 import {utils} from '../../../../common/utils';
 
 type SettingsModalRootProps = {
@@ -15,8 +16,15 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
   useEffect(() => {
     setSettings({
       focusMode: NimfomaneStorage.isFocusMode(),
+      darkMode: darkTheme.isEnabled(),
     });
     setStorageUsagePercent(utils.getStorageUsagePercent());
+  }, []);
+
+  const handleToggleDarkMode = useCallback(() => {
+    const next = !darkTheme.isEnabled();
+    darkTheme.setEnabled(next);
+    setSettings(prev => prev ? { ...prev, darkMode: next } : null);
   }, []);
 
   const handleToggleFocusMode = useCallback(() => {
@@ -74,6 +82,7 @@ const SettingsModalRoot: React.FC<SettingsModalRootProps> = ({ onClose }) => {
         onClose={onClose}
         settings={settings}
         onToggleFocusMode={handleToggleFocusMode}
+        onToggleDarkMode={handleToggleDarkMode}
         handleExport={handleExport}
         handleImport={handleImport}
         storageUsagePercent={storageUsagePercent}

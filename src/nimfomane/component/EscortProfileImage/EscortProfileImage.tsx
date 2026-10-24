@@ -37,7 +37,7 @@ const EscortProfileImage: React.FC<EscortProfileImageProps> = ({
       className={className}
       data-wwid={variant === 'card' ? 'escort-card-image-section' : 'escort-details-image-section'}
     >
-      {imageLoading && <Loader color="#555" />}
+      {imageLoading && <Loader color="#888" />}
       {showImage && (
         <img
           src={imageUrl}

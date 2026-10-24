@@ -39,7 +39,7 @@ export const TopicImage: FC<TopicImageProps> =
       data-wwid="topic-image"
       data-wwuser={user}
     >
-      {isLoading && !loadError ? <Loader color={'#555'} classes={classes.loader}/> : null}
+      {isLoading && !loadError ? <Loader color={'#888'} classes={classes.loader}/> : null}
       {typeof url === "string" && !hasError && !loadError
         ? <>
           <img

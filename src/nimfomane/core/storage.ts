@@ -172,6 +172,14 @@ export const NimfomaneStorage = {
     localStorage.setItem('p24fa:nimfo:focus_mode', enabled ? 'true' : 'false');
   },
 
+  isDarkMode(): boolean {
+    return localStorage.getItem('p24fa:nimfo:dark_mode') === 'true';
+  },
+
+  setDarkMode(enabled: boolean): void {
+    localStorage.setItem('p24fa:nimfo:dark_mode', enabled ? 'true' : 'false');
+  },
+
   getVersionSeen(): string | null {
     return localStorage.getItem('p24fa:nimfo:version-seen');
   },

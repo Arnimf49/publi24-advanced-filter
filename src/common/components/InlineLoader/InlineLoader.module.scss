@@ -12,6 +12,11 @@
   animation: none;
 }
 
+:global(.dark) {
+  --ww-inline-loader-color: #9aa1ad;
+  --ww-inline-loader-track: rgba(255, 255, 255, 0.15);
+}
+
 
 @keyframes spin {
   0% {

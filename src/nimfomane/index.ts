@@ -6,6 +6,10 @@ import {utils} from "../common/utils";
 import {userId} from "../common/userId";
 import {profileActions} from "./core/profileActions";
 import {analytics} from "./core/analytics";
+import {darkTheme} from "./core/darkTheme";
+import "./theme/darkTheme.module.scss";
+
+darkTheme.init();
 
 const IS_TOPIC_PAGE = window.location.pathname.match(/^\/forum\/topic\//);
 const IS_PROFILE_PAGE = window.location.pathname.match(/^\/forum\/profile\//);

@@ -8,6 +8,7 @@ import SettingsModalRoot from './SettingsModal/SettingsModalRoot';
 import {versionHistory} from '../../data/versionHistory';
 import {IS_MOBILE_VIEW} from '../../../common/globals';
 import {utils} from '../../../common/utils';
+import {darkTheme} from '../../core/darkTheme';
 
 type GlobalButtonsRootProps = {};
 
@@ -19,6 +20,9 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [favsCount, setFavsCount] = useState<number | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
+  const [isDark, setIsDark] = useState(() => darkTheme.isEnabled());
+
+  useEffect(() => darkTheme.onChange(setIsDark), []);
 
   useEffect(() => {
     const onFavsChanged = () => {
@@ -60,6 +64,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
       <GlobalButtons
         favsCount={favsCount}
         isMobile={IS_MOBILE_VIEW}
+        isDark={isDark}
         onLogoClick={utils.openExtensionPage}
         onFavsClick={onFavsClick}
         onSettingsClick={onSettingsClick}

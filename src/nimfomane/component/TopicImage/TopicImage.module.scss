@@ -113,3 +113,26 @@
 .publiNumber {
   color: #fbba10;
 }
+
+:global(.dark) {
+  .container {
+    background: #2a2d33;
+  }
+
+  .publiContainer {
+    background: #22303f;
+  }
+
+  .publiText {
+    color: #8fb3ef;
+  }
+
+  .publiNumber {
+    color: #e6c76a;
+  }
+}
+
+/* The same icon is rendered inside both topic images and favorite cards. */
+:global(.dark) svg[data-wwid="no-image-icon"] {
+  fill: #7a8290;
+}

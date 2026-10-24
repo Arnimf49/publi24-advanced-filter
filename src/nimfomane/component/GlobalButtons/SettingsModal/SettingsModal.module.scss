@@ -123,3 +123,53 @@
     font-size: 13px;
   }
 }
+
+:global(.dark) {
+  .control {
+    background: #24272e;
+    border-color: rgba(255, 255, 255, 0.09);
+
+    &:hover {
+      background: rgba(143, 179, 239, 0.1);
+      border-color: #8fb3ef;
+    }
+  }
+
+  .switchContainer {
+    background: #4a4f58;
+  }
+
+  .switchBall {
+    background: #e8ecf3;
+  }
+
+  .switchOn {
+    background: #3f639e;
+  }
+
+  .controlTitle,
+  .header {
+    color: #e8ecf3;
+  }
+
+  .controlDescription,
+  .storageInfo {
+    color: #aab1bd;
+  }
+
+  .button {
+    background: #3f639e;
+
+    &:hover {
+      background: #4a71b3;
+    }
+  }
+
+  .errorMessage {
+    color: #e58b8b;
+  }
+
+  .successMessage {
+    color: #82c99a;
+  }
+}

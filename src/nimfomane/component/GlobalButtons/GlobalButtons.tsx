@@ -6,11 +6,13 @@ import {HistoryIcon} from '../../../common/components/Icons/HistoryIcon';
 import {FeedbackIcon} from '../../../common/components/Icons/FeedbackIcon';
 import {SettingsIcon} from '../../../common/components/Icons/SettingsIcon';
 import {P24faLogoLight} from '../../../common/components/Logo/P24faLogoLight';
+import {P24faLogoDark} from '../../../common/components/Logo/P24faLogoDark';
 import {NimfomaneStorage} from '../../core/storage';
 
 type GlobalButtonsProps = {
   favsCount: number | null;
   isMobile: boolean;
+  isDark: boolean;
   onLogoClick: () => void;
   onFavsClick: MouseEventHandler;
   onSettingsClick: MouseEventHandler;
@@ -28,6 +30,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
 ({
   favsCount,
   isMobile,
+  isDark,
   onLogoClick,
   onFavsClick,
   onSettingsClick,
@@ -96,6 +99,8 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
     NimfomaneStorage.setGlobalButtonsCollapsed(nextIsCollapsed);
   };
 
+  const LogoComponent = isDark ? P24faLogoDark : P24faLogoLight;
+
   return (
     <div
       className={`${styles.globalButtonsContainer} ${isMobileViewport ? styles.mobileGlobalButtons : ''} ${isCollapsed ? styles.globalButtonsCollapsed : ''} ${isDemo ? styles.demoGlobalButtons : ''}`}
@@ -109,7 +114,7 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
           title="Logo"
           aria-label="Logo"
         >
-          <P24faLogoLight className={styles.logo} padding={false} onClick={onLogoClick}/>
+          <LogoComponent className={styles.logo} padding={false} onClick={onLogoClick}/>
         </button>
       </div>
 

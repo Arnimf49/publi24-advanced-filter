@@ -301,7 +301,7 @@ const EscortDetailsModal: React.FC<EscortDetailsModalProps> = ({
           </div>
           {isLoading && (
             <div className={styles.loadingState} data-wwid="escort-details-loading">
-              <InlineLoader color="#2f4979" size={14} />
+              <InlineLoader size={14} />
               <span>Se analizează datele din postări..</span>
             </div>
           )}

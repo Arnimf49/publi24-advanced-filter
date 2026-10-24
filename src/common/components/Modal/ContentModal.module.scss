@@ -163,6 +163,21 @@
   margin-top: 0;
 }
 
+/* Nimfomane uses the same dark surface hierarchy as the forum override,
+ * instead of the generic Publi24 dark palette. */
+:global(.dark .nimfomane) .container {
+  background: #181b21;
+  color: #c4c9d2;
+}
+
+:global(.dark .nimfomane) .header {
+  background: rgba(24, 27, 33, 0.9);
+}
+
+:global(.dark .nimfomane) .closeButton {
+  background: #24272e;
+}
+
 @media screen and (max-width: 640px) {
   .topBorder {
     top: 70px;

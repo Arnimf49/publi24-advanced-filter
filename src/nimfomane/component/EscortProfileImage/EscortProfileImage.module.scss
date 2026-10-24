@@ -36,3 +36,9 @@
 .clickable {
   cursor: pointer;
 }
+
+:global(.dark) {
+  .imageSection {
+    background: #2a2d33;
+  }
+}

@@ -72,7 +72,7 @@ export const Panel: React.FC<PanelProps> = ({ phone, visible, hiddenReason, isEs
         )}
         {loading && (
           <span className={styles.loadingIndicator} data-wwid="analysis-loading">
-            <InlineLoader color="#555" size={16} />
+            <InlineLoader size={16} />
           </span>
         )}
       </div>

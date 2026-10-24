@@ -156,3 +156,30 @@
     }
   }
 }
+
+:global(.dark) {
+  .emptyMessage {
+    color: #aab1bd;
+  }
+
+  .toggleButton {
+    &:not(.active) {
+      color: #d4d9e2;
+      background: #2c3038;
+    }
+
+    &.active {
+      color: #fff;
+      background: #6a3d4e;
+    }
+  }
+
+  .favoritesSectionHeader {
+    color: #e8ecf3;
+    background: #181b21;
+
+    .count {
+      color: #8f96a3;
+    }
+  }
+}

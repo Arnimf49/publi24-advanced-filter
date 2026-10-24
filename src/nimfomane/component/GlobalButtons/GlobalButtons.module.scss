@@ -479,6 +479,148 @@
   }
 }
 
+@keyframes popAnimationDark {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+    background: #6a3d4e;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+:global(.dark) {
+  .globalButtonsContainer {
+    background: #1f2127;
+    box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.55);
+  }
+
+  .globalButtonsToggle {
+    background: #24272e;
+    color: #aab1bd;
+    box-shadow: 2px -1px 5px 1px rgba(0, 0, 0, 0.4);
+
+    &:hover {
+      background: #2f333b;
+    }
+  }
+
+  .mobileGlobalButtons .globalButtonsToggle,
+  :global(.onMobile) .globalButtonsToggle {
+    background: transparent;
+    box-shadow: none;
+
+    &:hover {
+      background: transparent;
+    }
+  }
+
+  .globalButtonsContainer.globalButtonsCollapsed .globalButtonsToggle {
+    background: #3f639e;
+    color: #fff;
+
+    &:hover {
+      background: #4a71b3;
+    }
+  }
+
+  .globalButtonsContainer.globalButtonsCollapsed .globalButtonsToggle.globalButtonsToggleNewVersion {
+    background: linear-gradient(45deg, #3f639e, #6d94d1, #3f639e);
+    background-size: 200% 200%;
+
+    &:hover {
+      background: linear-gradient(45deg, #3f639e, #6d94d1, #3f639e);
+      background-size: 200% 200%;
+    }
+  }
+
+  .logoButtonBg {
+    background: #24272e;
+  }
+
+  .menuButton {
+    background: #2c3038;
+
+    &::before {
+      background: #2c3038;
+    }
+
+    &:hover {
+      background: #363b45;
+
+      &::before {
+        background: #363b45;
+      }
+    }
+
+    svg {
+      stroke: #c4c9d2;
+    }
+  }
+
+  .menuButtonNewVersion,
+  .menuItemNewVersion {
+    animation: none;
+  }
+
+  .savesButton {
+    background: #5a3342;
+    color: #e9a6bc;
+
+    &:hover {
+      background: #6a3d4e;
+      color: #f3b8ca;
+
+      .savesIcon {
+        fill: #f3b8ca;
+      }
+    }
+
+    .savesIcon {
+      fill: #e9a6bc;
+    }
+  }
+
+  .savesButtonAnimating {
+    animation-name: popAnimationDark;
+  }
+
+  .menuDropdown {
+    background: #1f2127;
+    box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.55);
+  }
+
+  .menuArrow {
+    background: #1f2127;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.35);
+  }
+
+  .menuHeader {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .menuTitle,
+  .menuVersion {
+    color: #e8ecf3;
+  }
+
+  .menuVersion {
+    color: #aab1bd;
+  }
+
+  .menuItem {
+    background: rgba(255, 255, 255, 0.05);
+    color: #d4d9e2;
+
+    &:hover {
+      background: rgba(143, 179, 239, 0.12);
+    }
+  }
+}
+
 .menuButtonNewVersion {
   animation: newVersionPulse 7.2s ease-in-out infinite;
 

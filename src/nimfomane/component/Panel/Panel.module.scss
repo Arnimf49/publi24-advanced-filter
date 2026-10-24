@@ -1,3 +1,13 @@
+:root {
+  --ww-hidden-row-background: #fff;
+  --ww-hidden-card-background: #fff;
+}
+
+:global(.dark) {
+  --ww-hidden-row-background: #181a1f;
+  --ww-hidden-card-background: #24272e;
+}
+
 .panel {
   margin-top: 8px;
   display: flex;
@@ -217,5 +227,59 @@
   :global(.onMobile) & {
     font-size: 12px;
     margin-left: 0;
+  }
+}
+
+:global(.dark) {
+  .whatsapp,
+  .escortInfoButton,
+  .hideButton,
+  .openPhotosButton {
+    background: #2c3038;
+    color: #c4c9d2;
+
+    &:hover {
+      background: #363b45;
+    }
+  }
+
+  .whatsapp svg path {
+    fill: #c4c9d2;
+  }
+
+  .hideButton svg {
+    stroke: #c4c9d2;
+  }
+
+  .favButtonOff {
+    background: #3a2930;
+
+    svg {
+      stroke: #e9a6bc !important;
+    }
+
+    &:hover {
+      background: #46313a;
+
+      svg {
+        stroke: #f3b8ca !important;
+      }
+    }
+  }
+
+  .favButtonOn {
+    background: #6a3d4e;
+
+    &:hover {
+      background: #7a475a;
+    }
+  }
+
+  .hideReason {
+    color: #aab1bd;
+
+    b {
+      color: #e8ecf3;
+    }
   }
 }

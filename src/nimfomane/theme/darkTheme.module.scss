@@ -1,0 +1,567 @@
+/* Site-wide dark theme for the Nimfomane forum (Invision Focus theme).
+ * Selectors are deliberately scoped to html#focus.dark so they win against the
+ * theme's own rules regardless of stylesheet load order.
+ */
+
+/* Theme palette: every --theme-* triplet is consumed via rgb(var(--...)). */
+:global(html#focus.dark) {
+  color-scheme: dark;
+
+  --focus-bg--color: #12141a;
+  --focus-bg--image: none;
+
+  --theme-page_background: 18, 20, 25;
+  --theme-header: 35, 48, 75;
+  --theme-header_text: 255, 255, 255;
+  --theme-main_nav: 28, 33, 42;
+  --theme-main_nav_font: 232, 236, 243;
+  --theme-main_nav_tab: 24, 27, 33;
+  --theme-main_nav_tab_font: 205, 211, 222;
+
+  --theme-area_background_reset: 24, 26, 31;
+  --theme-area_background_light: 39, 44, 53;
+  --theme-area_background: 44, 50, 60;
+  --theme-area_background_dark: 24, 26, 30;
+
+  --theme-text_color: 196, 201, 210;
+  --theme-text_dark: 238, 241, 246;
+  --theme-text_light: 145, 152, 165;
+  --theme-text_very_light: 250, 251, 253;
+
+  --theme-link: 126, 170, 230;
+  --theme-link_hover: 170, 203, 247;
+  --theme-link_button: 145, 152, 165;
+  --theme-brand_primary: 63, 99, 158;
+
+  --theme-selected: 35, 51, 73;
+  --theme-selected_border: 90, 146, 220;
+  --theme-active_input_border: 90, 146, 220;
+
+  --theme-post_highlight: 41, 35, 22;
+  --theme-post_highlight_border: 180, 143, 70;
+  --theme-moderated: 48, 30, 39;
+  --theme-moderated_light: 40, 27, 34;
+  --theme-moderated_text: 232, 164, 193;
+  --theme-moderated_text_light: 200, 140, 170;
+
+  --theme-comment_count: 45, 49, 58;
+  --theme-comment_count_font: 220, 225, 235;
+  --theme-button_bar: 39, 44, 53;
+  --theme-footer_text: 168, 176, 190;
+
+  --theme-item_status: 63, 99, 158;
+  --new-badge--background: #7a4a1d;
+  --new-badge--color: #ffe3bd;
+  --theme-tag: 43, 48, 58;
+  --theme-tag_font: 228, 233, 242;
+  --theme-timeline_color: 63, 99, 158;
+  --theme-mentions: 63, 99, 158;
+
+  --theme-tab_background: 24, 27, 33;
+  --theme-section_title: 32, 37, 46;
+  --theme-section_title_font: 236, 240, 247;
+  --theme-secondary_title: 32, 37, 46;
+  --theme-secondary_title_font: 236, 240, 247;
+  --theme-widget_title_bar: 43, 48, 58;
+  --theme-widget_title_font: 236, 240, 247;
+
+  --theme-primary_button: 60, 67, 80;
+  --theme-primary_button_font: 240, 243, 248;
+  --theme-normal_button: 76, 84, 98;
+  --theme-normal_button_font: 240, 243, 248;
+  --theme-light_button: 48, 53, 63;
+  --theme-light_button_font: 228, 233, 242;
+  --theme-very_light_button: 37, 41, 49;
+  --theme-very_light_button_font: 228, 233, 242;
+  --theme-alternate_button: 55, 62, 75;
+  --theme-alternate_button_font: 240, 243, 248;
+  --theme-important_button: 63, 99, 158;
+  --theme-important_button_font: 255, 255, 255;
+  --theme-pagination_active: 63, 99, 158;
+
+  --theme-rating_on: 255, 176, 40;
+  --theme-notification_bubble: 54, 171, 128;
+  --theme-featured: 70, 180, 130;
+  --theme-prefix: 200, 80, 80;
+  --theme-price: 210, 110, 110;
+  --theme-profile_header: 30, 34, 41;
+
+  /* Borderless surfaces: hierarchy comes from background levels and shadow. */
+  --box--backgroundColor: rgb(32, 36, 44);
+  --box--border-width: 0px;
+  --box--border-color: transparent;
+  --box--boxShadow: 0 2px 8px rgba(0, 0, 0, 0.24);
+  --popup--border: 0 solid transparent;
+  --popup--boxShadow: 0 8px 50px rgba(0, 0, 0, 0.55), 0 4px 15px rgba(0, 0, 0, 0.4);
+  --dialog--boxShadow: 0 5px 55px rgba(0, 0, 0, 0.7), 0 7px 24px -12px rgba(0, 0, 0, 0.85);
+
+  --breadcrumb--background: rgb(32, 36, 44);
+  --breadcrumb--border-width: 0px;
+  --breadcrumb--border: transparent;
+  --breadcrumb--box-shadow: none;
+  --breadcrumb-hover: #2d3139;
+  --breadcrumb-active: #3b3e45;
+  --breadcrumb-angle-1: #40454f;
+  --breadcrumb-angle-2: rgba(255, 255, 255, 0.1);
+
+  --ipsmenu--background: rgb(39, 44, 53);
+  --nav-dropdown--background: rgb(39, 44, 53);
+  --nav-dropdown--color: rgb(220, 225, 234);
+  --nav-dropdown--border: rgba(255, 255, 255, 0.1);
+  --nav-dropdown--box-shadow: rgba(0, 0, 0, 0.6) 0 6px 20px, rgba(0, 0, 0, 0.25) 0 2px 2px;
+  --nav-hover--background: rgba(255, 255, 255, 0.08);
+  --nav-active--background: rgba(255, 255, 255, 0.12);
+  --user-nav--hover-background: transparent;
+
+  --search--background: rgb(20, 23, 29);
+  --search--color: rgb(210, 216, 226);
+  --search--box-shadow: none;
+  --form-field--borderColor: rgba(255, 255, 255, 0.16);
+  --form-field--borderHoverColor: rgba(255, 255, 255, 0.35);
+  --form-field--focusShadow: rgba(90, 146, 220, 0.3) 0 0 0 4px;
+
+  --positive-light: #24382f;
+  --negative-light: #3a2424;
+  --intermediate-light: #3a3020;
+  --informational-light: #23323d;
+  --general-light: #2c3138;
+  --positive-dark: #6cc79b;
+  --negative-dark: #e56b6b;
+  --intermediate-dark: #e8a35f;
+  --informational-dark: #6fb2e8;
+  --general-dark: #aeb5c0;
+
+  --sectiontitle--background: rgb(43, 48, 58);
+  --sectiontitle--border-width: 0px;
+  --sectiontitle--border-color: transparent;
+  --widgettitle--border-width: 0px;
+  --widgettitle--border-color: transparent;
+  --guest-message-dark--color: #fff;
+}
+
+:global(html#focus.dark body) {
+  background: var(--focus-bg--color);
+  background-image: none;
+}
+
+/* main site canvas */
+:global(html#focus.dark .focus-wrap) {
+  background-color: #181b21;
+  background-image: linear-gradient(to bottom, rgba(24, 26, 31, 0.96) 0%, rgba(24, 26, 31, 0.96) 100%);
+  box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.6);
+}
+
+:global(html#focus.dark .focus-content),
+:global(html#focus.dark .focus-content-padding),
+:global(html#focus.dark #ipsLayout_contentArea) {
+  background-color: transparent;
+}
+
+/* header: keep the site's blue accent but darker */
+:global(html#focus.dark #ipsLayout_header header) {
+  background-color: rgb(var(--theme-header));
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.04) 50%, rgba(255, 255, 255, 0.04) calc(50% + 1px), rgba(0, 0, 0, 0) calc(50% + 1px), rgba(0, 0, 0, 0) 75%, rgba(0, 0, 0, 0.12) 100%);
+  box-shadow: inset rgba(255, 255, 255, 0.08) 0 -1px 0;
+}
+
+/* navigation bar: flat, borderless, with pill states */
+:global(html#focus.dark .focus-nav-bar) {
+  background: #1e222a;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+:global(html#focus.dark .ipsNavBar_primary > ul > li > a) {
+  border-radius: 8px;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+:global(html#focus.dark .ipsNavBar_primary > ul > li:not(.ipsNavBar_active):hover > a) {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
+
+:global(html#focus.dark .ipsNavBar_primary > ul > li.ipsNavBar_active > a) {
+  background: #3f639e;
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+}
+
+/* header user links follow the same hover language as the nav pills */
+:global(html#focus.dark .focus-user #elUserNav > li > a:not(#elRegisterButton)) {
+  border-radius: 8px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* use li:hover so icon links covered by an overlay (the colour picker
+ * input) still receive the hover treatment */
+:global(html#focus.dark .focus-user #elUserNav > li:hover > a:not(#elRegisterButton)) {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* the theme also paints the parent li on hover; keep the hover on the link
+ * only so the translucent layers do not stack */
+:global(html#focus.dark .focus-user #elUserNav > li:hover) {
+  background: transparent;
+}
+
+/* search input */
+:global(html#focus.dark #elSearch),
+:global(html#focus.dark .focus-mobile-search #elSearch) {
+  background: rgb(18, 21, 27);
+  color: rgb(224, 229, 237);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+:global(html#focus.dark #elSearch::placeholder) {
+  color: rgba(224, 229, 237, 0.5);
+}
+
+/* light hardcoded surfaces */
+:global(html#focus.dark .ipsReputation_count) {
+  background: rgb(38, 42, 50);
+  color: rgb(230, 234, 241);
+}
+:global(html#focus.dark .ipsTags a mark),
+:global(html#focus.dark .ipsTag_prefix mark) {
+  background: rgba(0, 0, 0, 0.25);
+  color: inherit;
+}
+:global(html#focus.dark mark) {
+  background: rgba(255, 196, 0, 0.2);
+  color: #ffd166;
+}
+:global(html#focus.dark .ipsSocial_google .ipsSocial_icon) {
+  background-color: #fff;
+  color: #333;
+}
+
+/* IPS member-group colours are presentational <font color> hints.
+ * Keep the semantic distinction, but use dark-theme-friendly tones. */
+:global(html#focus.dark font[color="#ff0000" i]),
+:global(html#focus.dark font[color="#f00" i]) {
+  color: rgb(225 107 133) !important;
+}
+:global(html#focus.dark font[color="#00cc00" i]),
+:global(html#focus.dark font[color="#0c600d" i]),
+:global(html#focus.dark font[color="#008000" i]) {
+  color: #82c99a !important;
+}
+:global(html#focus.dark font[color="#ffcc00" i]),
+:global(html#focus.dark font[color="#ffff00" i]) {
+  color: #e6c76a !important;
+}
+:global(html#focus.dark font[color="#3333cc" i]),
+:global(html#focus.dark font[color="#0000ff" i]) {
+  color: #8fb3ef !important;
+}
+:global(html#focus.dark font[color="#800080" i]),
+:global(html#focus.dark font[color="#ff00ff" i]) {
+  color: #c79adb !important;
+}
+:global(html#focus.dark font[color="#ff6600" i]),
+:global(html#focus.dark font[color="#ff9900" i]) {
+  color: #e0a06d !important;
+}
+
+/* member group label ("Escorta", "Membru Premium", ...) as a soft chip */
+:global(html#focus.dark .cAuthorPane_info li[data-role="group"]) {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* post "Author" badge */
+:global(html#focus.dark .ipsComment .ipsComment_authorBadge) {
+  --badge--background: rgba(143, 179, 239, 0.14);
+  --badge--color: #a9c7f7;
+}
+
+/* highlighted group badge (e.g. "Escorta"); brighter than the raw
+ * post-highlight colours so it stays legible on the dark card */
+:global(html#focus.dark .ipsBadge_highlightedGroup) {
+  --badge--background: #3a2e1b;
+  --badge--color: #f2c56b;
+  font-weight: 600;
+}
+
+/* old copied post content with an explicit near-black inline colour */
+:global(html#focus.dark .ipsType_richText [style*="color:#353c41" i]) {
+  color: inherit !important;
+}
+
+/* This member-group badge is a black PNG; invert only that asset so the
+ * coloured group icons (stars, female symbol, etc.) stay untouched. */
+:global(html#focus.dark img.cAuthorGroupIcon[src*="unverified"]) {
+  filter: invert(1) brightness(1.15);
+}
+
+/* framework uses hardcoded white rings around reaction/embed avatars */
+:global(html#focus.dark .ipsReactOverview ul img) {
+  border-color: rgb(var(--theme-area_background));
+}
+:global(html#focus.dark .ipsEmbedded_withImage .ipsEmbedded_image) {
+  border-color: rgb(var(--theme-area_background_light));
+}
+:global(html#focus.dark .cClubEmbedHeader .ipsUserPhoto) {
+  border-color: rgb(var(--theme-area_background_light));
+}
+
+/* tor / IPS light-code blocks */
+:global(html#focus.dark .ipsCode),
+:global(html#focus.dark .ipsType_code) {
+  background: rgb(31, 34, 40);
+  color: #e6c07b;
+}
+
+/* Popup menus (including the pagination "jump to page" menu) must be
+ * opaque; some page contexts can leave the generic .ipsMenu surface
+ * transparent. */
+:global(html#focus.dark .ipsMenu) {
+  background-color: var(--ipsmenu--background) !important;
+}
+
+/* Container borders replaced by background separation. Inputs/buttons keep
+ * their borders because they need a clear interactive affordance. */
+:global(html#focus.dark .ipsType_sectionTitle),
+:global(html#focus.dark .ipsWidget_title),
+:global(html#focus.dark .ipsMessage),
+:global(html#focus.dark .ipsMenu),
+:global(html#focus.dark .ipsBox) {
+  border: 0 !important;
+}
+
+:global(html#focus.dark .ipsBreadcrumb::before) {
+  border: 0 !important;
+}
+
+:global(html#focus.dark .ipsButtonBar) {
+  border-top-width: 0;
+  border-bottom-width: 0;
+}
+
+/* section and widget headers use flat colour surfaces */
+:global(html#focus.dark .ipsType_sectionTitle),
+:global(html#focus.dark .ipsWidget_title) {
+  background-image: none !important;
+}
+
+/* forum rows get a clear, wider separator instead of a border on the card */
+:global(html#focus.dark .cForumList .ipsDataItem),
+:global(html#focus.dark .cForumTopicTable > .ipsDataItem[data-rowid]),
+:global(html#focus.dark [data-blockid^="app_forums_postFeed_"] .ipsDataItem),
+:global(html#focus.dark .ipsStreamItem.ipsStreamItem_contentBlock),
+:global(html#focus.dark .ipsStreamItem.ipsStreamItem_actionBlock) {
+  border-bottom-width: 4px;
+}
+
+/* current breadcrumb page is content, not a link */
+:global(html#focus.dark .ipsBreadcrumb [data-role="breadcrumbList"] > li:not(:first-child):last-child),
+:global(html#focus.dark .ipsBreadcrumb [data-role="breadcrumbList"] > li:not(:first-child):last-child a) {
+  color: rgb(var(--theme-text_color));
+  opacity: 1;
+}
+
+/* "no permission" / general information boxes inside posts */
+:global(html#focus.dark .ipsMessage.ipsMessage_general) {
+  background: #2f3540;
+  color: #e8ecf3;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:global(html#focus.dark .ipsMessage.ipsMessage_general a) {
+  color: #a9c7f7;
+}
+
+/* Semantic notifications: keep the meaning, use muted dark surfaces
+ * instead of the bright pastel success/warning/error bars. */
+:global(html#focus.dark .ipsMessage_error) {
+  background: #45262a;
+  color: #ffd7d7;
+}
+:global(html#focus.dark .ipsMessage_error a) {
+  color: #ffb3b3;
+}
+
+:global(html#focus.dark .ipsMessage_success) {
+  background: #1f3529;
+  color: #d6f5e4;
+}
+:global(html#focus.dark .ipsMessage_success a) {
+  color: #9ee2bd;
+}
+
+:global(html#focus.dark .ipsMessage_warning) {
+  background: #3a2d17;
+  color: #ffe5c2;
+}
+:global(html#focus.dark .ipsMessage_warning a) {
+  color: #ffd18a;
+}
+
+:global(html#focus.dark .ipsMessage_information) {
+  background: #1d3040;
+  color: #d6e9fa;
+}
+:global(html#focus.dark .ipsMessage_information a) {
+  color: #8fc7f5;
+}
+
+/* darken the warning announcement strip */
+:global(html#focus.dark .cAnnouncementPageTop.ipsAnnouncement.ipsMessage_warning),
+:global(html#focus.dark .cAnnouncementPageTop.ipsAnnouncement.ipsMessage_warning a) {
+  background-color: #6f4a1f;
+  color: #ffe5c2;
+}
+:global(html#focus.dark .cAnnouncementPageTop.ipsAnnouncement.ipsMessage_warning:hover) {
+  background-color: #7c5322;
+}
+
+/* profile cover photos are arbitrary bright images */
+:global(html#focus.dark .ipsCoverPhoto_container) {
+  background-color: #1a1d23 !important;
+}
+:global(html#focus.dark .ipsCoverPhoto_photo) {
+  filter: brightness(0.55) saturate(0.85);
+}
+
+/* "won the day" blocks use a solid gold surface */
+:global(html#focus.dark .cProfileSidebarBlock.ipsLeaderboard_trophy_1) {
+  background: #3a2e12 !important;
+  color: #ffd66b;
+}
+:global(html#focus.dark .cProfileSidebarBlock.ipsLeaderboard_trophy_2) {
+  background: #2e3136 !important;
+  color: #d7dbe1;
+}
+:global(html#focus.dark .cProfileSidebarBlock.ipsLeaderboard_trophy_3) {
+  background: #33261a !important;
+  color: #e6b07a;
+}
+
+/* user-authored rich text often carries white inline backgrounds */
+:global(html#focus.dark .ipsType_richText [style*="background-color:#fff" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color: #fff" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:#ffffff" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color: rgb(255, 255, 255)" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:rgb(255,255,255)" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color: rgb(255,255,255)" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:rgba(255, 255, 255" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color: white" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:white" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:#f8f8f8" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color: #f8f8f8" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:#f9f9f9" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:#fafafa" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:#f5f5f5" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:#f2f2f2" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:#eee" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:#eeeeee" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color: rgb(248, 248, 248)" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:rgb(248,248,248)" i]) {
+  background-color: transparent !important;
+}
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color:#fff" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color: #fff" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color:#ffffff" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color: rgb(255, 255, 255)" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color:rgb(255,255,255)" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color:rgba(255, 255, 255" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color: white" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color:white" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color:#f8f8f8" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color: #f8f8f8" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color:#f9f9f9" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color:#fafafa" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color:#f5f5f5" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color:#f2f2f2" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color:#eee" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color:#eeeeee" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color: rgb(248, 248, 248)" i]),
+:global(html#focus.dark .ipsType_richText :not(a)[style*="background-color:rgb(248,248,248)" i]) {
+  color: inherit !important;
+}
+
+/* WYSIWYG text colours: force inline-coloured spans/paragraphs back to the
+ * normal post text colour. Background-highlighted spans are left to the
+ * highlight rules below so phone-number markers stay readable. */
+:global(html#focus.dark [data-role="commentContent"] span[style*="color" i]:not([style*="background-color" i])),
+:global(html#focus.dark [data-role="commentContent"] p[style*="color" i]:not([style*="background-color" i])) {
+  color: inherit !important;
+}
+
+/* yellow inline highlights (phone numbers) stay readable */
+:global(html#focus.dark .ipsType_richText [style*="background-color:#ffd800" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color: #ffd800" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:#ffff00" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color: #ffff00" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:#ff0;" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color: #ff0;" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color: yellow" i]),
+:global(html#focus.dark .ipsType_richText [style*="background-color:yellow" i]) {
+  background-color: #d9b900 !important;
+  color: #101010 !important;
+}
+
+/* misc light helpers */
+:global(html#focus.dark .ipsAreaBackground_reset) {
+  background-color: var(--box--backgroundColor);
+}
+:global(html#focus.dark .ipsAreaBackground_light) {
+  background-color: rgb(var(--theme-area_background_light));
+}
+:global(html#focus.dark .ipsAreaBackground) {
+  background-color: rgb(var(--theme-area_background));
+}
+:global(html#focus.dark .ipsAreaBackground_dark) {
+  background-color: rgb(var(--theme-area_background_dark));
+}
+
+:global(html#focus.dark .ipsTabs_activeItem) {
+  background-color: var(--box--backgroundColor);
+}
+
+/* subforum lists sit inside an .ipsBox; let the card surface show through */
+:global(html#focus.dark .cForumList > .ipsDataList.ipsAreaBackground_reset) {
+  background-color: transparent;
+}
+
+/* profile activity tabs / streams use the reset surface; keep them on the
+ * same card level as the surrounding profile boxes */
+:global(html#focus.dark .ipsTabs_panel),
+:global(html#focus.dark .ipsStreamItem.ipsAreaBackground_reset) {
+  background-color: var(--box--backgroundColor);
+}
+
+/* The two breadcrumb halves paint the same hover/active colour; keeping
+ * those colours opaque avoids the 1px seam caused by alpha overlap. */
+
+/* cookie / announcement bars already colored; ensure text is readable */
+:global(html#focus.dark .cCookieBar),
+:global(html#focus.dark .ipsCookieBar) {
+  background: rgb(24, 26, 31);
+  color: rgb(210, 216, 226);
+}
+
+/* image lightbox comments */
+:global(html#focus.dark .ipsLightbox_commentsPanel) {
+  background: rgb(24, 26, 31);
+  color: rgb(210, 216, 226);
+}
+
+/* code editor / ckeditor */
+:global(html#focus.dark .cke_wysiwyg_div),
+:global(html#focus.dark .cke_contents),
+:global(html#focus.dark .CodeMirror) {
+  background: rgb(24, 26, 31);
+  color: rgb(210, 216, 226);
+}
+
+/* select dropdowns are native; give them dark scheme */
+:global(html#focus.dark .ipsApp select),
+:global(html#focus.dark .ipsApp input),
+:global(html#focus.dark .ipsApp textarea) {
+  color-scheme: dark;
+}
+

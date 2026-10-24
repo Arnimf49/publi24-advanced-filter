@@ -18,3 +18,13 @@
   color: #c53030;
   font-weight: 500;
 }
+
+:global(.dark) {
+  .errorContainer svg {
+    fill: #e58b8b;
+  }
+
+  .errorText {
+    color: #e58b8b;
+  }
+}

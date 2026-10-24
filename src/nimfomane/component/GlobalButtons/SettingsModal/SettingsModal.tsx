@@ -47,12 +47,14 @@ const SettingControl: React.FC<SettingControlProps> = ({ title, description, isO
 
 export type NimfomaneSettingsData = {
   focusMode: boolean;
+  darkMode: boolean;
 };
 
 type SettingsModalProps = {
   onClose: () => void;
   settings: NimfomaneSettingsData;
   onToggleFocusMode: () => void;
+  onToggleDarkMode: () => void;
   handleExport: () => void;
   handleImport: () => Promise<void>;
   storageUsagePercent: number | null;
@@ -62,6 +64,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   settings,
   onToggleFocusMode,
+  onToggleDarkMode,
   handleExport,
   handleImport,
   storageUsagePercent,
@@ -93,6 +96,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       maxWidth={600}
       color="rgb(47, 73, 121)"
     >
+      <SettingControl
+        title="Temă întunecată"
+        description="Activează tema întunecată pentru forum și pentru elementele extensiei."
+        isOn={settings.darkMode}
+        onToggle={onToggleDarkMode}
+        dataWwid="dark-mode-switch"
+      />
+
       <SettingControl
         title="Mod focus"
         description="Când este activat, topicele ascunse anterior nu se vor mai afișa deloc pe pagina de listare. Util pentru a vedea numai ceea ce este nou sau încă neascuns."

@@ -137,3 +137,16 @@
     cursor: not-allowed;
   }
 }
+
+:global(.dark .nimfomane) {
+  .textarea {
+    background: #24272e;
+    color: #d4d9e2;
+    border-color: #3a404a;
+  }
+
+  .footer {
+    background: #181b21;
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+}
