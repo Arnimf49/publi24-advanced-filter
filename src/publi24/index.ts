@@ -21,7 +21,7 @@ const waitForSiteLoad = () => new Promise<void>(resolve => {
       document.body &&
       (
         document.querySelector('.site-copyright, .footer, #footer')
-        || Date.now() - start > 300
+        || Date.now() - start > 3000
       )
     ) {
       if (IS_SAFARI_IOS) {
