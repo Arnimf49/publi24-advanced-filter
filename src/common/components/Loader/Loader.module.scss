@@ -1,19 +1,43 @@
 .loaderAnimation {
   height: 9px;
   width: 60px;
-  --c: no-repeat linear-gradient(#FFF 0 0);
-  background: var(--c), var(--c), var(--c), var(--c);
-  background-size: 26% 3px;
-  animation: l5 1s infinite;
+  color: #fff;
 }
 
-@keyframes l5 {
+.wave {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.traveller {
+  animation: travel .75s linear infinite;
+}
+
+.path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: amplitude 2s ease-in-out infinite;
+}
+
+// One wave period is 30px wide, so shifting by exactly one period loops seamlessly.
+@keyframes travel {
+  from { transform: translateX(-30px); }
+  to { transform: translateX(0); }
+}
+
+// Flat line -> grows into a wave -> holds while it travels -> settles back to rest.
+@keyframes amplitude {
   0%,
   70%,
-  100% {background-position: calc(0*100%/3) 50% ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
-  12.5%{background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 50% ,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
-  25%  {background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 100%,calc(2*100%/3) 50% ,calc(3*100%/3) 50% }
-  37.5%{background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 100%,calc(2*100%/3) 0   ,calc(3*100%/3) 50% }
-  50%,
-  60%  {background-position: calc(0*100%/3) 0   ,calc(1*100%/3) 100%,calc(2*100%/3) 0   ,calc(3*100%/3) 100%}
+  100% {
+    d: path("M0 4.5 C2.5 4.5 5 4.5 7.5 4.5 C10 4.5 12.5 4.5 15 4.5 C17.5 4.5 20 4.5 22.5 4.5 C25 4.5 27.5 4.5 30 4.5");
+  }
+  15%,
+  55% {
+    d: path("M0 4.5 C2.5 6.0708 5 7.5 7.5 7.5 C10 7.5 12.5 6.0708 15 4.5 C17.5 2.9292 20 1.5 22.5 1.5 C25 1.5 27.5 2.9292 30 4.5");
+  }
 }
