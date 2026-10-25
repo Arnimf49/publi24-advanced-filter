@@ -1,11 +1,13 @@
-import React, {FC, MouseEventHandler, Ref} from "react";
+import React, {FC, MouseEventHandler, Ref, useEffect, useState} from "react";
 import type {Image} from "../../../core/escortActions";
 import classes from './EscortImages.module.scss';
 import {CloseIcon} from "../../../../publi24/component/Common/Icons/CloseIcon";
 import {Loader} from "../../../../common/components/Loader/Loader";
 import ErrorDisplay from "../../Common/ErrorDisplay/ErrorDisplay";
 import {P24faLogoLight} from "../../../../common/components/Logo/P24faLogoLight";
+import {P24faLogoDark} from "../../../../common/components/Logo/P24faLogoDark";
 import {nimfomaneUtils} from "../../../core/nimfomaneUtils";
+import {darkTheme} from "../../../core/darkTheme";
 
 export interface EscortImagesProps {
   images: Image[];
@@ -28,9 +30,14 @@ export const EscortImages: FC<EscortImagesProps> = ({
   onLogoClick,
   containerRef,
 }) => {
+  const [isDark, setIsDark] = useState(() => darkTheme.isEnabled());
+  const LogoComponent = isDark ? P24faLogoDark : P24faLogoLight;
+
+  useEffect(() => darkTheme.onChange(setIsDark), []);
+
   const headerContent = (
     <div className={classes.header}>
-      <P24faLogoLight onClick={onLogoClick} className={classes.logo} data-wwid="logo" />
+      <LogoComponent onClick={onLogoClick} className={classes.logo} data-wwid="logo" />
       <button type="button" className={classes.closeButton} onClick={onClose} data-wwid="close">
         <CloseIcon />
       </button>

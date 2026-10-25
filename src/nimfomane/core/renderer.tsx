@@ -48,13 +48,11 @@ export const renderer = {
   renderGlobalButtons() {
     const globalButtonsContainer = document.createElement('div');
 
-    if (IS_MOBILE_VIEW) {
-      const bottomNav = document.querySelector<HTMLElement>('.focus-mobile-footer')!;
-      bottomNav.appendChild(globalButtonsContainer);
-      bottomNav.style.overflow = 'initial';
-    } else {
-      document.body.appendChild(globalButtonsContainer);
-    }
+    // Always mount on body: the mobile footer has its own backdrop-filter, and
+    // nesting ours inside it would make the footer a backdrop root, preventing
+    // the bar from blurring the page content behind it.
+    document.body.appendChild(globalButtonsContainer);
+
     const globalButtonsRoot = ReactDOM.createRoot(globalButtonsContainer);
     globalButtonsRoot.render(<GlobalButtonsRoot />);
   },

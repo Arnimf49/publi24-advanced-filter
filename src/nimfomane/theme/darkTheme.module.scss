@@ -28,8 +28,8 @@
   --theme-text_light: 145, 152, 165;
   --theme-text_very_light: 250, 251, 253;
 
-  --theme-link: 126, 170, 230;
-  --theme-link_hover: 170, 203, 247;
+  --theme-link: 224, 229, 236;
+  --theme-link_hover: 250, 251, 253;
   --theme-link_button: 145, 152, 165;
   --theme-brand_primary: 63, 99, 158;
 
@@ -183,7 +183,7 @@
 :global(html#focus.dark .ipsNavBar_primary > ul > li.ipsNavBar_active > a) {
   background: #3f639e;
   color: #ffffff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+  box-shadow: none;
 }
 
 /* header user links follow the same hover language as the nav pills */
@@ -209,7 +209,7 @@
 /* search input */
 :global(html#focus.dark #elSearch),
 :global(html#focus.dark .focus-mobile-search #elSearch) {
-  background: rgb(18, 21, 27);
+  background: linear-gradient(0deg, rgb(25 29 39), rgb(23 28 37) 49%, rgb(25 31 43) 50%, rgb(18, 21, 27));
   color: rgb(224, 229, 237);
   border-color: rgba(255, 255, 255, 0.14);
 }
@@ -306,6 +306,18 @@
 }
 :global(html#focus.dark .cClubEmbedHeader .ipsUserPhoto) {
   border-color: rgb(var(--theme-area_background_light));
+}
+
+/* reaction counter chip: match the flat post-controls buttons */
+:global(html#focus.dark .ipsReact_reactCount > a),
+:global(html#focus.dark .ipsReact_reactCount > span) {
+  background: var(--commentControlButton--background);
+  border: none;
+}
+
+:global(html#focus.dark .ipsReact_reactCount > span > span:first-child),
+:global(html#focus.dark .ipsReact_reactCount > a > span:first-child) {
+  padding: 0px 0px 2px 6px;
 }
 
 /* tor / IPS light-code blocks */
@@ -556,6 +568,13 @@
 :global(html#focus.dark .CodeMirror) {
   background: rgb(24, 26, 31);
   color: rgb(210, 216, 226);
+}
+
+/* mobile compose-message button: match the row's 38px control height */
+@media (max-width: 767px) {
+  :global(html#focus.dark a[href*="/messenger/compose/"].ipsButton_alternate) {
+    height: 38px !important;
+  }
 }
 
 /* select dropdowns are native; give them dark scheme */

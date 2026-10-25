@@ -12,7 +12,9 @@
   padding: 3px;
   padding-right: 5px;
   border-radius: 9999px;
-  background: #f8f8f8;
+  background: rgba(248, 248, 248, 0.8);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.2);
 
   :global(.onMobile) &, &.mobileGlobalButtons {
@@ -24,6 +26,12 @@
     left: 6px;
     transform: translateX(0%);
     box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.15);
+  }
+
+  /* the real site mounts the bar on <body>, so it must stay viewport-fixed
+   * above the mobile footer (the demo keeps its absolute positioning) */
+  :global(body.onMobile) & {
+    position: fixed;
   }
 }
 
@@ -146,6 +154,25 @@
   border-radius: 0 20px 0 0;
 }
 
+/* wide desktop: the floating toggle gets the same frosted surface as the bar */
+:global(body:not(.onMobile)) .globalButtonsContainer:not(.mobileGlobalButtons):not(.globalButtonsCollapsed) .globalButtonsToggle {
+  background: rgba(248, 248, 248, 0.8);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+
+  &:hover {
+    background: rgba(245, 245, 245, 0.85);
+  }
+}
+
+:global(html.dark body:not(.onMobile)) .globalButtonsContainer:not(.mobileGlobalButtons):not(.globalButtonsCollapsed) .globalButtonsToggle {
+  background: rgba(36, 39, 46, 0.8);
+
+  &:hover {
+    background: rgba(47, 51, 59, 0.85);
+  }
+}
+
 @media (max-width: 1350px) {
   :global(body:not(.onMobile)) .globalButtonsContainer:not(.mobileGlobalButtons) {
     right: 15px;
@@ -242,20 +269,15 @@
   &::before {
     content: '';
     position: absolute;
-    transition: background 0.2s ease;
     right: 97%;
     top: 0;
     bottom: 0;
     width: 50%;
-    background: rgb(216 222 235);
+    background: inherit;
   }
 
   &:hover {
     background: rgb(217, 226, 246);
-
-    &::before {
-      background: rgb(217, 226, 246);
-    }
   }
 
   svg {
@@ -479,6 +501,37 @@
   }
 }
 
+@keyframes menuItemVersionPulseDark {
+  0%, 100% {
+    transform: scale(1);
+    background: #363b45;
+  }
+  3.75% {
+    transform: scale(1.05);
+    background: #424856;
+  }
+  7.5% {
+    transform: scale(1);
+    background: #363b45;
+  }
+  11.25% {
+    transform: scale(1.05);
+    background: #424856;
+  }
+  15% {
+    transform: scale(1);
+    background: #363b45;
+  }
+  18.75% {
+    transform: scale(1.05);
+    background: #424856;
+  }
+  22.5%, 97.5% {
+    transform: scale(1);
+    background: #363b45;
+  }
+}
+
 @keyframes popAnimationDark {
   0% {
     transform: scale(1);
@@ -494,7 +547,9 @@
 
 :global(.dark) {
   .globalButtonsContainer {
-    background: #1f2127;
+    background: rgba(31, 33, 39, 0.8);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.55);
   }
 
@@ -542,18 +597,10 @@
   }
 
   .menuButton {
-    background: #2c3038;
-
-    &::before {
-      background: #2c3038;
-    }
+    background: #363b45;
 
     &:hover {
-      background: #363b45;
-
-      &::before {
-        background: #363b45;
-      }
+      background: #424856;
     }
 
     svg {
@@ -561,9 +608,12 @@
     }
   }
 
-  .menuButtonNewVersion,
   .menuItemNewVersion {
-    animation: none;
+    animation: menuItemVersionPulseDark 7.2s ease-in-out infinite;
+  }
+
+  .menuButtonNewVersion {
+    animation: newVersionPulseDark 7.2s ease-in-out infinite;
   }
 
   .savesButton {
@@ -612,21 +662,17 @@
   }
 
   .menuItem {
-    background: rgba(255, 255, 255, 0.05);
+    background: #363b45;
     color: #d4d9e2;
 
     &:hover {
-      background: rgba(143, 179, 239, 0.12);
+      background: #424856;
     }
   }
 }
 
 .menuButtonNewVersion {
   animation: newVersionPulse 7.2s ease-in-out infinite;
-
-  &::before {
-    animation: newVersionPulseColor 7.2s ease-in-out infinite;
-  }
 }
 
 @keyframes newVersionPulse {
@@ -660,26 +706,33 @@
   }
 }
 
-@keyframes newVersionPulseColor {
+@keyframes newVersionPulseDark {
   0%, 100% {
-    background: rgb(216 222 235);
+    transform: scale(1);
+    background: #363b45;
   }
   3.75% {
-    background: rgb(200, 208, 230);
+    transform: scale(1.08);
+    background: #4a515f;
   }
   7.5% {
-    background: rgb(216 222 235);
+    transform: scale(1);
+    background: #363b45;
   }
   11.25% {
-    background: rgb(200, 208, 230);
+    transform: scale(1.08);
+    background: #4a515f;
   }
   15% {
-    background: rgb(216 222 235);
+    transform: scale(1);
+    background: #363b45;
   }
   18.75% {
-    background: rgb(200, 208, 230);
+    transform: scale(1.08);
+    background: #4a515f;
   }
   22.5%, 97.5% {
-    background: rgb(216 222 235);
+    transform: scale(1);
+    background: #363b45;
   }
 }
