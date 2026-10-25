@@ -162,8 +162,13 @@ export const renderer = {
     const root = ReactDOM.createRoot(element);
     root.render(<GlobalButtonsRoot/>);
 
-    if (IS_MOBILE_VIEW) {
-      document.querySelector('.section-bottom-nav')?.appendChild(element);
+    const isCompact = IS_MOBILE_VIEW && WWStorage.isCompactMode();
+    const siteBottomNav = IS_MOBILE_VIEW && !isCompact
+      ? document.querySelector('.section-bottom-nav')
+      : null;
+
+    if (siteBottomNav) {
+      siteBottomNav.appendChild(element);
     } else {
       document.body.appendChild(element);
     }

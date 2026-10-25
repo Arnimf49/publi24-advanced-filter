@@ -23,7 +23,11 @@
   }
 
   :global(.onMobile.wwCompact) & {
-    bottom: calc(66px - 54px);
+    position: fixed;
+    bottom: 6px;
+    left: 6px;
+    right: 6px;
+    transform: none;
   }
 }
 

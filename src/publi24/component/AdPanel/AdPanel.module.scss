@@ -317,6 +317,10 @@
   height: 42px;
   margin-right: 5px;
 
+  :global(.onMobile.wwCompact) & {
+    height: 36px;
+  }
+
   &:hover {
     background: #3a5077;
   }
