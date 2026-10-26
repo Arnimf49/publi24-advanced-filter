@@ -113,10 +113,16 @@ test('Should still analyze topics hidden by focus mode.', async ({page}) => {
 
   const {id: topicId} = await utilsNimfomane.waitForNthImage(page);
 
+  // Make sure the initial analysis has settled so it cannot overwrite the state below.
+  await expect(
+    page.locator(`[data-wwtopic="${topicId}"] [data-wwid="analysis-loading"]`)
+  ).toHaveCount(0, {timeout: 15000});
+
   // Store the topic as hidden at topic level and with no analysis result yet.
   await utilsNimfomane.deleteTopicInfoStorage(page, topicId);
   await utilsNimfomane.setTopicStorageProp(page, topicId, 'isOfEscort', false);
   await utilsNimfomane.setTopicStorageProp(page, topicId, 'escortDeterminationTime', Date.now());
+  await utilsNimfomane.setTopicStorageProp(page, topicId, 'publiLinkDeterminationTime', Date.now());
   await utilsNimfomane.setTopicStorageProp(page, topicId, 'hidden', true);
 
   await page.evaluate(() => localStorage.setItem('p24fa:nimfo:focus_mode', 'true'));

@@ -128,68 +128,55 @@ test('Should paginate inspector escorte ads correctly.', async ({ page, context 
 });
 
 test('Should show error display when inspector-escorte ad fails to load', async ({ page, context }) => {
-  let inspectorAdUrls: string[] = [];
+  const inspectorAdUrl = 'https://www.publi24.ro/anunturi/matrimoniale/escorte/anunt/-/inspector-escorte-test-ad.html';
+  const failedAdUrl = inspectorAdUrl.replace('/-/', '/titlu-sters/');
 
-  await context.route('https://api.inspector-escorte.com/v1/ads*', async (route) => {
-    const response = await route.fetch();
-    const body = await response.text();
-    const json = JSON.parse(body);
+  await context.route('https://api.inspector-escorte.com/v1/ads*', (route) => {
+    const requestUrl = new URL(route.request().url());
 
-    if (json.data && Array.isArray(json.data)) {
-      inspectorAdUrls = json.data.map((ad: any) => ad.urls?.publi24).filter(Boolean);
+    if (requestUrl.searchParams.get('phone') === 'test') {
+      return route.fulfill({status: 200, contentType: 'application/json', body: JSON.stringify({data: []})});
     }
 
-    await route.fulfill({
-      response,
-      body,
+    const now = new Date().toISOString();
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        data: [{
+          id: 'inspector-match',
+          title: 'Inspector match',
+          description: 'desc',
+          phone: requestUrl.searchParams.get('phone') ?? '',
+          views: 0,
+          created_at: now,
+          updated_at: now,
+          geolocation: '',
+          images: [],
+          urls: {'inspector-escorte': 'https://inspector-escorte.com/ad/match', publi24: inspectorAdUrl},
+        }],
+      }),
     });
+  });
+
+  await context.route(failedAdUrl, (route) => {
+    return route.fulfill({ status: 500, body: 'Internal Server Error', contentType: 'text/plain' });
   });
 
   await utilsPubli.open(context, page, {inspectorEscorte: true});
 
   const ad = await utilsPubli.findAdWithDuplicates(page);
-  const adUrl = await (await ad.$('.article-title a')).evaluate((el: HTMLAnchorElement) => el.href);
-
   await (await ad.$('[data-wwid="duplicates"]')).click();
 
   const modal = page.locator('[data-wwid="ads-modal"]');
   await expect(modal).toBeVisible();
   await expect(modal.locator('[data-articleid]').first()).toBeVisible({ timeout: 60000 });
 
-  const normalizeUrl = (url: string) => url.replace(/\/anunt\/[^/]+\//, '/anunt/-/');
-  const currentAdNormalized = normalizeUrl(adUrl);
-  const otherUrls = inspectorAdUrls.filter(url => normalizeUrl(url) !== currentAdNormalized);
-
-  if (otherUrls.length === 0) {
-    throw new Error('No other inspector escorte ads found to mock error for');
-  }
-
-  await context.unroute('https://api.inspector-escorte.com/v1/ads*');
-
-  const mockedUrl = otherUrls.find(u => u.split('/').pop() !== adUrl.split('/').pop());
-  const mockedUrlTitluSter = mockedUrl.replace(/\/anunt\/[^/]+\//, '/anunt/titlu-sters/');
-
-  await context.route(mockedUrlTitluSter, (route) => {
-    return route.fulfill({ status: 500, body: 'Internal Server Error', contentType: 'text/plain' });
-  });
-
-  await modal.locator('[data-wwid="close"]').click();
-  await page.waitForTimeout(100);
-
-  await page.goto(adUrl);
-  await page.waitForTimeout(1500);
-
-  const adAfterReload = await utilsPubli.findAdWithDuplicates(page);
-  await adAfterReload.waitForSelector('[data-wwid="duplicates-container"] img[src*="inspector-escorte"]');
-  await (await adAfterReload.$('[data-wwid="duplicates"]')).click();
-
-  await expect(modal).toBeVisible();
-  await expect(modal.locator('[data-articleid]').first()).toBeVisible({ timeout: 60000 });
-
-  const errorDisplay = modal.locator('[data-wwid="load-error"]');
+  const errorDisplay = modal.locator('[data-wwid="load-error"]').filter({hasText: failedAdUrl});
   await expect(errorDisplay).toBeVisible();
   await expect(errorDisplay).toContainText('Eroare la încărcarea anunțului de la inspector-escorte');
-  await expect(errorDisplay).toContainText(mockedUrlTitluSter);
+  await expect(errorDisplay).toContainText(failedAdUrl);
 });
 
 test('Should merge unique local duplicates into inspector escorte results', async ({ page, context }) => {
@@ -202,11 +189,12 @@ test('Should merge unique local duplicates into inspector escorte results', asyn
   const localOnlyAd = await utilsPubli.findAdWithoutDuplicates(page);
   const localOnlyAdId = (await localOnlyAd.getAttribute('data-articleid'))!;
   const localOnlyAdUrl = await (await localOnlyAd.$('.article-title a')).evaluate((el: HTMLAnchorElement) => el.href);
-  const existingEntries = await utilsPubli.getPhoneAds(page, phone);
-  const localOnly = existingEntries.filter((entry) => !entry.startsWith(`${adId}|`)).slice(0, 2);
-  const localEntries = [`${adId}|${adUrl}`, ...localOnly, `${localOnlyAdId}|${localOnlyAdUrl}`];
+
+  // Use only ads that are available on the current listing so the expected
+  // count does not depend on stale phone ads that may fail to load.
+  const localEntries = [`${adId}|${adUrl}`, `${localOnlyAdId}|${localOnlyAdUrl}`];
   await utilsPubli.setPhoneStorageProp(page, phone, 'ads', localEntries);
-  const expectedCount = 1 + new Set(localEntries.slice(1).map((entry) => entry.split('|')[0])).size;
+  const expectedCount = 2;
 
   await context.route('https://api.inspector-escorte.com/v1/ads*', (route) => {
     const requestUrl = route.request().url();

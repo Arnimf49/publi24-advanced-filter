@@ -40,7 +40,23 @@ export const utilsNimfomane = {
       await page.goto('about:blank');
       await page.waitForTimeout(4000);
     }
-    const response = await page.goto(url);
+
+    let response: Awaited<ReturnType<Page['goto']>> = null;
+    for (let attempt = 0; ; attempt++) {
+      try {
+        response = await page.goto(url);
+        break;
+      } catch (error) {
+        // A pending navigation (for example the cookie consent redirect) can
+        // abort this one. Retry once on the new document.
+        const isAborted = error instanceof Error && error.message.includes('ERR_ABORTED');
+        if (!isAborted || attempt >= 1) {
+          throw error;
+        }
+        await page.waitForTimeout(500);
+      }
+    }
+
     utilsNimfomane.clearPopups(page);
     return response;
   },
@@ -60,8 +76,12 @@ export const utilsNimfomane = {
 
     const interval = setInterval(async () => {
       try {
+        const hasConsent = await page.evaluate(() =>
+          document.cookie.split(';').some(part => part.trim() === 'ips4_cookie_consent=1')
+        ).catch(() => false);
+
         const consent = await page.$('[data-role="cookieConsentBar"] [type="submit"]');
-        if (consent) {
+        if (consent && !hasConsent) {
           await consent.click();
         }
       } catch (e) {
@@ -99,7 +119,9 @@ export const utilsNimfomane = {
     }
 
     await utilsNimfomane.goto(page, url || `https://nimfomane.com/forum/forum/35-escorte-din-cluj/`);
-    await page.waitForTimeout(600);
+    // Allow the cookie consent prompt to be handled (it triggers a navigation
+    // on the first visit) before the test starts interacting with the page.
+    await page.waitForTimeout(2500);
   },
 
   async waitForNthImage(page: Page, nth: number = 0) {

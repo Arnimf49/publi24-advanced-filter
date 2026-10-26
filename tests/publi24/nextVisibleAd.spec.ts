@@ -27,7 +27,12 @@ test('Should advance to next visible ad on each global button click.', async ({ 
   await utilsPubli.open(context, page, {clearStorage: true});
 
   await page.locator('[data-wwid="next-visible-ad"]').waitFor();
+  await expect(page.locator('[data-articleid]').nth(1)).toBeAttached({timeout: 15000});
+
+  const firstPageUrl = page.url();
   await page.locator('[data-wwid="next-visible-ad"]').click();
+  await page.waitForURL(url => url.href !== firstPageUrl, {timeout: 15000});
+  await expect(page.locator('[data-articleid]').nth(1)).toBeAttached({timeout: 15000});
 
   const globalBtn = page.locator('[data-wwid="next-visible-ad-global"]');
 

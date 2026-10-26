@@ -158,6 +158,9 @@ test('Should be able to search images on ads without phone.', async ({ page, con
   test.setTimeout(70000);
   await utilsPubli.open(context, page, {loadStorage: false});
 
+  // The listing registers ads progressively; make sure the third one exists.
+  await expect(page.locator('[data-articleid]').nth(2)).toBeAttached({timeout: 15000});
+
   const articles = await page.$$('[data-articleid]');
   const ad =  articles[2];
   const id = await ad.getAttribute('data-articleid');

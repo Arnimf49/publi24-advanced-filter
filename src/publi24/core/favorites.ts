@@ -23,8 +23,19 @@ const favorites = {
         });
         await new Promise(r => setTimeout(r, 2500));
 
-        if (data.length && data[0].timestamp > newestTime) {
-          newestTime = data[0].timestamp;
+        if (!data.length) {
+          continue;
+        }
+
+        const timestamp = data[0].timestamp;
+        // Ads reposted on the same minute share a timestamp. Use the id as a
+        // deterministic tie-breaker so the first ad does not depend on the
+        // current order of the stored ads.
+        const isNewer = timestamp > newestTime
+          || (timestamp === newestTime && timestamp > 0 && !!newestUuid && uuid.id < newestUuid.id);
+
+        if (isNewer) {
+          newestTime = timestamp;
           newestUuid = uuid;
         }
       }

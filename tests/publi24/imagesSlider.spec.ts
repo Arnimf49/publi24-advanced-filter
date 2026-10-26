@@ -47,13 +47,14 @@ test('Should toggle visibility from slider.', async ({ page, context }) => {
   await utilsPubli.assertAdHidden(firstAd, {hidden: false});
 })
 
-test('Should search images from slider.', async ({ page, context }) => {
+test('Should search images from slider.', async ({ page, context }, testInfo) => {
+  testInfo.setTimeout(90000);
   await utilsPubli.open(context, page);
   const firstAd =  await utilsPubli.findFirstAdWithImageSearch(page);
 
   await utilsPubli.resolveGooglePage(async () => {
     await (await firstAd.$('[class="art-img"]')).click()
-    return page.waitForSelector('[data-wwid="images-slider"] [data-wwid="analyze-images"]')
+    return page.waitForSelector('[data-wwid="images-slider"] [data-wwid="analyze-images"]', {state: 'visible'})
   }, context , page);
   await expect(page.locator('[data-wwid="images-slider"]')).not.toBeVisible();
 

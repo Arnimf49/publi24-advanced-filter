@@ -71,7 +71,7 @@ test('Should skip images posted in non-escort sections.', async ({page}) => {
 
   const modifier = ($: CheerioAPI) => {
     const imageItems = $('.ipsStreamItem').filter((_, el) => $(el).find('[data-background-src]').length > 0);
-    secondImageUrl = imageItems.eq(1).find('[data-background-src]').attr('data-background-src');
+    secondImageUrl ??= imageItems.eq(1).find('[data-background-src]').attr('data-background-src');
 
     imageItems.eq(0).find('.ipsStreamItem_status a:last-child')
       .attr('href', 'https://nimfomane.com/forum/forum/999-non-escort-section/');

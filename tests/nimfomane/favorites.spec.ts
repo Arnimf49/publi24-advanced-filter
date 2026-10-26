@@ -155,6 +155,12 @@ test('Should separate inactive favorites by last activity and removed profiles.'
     {lastVisited: new Date(Date.now() - 60 * 60 * 1000).toISOString()},
   );
   await utilsNimfomane.setEscortStorageProp(page, third.user, 'profileStatsTime', Date.now());
+
+  // Prevent the background stats refresh from overwriting the stored inactive
+  // state while the modal is open.
+  const firstProfileLink = await utilsNimfomane.getUserProfileLink(page, first.user);
+  await page.route(`${firstProfileLink}**`, route => route.abort());
+
   await utilsNimfomane.throttleReload(page);
   await page.locator('[data-wwid="favs-button"]').click();
 
