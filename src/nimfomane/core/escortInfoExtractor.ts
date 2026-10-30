@@ -4552,6 +4552,55 @@ function extractSchedule(text: string): EscortSchedule[] {
   return schedules;
 }
 
+const NARRATIVE_DISCUSSION_PATTERNS = [
+  /\b(?:recenzi\w*|review\w*|comentari\w*|postar\w*|topic\w*|forum\w*|discu[tț]i\w*|pareri?\b|opinii\w*|rubrica\w*|regulament\w*|sectiunea\w*)\b/i,
+  /\b(?:mi-a\s+(?:scris|spus|zis|dat|ajuns)|mi\s*-?\s*ai\s+(?:scris|spus|zis)|i-am\s+(?:scris|spus|zis|raspuns|explicat)|ti-am\s+(?:spus|zis)|mi-am\s+(?:spus|zis)|m-am\s+(?:simtit|gandit)|simteam\s+nevoia|te\s+rog|va\s+rog|te\s+las|hai\s+sa|nu\s+ma\s+(?:mai\s+)?(?:intreba|gravesc)|ma\s+bucur|mi\s+se\s+pare|am\s+uitat|am\s+patit|am\s+primit|mi-e\s+greu|nu\s+stiu\s+de\s+ce|tin\s+sa\s+(?:precizez|mentionez)|imi\s+spui|iti\s+recomand|te-ai\s+simtit|nu\s+esti\s+nimeni|te\s+pup|te\s+mai\s+astept|eu\s+cred)\b/i,
+  /\b(?:atitudine|comportament\w*|respect|bun\s+simt|educatie|rusine|teapa|tepar\w*|plang\w*|rautate|misoginism|jignir\w*|atac\w*|minciun\w*|minte\w*|probleme?\s+(?:cu|de)\s+erecti\w*|pulometru|pula\b|tupeu|nesimt\w*|carcot\w*|interogatoriu|hate)\b/i,
+  /\b(?:idealul|ideal\s+ar\s+fi|ar\s+fi\s+fost|pare\s+sa\s+fie|cat\s+ai\s+vrea|cata\s+ai\s+vrea|prea\s+mic|prea\s+mare|pre[tț]ur\w*\s+(?:exagerat|umflat|mari|mici)\w*|nu\s+mai\s+(?:este|ii)|pretul\s+era|era\s+cu|zodia|rupt\s+timp|piata\s+atat\s+de\s+variat\w*|pret\s+intreg|nu\s+vom\s+depasi)\b/i,
+  /\b(?:nu\s+negociez|mi-a\s+dat|am\s+dat|platesc\s+la\s+chirie|taxiurile|banii\s+inainte|la\s+kilogram|ofera\s+\d{2,5}\s*lei|finalizarea?\s+la\s+\d{2,5})\b/i,
+];
+
+const STRONG_NARRATIVE_DISCUSSION_PATTERNS = [
+  /\b(?:pulometru|la\s+kilogram)\b/i,
+  /\b(?:nu\s+avem\s+postari|stergem\s+postari|sterge\w*\s+o\s+recenzie)\b/i,
+];
+
+const STRUCTURED_RATE_PATTERNS = [
+  /\b(?:30|60|90|120)\s*(?:de\s*)?(?:min(?:ute)?s?|'|’)[^\n\d]{0,20}\d{2,5}\s*(?:lei|ron|€|eur|euro)(?![a-z])/gi,
+  /\b\d{2,5}\s*(?:lei|ron|€|eur|euro)?\s*[-–—/]?\s*(?:30|60|90|120)\s*(?:de\s*)?(?:min(?:ute)?s?|'|’)\b/gi,
+  /\b\d{2,5}\s*(?:lei|ron|€|eur|euro)\s*(?:\/|[-–—])\s*(?:o\s+)?(?:or[aă]|h\b|finaliz\w*)\b/gi,
+  /\b\d{2,5}\s*(?:\/|[-–—])\s*(?:o\s+)?(?:or[aă]|h\b|finaliz\w*)\b/gi,
+  /\b(?:o\s+)?(?:or[aă]|h)\s*(?:[-:]\s*)?\d{2,5}\s*(?:lei|ron|€|eur|euro)\b/gi,
+];
+
+const STRUCTURED_SERVICE_WORDS = /\b(?:oral|normal|69|gfe|pse|cim|cof|cob|fk|anal|masaj|handjob|footfetish|footjob|cuni\w*|ani\w*|uro|on\b|op\b|np\b)\b/gi;
+
+function hasStructuredServiceOffer(text: string): boolean {
+  const hasServiceHeading = /\b(?:servici\w*|prestat\w*|meniu|ofer(?:t[aă]|te|tele)?|pre[tț]ur\w*|tarif(?:e|ele|ul)?|cadou\w*)\b/i.test(text);
+  if (!hasServiceHeading) {
+    return false;
+  }
+
+  let rateCount = 0;
+  for (const pattern of STRUCTURED_RATE_PATTERNS) {
+    rateCount += [...text.matchAll(pattern)].length;
+  }
+  const serviceCount = new Set([...text.matchAll(STRUCTURED_SERVICE_WORDS)].map(match => match[0])).size;
+
+  return rateCount >= 2 || serviceCount >= 3;
+}
+
+function isNarrativeDiscussion(text: string): boolean {
+  if (STRONG_NARRATIVE_DISCUSSION_PATTERNS.some(pattern => pattern.test(text))) {
+    return true;
+  }
+  if (hasStructuredServiceOffer(text)) {
+    return false;
+  }
+
+  return NARRATIVE_DISCUSSION_PATTERNS.filter(pattern => pattern.test(text)).length >= 2;
+}
+
 export const escortInfoExtractor = {
   extractPersonalDetails(text: string): PersonalDetails | null {
     const normalizedText = normalizeText(text);
@@ -4575,46 +4624,7 @@ export const escortInfoExtractor = {
 
   extractServiceDetails(text: string): ServiceDetails | null {
     const normalizedText = normalizeText(text);
-    if (/\bfinaliz\w*\s+la\s+\d{2,5}\s+de\s+lei\b[\s\S]{0,300}\bnu\s+mai\s+(?:este|e)\b/i.test(normalizedText)) {
-      return null;
-    }
-    if (/\bfinaliz\w*\b[\s\S]{0,240}\b(?:platesc|pl[aă]tesc)\s+la\s+chirie\s+\d{2,5}\s+lei\b/i.test(normalizedText)
-      && /\b(?:door\s+to\s+door|c[aă]teva\s+ore)\b/i.test(normalizedText)) {
-      return null;
-    }
-    if (/\bnu\s+am\s+un\s+pulometru\b/i.test(normalizedText)
-      && /\bnu\s+(?:ii\s+)?m[aă]sor\s+pe\s+b[aă]ie[tț]i\b/i.test(normalizedText)) {
-      return null;
-    }
-    if (/^\s*tin\s+sa\s+precizez\s+din\s+nou\b[\s\S]{0,220}\bfk\b[\s\S]{0,120}\bserviciu\s+extra\b/i.test(normalizedText)) {
-      return null;
-    }
-    if (/\brecenzi\w*\b/i.test(normalizedText)
-      && /\b(?:sterge\w*\s+o\s+recenzie|la\s+on,\s+la\s+np,\s+la\s+gfe|nu\s+avem\s+postari)\b/i.test(normalizedText)
-      && !/\b(?:servici\w*|prestat\w*|meniu|ofer\w*|tarif\w*)\b/i.test(normalizedText)) {
-      return null;
-    }
-    if (/\btermenii\s+t[aă]i\b/i.test(normalizedText)
-      && /\bpretul\s+era\s+cu\s+\d{2,5}\s+lei\s+mai\s+putin\s+pe\s+ora\b/i.test(normalizedText)
-      && /\brecenzi\w*\b/i.test(normalizedText)) {
-      return null;
-    }
-    if (/\beu\s+zodia\s+pesti\b[^\n]{0,80}\bgfe\b/i.test(normalizedText)
-      && /\btu\s+zodia\s+pesti\b[^\n]{0,80}\bpse\b/i.test(normalizedText)
-      && /\bfetele?\s+cu\s+tarif\s+de\b/i.test(normalizedText)) {
-      return null;
-    }
-    if (/\bin\s+serviciul\s+bazic\s+de\s+200(?:\s+de)?\s+lei\b[\s\S]{0,120}\bdoar\s+daca\s+alegi\s+in\s+serviciu\s+extra\b/i.test(normalizedText)) {
-      return null;
-    }
-    if (/\bb[aă]tai\w*\b[\s\S]{0,80}\b\d{2,5}\s+(?:de\s+)?lei\b/i.test(normalizedText)
-      && !/\b(?:servici\w*|ofer\w*|tarif\w*|pret\w*|finaliz\w*|deplasar\w*|ora|minute?)\b/i.test(normalizedText)) {
-      return null;
-    }
-    if (/\bte\s+rog\s+de\s+aici\s+incolo\b[\s\S]{0,120}\bnu\s+mai\s+vii\s+la\s+mine\b[\s\S]{0,300}\bpreturile?\b/i.test(normalizedText)) {
-      return null;
-    }
-    if (/\bm-am\s+simt(?:it|ind)\b[\s\S]{0,500}\bprogramar\w*\b[\s\S]{0,500}\b(?:nu\s+mai\s+primesc|te\s+mai\s+primesc)\b/i.test(normalizedText)) {
+    if (isNarrativeDiscussion(normalizedText)) {
       return null;
     }
     const hasAmbiguousAvailabilityPrice = (
@@ -5146,7 +5156,7 @@ export const escortInfoExtractor = {
         && !/\bann?ilingus\s+activ\w*/i.test(normalizedText)) {
         services.ani = true;
       }
-      if (/(?:\buro\s+activ\w*\b|\buro\s*\(\s*activ\w*\s*\))/i.test(normalizedText)
+      if (/(?:\buro\s+activ\w*\b|\buro\s*\(\s*activ\w*\s*\)|\buro\b[^\n]{0,20}\bactiv\w*\b)/i.test(normalizedText)
         && !/(?:\buro\s+pasiv\w*\b|\buro\s*\(\s*pasiv\w*\s*\))/i.test(normalizedText)
         && services.uro !== undefined
         && services.uroActive === undefined) {

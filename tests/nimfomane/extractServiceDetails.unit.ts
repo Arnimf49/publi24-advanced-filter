@@ -167,7 +167,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       outcallRates: {'1h': 800, '2h': 1300},
       services: {
         '69': true, op: true, on: true, np: true, fk: {extraCost: 100}, fj: true,
-        cim: false, cof: false, cob: true, massage: true, uro: {extraCost: 100},
+        cim: false, cof: false, cob: true, massage: true, uroActive: {extraCost: 100},
         ap: false, hj: true, gfe: true, pse: true, cuni: true, ani: true, footfetish: true,
       },
     },
@@ -796,7 +796,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       baseRates: {'30m': 200, '1h': 350},
       services: {
         fk: true, cim: {extraCost: 50},
-        uro: {extraCost: 50}, gfe: true,
+        uroActive: {extraCost: 50}, gfe: true,
         prostateMassage: {extraCost: 100},
       },
     },
@@ -997,7 +997,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       schedule: [{start: "10:30", end: "23:30", days: "zilnic"}],
       services: {
         op: true, on: {extraCost: 50}, np: true, showerSex: {extraCost: 100},
-        fk: {extraCost: 100}, cob: {extraCost: 50}, uro: {extraCost: 100},
+        fk: {extraCost: 100}, cob: {extraCost: 50}, uroActive: {extraCost: 100},
         ap: false, shower: true,
       },
     },
@@ -1042,7 +1042,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       schedule: [{start: "10:00", end: "00:00"}],
       services: {tj: true, nn: false,
         '69': true, op: true, on: true, np: true, deepthroat: true, fk: true,
-        fj: true, cim: true, uro: true, ap: {extraCost: 100},
+        fj: true, cim: true, uroActive: true, ap: {extraCost: 100},
         hj: true, gfe: true, couples: false,
       },
     },
@@ -1289,7 +1289,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       schedule: [{start: "09:00", end: "19:00"}],
       services: {      tj: false, nn: false,
         '69': true, op: true, on: true, facesitting: true, fk: false, fj: true,
-        cim: false, cof: false, massage: true, uro: {extraCost: 50},
+        cim: false, cof: false, massage: true, uroActive: {extraCost: 50},
         hj: true, cuni: true, ani: true, domSoft: true, domHard: true,
         footfetish: true, ap: {extraCost: 100},
       },
@@ -5231,7 +5231,7 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       services: {
         '69': true, op: true, on: true, np: true,
         facesitting: true, fk: {extraCost: 100}, cob: true, massage: true,
-        uro: {extraCost: 100}, hj: true, gfe: true, cuni: true, ani: true,
+        uroActive: {extraCost: 100}, hj: true, gfe: true, cuni: true, ani: true,
         shower: {extraCost: 100}, footfetish: true, fj: true,
         cim: false, ap: false, hardSex: false,
       },
@@ -5689,6 +5689,18 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       },
     },
   },
+  {
+    file: "sample791.txt",
+    expected: {
+      baseRates: {'30m': 250, '1h': 400},
+      outcallRates: {'1h': 700},
+      services: {
+        op: true, on: {extraCost: 50}, np: true, showerSex: {extraCost: 100},
+        fk: {extraCost: 100}, cob: {extraCost: 50}, cuni: true, ani: true,
+        shower: true, uroActive: {extraCost: 100}, ap: false,
+      },
+    },
+  },
 ];
 
 for (const sample of samples) {
@@ -5697,7 +5709,7 @@ for (const sample of samples) {
   });
 }
 
-for (const file of ["false-sample1.txt", "false-sample2.txt", "false-sample3.txt", "false-sample4.txt", "false-sample5.txt", "false-sample6.txt", "false-sample7.txt", "false-sample8.txt", "false-sample9.txt", "false-sample10.txt", "false-sample11.txt", "false-sample12.txt", "false-sample13.txt", "false-sample14.txt", "false-sample15.txt", "false-sample16.txt", "false-sample17.txt", "false-sample18.txt", "false-sample19.txt", "false-sample20.txt", "false-sample21.txt", "false-sample22.txt", "false-sample23.txt", "false-sample24.txt", "false-sample25.txt", "false-sample27.txt", "false-sample28.txt", "false-sample29.txt", "false-sample31.txt", "false-sample32.txt", "false-sample33.txt", "false-sample34.txt", "false-sample35.txt", "false-sample36.txt", "false-sample37.txt", "false-sample38.txt", "false-sample39.txt", "false-sample41.txt", "false-sample42.txt", "false-sample43.txt", "false-sample44.txt", "false-sample45.txt", "false-sample46.txt", "false-sample47.txt", "false-sample48.txt", "false-sample49.txt", "false-sample50.txt", "false-sample51.txt", "false-sample52.txt", "false-sample53.txt", "false-sample54.txt", "false-sample55.txt", "false-sample56.txt", "false-positive10.txt"]) {
+for (const file of ["false-sample1.txt", "false-sample2.txt", "false-sample3.txt", "false-sample4.txt", "false-sample5.txt", "false-sample6.txt", "false-sample7.txt", "false-sample8.txt", "false-sample9.txt", "false-sample10.txt", "false-sample11.txt", "false-sample12.txt", "false-sample13.txt", "false-sample14.txt", "false-sample15.txt", "false-sample16.txt", "false-sample17.txt", "false-sample18.txt", "false-sample19.txt", "false-sample20.txt", "false-sample21.txt", "false-sample22.txt", "false-sample23.txt", "false-sample24.txt", "false-sample25.txt", "false-sample27.txt", "false-sample28.txt", "false-sample29.txt", "false-sample31.txt", "false-sample32.txt", "false-sample33.txt", "false-sample34.txt", "false-sample35.txt", "false-sample36.txt", "false-sample37.txt", "false-sample38.txt", "false-sample39.txt", "false-sample41.txt", "false-sample42.txt", "false-sample43.txt", "false-sample44.txt", "false-sample45.txt", "false-sample46.txt", "false-sample47.txt", "false-sample48.txt", "false-sample49.txt", "false-sample50.txt", "false-sample51.txt", "false-sample52.txt", "false-sample53.txt", "false-sample54.txt", "false-sample55.txt", "false-sample56.txt", "false-sample57.txt", "false-positive10.txt"]) {
   test(`does not extract service details from ${file}`, () => {
     expect(escortInfoExtractor.extractServiceDetails(readFalseSample(file))).toBeNull();
   });
