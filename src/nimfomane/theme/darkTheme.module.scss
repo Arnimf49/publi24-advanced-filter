@@ -272,6 +272,13 @@
   background: rgba(255, 255, 255, 0.06);
 }
 
+/* "joined recently" / moderator / anon badges: the framework paints the glyph
+ * with the reset surface colour (near-black in dark mode), which vanishes on
+ * the coloured bubble. Use a light glyph instead. */
+:global(html#focus.dark .cAuthorPane_badge:not(.cAuthorPane_badge--rank)) {
+  color: #ffffff;
+}
+
 /* post "Author" badge */
 :global(html#focus.dark .ipsComment .ipsComment_authorBadge) {
   --badge--background: rgba(143, 179, 239, 0.14);
