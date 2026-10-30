@@ -17,6 +17,7 @@ interface AnalyticsData {
   info_analyze_monthly: MonthCount;
   settings_enabled: {
     focusMode: boolean;
+    darkMode: boolean;
   };
   user_agent: string;
   storage_size: number | null;
@@ -108,6 +109,7 @@ function collectAnalyticsData(): AnalyticsData {
     info_analyze_monthly: infoAnalyzeMonthly,
     settings_enabled: {
       focusMode: NimfomaneStorage.isFocusMode(),
+      darkMode: NimfomaneStorage.isDarkMode(),
     },
     user_agent: navigator.userAgent,
     storage_size: utils.getStorageSizeKb(),

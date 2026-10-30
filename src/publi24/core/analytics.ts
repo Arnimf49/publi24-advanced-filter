@@ -19,6 +19,7 @@ interface AnalyticsData {
   hidden_count: number;
   settings_enabled: {
     focusMode: boolean;
+    compactMode: boolean;
     adDeduplication: boolean;
     autoHide: boolean;
     nextOnlyVisible: boolean;
@@ -115,6 +116,7 @@ function collectAnalyticsData(): AnalyticsData {
 
   const settingsEnabled = {
     focusMode: WWStorage.isFocusMode(),
+    compactMode: WWStorage.isCompactMode(),
     adDeduplication: WWStorage.isAdDeduplicationEnabled(),
     autoHide: WWStorage.isAutoHideEnabled(),
     nextOnlyVisible: WWStorage.isNextOnlyVisibleEnabled(),
