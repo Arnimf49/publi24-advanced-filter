@@ -63,6 +63,10 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
 
   const currentCity = useMemo(() => sectionsService.getCurrentCity(), []);
 
+  const isUnavailable = useCallback((user: string) => {
+    return NimfomaneStorage.getEscort(user).profileStats?.currentCity?.unavailable === true;
+  }, []);
+
   const { activeFavorites, inactiveEscorts } = useMemo(() => {
     const active: string[] = [];
     const inactive: string[] = [];
@@ -95,9 +99,14 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
       sections.set(city, escorts);
     });
 
-    return Array.from(sections, ([city, escorts]) => ({city, escorts}))
+    return Array.from(sections, ([city, escorts]) => ({
+      city,
+      escorts: [...escorts].sort(
+        (a, b) => Number(isUnavailable(a)) - Number(isUnavailable(b)),
+      ),
+    }))
       .sort((a, b) => Number(b.city === currentCity) - Number(a.city === currentCity));
-  }, [activeFavorites, currentCity, escortVersion]);
+  }, [activeFavorites, currentCity, escortVersion, isUnavailable]);
 
   const handleClearFavorites = useCallback(() => {
     NimfomaneStorage.clearFavorites();
@@ -111,7 +120,9 @@ const FavoritesModalRoot: React.FC<FavoritesModalRootProps> = ({ onClose }) => {
       favorites={favorites}
       citySections={citySections}
       inactiveEscorts={inactiveEscorts}
-      renderEscort={(user, index) => <EscortCardRoot user={user} index={index} />}
+      renderEscort={(user, index) => (
+        <EscortCardRoot user={user} index={index} isUnavailable={isUnavailable(user)} />
+      )}
     />
   );
 };

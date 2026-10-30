@@ -20,6 +20,7 @@ export type EscortCardProps = {
   statsLoading: boolean;
   statsStale: boolean;
   lastVisitedLabel?: string | null;
+  isUnavailable?: boolean;
   panel: React.ReactNode;
   imageModal?: React.ReactNode;
 };
@@ -39,6 +40,7 @@ export const EscortCard: React.FC<EscortCardProps> = ({
   statsLoading,
   statsStale,
   lastVisitedLabel,
+  isUnavailable = false,
   panel,
   imageModal,
 }) => {
@@ -78,9 +80,16 @@ export const EscortCard: React.FC<EscortCardProps> = ({
             onClick={onImageClick}
           />
           <div className={styles.contentSection}>
-            <a href={profileUrl} target="_blank" rel="noopener noreferrer" className={styles.escortName} data-wwid="escort-name">
-              {user}
-            </a>
+            <div className={styles.nameRow}>
+              <a href={profileUrl} target="_blank" rel="noopener noreferrer" className={styles.escortName} data-wwid="escort-name">
+                {user}
+              </a>
+              {isUnavailable && (
+                <span className={styles.unavailableBadge} data-wwid="escort-unavailable">
+                  indisponibilă
+                </span>
+              )}
+            </div>
             <div className={styles.profileStats}>
               <div className={styles.statsGrid}>
                 <div className={styles.statItem}>

@@ -60,10 +60,17 @@ function getVisitEndSignal(text: string): VisitEndSignal | undefined {
   return undefined;
 }
 
+type CurrentCity = {
+  name: string;
+  topicUrl: string;
+  unavailable?: true;
+};
+
 type CityLink = {
   url: string;
   city: string;
   topicUrl: string;
+  topicTitle: string;
   streamItem: Element;
 };
 
@@ -77,41 +84,39 @@ function getCityLinks(doc: Document): CityLink[] {
     const topicLink = streamItem?.querySelector<HTMLAnchorElement>('.ipsStreamItem_title a[data-linktype="link"]');
 
     if (city && streamItem && topicLink?.href) {
-      cityLinks.push({url: anchor.href, city, topicUrl: topicLink.href, streamItem});
+      cityLinks.push({
+        url: anchor.href,
+        city,
+        topicUrl: topicLink.href,
+        topicTitle: topicLink.textContent?.trim() || '',
+        streamItem,
+      });
     }
   }
 
   return cityLinks;
 }
 
-function findCurrentCity(doc: Document): {name: string; topicUrl: string} | undefined {
+function getActivityText(cityLink: CityLink): string {
+  return cityLink.streamItem.querySelector('.ipsStreamItem_snippet')?.textContent
+    || cityLink.streamItem.textContent
+    || '';
+}
+
+function findCurrentCity(doc: Document): CurrentCity | undefined {
   const cityLinks = getCityLinks(doc);
-  const citiesWithStatus = new Set<string>();
-  let hasAvailabilityStatus = false;
 
   for (const cityLink of cityLinks) {
-    if (!citiesWithStatus.has(cityLink.city)) {
-      const activityText = cityLink.streamItem.querySelector('.ipsStreamItem_snippet')?.textContent
-        || cityLink.streamItem.textContent
-        || '';
-      const status = getAvailabilityStatus(activityText);
+    const status = getAvailabilityStatus(cityLink.topicTitle)
+      ?? getAvailabilityStatus(getActivityText(cityLink));
 
-      if (status) {
-        hasAvailabilityStatus = true;
-        citiesWithStatus.add(cityLink.city);
-
-        if (status === 'available') {
-          return {
-            name: cityLink.city,
-            topicUrl: cityLink.topicUrl,
-          };
-        }
-      }
+    if (status) {
+      return {
+        name: cityLink.city,
+        topicUrl: cityLink.topicUrl,
+        ...(status === 'unavailable' ? {unavailable: true as const} : {}),
+      };
     }
-  }
-
-  if (hasAvailabilityStatus) {
-    return undefined;
   }
 
   for (let i = 0; i < cityLinks.length - 2; i++) {

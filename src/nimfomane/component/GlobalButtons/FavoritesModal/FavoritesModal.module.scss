@@ -86,12 +86,14 @@
 
 .escortsList {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
+  min-width: 0;
 }
 
 .section {
   position: relative;
+  min-width: 0;
   padding-bottom: 10px;
 
   &:not(:last-child) {

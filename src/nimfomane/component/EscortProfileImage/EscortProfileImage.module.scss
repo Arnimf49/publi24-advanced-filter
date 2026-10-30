@@ -4,7 +4,8 @@
   justify-content: center;
   flex-shrink: 0;
   width: 150px;
-  height: 180px;
+  height: auto;
+  min-height: 0;
   position: relative;
   overflow: hidden;
   background: #e0e0e0;
@@ -12,7 +13,6 @@
 
   :global(.onMobile) & {
     width: 100px;
-    height: 175px;
   }
 }
 

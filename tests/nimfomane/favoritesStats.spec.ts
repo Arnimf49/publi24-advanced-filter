@@ -12,19 +12,20 @@ type ActivityItem = {
   cityUrl: string;
   topicUrl: string;
   text: string;
+  topicTitle?: string;
 };
 
 async function interceptProfileActivity(page: Page, user: string, items: ActivityItem[]) {
   const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
-  const body = items.map(({cityUrl, topicUrl, text}) => `
+  const body = items.map(({cityUrl, topicUrl, text, topicTitle = 'topic'}) => `
     <div class="ipsStreamItem">
       <div class="ipsStreamItem_status"><a href="${cityUrl}">secțiune</a></div>
-      <div class="ipsStreamItem_title"><a data-linktype="link" href="${topicUrl}">topic</a></div>
+      <div class="ipsStreamItem_title"><a data-linktype="link" href="${topicUrl}">${topicTitle}</a></div>
       <div class="ipsStreamItem_snippet">${text}</div>
     </div>
   `).join('');
 
-  await page.route(/\/forum\/profile\/.*\/content\//, route => route.fulfill({
+  await page.route(`${profileLink}content/?all_activity**`, route => route.fulfill({
     status: 200,
     contentType: 'application/json',
     body: JSON.stringify({rows: body}),
@@ -50,7 +51,7 @@ async function interceptProfileCity(page: Page, user: string, cityUrl: string, c
   }));
 }
 
-async function interceptProfileStats(page: Page, user: string) {
+async function interceptProfileStats(page: Page, user: string, lastVisited = '2026-09-26T10:00:00Z') {
   const profileLink = await utilsNimfomane.getUserProfileLink(page, user);
 
   await page.route(profileLink, route => route.fulfill({
@@ -58,7 +59,7 @@ async function interceptProfileStats(page: Page, user: string) {
     contentType: 'text/html',
     body: `<html><body>
       <div id="elProfileStats">
-        <ul><li>Posts 1</li><li>Joined</li><li><time datetime="2026-09-26T10:00:00Z"></time></li></ul>
+        <ul><li>Posts 1</li><li>Joined</li><li><time datetime="${lastVisited}"></time></li></ul>
       </div>
     </body></html>`,
   }));
@@ -339,7 +340,7 @@ test('Should detect the current city from a post mentioning available places.', 
   }, user, {timeout: 15000});
 });
 
-test('Should reject a city when its newest availability post says unavailable.', async ({ page }) => {
+test('Should keep the current city and mark it unavailable when its newest availability post says unavailable.', async ({ page }) => {
   test.setTimeout(30000);
   await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'});
   const {user, id} = await utilsNimfomane.waitForNthImage(page);
@@ -361,10 +362,82 @@ test('Should reject a city when its newest availability post says unavailable.',
   await interceptProfileStats(page, user);
 
   await page.locator('[data-wwid="favs-button"]').click();
-  await page.waitForTimeout(5000);
+  await page.waitForFunction((user) => {
+    const escort = JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${user}`) || '{}');
+    return escort.profileStats?.currentCity?.unavailable === true;
+  }, user, {timeout: 15000});
 
   const escort = await utilsNimfomane.getEscortStorageProp(page, user, 'profileStats');
-  expect(escort?.currentCity).toBeUndefined();
+  expect(escort?.currentCity?.name).toBe('Cluj');
+  expect(escort?.currentCity?.unavailable).toBe(true);
+  await expect(page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-unavailable"]')).toHaveText('indisponibilă');
+});
+
+test('Should detect unavailability from the current city topic title.', async ({ page }) => {
+  test.setTimeout(30000);
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'});
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
+  const clujUrl = 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/';
+
+  await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
+  await interceptProfileActivity(page, user, [{
+    cityUrl: clujUrl,
+    topicUrl: 'https://nimfomane.com/forum/topic/unavailable-cluj/',
+    topicTitle: 'Escortă Cluj - INDISPONIBILĂ',
+    text: 'Am locuri disponibile în Cluj pentru programări.',
+  }]);
+  await interceptProfileStats(page, user);
+
+  await page.locator('[data-wwid="favs-button"]').click();
+  await page.waitForFunction((user) => {
+    const escort = JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${user}`) || '{}');
+    return escort.profileStats?.currentCity?.unavailable === true;
+  }, user, {timeout: 15000});
+
+  const escort = await utilsNimfomane.getEscortStorageProp(page, user, 'profileStats');
+  expect(escort?.currentCity?.name).toBe('Cluj');
+  expect(escort?.currentCity?.unavailable).toBe(true);
+});
+
+test('Should sort unavailable favorites last within a city section.', async ({ page }) => {
+  test.setTimeout(30000);
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'});
+  const unavailable = await utilsNimfomane.getNthTopic(page, 0);
+  const available = await utilsNimfomane.getNthTopic(page, 1);
+  const clujUrl = 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/';
+
+  await page.locator(`[data-wwtopic="${unavailable.id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
+  await page.locator(`[data-wwtopic="${available.id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
+
+  await interceptProfileActivity(page, unavailable.user, [{
+    cityUrl: clujUrl,
+    topicUrl: 'https://nimfomane.com/forum/topic/unavailable-cluj/',
+    text: 'Am plecat din Cluj.',
+  }]);
+  await interceptProfileActivity(page, available.user, [{
+    cityUrl: clujUrl,
+    topicUrl: 'https://nimfomane.com/forum/topic/available-cluj/',
+    text: 'Am locuri disponibile în Cluj pentru programări.',
+  }]);
+  await interceptProfileStats(page, unavailable.user, new Date(Date.now() - 60 * 60 * 1000).toISOString());
+  await interceptProfileStats(page, available.user, new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString());
+
+  await page.locator('[data-wwid="favs-button"]').click();
+  await page.waitForFunction(({unavailableUser, availableUser}) => {
+    const unavailableEscort = JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${unavailableUser}`) || '{}');
+    const availableEscort = JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${availableUser}`) || '{}');
+    return unavailableEscort.profileStats?.currentCity?.unavailable === true
+      && !!availableEscort.profileStats?.currentCity?.name;
+  }, {unavailableUser: unavailable.user, availableUser: available.user}, {timeout: 15000});
+
+  await page.locator('[data-wwid="favorites-modal"] [data-wwid="close"]').click();
+  await page.locator('[data-wwid="favs-button"]').click();
+
+  const cards = page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-card"]');
+  await expect(cards).toHaveCount(2);
+  await expect(cards.first().locator('[data-wwid="escort-name"]')).toHaveText(available.user);
+  await expect(cards.last().locator('[data-wwid="escort-name"]')).toHaveText(unavailable.user);
+  await expect(cards.last().locator('[data-wwid="escort-unavailable"]')).toHaveText('indisponibilă');
 });
 
 test('Should use the newest positive availability post across cities.', async ({ page }) => {

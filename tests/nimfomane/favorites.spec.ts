@@ -62,6 +62,7 @@ test('Should be able to do panel actions from favorites modal.', async ({ page }
   }
 
   const escortCard = page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-card"]');
+  await expect(escortCard.locator('[data-wwid="inline-loader"]')).toHaveCount(0, {timeout: 15000});
   await escortCard.locator('[data-wwid="toggle-hidden"]').click();
   await page.waitForTimeout(100);
   await page.locator('[data-wwid="reason"]').filter({hasText: 'alta'}).click();

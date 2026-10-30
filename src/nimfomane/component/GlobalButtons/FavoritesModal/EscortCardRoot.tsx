@@ -13,9 +13,10 @@ import {EscortCard} from './EscortCard';
 type EscortCardRootProps = {
   user: string;
   index?: number;
+  isUnavailable?: boolean;
 };
 
-export const EscortCardRoot: React.FC<EscortCardRootProps> = ({user, index}) => {
+export const EscortCardRoot: React.FC<EscortCardRootProps> = ({user, index, isUnavailable = false}) => {
   const ref = useRef<HTMLDivElement>(null);
   const escort = NimfomaneStorage.getEscort(user);
   const escortMemoryState = NimfomaneMemoryStorage.getEscortState(user);
@@ -64,6 +65,7 @@ export const EscortCardRoot: React.FC<EscortCardRootProps> = ({user, index}) => 
       statsLoading={isStatsLoading}
       statsStale={isStatsStale}
       lastVisitedLabel={lastVisitedLabel}
+      isUnavailable={isUnavailable}
       panel={mounted && ref.current ? <PanelRoot escortUser={user} container={ref.current} hideReasonLayout="vertical" /> : null}
       imageModal={isModalOpen ? (
         <Modal close={() => setImageModalOpen(false)} mobileContentOverlay dataWwid="escort-image-modal">

@@ -34,6 +34,7 @@ export interface EscortItem {
     currentCity?: {
       name: string;
       topicUrl: string;
+      unavailable?: true;
     };
   };
   visitedCities?: VisitedCity[];

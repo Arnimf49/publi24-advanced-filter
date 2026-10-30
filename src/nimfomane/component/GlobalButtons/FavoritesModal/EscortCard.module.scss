@@ -4,6 +4,7 @@
   border-radius: 5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: relative;
+  min-width: 0;
 
   :global(.onMobile) & {
     padding: 14px 7px;
@@ -48,7 +49,8 @@
 .escortCardInset {
   display: flex;
   gap: 16px;
-  align-items: flex-start;
+  align-items: stretch;
+  min-width: 0;
 
   :global(.onMobile) & {
     gap: 12px;
@@ -57,6 +59,7 @@
 
 .contentSection {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -66,11 +69,44 @@
   }
 }
 
+.nameRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
 .escortName {
   font-size: 21px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1 1 auto;
 
   :global(.onMobile) & {
     font-size: 16px;
+  }
+}
+
+.unavailableBadge {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 2px 9px;
+  border-radius: 9999px;
+  background: #fdf0bf;
+  color: #8a6a00;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+
+  :global(.onMobile) & {
+    padding: 1px 7px;
+    font-size: 10px;
   }
 }
 
@@ -105,7 +141,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #e2e3e5;
+  background: rgb(235 235 235);
   border-radius: 10px;
   overflow: hidden;
   min-height: 28px;
@@ -181,5 +217,10 @@
 
   .statValue {
     color: #d4d9e2;
+  }
+
+  .unavailableBadge {
+    background: #4a3f1f;
+    color: #f2d98a;
   }
 }
