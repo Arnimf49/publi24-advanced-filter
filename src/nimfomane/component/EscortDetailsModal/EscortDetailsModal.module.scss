@@ -297,6 +297,18 @@
   font-weight: normal;
 }
 
+.cityNode .cityName.pauseName {
+  background: repeating-linear-gradient(135deg, #e2e3e5 0, #e2e3e5 6px, #d5d7dc 6px, #d5d7dc 12px);
+}
+
+.cityNode:first-child .cityName.pauseName {
+  background: repeating-linear-gradient(135deg, #dddbe1 0, #dddbe1 6px, #cfccd6 6px, #cfccd6 12px);
+}
+
+.pauseLabel {
+  color: #838793;
+}
+
 @media screen and (max-width: 640px) {
   .cityName {
     padding-right: 4px;
@@ -479,5 +491,17 @@
 
   .cityDays {
     color: #8f96a3;
+  }
+
+  .cityNode .cityName.pauseName {
+    background: repeating-linear-gradient(135deg, #2c3038 0, #2c3038 6px, #25282f 6px, #25282f 12px);
+  }
+
+  .cityNode:first-child .cityName.pauseName {
+    background: repeating-linear-gradient(135deg, #363b45 0, #363b45 6px, #2f333c 6px, #2f333c 12px);
+  }
+
+  .pauseLabel {
+    color: #aab1bd;
   }
 }

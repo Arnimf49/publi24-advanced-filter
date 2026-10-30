@@ -9,6 +9,7 @@ import type {
   ServiceDetails,
 } from '../../core/escortInfoExtractor';
 import type {VisitedCity} from '../../core/storage';
+import {cityTimeline} from '../../core/cityTimeline';
 import {nimfomaneUtils} from '../../core/nimfomaneUtils';
 import {escortProfileImage} from '../EscortProfileImage/EscortProfileImage';
 import {serviceDisplay} from './serviceDisplay';
@@ -199,8 +200,21 @@ const ServiceDetailsSection: React.FC<{details: ServiceDetails; escort: EscortIt
   </section>
 );
 
-const VisitedCitiesSection: React.FC<{visitedCities?: VisitedCity[]}> = ({visitedCities}) => {
-  if (!visitedCities?.length) {
+function getStoredCityDays(entry: VisitedCity): number | undefined {
+  return Array.isArray(entry) ? entry[1] : undefined;
+}
+
+const VisitedCitiesSection: React.FC<{escort: EscortItem}> = ({escort}) => {
+  const visitedCities = escort.visitedCities || [];
+  const currentCityDays = escort.currentCitySince === undefined
+    ? undefined
+    : cityTimeline.getOngoingDays(escort.currentCitySince);
+  const currentPauseDays = escort.currentPauseSince === undefined
+    ? undefined
+    : cityTimeline.getOngoingDays(escort.currentPauseSince);
+  const hasCurrentPause = currentPauseDays !== undefined;
+
+  if (!visitedCities.length && !hasCurrentPause) {
     return null;
   }
 
@@ -208,21 +222,61 @@ const VisitedCitiesSection: React.FC<{visitedCities?: VisitedCity[]}> = ({visite
     <section className={styles.detailSection} data-wwid="visited-cities-section">
       <h4 className={styles.sectionTitle}>Orase vizitate</h4>
       <p className={styles.cityHistory}>
-        {visitedCities.map((city, index) => (
-          <span className={styles.cityNode} key={`${Array.isArray(city) ? city[0] : city}-${index}`}>
-            <span
-              className={`${styles.cityName} ${Array.isArray(city) ? styles.cityNameWithDays : ''}`}
-              data-wwid="visited-city"
-            >
-              <span className={styles.cityLabel} data-wwid="visited-city-label">
-                {Array.isArray(city) ? city[0] : city}
+        {hasCurrentPause && (
+          <span
+            className={styles.cityNode}
+            data-wwid="current-pause"
+          >
+            <span className={`${styles.cityName} ${styles.cityNameWithDays} ${styles.pauseName}`}>
+              <span className={`${styles.cityLabel} ${styles.pauseLabel}`} data-wwid="current-pause-label">
+                pauză
               </span>
-              {Array.isArray(city) && (
-                <span className={styles.cityDays} data-wwid="visited-city-days">{city[1]} zile</span>
-              )}
+              <span className={styles.cityDays} data-wwid="current-pause-days">
+                {currentPauseDays} zile
+              </span>
             </span>
           </span>
-        ))}
+        )}
+        {visitedCities.map((entry, index) => {
+          if (cityTimeline.isPause(entry)) {
+            return (
+              <span className={styles.cityNode} key={`pause-${index}`}>
+                <span className={`${styles.cityName} ${styles.cityNameWithDays} ${styles.pauseName}`} data-wwid="city-pause">
+                  <span className={`${styles.cityLabel} ${styles.pauseLabel}`} data-wwid="city-pause-label">
+                    pauză
+                  </span>
+                  <span className={styles.cityDays} data-wwid="city-pause-days">
+                    {entry.pause} zile
+                  </span>
+                </span>
+              </span>
+            );
+          }
+
+          const city = Array.isArray(entry) ? entry[0] : entry;
+          const isCurrentCity = index === 0 && !hasCurrentPause;
+          const days = isCurrentCity && currentCityDays !== undefined
+            ? currentCityDays
+            : getStoredCityDays(entry);
+
+          return (
+            <span
+              className={styles.cityNode}
+              key={`${city}-${index}`}
+            >
+              <span
+                className={`${styles.cityName} ${days !== undefined ? styles.cityNameWithDays : ''}`}
+                data-wwid="visited-city"
+                data-wwcurrent={isCurrentCity ? 'true' : undefined}
+              >
+                <span className={styles.cityLabel} data-wwid="visited-city-label">{city}</span>
+                {days !== undefined && (
+                  <span className={styles.cityDays} data-wwid="visited-city-days">{days} zile</span>
+                )}
+              </span>
+            </span>
+          );
+        })}
         <span className={styles.cityNode}>
           <span className={styles.cityName} data-wwid="visited-city">...</span>
         </span>
@@ -312,7 +366,7 @@ const EscortDetailsModal: React.FC<EscortDetailsModalProps> = ({
           >
             {escort.personalDetails && <PersonalDetailsSection details={escort.personalDetails} escort={escort} />}
             {escort.serviceDetails && <ServiceDetailsSection details={escort.serviceDetails} escort={escort} />}
-            <VisitedCitiesSection visitedCities={escort.visitedCities} />
+            <VisitedCitiesSection escort={escort} />
           </div>
           {!isLoading && !escort.personalDetails && !escort.serviceDetails && (
             <p className={styles.noDetails}>Nu s-au găsit detalii personale sau despre servicii</p>

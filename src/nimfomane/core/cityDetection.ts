@@ -2,8 +2,17 @@ import {sectionsService} from './sectionsService';
 
 type AvailabilityStatus = 'available' | 'unavailable';
 
+export type VisitEndSignal = {
+  kind: 'unavailable' | 'lastDay' | 'lastDays';
+  days?: number;
+  endOffsetDays: number;
+};
+
 const UNAVAILABLE_PATTERN = /\b(?:indisponibil\w*|am\s+plecat|nu\s+(?:mai\s+)?(?:sunt\s+)?disponibil\w*)\b/;
 const AVAILABLE_PATTERN = /\b(?:am\s+ajuns|disponibil\w*|locuri\s+disponibil\w*|ma\s+gasiti|va\s+astept)\b/;
+const LAST_DAYS_PATTERN = /\bultimele\s+(\d{1,2})\s+(?:de\s+)?zile\b/;
+const LAST_DAY_PATTERN = /\bultima\s+zi(?:i|le)?\b/;
+const TOMORROW_PATTERN = /\bmaine\b/;
 
 function normalizeActivityText(text: string): string {
   return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
@@ -18,6 +27,34 @@ function getAvailabilityStatus(text: string): AvailabilityStatus | undefined {
 
   if (AVAILABLE_PATTERN.test(normalizedText)) {
     return 'available';
+  }
+
+  return undefined;
+}
+
+function getVisitEndSignal(text: string): VisitEndSignal | undefined {
+  const normalizedText = normalizeActivityText(text);
+
+  if (UNAVAILABLE_PATTERN.test(normalizedText)) {
+    return {kind: 'unavailable', endOffsetDays: 0};
+  }
+
+  const lastDaysMatch = LAST_DAYS_PATTERN.exec(normalizedText);
+  if (lastDaysMatch) {
+    const days = Number.parseInt(lastDaysMatch[1], 10);
+    return {
+      kind: 'lastDays',
+      days,
+      endOffsetDays: Math.max(0, days - 1),
+    };
+  }
+
+  const lastDayMatch = LAST_DAY_PATTERN.exec(normalizedText);
+  if (lastDayMatch) {
+    const contextStart = Math.max(0, lastDayMatch.index - 30);
+    const contextEnd = lastDayMatch.index + lastDayMatch[0].length + 30;
+    const isTomorrow = TOMORROW_PATTERN.test(normalizedText.slice(contextStart, contextEnd));
+    return {kind: 'lastDay', endOffsetDays: isTomorrow ? 1 : 0};
   }
 
   return undefined;
@@ -123,6 +160,14 @@ export const cityDetection = {
 
   getCityHistory(doc: Document): string[] {
     return getCityLinks(doc).map(cityLink => cityLink.city);
+  },
+
+  getAvailabilityStatus(text: string): AvailabilityStatus | undefined {
+    return getAvailabilityStatus(text);
+  },
+
+  getVisitEndSignal(text: string): VisitEndSignal | undefined {
+    return getVisitEndSignal(text);
   },
 
   findCurrentCity,

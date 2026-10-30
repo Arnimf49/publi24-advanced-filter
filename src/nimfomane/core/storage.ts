@@ -12,7 +12,11 @@ export interface TopicItem {
   hiddenReason?: string;
 }
 
-export type VisitedCity = string | [city: string, days: number];
+export interface PauseEntry {
+  pause: number;
+}
+
+export type VisitedCity = string | [city: string, days: number] | PauseEntry;
 
 export interface EscortItem {
   optimizedProfileImage?: string | null;
@@ -33,6 +37,8 @@ export interface EscortItem {
     };
   };
   visitedCities?: VisitedCity[];
+  currentCitySince?: number;
+  currentPauseSince?: number;
   profileStatsTime?: number;
   profileNotFound?: true;
   isUnverified?: true;

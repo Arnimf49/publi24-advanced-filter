@@ -4,11 +4,12 @@ import {escortInfoExtractor, PersonalDetails, RateOverride, ServiceDetails} from
 import {NimfomaneStorage} from './storage';
 import type {EscortItem, VisitedCity} from './storage';
 import {cityDetection} from './cityDetection';
+import {cityTimeline} from './cityTimeline';
+import type {CityActivityPost} from './cityTimeline';
 
 const REFRESH_INTERVAL = 21 * 24 * 60 * 60 * 1000;
 const OLDEST_POST_DATE = 3 * 365 * 24 * 60 * 60 * 1000;
 const MIN_VISITED_CITIES = 20;
-const MAX_VISITED_CITIES = 32;
 const ACTIVE_COLLECTIONS = new Map<string, Promise<void>>();
 
 interface CollectedDetails {
@@ -26,11 +27,8 @@ interface CollectedDetails {
   servicePostSourceSelected?: boolean;
   servicePostSourceCount?: number;
   visitedCities: VisitedCity[];
-  currentVisitedCity?: {
-    city: string;
-    newestPostDate?: number;
-    oldestPostDate?: number;
-  };
+  cityActivityPosts: CityActivityPost[];
+  cityActivityKeys: Set<string>;
 }
 
 interface SourceRank {
@@ -346,10 +344,12 @@ function clearProfileContentDates(user: string, escort: EscortItem): void {
 }
 
 function hasAllDetails(details: CollectedDetails): boolean {
+  const cityVisitCount = details.visitedCities.filter(entry => !cityTimeline.isPause(entry)).length;
+
   return hasCompletePersonalDetails(details)
     && !!details.serviceDetails
     && !!details.servicePostSourceSelected
-    && details.visitedCities.length >= MIN_VISITED_CITIES;
+    && cityVisitCount >= MIN_VISITED_CITIES;
 }
 
 function hasCompletePersonalDetails(details: CollectedDetails): boolean {
@@ -432,15 +432,16 @@ function collectPostContent(
     }
 
     const postSourceUrl = getTopicPostSourceUrl(post, sourceUrl);
-    const city = cityDetection.getAvailableCityFromElement(post, postSourceUrl, content);
-    if (city) {
-      appendVisitedCity(user, details, city, postDate);
-    }
-
     const contentCopy = content.cloneNode(true) as HTMLElement;
     contentCopy.querySelectorAll('.ipsQuote').forEach(quote => quote.remove());
+    const contentText = contentCopy.textContent || '';
+    const city = cityDetection.getCityFromElement(post, postSourceUrl);
+    if (city) {
+      appendCityActivity(user, details, city, contentText, postDate);
+    }
+
     collectText(
-      contentCopy.textContent || '',
+      contentText,
       postSourceUrl,
       postDate,
       details,
@@ -469,45 +470,30 @@ function saveVisitedCities(user: string, visitedCities: VisitedCity[]): void {
   NimfomaneStorage.setEscortProp(user, 'visitedCities', [...visitedCities]);
 }
 
-function getStayDays(newestPostDate?: number, oldestPostDate?: number): number {
-  if (newestPostDate === undefined || oldestPostDate === undefined) {
-    return 1;
-  }
+function rebuildVisitedCities(user: string, details: CollectedDetails): void {
+  const result = cityTimeline.build(details.cityActivityPosts);
+  details.visitedCities = result.visitedCities;
 
-  return Math.max(1, Math.ceil(Math.abs(newestPostDate - oldestPostDate) / (24 * 60 * 60 * 1000)));
+  saveVisitedCities(user, details.visitedCities);
+  NimfomaneStorage.setEscortProp(user, 'currentCitySince', result.currentCitySince);
+  NimfomaneStorage.setEscortProp(user, 'currentPauseSince', result.currentPauseSince);
 }
 
-function appendVisitedCity(
+function appendCityActivity(
   user: string,
   details: CollectedDetails,
   city: string,
+  text: string,
   postDate?: number,
 ): void {
-  const currentVisitedCity = details.currentVisitedCity;
-
-  if (currentVisitedCity?.city === city) {
-    currentVisitedCity.oldestPostDate = postDate ?? currentVisitedCity.oldestPostDate;
-    const currentEntry = details.visitedCities.at(-1);
-    if (Array.isArray(currentEntry)) {
-      currentEntry[1] = getStayDays(currentVisitedCity.newestPostDate, currentVisitedCity.oldestPostDate);
-      saveVisitedCities(user, details.visitedCities);
-    }
+  const key = `${city}|${postDate ?? ''}|${text.trim().slice(0, 160)}`;
+  if (details.cityActivityKeys.has(key)) {
     return;
   }
 
-  if (
-    details.visitedCities.length >= MAX_VISITED_CITIES
-  ) {
-    return;
-  }
-
-  details.visitedCities.push(details.visitedCities.length === 0 ? city : [city, 1]);
-  details.currentVisitedCity = {
-    city,
-    newestPostDate: postDate,
-    oldestPostDate: postDate,
-  };
-  saveVisitedCities(user, details.visitedCities);
+  details.cityActivityKeys.add(key);
+  details.cityActivityPosts.push({city, date: postDate, text});
+  rebuildVisitedCities(user, details);
 }
 
 function collectActivityContent(
@@ -526,12 +512,12 @@ function collectActivityContent(
     const sourceLink = streamItem.querySelector<HTMLAnchorElement>('.ipsStreamItem_title a[href]');
     const itemUrl = sourceLink?.getAttribute('href');
     const itemSourceUrl = itemUrl ? resolveUrl(itemUrl, sourceUrl) : sourceUrl;
-    const city = cityDetection.getAvailableCityFromElement(streamItem, undefined, content);
+    const contentDate = getPostDate(streamItem);
+    const city = cityDetection.getCityFromElement(streamItem, itemSourceUrl);
     if (city) {
-      appendVisitedCity(user, details, city, getPostDate(streamItem));
+      appendCityActivity(user, details, city, content.textContent || '', contentDate);
     }
 
-    const contentDate = getPostDate(streamItem);
     collectText(
       content.textContent || '',
       itemSourceUrl,
@@ -551,8 +537,12 @@ async function collectEscortDetails(user: string, profileUrl: string, priority: 
     personalDetailsSourceUrls: [],
     serviceDetailsSourceUrls: [],
     visitedCities: [],
+    cityActivityPosts: [],
+    cityActivityKeys: new Set(),
   };
   saveVisitedCities(user, details.visitedCities);
+  NimfomaneStorage.setEscortProp(user, 'currentCitySince', undefined);
+  NimfomaneStorage.setEscortProp(user, 'currentPauseSince', undefined);
   const profilePage = await page.load(profileUrl, {priority});
   const birthdayAge = profilePage && getProfileBirthdayAge(profilePage);
   if (birthdayAge !== undefined) {

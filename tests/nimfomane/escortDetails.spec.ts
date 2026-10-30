@@ -323,6 +323,48 @@ test('Should display visited cities in reverse chronological order.', async ({pa
   await expect(cities.nth(1).locator('[data-wwid="visited-city-days"]')).toHaveText('1 zile');
 });
 
+test('Should display pauses between visits and the ongoing days in the current city.', async ({page}) => {
+  await utilsNimfomane.open(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
+  const day = 24 * 60 * 60 * 1000;
+
+  await setEscort(page, user, {
+    visitedCities: [['București', 2], {pause: 3}, ['Cluj', 4]] as VisitedCity[],
+    currentCitySince: Date.now() - (2 * day - 60 * 60 * 1000),
+    escortDetailsTime: Date.now(),
+  });
+  await openDetails(page, id);
+
+  const currentCity = page.locator('[data-wwid="visited-city"][data-wwcurrent="true"]');
+  await expect(currentCity.locator('[data-wwid="visited-city-label"]')).toHaveText('București');
+  await expect(currentCity.locator('[data-wwid="visited-city-days"]')).toHaveText('2 zile');
+
+  const pauses = page.locator('[data-wwid="city-pause"]');
+  await expect(pauses).toHaveCount(1);
+  await expect(pauses.locator('[data-wwid="city-pause-days"]')).toHaveText('3 zile');
+});
+
+test('Should display the current pause as the first block.', async ({page}) => {
+  await utilsNimfomane.open(page);
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
+  const day = 24 * 60 * 60 * 1000;
+
+  await setEscort(page, user, {
+    visitedCities: [['București', 2], {pause: 3}, ['Cluj', 4]] as VisitedCity[],
+    currentPauseSince: Date.now() - (5 * day - 60 * 60 * 1000),
+    escortDetailsTime: Date.now(),
+  });
+  await openDetails(page, id);
+
+  const currentPause = page.locator('[data-wwid="current-pause"]');
+  await expect(currentPause.locator('[data-wwid="current-pause-label"]')).toHaveText('pauză');
+  await expect(currentPause.locator('[data-wwid="current-pause-days"]')).toHaveText('5 zile');
+
+  const cities = page.locator('[data-wwid="visited-city"]');
+  await expect(cities.nth(0).locator('[data-wwid="visited-city-label"]')).toHaveText('București');
+  await expect(cities.nth(1).locator('[data-wwid="visited-city-label"]')).toHaveText('Cluj');
+});
+
 test('Should display durations in the updated visited city format and support legacy entries.', async ({page}) => {
   await utilsNimfomane.open(page);
   const {user, id} = await utilsNimfomane.waitForNthImage(page);
