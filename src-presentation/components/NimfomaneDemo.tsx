@@ -14,7 +14,6 @@ import AnimationStatusBar from './AnimationStatusBar';
 import DemoMouse from './DemoMouse';
 import useDemoVisibility from './useDemoVisibility';
 import {presentationAsset} from '../presentationAsset';
-import '../../src/nimfomane/theme/darkTheme.module.scss';
 import styles from './NimfomaneDemo.module.scss';
 
 export type NimfomaneDemoMode = 'extension' | 'hide' | 'details' | 'images' | 'favorites' | 'dark';
