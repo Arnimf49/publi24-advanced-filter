@@ -168,10 +168,20 @@
 :global(.dark .nimfomane) .container {
   background: rgb(24 25 28);
   color: #c4c9d2;
+  border-color: rgba(143, 179, 239, 0.18);
 }
 
 :global(.dark .nimfomane) .header {
-  background: rgba(24, 27, 33, 0.7);
+  background: rgba(24, 27, 33, 0.95);
+}
+
+:global(.dark .nimfomane) .headerTitle {
+  background: rgb(54 72 101);
+  color: #d4d9e2;
+}
+
+:global(.dark .nimfomane) .topBorder {
+  background: rgba(143, 179, 239, 0.18);
 }
 
 :global(.dark .nimfomane) .closeButton {

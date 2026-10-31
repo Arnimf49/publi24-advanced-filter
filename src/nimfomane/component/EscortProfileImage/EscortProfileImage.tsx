@@ -30,7 +30,8 @@ const EscortProfileImage: React.FC<EscortProfileImageProps> = ({
   const showImage = typeof imageUrl === 'string' && !imageError && !imageLoadError;
   const showNoImage = imageUrl === null && !imageLoadError;
   const showError = imageError || !!imageLoadError;
-  const className = `${styles.imageSection} ${variant === 'details' ? styles.detailsImageSection : ''}`;
+  const variantClass = variant === 'details' ? styles.detailsImageSection : styles.cardImageSection;
+  const className = `${styles.imageSection} ${variantClass}`;
 
   return (
     <div

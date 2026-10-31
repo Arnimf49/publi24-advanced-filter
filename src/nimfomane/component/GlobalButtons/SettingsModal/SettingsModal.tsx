@@ -94,7 +94,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       title={<><SettingsIcon fill="#fff"/> Setări</>}
       onClose={onClose}
       maxWidth={600}
-      color="rgb(47, 73, 121)"
     >
       <SettingControl
         title="Temă întunecată"

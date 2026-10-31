@@ -139,6 +139,8 @@
 }
 
 :global(.dark .nimfomane) {
+  --feedback-color: rgb(54 72 101);
+
   .textarea {
     background: #24272e;
     color: #d4d9e2;

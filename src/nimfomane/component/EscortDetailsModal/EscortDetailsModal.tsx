@@ -309,7 +309,6 @@ const EscortDetailsModal: React.FC<EscortDetailsModalProps> = ({
         title="Detalii escortă"
         onClose={onClose}
         maxWidth={600}
-        color="rgb(47, 73, 121)"
       >
         <section className={styles.section}>
           <div className={styles.detailsHeader}>

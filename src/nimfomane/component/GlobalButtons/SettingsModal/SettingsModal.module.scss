@@ -130,8 +130,8 @@
     border-color: rgba(255, 255, 255, 0.09);
 
     &:hover {
-      background: rgba(143, 179, 239, 0.1);
-      border-color: #8fb3ef;
+      background: rgba(143, 179, 239, 0.08);
+      border-color: rgba(143, 179, 239, 0.35);
     }
   }
 
@@ -144,7 +144,7 @@
   }
 
   .switchOn {
-    background: #3f639e;
+    background: rgb(54 72 101);
   }
 
   .controlTitle,
@@ -158,10 +158,10 @@
   }
 
   .button {
-    background: #3f639e;
+    background: rgb(54 72 101);
 
     &:hover {
-      background: #4a71b3;
+      background: rgb(63 84 118);
     }
   }
 

@@ -4,8 +4,7 @@
   justify-content: center;
   flex-shrink: 0;
   width: 150px;
-  height: auto;
-  min-height: 0;
+  height: 180px;
   position: relative;
   overflow: hidden;
   background: #e0e0e0;
@@ -13,6 +12,24 @@
 
   :global(.onMobile) & {
     width: 100px;
+    height: 175px;
+  }
+}
+
+.cardImageSection {
+  height: auto;
+  min-height: 0;
+  align-self: stretch;
+
+  .profileImage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  :global(.onMobile) & {
+    height: auto;
   }
 }
 

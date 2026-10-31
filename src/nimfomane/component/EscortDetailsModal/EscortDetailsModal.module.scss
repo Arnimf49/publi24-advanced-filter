@@ -346,28 +346,27 @@
   }
 
   .headerInfo {
-    position: relative;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 4px;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    justify-content: normal;
+    justify-items: stretch;
+    gap: 0;
   }
 
   .userName {
-    position: absolute;
-    top: 50%;
+    align-self: end;
     width: 100%;
-    transform: translateY(-50%);
+    margin-bottom: 15px;
     text-align: center;
+    font-size: 16px;
   }
 
   .statusRow {
+    align-self: start;
     align-items: center;
-    margin-top: auto;
-  }
-
-  .userName {
-    font-size: 16px;
+    gap: 3px;
   }
 
   .loadingState {
@@ -504,4 +503,8 @@
   .pauseLabel {
     color: #aab1bd;
   }
+}
+
+:global(.dark .isFirefox) .loadingState {
+  background: rgb(24 25 28 / 0.95);
 }

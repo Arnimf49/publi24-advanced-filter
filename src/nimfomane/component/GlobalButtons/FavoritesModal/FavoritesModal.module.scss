@@ -160,6 +160,24 @@
 }
 
 :global(.dark) {
+  .clearFavoritesButton {
+    background: #363b45;
+    color: #e8ecf3;
+
+    &:hover {
+      background: #424856;
+    }
+
+    &[data-wwconfirm="true"] {
+      background: #6a3d4e;
+      color: #fff;
+
+      &:hover {
+        background: #7b4759;
+      }
+    }
+  }
+
   .emptyMessage {
     color: #aab1bd;
   }
@@ -184,4 +202,8 @@
       color: #8f96a3;
     }
   }
+}
+
+:global(.dark .isFirefox) .favoritesSectionHeader {
+  background: rgb(24 25 28 / 0.95);
 }

@@ -483,33 +483,13 @@
 :global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText [style*="background-color:rgb(248,248,248)" i]) {
   background-color: transparent !important;
 }
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color:#fff" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color: #fff" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color:#ffffff" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color: rgb(255, 255, 255)" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color:rgb(255,255,255)" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color:rgba(255, 255, 255" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color: white" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color:white" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color:#f8f8f8" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color: #f8f8f8" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color:#f9f9f9" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color:#fafafa" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color:#f5f5f5" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color:#f2f2f2" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color:#eee" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color:#eeeeee" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color: rgb(248, 248, 248)" i]),
-:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText :not(a)[style*="background-color:rgb(248,248,248)" i]) {
-  color: inherit !important;
-}
-
-/* WYSIWYG text colours: force inline-coloured spans/paragraphs back to the
- * normal post text colour. Background-highlighted spans are left to the
- * highlight rules below so phone-number markers stay readable. */
-:global(:is(html#focus.dark, .ww-dark-theme) [data-role="commentContent"] span[style*="color" i]:not([style*="background-color" i])),
-:global(:is(html#focus.dark, .ww-dark-theme) [data-role="commentContent"] p[style*="color" i]:not([style*="background-color" i])) {
-  color: inherit !important;
+/* WYSIWYG inline text colours: any explicit colour is replaced with the
+ * normal post text colour. Background highlights are handled below so
+ * highlighted markers stay readable. */
+:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText [style^="color:" i]),
+:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText [style*=";color:" i]),
+:global(:is(html#focus.dark, .ww-dark-theme) .ipsType_richText [style*="; color:" i]) {
+  color: #c4c9d2 !important;
 }
 
 /* yellow inline highlights (phone numbers) stay readable */
