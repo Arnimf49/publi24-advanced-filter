@@ -34,6 +34,7 @@ const DEMO_SETTINGS: SettingsData = {
   whatsappMessage: 'Bună, mai este disponibil anunțul?',
   focusMode: false,
   adDeduplication: false,
+  compactMode: false,
   autoHide: true,
   nextOnlyVisible: true,
   defaultManualHideReasonEnabled: true,
@@ -283,6 +284,8 @@ const SettingsFeatureDemo: React.FC = () => {
                 showDuplicates={false}
                 hasDuplicateAdsWithSamePhone={false}
                 isDark={false}
+                hasGooglePermission={true}
+                hasLensPermission={true}
                 renderPhoneAndTags={(_adId, phone, children) => (
                   <PhoneAndTags
                     phone={phone}
@@ -339,6 +342,7 @@ const SettingsFeatureDemo: React.FC = () => {
               onWhatsappMessageChange={() => undefined}
               onToggleFocusMode={() => undefined}
               onToggleAdDeduplication={() => undefined}
+              onToggleCompactMode={() => undefined}
               onToggleAutoHide={() => undefined}
               onToggleNextOnlyVisible={() => undefined}
               onToggleDefaultManualHideReason={() => undefined}
@@ -351,6 +355,7 @@ const SettingsFeatureDemo: React.FC = () => {
               handleImport={async () => undefined}
               storageUsagePercent={18}
               isDark={false}
+              isMobile={isMobile}
             />
           </Modal>
         )}

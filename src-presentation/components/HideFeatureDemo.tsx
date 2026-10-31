@@ -260,6 +260,8 @@ const HideFeatureDemo: React.FC = () => {
                 showDuplicates={false}
                 hasDuplicateAdsWithSamePhone={false}
                 isDark={false}
+                hasGooglePermission={true}
+                hasLensPermission={true}
                 renderPhoneAndTags={(_adId, phone, children) => (
                   <PhoneAndTags
                     phone={phone}

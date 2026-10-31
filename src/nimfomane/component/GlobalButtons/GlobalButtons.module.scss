@@ -165,7 +165,7 @@
   }
 }
 
-:global(html.dark body:not(.onMobile)) .globalButtonsContainer:not(.mobileGlobalButtons):not(.globalButtonsCollapsed) .globalButtonsToggle {
+:global(:is(html.dark body:not(.onMobile), .dark)) .globalButtonsContainer:not(.mobileGlobalButtons):not(.globalButtonsCollapsed) .globalButtonsToggle {
   background: rgba(36, 39, 46, 0.8);
 
   &:hover {

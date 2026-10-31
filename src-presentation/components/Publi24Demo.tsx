@@ -143,6 +143,8 @@ const Publi24Demo: React.FC<Publi24DemoProps> = ({extensionEnabled, onExtensionC
                   filteredSearchLinks={[]}
                   imageSearchDomains={undefined}
                   isDark={false}
+                  hasGooglePermission={true}
+                  hasLensPermission={true}
                    renderPhoneAndTags={(_adId, phone, children) => (
                      <PhoneAndTags
                        phone={phone}

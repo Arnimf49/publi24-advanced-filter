@@ -17,6 +17,10 @@ export default defineConfig({
       enableBuild: false,
     }),
   ],
+  define: {
+    'process.env.PROMOTER': JSON.stringify('false'),
+    'process.env.WATCH_MODE': JSON.stringify(false),
+  },
   css: {
     preprocessorOptions: {
       scss: {

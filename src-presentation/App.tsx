@@ -175,6 +175,15 @@ const NimfomaneSections: React.FC = () => (
       </div>
       <NimfomaneDemo mode="favorites" />
     </section>
+
+    <section className={styles.featureBlock} aria-labelledby="nimfomane-dark-title">
+      <div className={styles.featureCopy}>
+        <p className={styles.sectionNumber}>06 / Temă întunecată</p>
+        <h2 id="nimfomane-dark-title">Temă întunecată pentru forum</h2>
+        <p>Comută forumul pe tema întunecată, gândită pentru sesiuni lungi de citit. Informațiile și acțiunile extensiei rămân lizibile.</p>
+      </div>
+      <NimfomaneDemo mode="dark" />
+    </section>
   </>
 );
 

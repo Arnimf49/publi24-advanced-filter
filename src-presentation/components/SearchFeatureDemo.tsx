@@ -261,6 +261,8 @@ const SearchFeatureDemo: React.FC<SearchFeatureDemoProps> = ({searchType}) => {
                 imageSearchJustCompleted={searchType === 'image' && hasResults}
                 phoneSearchJustCompleted={searchType === 'phone' && hasResults}
                 isDark={false}
+                hasGooglePermission={true}
+                hasLensPermission={true}
                 renderPhoneAndTags={(_adId, phone, children) => (
                   <PhoneAndTags
                     phone={phone}

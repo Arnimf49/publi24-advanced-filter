@@ -226,6 +226,8 @@ const DuplicateFeatureDemo: React.FC = () => {
         showDuplicates={false}
         hasDuplicateAdsWithSamePhone={false}
         isDark={false}
+        hasGooglePermission={true}
+        hasLensPermission={true}
         renderPhoneAndTags={(_adId, phone, children) => (
           <PhoneAndTags
             phone={phone}
@@ -294,6 +296,8 @@ const DuplicateFeatureDemo: React.FC = () => {
                 numberOfAdsWithSamePhone={2}
                 duplicatesSource="inspector-escorte"
                 isDark={false}
+                hasGooglePermission={true}
+                hasLensPermission={true}
                 renderPhoneAndTags={(_adId, phone, children) => (
                   <PhoneAndTags
                     phone={phone}

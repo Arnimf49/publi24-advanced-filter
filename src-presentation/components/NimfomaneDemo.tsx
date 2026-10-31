@@ -14,9 +14,10 @@ import AnimationStatusBar from './AnimationStatusBar';
 import DemoMouse from './DemoMouse';
 import useDemoVisibility from './useDemoVisibility';
 import {presentationAsset} from '../presentationAsset';
+import '../../src/nimfomane/theme/darkTheme.module.scss';
 import styles from './NimfomaneDemo.module.scss';
 
-export type NimfomaneDemoMode = 'extension' | 'hide' | 'details' | 'images' | 'favorites';
+export type NimfomaneDemoMode = 'extension' | 'hide' | 'details' | 'images' | 'favorites' | 'dark';
 
 const BIKINI_LINE_ART_IMAGE = presentationAsset.getUrl('nimfomane-demo-bikini-line-art.jpg');
 const WOMAN_SILHOUETTE_IMAGE = presentationAsset.getUrl('nimfomane-demo-woman-silhouette.jpg');
@@ -367,6 +368,7 @@ const NimfomaneSite: React.FC<{
   onImageClick?: () => void;
   onDetails: () => void;
   favoritesOpen: boolean;
+  isDark: boolean;
   isMobile: boolean;
   onFavoritesOpen: () => void;
   onFavoritesClose: () => void;
@@ -384,6 +386,7 @@ const NimfomaneSite: React.FC<{
   onImageClick,
   onDetails,
   favoritesOpen,
+  isDark,
   isMobile,
   onFavoritesOpen,
   onFavoritesClose,
@@ -484,6 +487,7 @@ const NimfomaneSite: React.FC<{
           <GlobalButtons
             favsCount={favoriteUsers.length}
             isMobile={isMobile}
+            isDark={isDark}
             onLogoClick={() => undefined}
             onFavsClick={onFavoritesOpen}
             onSettingsClick={() => undefined}
@@ -533,10 +537,12 @@ const ANIMATION_DURATION: Record<NimfomaneDemoMode, number> = {
   details: 7600,
   favorites: 14100,
   images: 7800,
+  dark: 15000,
 };
 
 const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
   const [extensionEnabled, setExtensionEnabled] = useState(false);
+  const [darkEnabled, setDarkEnabled] = useState(false);
   const [visibleTopics, setVisibleTopics] = useState<Record<string, boolean>>({});
   const [favoriteTopics, setFavoriteTopics] = useState<Record<string, boolean>>({});
   const [hideReasons, setHideReasons] = useState<Record<string, string>>({});
@@ -554,6 +560,7 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
   const stageRef = useRef<HTMLDivElement>(null);
   const isDemoActive = useDemoVisibility(stageRef, 3000, playRequested, () => {
     setExtensionEnabled(false);
+    setDarkEnabled(false);
     setVisibleTopics({});
     setFavoriteTopics({});
     setHideReasons({});
@@ -617,6 +624,7 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
     };
     const restart = () => {
       setExtensionEnabled(false);
+      setDarkEnabled(false);
       setVisibleTopics({});
       setFavoriteTopics({});
       setHideReasons({});
@@ -630,22 +638,25 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
       setPhase('waiting');
     };
 
-    switch (phase) {
-      case 'waiting': {
-        const selector = mode === 'extension'
-          ? '[data-demo-state="enabled"]'
-          : mode === 'images'
-            ? '[data-wwid="topic-image"]'
-            : mode === 'details'
-              ? '[data-wwid="escort-info-button"]'
+    const toggleSelector = mode === 'extension'
+      ? '[data-demo-state="enabled"]'
+      : mode === 'dark'
+        ? '[data-demo-state="dark"]'
+        : mode === 'images'
+          ? '[data-wwid="topic-image"]'
+          : mode === 'details'
+            ? '[data-wwid="escort-info-button"]'
             : mode === 'favorites'
               ? '[data-wwid="fav-toggle"]'
               : '[data-wwid="toggle-hidden"]';
+
+    switch (phase) {
+      case 'waiting': {
         timeout = window.setTimeout(() => {
-          if (movePointerTo(selector)) {
+          if (movePointerTo(toggleSelector)) {
             setPhase('entering');
           }
-        }, mode === 'extension' ? 400 : 700);
+        }, mode === 'extension' || mode === 'dark' ? 400 : 700);
         break;
       }
       case 'entering':
@@ -656,12 +667,16 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
         break;
       case 'clicking':
         timeout = window.setTimeout(() => {
-          if (!clickElement(mode === 'extension' ? '[data-demo-state="enabled"]' : mode === 'images' ? '[data-wwid="topic-image"]' : mode === 'details' ? '[data-wwid="escort-info-button"]' : mode === 'favorites' ? '[data-wwid="fav-toggle"]' : '[data-wwid="toggle-hidden"]')) {
+          if (!clickElement(toggleSelector)) {
             return;
           }
 
           if (mode === 'extension') {
             setExtensionEnabled(true);
+            setPhase('showing');
+          }
+          else if (mode === 'dark') {
+            setDarkEnabled(true);
             setPhase('showing');
           }
           else if (mode === 'hide') {
@@ -807,13 +822,15 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
           restart,
           mode === 'extension'
             ? 30000
-            : mode === 'favorites'
-              ? FAVORITES_MODAL_DURATION
-              : mode === 'images'
-                ? IMAGE_MODAL_POST_SCROLL_DURATION
-                : mode === 'details'
-                  ? 5000
-                : 2400,
+            : mode === 'dark'
+              ? 12000
+              : mode === 'favorites'
+                ? FAVORITES_MODAL_DURATION
+                : mode === 'images'
+                  ? IMAGE_MODAL_POST_SCROLL_DURATION
+                  : mode === 'details'
+                    ? 5000
+                    : 2400,
         );
         break;
     }
@@ -830,6 +847,7 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
 
   const reset = () => {
     setExtensionEnabled(false);
+    setDarkEnabled(false);
     setVisibleTopics({});
     setFavoriteTopics({});
     setHideReasons({});
@@ -868,6 +886,8 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
     setDetailsLoading(true);
   };
 
+  const isDark = mode === 'dark' && darkEnabled;
+
   return (
     <div className={`${styles.demo}${isMobile ? ' onMobile' : ''}`} ref={stageRef}>
       {mode === 'extension' && (
@@ -876,9 +896,15 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
           <button type="button" className={extensionEnabled ? styles.stateActive : ''} onClick={() => setExtensionEnabled(true)} aria-pressed={extensionEnabled} data-demo-state="enabled">Cu extensie</button>
         </div>
       )}
+      {mode === 'dark' && (
+        <div className={styles.stateSwitch} role="group" aria-label="Tema forumului">
+          <button type="button" className={!darkEnabled ? styles.stateActive : ''} onClick={() => setDarkEnabled(false)} aria-pressed={!darkEnabled} data-demo-state="light">Normal</button>
+          <button type="button" className={darkEnabled ? styles.stateActive : ''} onClick={() => setDarkEnabled(true)} aria-pressed={darkEnabled} data-demo-state="dark">Întunecat</button>
+        </div>
+      )}
       <AnimationStatusBar
-        duration={mode === 'extension' && !extensionEnabled ? 2000 : ANIMATION_DURATION[mode]}
-        resetKey={`${mode}-${extensionEnabled ? 'enabled' : 'disabled'}-${animationCycle}`}
+        duration={(mode === 'extension' && !extensionEnabled) || (mode === 'dark' && !darkEnabled) ? 2000 : ANIMATION_DURATION[mode]}
+        resetKey={`${mode}-${extensionEnabled ? 'enabled' : 'disabled'}-${darkEnabled ? 'dark' : 'light'}-${animationCycle}`}
         isPaused={!isDemoActive}
         onPlay={() => {
           setPlayRequested(true);
@@ -887,7 +913,7 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
         onPauseChange={setIsAnimationPaused}
         onRestart={reset}
       />
-      <div className={`${styles.viewport}${isDemoActive && !isAnimationPaused ? ` ${styles.mobileScrollThrough}` : ''}`}>
+      <div className={`${styles.viewport}${isDark ? ` ${styles.viewportDark} dark ww-dark-theme` : ''}${isDemoActive && !isAnimationPaused ? ` ${styles.mobileScrollThrough}` : ''}`}>
         <NimfomaneSite
           mode={mode}
            extensionEnabled={mode !== 'extension' || extensionEnabled}
@@ -905,6 +931,7 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
           onImageClick={mode === 'images' ? () => setImageModalOpen(true) : undefined}
           onDetails={openDetails}
           favoritesOpen={favoritesOpen}
+          isDark={isDark}
           isMobile={isMobile}
            onFavoritesOpen={() => setFavoritesOpen(true)}
            onFavoritesClose={() => setFavoritesOpen(false)}
@@ -918,6 +945,8 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
               loading={false}
               ended={true}
               error={null}
+              escortName={TOPICS[0].user}
+              profileUrl={getTopicUrl(TOPICS[0])}
               onClose={() => setImageModalOpen(false)}
               onLogoClick={() => undefined}
               isMobile={isMobile}
@@ -946,7 +975,7 @@ const NimfomaneDemo: React.FC<NimfomaneDemoProps> = ({mode}) => {
           );
         })()}
       </div>
-      {mode !== 'extension' && <DemoMouse x={pointerPosition.x} y={pointerPosition.y} isClicking={pointerIsClicking} />}
+      {mode !== 'extension' && mode !== 'dark' && <DemoMouse x={pointerPosition.x} y={pointerPosition.y} isClicking={pointerIsClicking} />}
     </div>
   );
 };
