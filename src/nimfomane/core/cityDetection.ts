@@ -13,6 +13,7 @@ const AVAILABLE_PATTERN = /\b(?:am\s+ajuns|disponibil\w*|locuri\s+disponibil\w*|
 const LAST_DAYS_PATTERN = /\bultimele\s+(\d{1,2})\s+(?:de\s+)?zile\b/;
 const LAST_DAY_PATTERN = /\bultima\s+zi(?:i|le)?\b/;
 const TOMORROW_PATTERN = /\bmaine\b/;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 function normalizeActivityText(text: string): string {
   return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
@@ -60,6 +61,21 @@ function getVisitEndSignal(text: string): VisitEndSignal | undefined {
   return undefined;
 }
 
+function getVisitEndTime(signal: VisitEndSignal, postDate?: number): number | undefined {
+  if (postDate === undefined) {
+    return undefined;
+  }
+
+  if (signal.kind === 'unavailable') {
+    return postDate;
+  }
+
+  const endOfPostDay = new Date(postDate);
+  endOfPostDay.setHours(24, 0, 0, 0);
+
+  return endOfPostDay.getTime() + signal.endOffsetDays * DAY_MS;
+}
+
 type CurrentCity = {
   name: string;
   topicUrl: string;
@@ -71,6 +87,7 @@ type CityLink = {
   city: string;
   topicUrl: string;
   topicTitle: string;
+  date?: number;
   streamItem: Element;
 };
 
@@ -82,6 +99,8 @@ function getCityLinks(doc: Document): CityLink[] {
     const city = sectionsService.getCityFromForumUrl(anchor.href);
     const streamItem = link.closest('.ipsStreamItem');
     const topicLink = streamItem?.querySelector<HTMLAnchorElement>('.ipsStreamItem_title a[data-linktype="link"]');
+    const datetime = streamItem?.querySelector('.ipsStreamItem_meta time')?.getAttribute('datetime');
+    const date = datetime ? Date.parse(datetime) : undefined;
 
     if (city && streamItem && topicLink?.href) {
       cityLinks.push({
@@ -89,6 +108,7 @@ function getCityLinks(doc: Document): CityLink[] {
         city,
         topicUrl: topicLink.href,
         topicTitle: topicLink.textContent?.trim() || '',
+        date: date !== undefined && !Number.isNaN(date) ? date : undefined,
         streamItem,
       });
     }
@@ -103,12 +123,33 @@ function getActivityText(cityLink: CityLink): string {
     || '';
 }
 
-function findCurrentCity(doc: Document): CurrentCity | undefined {
+function getCityLinkStatus(cityLink: CityLink, now: number): AvailabilityStatus | undefined {
+  const activityText = getActivityText(cityLink);
+  const status = getAvailabilityStatus(cityLink.topicTitle)
+    ?? getAvailabilityStatus(activityText);
+
+  if (status !== 'available') {
+    return status;
+  }
+
+  const signal = getVisitEndSignal(cityLink.topicTitle) ?? getVisitEndSignal(activityText);
+  if (!signal || signal.kind === 'unavailable') {
+    return status;
+  }
+
+  const endTime = getVisitEndTime(signal, cityLink.date);
+  if (endTime !== undefined && now >= endTime) {
+    return 'unavailable';
+  }
+
+  return status;
+}
+
+function findCurrentCity(doc: Document, now: number = Date.now()): CurrentCity | undefined {
   const cityLinks = getCityLinks(doc);
 
   for (const cityLink of cityLinks) {
-    const status = getAvailabilityStatus(cityLink.topicTitle)
-      ?? getAvailabilityStatus(getActivityText(cityLink));
+    const status = getCityLinkStatus(cityLink, now);
 
     if (status) {
       return {
