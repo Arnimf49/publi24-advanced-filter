@@ -1,5 +1,6 @@
-import React, {FC, useCallback, useEffect, useLayoutEffect, useMemo, useState} from "react";
+import React, {FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from "react";
 import {escortActions, Image} from "../../../core/escortActions";
+import {NimfomaneStorage} from "../../../core/storage";
 import {utils} from "../../../../common/utils";
 import {EscortImages} from './EscortImages';
 
@@ -9,6 +10,12 @@ type EscortImagesRootProps = {
   isMobile: boolean;
 };
 
+// Rendering an image triggers a network request (lazy images start loading as
+// soon as they enter the viewport). Keep the request burst below Cloudflare's
+// per-IP rate limit while still loading fast during normal browsing.
+const IMAGE_RENDER_WINDOW_MS = 10_000;
+const IMAGE_RENDER_LIMIT = 50;
+
 export const EscortImagesRoot: FC<EscortImagesRootProps> = ({user, onClose, isMobile}) => {
   const [images, setImages] = useState<Image[]>([]);
   const [loadedPages, setLoadedPages] = useState(0);
@@ -16,10 +23,45 @@ export const EscortImagesRoot: FC<EscortImagesRootProps> = ({user, onClose, isMo
   const [ended, setEnded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(null);
+  const renderedAt = useRef<number[]>([]);
   const scrollParent = useMemo(
     () => utils.getScrollParent(scrollElement, false),
     [scrollElement],
   );
+
+  const pruneRenderWindow = useCallback(() => {
+    const cutoff = Date.now() - IMAGE_RENDER_WINDOW_MS;
+    renderedAt.current = renderedAt.current.filter(timestamp => timestamp > cutoff);
+  }, []);
+
+  const markRendered = useCallback((imageCount: number) => {
+    const now = Date.now();
+    for (let index = 0; index < imageCount; index++) {
+      renderedAt.current.push(now);
+    }
+  }, []);
+
+  const appendImagesWithThrottle = useCallback(async (newImages: Image[]) => {
+    let offset = 0;
+
+    while (offset < newImages.length) {
+      pruneRenderWindow();
+      const availableSlots = Math.max(0, IMAGE_RENDER_LIMIT - renderedAt.current.length);
+
+      if (availableSlots === 0) {
+        // The loader remains visible while the next batch waits for the
+        // window to free up.
+        const waitUntil = renderedAt.current[0] + IMAGE_RENDER_WINDOW_MS - Date.now();
+        await new Promise(resolve => setTimeout(resolve, Math.max(50, waitUntil + 25)));
+        continue;
+      }
+
+      const chunk = newImages.slice(offset, offset + availableSlots);
+      setImages((previous) => [...previous, ...chunk]);
+      markRendered(chunk.length);
+      offset += chunk.length;
+    }
+  }, [pruneRenderWindow, markRendered]);
 
   const loadMoreImages = useCallback(async () => {
     if (loading) {
@@ -44,7 +86,7 @@ export const EscortImagesRoot: FC<EscortImagesRootProps> = ({user, onClose, isMo
         }
 
         if (newImages.length > 0) {
-          setImages((previous) => [...previous, ...newImages]);
+          await appendImagesWithThrottle(newImages);
           currentPage += 1;
           setLoadedPages(currentPage);
           loadedLength += newImages.length;
@@ -58,7 +100,7 @@ export const EscortImagesRoot: FC<EscortImagesRootProps> = ({user, onClose, isMo
     } finally {
       setLoading(false);
     }
-  }, [loading, loadedPages, user]);
+  }, [loading, loadedPages, user, appendImagesWithThrottle]);
 
   const handleScroll = useCallback(() => {
     if (!(scrollParent instanceof HTMLElement)) {
@@ -87,6 +129,10 @@ export const EscortImagesRoot: FC<EscortImagesRootProps> = ({user, onClose, isMo
     return () => scrollParent.removeEventListener('scroll', handleScroll);
   }, [ended, handleScroll, scrollParent]);
 
+  const escort = NimfomaneStorage.getEscort(user);
+  const profileUrl = escort.profileLink
+    || `https://nimfomane.com/forum/profile/${encodeURIComponent(user)}/`;
+
   return (
     <EscortImages
       images={images}
@@ -94,6 +140,8 @@ export const EscortImagesRoot: FC<EscortImagesRootProps> = ({user, onClose, isMo
       ended={ended}
       error={error}
       isMobile={isMobile}
+      escortName={user}
+      profileUrl={profileUrl}
       onClose={onClose}
       onLogoClick={utils.openExtensionPage}
       containerRef={setScrollElement}

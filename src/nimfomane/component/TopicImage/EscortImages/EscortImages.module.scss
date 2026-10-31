@@ -49,12 +49,71 @@
     padding: 0 20px calc(8px + env(safe-area-inset-bottom, 0px));
     margin-bottom: 0;
     justify-content: space-between;
+    align-items: flex-end;
     pointer-events: none;
 
+    .headerLeft,
     .logo,
+    .escortName,
     .closeButton {
       pointer-events: auto;
     }
+  }
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.escortName {
+  position: relative;
+  z-index: 0;
+  margin-left: -26px;
+  padding: 6px 12px 6px 38px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: normal;
+  color: #ffffff;
+  background: rgba(20, 20, 20, 0.7);
+  backdrop-filter: blur(6px);
+  border-radius: 8px;
+  max-width: 40vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration: none;
+
+  &:hover {
+    color: #ffffff;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  :global(.isFirefox) & {
+    backdrop-filter: none;
+    background: rgba(20, 20, 20, 0.9);
+  }
+
+  :global(.onMobile) & {
+    margin-left: -18px;
+    padding: 4px 10px 4px 28px;
+    font-size: 0.75rem;
+    max-width: 55vw;
+  }
+}
+
+.logo {
+  position: relative;
+  z-index: 1;
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+
+  :global(.onMobile) & {
+    width: 42px;
+    height: 42px;
   }
 }
 
@@ -101,8 +160,17 @@
   gap: 6px;
   position: absolute;
   bottom: 0;
-  left: 14px;
+  right: 0;
   line-height: normal;
+  background: rgba(34, 34, 34, 0.5);
+  backdrop-filter: blur(6px);
+  border-radius: 8px 0 0 0;
+  overflow: hidden;
+
+  :global(.isFirefox) & {
+    backdrop-filter: none;
+    background: rgba(34, 34, 34, 0.85);
+  }
 
   :global(.onMobile) & {
     gap: 4px;
@@ -112,17 +180,9 @@
 .image_date {
   padding: 6px 10px;
   font-size: 0.85rem;
-  color: #e1e1e1;
-  background: rgba(34, 34, 34, 0.7);
-  backdrop-filter: blur(2px);
-  border-radius: 5px 5px 0 0;
+  color: rgb(225 225 225 / 0.75);
   display: flex;
   align-items: center;
-
-  :global(.isFirefox) & {
-    backdrop-filter: none;
-    background: rgba(34, 34, 34, 0.85);
-  }
 
   :global(.onMobile) & {
     padding: 4px 8px;
@@ -133,10 +193,7 @@
 .image_topic {
   padding: 6px 12px;
   font-size: 0.85rem;
-  color: #e1e1e1;
-  background: rgba(34, 34, 34, 0.7);
-  backdrop-filter: blur(2px);
-  border-radius: 5px 5px 0 0;
+  color: rgb(225 225 225 / 0.75);
   text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-color: rgba(255, 255, 255, 0.4);
@@ -145,14 +202,8 @@
   align-items: center;
 
   &:hover {
-    background: rgba(60, 60, 60, 0.8);
     color: #ffffff;
     text-decoration-color: rgba(255, 255, 255, 0.8);
-  }
-
-  :global(.isFirefox) & {
-    backdrop-filter: none;
-    background: rgba(34, 34, 34, 0.85);
   }
 
   :global(.onMobile) & {
@@ -161,24 +212,19 @@
   }
 }
 
-.logo {
-  width: 60px;
-  height: 60px;
-  cursor: pointer;
-
-  :global(.onMobile) & {
-    width: 42px;
-    height: 42px;
-  }
-}
-
 .closeButton {
   border: 2px solid #000;
   border-radius: 1000px;
   padding: 9px;
   line-height: 0 !important;
-  background: rgba(20,20,20,0.85);
+  background: rgba(20,20,20,0.7);
+  backdrop-filter: blur(6px);
   cursor: pointer;
+
+  :global(.isFirefox) & {
+    backdrop-filter: none;
+    background: rgba(20,20,20,0.9);
+  }
 
   svg {
     stroke: #ffffff;

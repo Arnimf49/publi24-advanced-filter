@@ -15,6 +15,8 @@ export interface EscortImagesProps {
   ended: boolean;
   error: string | null;
   isMobile: boolean;
+  escortName: string;
+  profileUrl: string;
   onClose: MouseEventHandler;
   onLogoClick: () => void;
   containerRef?: Ref<HTMLDivElement>;
@@ -26,6 +28,8 @@ export const EscortImages: FC<EscortImagesProps> = ({
   ended,
   error,
   isMobile,
+  escortName,
+  profileUrl,
   onClose,
   onLogoClick,
   containerRef,
@@ -37,7 +41,17 @@ export const EscortImages: FC<EscortImagesProps> = ({
 
   const headerContent = (
     <div className={classes.header}>
-      <LogoComponent onClick={onLogoClick} className={classes.logo} data-wwid="logo" />
+      <div className={classes.headerLeft}>
+        <LogoComponent onClick={onLogoClick} className={classes.logo} data-wwid="logo" />
+        <a
+          className={classes.escortName}
+          href={profileUrl}
+          target="_blank"
+          rel="noreferrer"
+          onClick={(event) => event.stopPropagation()}
+          data-wwid="escort-image-name"
+        >{escortName}</a>
+      </div>
       <button type="button" className={classes.closeButton} onClick={onClose} data-wwid="close">
         <CloseIcon />
       </button>
