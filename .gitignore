@@ -12,3 +12,4 @@ src-mapper/unknown-domains.json
 src-mapper/data/
 .env
 /local
+/.agents/skills/mobile-tester/.mobile/
