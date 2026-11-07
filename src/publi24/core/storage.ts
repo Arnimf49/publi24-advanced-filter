@@ -1,7 +1,16 @@
 import {WWBrowserStorage} from "./browserStorage";
-import {IS_MOBILE_VIEW, IS_PROMOTER} from "../../common/globals";
+import {browserApi, IS_MOBILE_VIEW, IS_PROMOTER} from "../../common/globals";
 import {dataCompression} from "./dataCompression";
 import {ImageResult, ImageSearchError} from "./linksFilter";
+
+export type Publi24StatusValue = 'safe' | 'dup_n_old' | 'dup_old' | 'dead';
+
+export interface Publi24Status {
+  status: Publi24StatusValue;
+  city?: string;
+}
+
+export type Publi24StatusEntry = Publi24Status | null;
 
 export interface AdUuid {
   id: string;
@@ -48,6 +57,36 @@ function isImageSearchError(result: ImageResult | ImageSearchError): result is I
   return typeof result === 'object'
     && !Array.isArray(result)
     && result.type === 'err';
+}
+
+function getAdPubli24StatusKey(id: string): string {
+  return `ww:publi24_status:${id}`;
+}
+
+function isPubli24Result(result: ImageResult): boolean {
+  if (Array.isArray(result)) {
+    const siteName = result[0].trim().toLowerCase().replace(/^www\./, '');
+    return siteName === 'publi24' || siteName === 'publi24.ro';
+  }
+
+  try {
+    const hostname = new URL(result, 'https://www.google.com').hostname.replace(/^www\./, '').toLowerCase();
+    return hostname === 'publi24.ro';
+  } catch (error) {
+    console.error(`Error parsing image result URL "${result}":`, error);
+    return false;
+  }
+}
+
+function isPubli24AdLink(url: string): boolean {
+  try {
+    const parsedUrl = new URL(url, 'https://www.google.com');
+    return parsedUrl.hostname.replace(/^www\./, '').toLowerCase() === 'publi24.ro'
+      && parsedUrl.pathname.includes('/anunt/');
+  } catch (error) {
+    console.error(`Error parsing publi24 URL "${url}":`, error);
+    return false;
+  }
 }
 
 export interface AutoHideCriterias {
@@ -189,57 +228,6 @@ export const WWStorage = {
     return value === true || value === 1;
   },
 
-  addAdDuplicateInOtherLocation(id: string, link: string, old: boolean = true): void {
-    const compressedLink = dataCompression.compressAdLink(link);
-    const list = WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLoc') || [];
-    if (!list.includes(compressedLink)) {
-      list.push(compressedLink);
-      WWStorage.setAdProp(id, 'duplicatesInOtherLoc', list);
-    }
-
-    if (!old) {
-      const notOldList = WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLocNotOld') || [];
-      if (!notOldList.includes(compressedLink)) {
-        notOldList.push(compressedLink);
-        WWStorage.setAdProp(id, 'duplicatesInOtherLocNotOld', notOldList);
-      }
-    }
-  },
-
-  clearAdDuplicatesInOtherLocation(id: string): void {
-    WWStorage.setAdProp(id, 'duplicatesInOtherLoc', null);
-    WWStorage.setAdProp(id, 'duplicatesInOtherLocNotOld', null);
-  },
-
-  hasAdDuplicatesInOtherLocation(id: string): boolean {
-    return WWStorage.getAdDuplicatesInOtherLocation(id).length > 0;
-  },
-
-  getAdDuplicatesInOtherLocation(id: string): string[] {
-    return WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLoc') || [];
-  },
-
-  getAdNotOldDuplicatesInOtherLocation(id: string): string[] {
-    return WWStorage.getAdProp<string[]>(id, 'duplicatesInOtherLocNotOld') || [];
-  },
-
-  addAdDeadLink(id: string, link: string): void {
-    const compressedLink = dataCompression.compressAdLink(link);
-    const list = WWStorage.getAdProp<string[]>(id, 'deadLinks') || [];
-    if (!list.includes(compressedLink)) {
-      list.push(compressedLink);
-      WWStorage.setAdProp(id, 'deadLinks', list);
-    }
-  },
-
-  clearAdDeadLinks(id: string): void {
-    WWStorage.setAdProp(id, 'deadLinks', null);
-  },
-
-  getAdDeadLinks(id: string): string[] {
-    return WWStorage.getAdProp<string[]>(id, 'deadLinks') || [];
-  },
-
   setInvestigatedTime(id: string, timestamp: number): void {
     WWStorage.setAdProp(id, 'phoneTime', timestamp);
   },
@@ -288,19 +276,34 @@ export const WWStorage = {
     search?: string[];
     images?: ImageResult[];
     imageSearchErrors?: ImageSearchError[];
+    publi24Statuses?: Publi24StatusEntry[];
   }> {
-    return WWBrowserStorage.get([`ww:search_results:${id}`, `ww:image_results:${id}`])
+    const statusKey = getAdPubli24StatusKey(id);
+
+    return WWBrowserStorage.get([`ww:search_results:${id}`, `ww:image_results:${id}`, statusKey])
       .then((results) => {
         const imageResults = results[`ww:image_results:${id}`] as Array<ImageResult | ImageSearchError> | undefined;
         const images = imageResults?.filter((result): result is ImageResult => !isImageSearchError(result));
         const imageSearchErrors = imageResults?.filter(isImageSearchError);
+        const publi24Statuses = results[statusKey] as Publi24StatusEntry[] | undefined;
 
         return {
           search: results[`ww:search_results:${id}`],
           images,
           imageSearchErrors,
+          publi24Statuses: Array.isArray(publi24Statuses) ? publi24Statuses : undefined,
         };
       })
+  },
+
+  async setAdPubli24Statuses(id: string, statuses: Publi24StatusEntry[]): Promise<void> {
+    await WWBrowserStorage.set(getAdPubli24StatusKey(id), statuses);
+    WWStorage.triggerAdChanged(id);
+  },
+
+  async clearAdPubli24Statuses(id: string): Promise<void> {
+    await WWBrowserStorage.set(getAdPubli24StatusKey(id), null);
+    WWStorage.triggerAdChanged(id);
   },
 
   getPhoneItem(phone: string): PhoneItem {
@@ -872,10 +875,10 @@ export const WWStorage = {
 
   async upgrade(): Promise<void> {
     const version = WWStorage.getVersion();
-    const currentVersion = 9;
+    const currentVersion = 10;
     const parsedVersion = version ? parseInt(version, 10) : currentVersion;
 
-    type MigrationFunction = () => void;
+    type MigrationFunction = () => void | Promise<void>;
     const migrations: Record<number, MigrationFunction> = {
       // --- MIGRATION from v1 to v2 ---
       1: () => {
@@ -1121,6 +1124,98 @@ export const WWStorage = {
 
         _WW_STORE_CACHE.phone = {};
         console.log(`Migration v8 -> v9 complete: Removed ${removedCount} orphaned phone items with no ads`);
+      },
+
+      // --- MIGRATION from v9 to v10 ---
+      9: async () => {
+        console.log("Running migration v9 -> v10");
+        const browserData = await browserApi.storage.local.get(null) as Record<string, any>;
+        const imageResultKeys = Object.keys(browserData).filter(key => /^ww:image_results:/.test(key));
+        let migratedCount = 0;
+
+        await Promise.all(imageResultKeys.map(async (key) => {
+          const id = key.replace(/^ww:image_results:/, '');
+          const imageResults = browserData[key] as Array<ImageResult | ImageSearchError> | undefined;
+
+          if (!Array.isArray(imageResults)) {
+            return;
+          }
+
+          const statusKey = getAdPubli24StatusKey(id);
+
+          if (browserData[statusKey] !== undefined) {
+            return;
+          }
+
+          const adItemKey = `ww2:${id}`;
+          const adItemRaw = localStorage.getItem(adItemKey);
+          let adItem: AdItem = {};
+
+          if (adItemRaw) {
+            try {
+              adItem = JSON.parse(adItemRaw);
+            } catch (error) {
+              console.error(`Migration v9 error parsing ${adItemKey}:`, error);
+            }
+          }
+
+          const duplicates = adItem.duplicatesInOtherLoc || [];
+          const notOldDuplicates = adItem.duplicatesInOtherLocNotOld || [];
+          const deadLinks = adItem.deadLinks || [];
+          const statuses: Publi24StatusEntry[] = [];
+
+          for (const result of imageResults) {
+            if (isImageSearchError(result) || !isPubli24Result(result)) {
+              continue;
+            }
+
+            if (Array.isArray(result)) {
+              statuses.push(null);
+              continue;
+            }
+
+            if (!isPubli24AdLink(result)) {
+              statuses.push({ status: 'dead' });
+              continue;
+            }
+
+            const compressedLink = dataCompression.compressAdLink(result);
+
+            if (deadLinks.includes(compressedLink)) {
+              statuses.push({ status: 'dead' });
+            } else if (notOldDuplicates.includes(compressedLink)) {
+              // The legacy not-old list was populated for older duplicates,
+              // so it maps to the suspicious status.
+              statuses.push({ status: 'dup_old' });
+            } else if (duplicates.includes(compressedLink)) {
+              statuses.push({ status: 'dup_n_old' });
+            } else {
+              statuses.push({ status: 'safe' });
+            }
+          }
+
+          await WWBrowserStorage.set(statusKey, statuses);
+
+          if (adItemRaw) {
+            let modified = false;
+
+            (['duplicatesInOtherLoc', 'duplicatesInOtherLocNotOld', 'deadLinks'] as const).forEach((prop) => {
+              if (prop in adItem) {
+                delete adItem[prop];
+                modified = true;
+              }
+            });
+
+            if (modified) {
+              localStorage.setItem(adItemKey, JSON.stringify(adItem));
+            }
+          }
+
+          migratedCount++;
+        }));
+
+        _WW_STORE_CACHE.item = {};
+        console.log(`Migration v9 -> v10 complete: Migrated image statuses for ${migratedCount} ads`);
       }
     };
 
@@ -1130,10 +1225,11 @@ export const WWStorage = {
         if (migrations[i]) {
           try {
             console.log(`Running migration for v${i + 1}...`);
-            migrations[i]();
+            await migrations[i]();
             console.log(`Migration for v${i + 1} completed.`);
           } catch (e) {
             console.error(`Error during migration for v${i + 1}:`, e);
+            return;
           }
         } else {
           console.warn(`No migration found for version ${i+1}`);
@@ -1152,7 +1248,7 @@ WWBrowserStorage.listen((changes) => {
   Object.keys(changes).forEach(key => {
     let match: any;
 
-    if ((match = key.match(/^ww:(search_results|image_results):([^:]+)$/))) {
+    if ((match = key.match(/^ww:(search_results|image_results|publi24_status):([^:]+)$/))) {
       WWStorage.triggerAdChanged(match[2]);
     }
   })

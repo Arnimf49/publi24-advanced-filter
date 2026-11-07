@@ -1,6 +1,7 @@
 import React, {FC, MouseEventHandler, useCallback, useEffect, useState} from "react";
 import {adData} from "../../core/adData";
 import {WWStorage} from "../../core/storage";
+import type {Publi24StatusEntry} from "../../core/storage";
 import {ImageResult, ImageSearchError, SearchResult, linksFilter} from "../../core/linksFilter";
 import {dateLib} from "../../core/dateLib";
 import AdPanel from "./AdPanel";
@@ -46,10 +47,11 @@ function getImageCount(item: Element, hasImages: boolean): number {
 
 const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const [renderCycle, setRenderCycle] = useState(0);
-  const [{search, images, imageSearchErrors}, setSearches] = useState<{
+  const [{search, images, imageSearchErrors, publi24Statuses}, setSearches] = useState<{
     search?: SearchResult[];
     images?: ImageResult[];
     imageSearchErrors?: ImageSearchError[];
+    publi24Statuses?: Publi24StatusEntry[];
   }>({});
   const [showHideReason, setShowHideReason] = useState(false);
   const [showImagesSlider, setShowImagesSlider] = useState(false);
@@ -87,7 +89,12 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
 
     return l[0].startsWith('ddcforum.com ') ? new URL(l[1], 'https://www.google.com').href : undefined;
   }, undefined);
-  const imageSearchDomains = images ? linksFilter.processImageLinks(id, images, itemUrl) : undefined;
+  const imageSearchDomains = images
+    ? linksFilter.processImageLinks(images, itemUrl, publi24Statuses || [])
+    : undefined;
+  const hasImagesInOtherLocation = publi24Statuses?.some(entry =>
+    entry?.status === 'dup_n_old' || entry?.status === 'dup_old'
+  ) ?? false;
 
   const phoneTime = WWStorage.getInvestigatedTime(id);
   const imageTime = WWStorage.getAdImagesInvestigatedTime(id);
@@ -105,7 +112,9 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const isInTutorial = WWStorage.isAdTutorial(id);
   const visible = isInTutorial || adData.getItemVisibility(id);
   let hideReason = WWStorage.getPhoneHiddenReason(phone);
-  const defaultHideReason = imageSearchDomains?.some(({links}) => links.some(({isSafe}) => !isSafe)) ? 'poze false' : null;
+  const defaultHideReason = imageSearchDomains?.some(({links}) => links.some(({isSafe, isUnknown, isDead}) => !isSafe && !isUnknown && !isDead))
+    ? 'poze false'
+    : null;
   let automaticHideReason = !!(hideReason && hideReason.match(/^automat:/));
 
   if (automaticHideReason && hideReason) {
@@ -324,7 +333,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
         isFav={WWStorage.isFavorite(phone)}
         showDuplicates={renderOptions?.showDuplicates ?? true}
         hasDuplicateAdsWithSamePhone={hasDuplicateAdsWithSamePhone}
-        hasImagesInOtherLocation={WWStorage.hasAdDuplicatesInOtherLocation(id)}
+        hasImagesInOtherLocation={hasImagesInOtherLocation}
         hasImages={hasImages}
         hideReason={hideReason}
         automaticHideReason={automaticHideReason}

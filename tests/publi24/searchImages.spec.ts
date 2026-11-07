@@ -31,12 +31,12 @@ test('Should search for images and show relevant results.', async ({ page, conte
 
         if (GOOGLE_GOTO_ACTIVE) {
           const isGoogleResult = extractedDomain === 'google.com';
-          const isResolvedPubli24Ad = extractedDomain === 'publi24.ro' && linkUrl.pathname.includes('/anunt/');
-          expect(isGoogleResult || isResolvedPubli24Ad).toBe(true);
+          const isResolvedPubli24 = extractedDomain === 'publi24.ro';
+          expect(isGoogleResult || isResolvedPubli24).toBe(true);
 
           if (text.startsWith('#')) {
             domainIndex++;
-            expect(text).toEqual(`#${domainIndex}`);
+            expect(text).toMatch(new RegExp(`^#${domainIndex}(\\s|$)`));
           } else {
             domainIndex = 1;
             expect(text).not.toContain('google.com');
@@ -75,7 +75,7 @@ test('Should search for images and show relevant results.', async ({ page, conte
       const links = await ad.$$('[data-wwid="image-results"] a[target="_blank"][href]');
       for (let link of links) {
         const className = await link.getAttribute('class');
-        if (className.indexOf('linkSafe')) {
+        if (className.includes('linkSafe')) {
           return true;
         }
       }
@@ -85,7 +85,7 @@ test('Should search for images and show relevant results.', async ({ page, conte
       const links = await ad.$$('[data-wwid="image-results"] a[target="_blank"][href]');
       for (let link of links) {
         const className = await link.getAttribute('class');
-        if (className.indexOf('linkUnsafe')) {
+        if (className.includes('linkUnsafe')) {
           return true;
         }
       }
@@ -249,13 +249,114 @@ test('Should keep image search errors after post-search analysis resolves result
     });
   }, {id: adId});
 
-  await page.waitForTimeout(1000);
+  await page.waitForFunction(
+    id => {
+      const adElement = document.querySelector(`[data-articleid="${id}"]`);
+      return adElement && !adElement.querySelector('[data-wwid="inline-loader"]');
+    },
+    adId,
+    {timeout: 30000},
+  );
 
   const errorMessage = await ad.waitForSelector('[data-wwid="image-search-error"]');
   expect(await errorMessage.innerText()).toEqual('Căutare eșuată pentru 2 poze !');
   expect(await ad.$$('[data-wwid="image-results"] a[target="_blank"][href]')).toHaveLength(1);
 });
 
+
+test('Should analyse and display relevant data on publi24 results', async ({ page, context }, testInfo) => {
+  testInfo.setTimeout(120000);
+
+  await utilsPubli.open(context, page);
+
+  const currentAd = await utilsPubli.findFirstAdWithImageSearch(page);
+  const adId = await currentAd.getAttribute('data-articleid');
+  const adUrl = await (await currentAd.$('.article-title a')).getAttribute('href');
+
+  expect(adId).toBeTruthy();
+  expect(adUrl).toBeTruthy();
+
+  await page.goto('https://www.publi24.ro/anunturi/matrimoniale/escorte/brasov/brasov/');
+  await page.waitForSelector('[data-articleid] .article-title a');
+
+  const otherLocationAdUrls = await page.$$eval(
+    '[data-articleid] .article-title a',
+    links => links.slice(0, 2).map(link => (link as HTMLAnchorElement).href),
+  );
+
+  expect(otherLocationAdUrls).toHaveLength(2);
+
+  const listingUrlArad = 'https://www.publi24.ro/anunturi/matrimoniale/escorte/arad/arad/';
+  const listingUrlSibiu = 'https://www.publi24.ro/anunturi/matrimoniale/escorte/sibiu/sibiu/';
+  const listingUrlAradWithQuery = `${listingUrlArad}?q=test`;
+  const missingAdUrl = 'https://www.publi24.ro/anunturi/matrimoniale/escorte/cluj/cluj-napoca/anunt/test-missing-ad/doesnotexist1337.html';
+
+  await page.goto(adUrl!);
+  await page.waitForSelector('[data-wwid="investigate_img"]');
+  utilsPubli.clearPopups(page);
+
+  context.on('page', openedPage => {
+    openedPage.close().catch(error => console.debug('Image search tab was already closed.', error));
+  });
+
+  await (await page.waitForSelector('[data-wwid="investigate_img"]')).click();
+  await page.waitForTimeout(1000);
+
+  const background = context.serviceWorkers()[0];
+
+  await background.evaluate(async ({id, imageResults}) => {
+    await chrome.storage.local.set({
+      [`ww:image_results:${id}`]: imageResults,
+      'ww:img_search_started_for': null,
+    });
+  }, {
+    id: adId,
+    imageResults: [
+      adUrl,
+      ...otherLocationAdUrls,
+      listingUrlArad,
+      listingUrlSibiu,
+      listingUrlAradWithQuery,
+      missingAdUrl,
+    ],
+  });
+
+  const resultSelector = `[data-articleid="${adId}"] [data-wwid="image-results"] a[target="_blank"][href]`;
+
+  await expect.poll(async () => {
+    const statuses = await background.evaluate(async (id) => {
+      const key = `ww:publi24_status:${id}`;
+      const data = await chrome.storage.local.get(key);
+      return data[key] as Array<{status: string} | null> | undefined;
+    }, adId);
+
+    return statuses?.slice(1).every(Boolean) ?? false;
+  }, {timeout: 90000}).toBe(true);
+
+  await page.waitForFunction(
+    selector => document.querySelectorAll(selector).length >= 5,
+    resultSelector,
+    {timeout: 90000},
+  );
+  await page.waitForFunction(
+    () => !document.querySelector('[data-wwid="inline-loader"]'),
+    undefined,
+    {timeout: 30000},
+  );
+
+  const links = await page.$$eval(resultSelector, anchors => anchors.map(anchor => ({
+    href: (anchor as HTMLAnchorElement).href,
+    text: anchor.textContent?.trim() ?? '',
+  })));
+
+  expect(links).toHaveLength(5);
+  expect(links.some(link => link.href === adUrl)).toBe(false);
+  expect(links.filter(link => /Bra[sș]ov/i.test(link.text))).toHaveLength(2);
+  expect(links.filter(link => /\barad\b/i.test(link.text))).toHaveLength(1);
+  expect(links.some(link => /\bsibiu\b/i.test(link.text))).toBe(true);
+  expect(links.some(link => /\sx$/.test(link.text))).toBe(true);
+  expect(links.some(link => /\?$/.test(link.text))).toBe(false);
+});
 
 test('Should be able to do manual search', async ({ page, context }, testInfo) => {
   testInfo.setTimeout(60000);

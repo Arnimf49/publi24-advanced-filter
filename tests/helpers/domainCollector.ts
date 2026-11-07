@@ -47,7 +47,7 @@ export async function collectFromLensPage(lensPage: Page): Promise<void> {
 
       try {
         const linkUrl = new URL(source);
-        if (linkUrl.hostname === 'www.google.com' && linkUrl.pathname === '/goto') {
+        if (linkUrl.hostname === 'www.google.com' && (linkUrl.pathname === '/goto' || linkUrl.pathname === '/url')) {
           const knownDomain = escortDomainBySiteName.get(siteName.toLowerCase());
           if (knownDomain) {
             entries.push({domain: knownDomain, source, siteNames: siteName ? [siteName] : []});

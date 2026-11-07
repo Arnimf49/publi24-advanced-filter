@@ -13,6 +13,7 @@ interface HostPermissionsResponse {
 const GOOGLE_ORIGIN = 'https://www.google.com/*';
 const LENS_ORIGIN = 'https://lens.google.com/*';
 const INSPECTOR_ESCORTE_ORIGIN = 'https://api.inspector-escorte.com/*';
+const GOTO_RESOLVE_TIMEOUT_MS = 15_000;
 
 async function getHostPermissions(): Promise<HostPermissionsResponse> {
   const [google, lens, inspectorEscorte] = await Promise.all([
@@ -24,17 +25,19 @@ async function getHostPermissions(): Promise<HostPermissionsResponse> {
   return { google, lens, inspectorEscorte };
 }
 
-async function batchThrottle<T>(items: T[], batchSize: number, delayMs: number, fn: (item: T) => Promise<unknown>): Promise<unknown[]> {
-  const results: unknown[] = [];
+async function resolveUrl(url: string): Promise<string | null> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), GOTO_RESOLVE_TIMEOUT_MS);
 
-  for (let i = 0; i < items.length; i += batchSize) {
-    if (i > 0) {
-      await new Promise(r => setTimeout(r, delayMs));
-    }
-    results.push(...await Promise.all(items.slice(i, i + batchSize).map(fn)));
+  try {
+    const res = await fetch(url, { redirect: 'follow', signal: controller.signal, credentials: 'include' });
+    return res.url;
+  } catch (error) {
+    console.error(`Error resolving URL "${url}":`, error);
+    return null;
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  return results;
 }
 
 browserApi.runtime.onMessage.addListener((message, _sender, sendResponse) => {
@@ -88,18 +91,19 @@ browserApi.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
-  if (message.type === 'RESOLVE_GOTO_URLS') {
-    const urls = (message.gotoPaths as string[])
-      .map(p => new URL(p, 'https://www.google.com').href);
-    batchThrottle(urls, 10, 5000, async url => {
-      try {
-        const res = await fetch(url, { redirect: 'follow' });
-        return res.url;
-      } catch (error) {
-        console.error(error);
-        return null;
-      }
-    }).then(locations => sendResponse({ locations }));
+  if (message.type === 'RESOLVE_GOTO_URL') {
+    let url: string;
+
+    try {
+      url = new URL(message.gotoPath as string, 'https://www.google.com').href;
+    } catch (error) {
+      console.error(`Error parsing goto path "${message.gotoPath}":`, error);
+      sendResponse({ url: null });
+      return true;
+    }
+
+    resolveUrl(url).then(resolvedUrl => sendResponse({ url: resolvedUrl }));
+
     return true;
   }
 

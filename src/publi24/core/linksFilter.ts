@@ -1,7 +1,7 @@
-import {WWStorage} from "./storage";
+import type {Publi24StatusEntry, Publi24StatusValue} from "./storage";
+import {google} from "../../common/google";
 import {utils} from "../../common/utils";
 import escortListingDomainsData from '../../../escort-listing-domains.json';
-import {dataCompression} from "./dataCompression";
 
 export interface EscortDomainEntry {
   country: string;
@@ -100,7 +100,7 @@ for (const [key, countries] of escortSiteNameCountries) {
 }
 
 // A raw image result: either an absolute URL string, or a [siteName, gotoPath] tuple
-// when the absolute URL could not be determined (Google Lens /goto redirect).
+// when the absolute URL could not be determined (Google Lens /goto or /url redirect).
 export type ImageResult = string | [string, string];
 
 export interface ImageSearchError {
@@ -108,7 +108,7 @@ export interface ImageSearchError {
 }
 
 // A raw search result: either an absolute URL string, or a [displayName, gotoPath] tuple
-// when Google renders a /goto redirect hiding the real destination URL.
+// when Google renders a /goto or /url redirect hiding the real destination URL.
 export type SearchResult = string | [string, string];
 
 interface ProcessedLink {
@@ -116,6 +116,11 @@ interface ProcessedLink {
   isDead: boolean;
   isSafe: boolean;
   isSuspicious: boolean;
+  isUnknown: boolean;
+  isListing: boolean;
+  listingLabel: string | null;
+  city: string | null;
+  status: Publi24StatusValue | null;
 }
 
 interface DomainInfo {
@@ -155,13 +160,79 @@ function getFlagForDomain(domain: string): string | null {
   return null;
 }
 
-function isGotoPath(gotoPath: string): boolean {
+function getResultUrl(result: ImageResult): string {
+  return Array.isArray(result) ? google.toAbsoluteUrl(result[1]) : result;
+}
+
+function getAdIdFromUrl(url: string): string | null {
+  const match = url.match(/.+\/([^./]+)\.html/);
+  return match ? match[1] : null;
+}
+
+function isPubli24ImageResult(result: ImageResult): boolean {
+  if (Array.isArray(result)) {
+    const siteName = result[0].trim().toLowerCase().replace(/^www\./, '');
+    return siteName === 'publi24' || siteName === 'publi24.ro';
+  }
+
   try {
-    return new URL(gotoPath, 'https://www.google.com').pathname === '/goto';
+    const hostname = new URL(result, 'https://www.google.com').hostname.replace(/^www\./, '').toLowerCase();
+    return hostname === 'publi24.ro';
   } catch (error) {
-    console.error(`Error parsing possible Google redirect URL "${gotoPath}":`, error);
+    console.error(`Error parsing image result URL "${result}":`, error);
     return false;
   }
+}
+
+function isPubli24AdLink(url: string): boolean {
+  try {
+    const parsedUrl = new URL(url, 'https://www.google.com');
+    return parsedUrl.hostname.replace(/^www\./, '').toLowerCase() === 'publi24.ro'
+      && parsedUrl.pathname.includes('/anunt/');
+  } catch (error) {
+    console.error(`Error parsing publi24 URL "${url}":`, error);
+    return false;
+  }
+}
+
+function getLastPathPart(url: string): string | null {
+  try {
+    const pathname = new URL(url, 'https://www.google.com').pathname;
+    const parts = pathname.split('/').filter(Boolean);
+    const lastPart = parts[parts.length - 1];
+
+    return lastPart ? decodeURIComponent(lastPart) : null;
+  } catch (error) {
+    console.error(`Error parsing URL path "${url}":`, error);
+    return null;
+  }
+}
+
+function normalizePubli24Url(url: string): string {
+  try {
+    const parsedUrl = new URL(url, 'https://www.google.com');
+
+    if (parsedUrl.hostname.replace(/^www\./, '').toLowerCase() !== 'publi24.ro' || !parsedUrl.searchParams.has('q')) {
+      return url;
+    }
+
+    parsedUrl.searchParams.delete('q');
+    return parsedUrl.href;
+  } catch (error) {
+    console.error(`Error normalizing publi24 URL "${url}":`, error);
+    return url;
+  }
+}
+
+function isSameAdResult(result: ImageResult, itemUrl: string): boolean {
+  if (!isPubli24ImageResult(result)) {
+    return false;
+  }
+
+  const adId = getAdIdFromUrl(getResultUrl(result));
+  const itemAdId = getAdIdFromUrl(itemUrl);
+
+  return !!adId && !!itemAdId && adId === itemAdId;
 }
 
 function getDomain(value: string): string {
@@ -212,14 +283,36 @@ export const linksFilter = {
   },
 
   isUrlSameAd(url: string, adUrl: string) {
-    return linksFilter.isAdUrl(url) &&
-      url.replace(/.+\/([^.\/]+)\.html.*/, '$1') === adUrl.replace(/.+\/([^.\/]+)\.html.*/, '$1');
+    if (!linksFilter.isAdUrl(url)) {
+      return false;
+    }
+
+    const adId = getAdIdFromUrl(url);
+    const itemAdId = getAdIdFromUrl(adUrl);
+
+    return !!adId && !!itemAdId && adId === itemAdId;
+  },
+
+  isPubli24Result(result: ImageResult): boolean {
+    return isPubli24ImageResult(result);
+  },
+
+  isPubli24AdLink(url: string): boolean {
+    return isPubli24AdLink(url);
+  },
+
+  normalizePubli24Url(url: string): string {
+    return normalizePubli24Url(url);
+  },
+
+  isSameAdResult(result: ImageResult, itemUrl: string): boolean {
+    return isSameAdResult(result, itemUrl);
   },
 
   filterLinks(links: SearchResult[], itemUrl: string): SearchResult[] {
     return links
       .filter((l: SearchResult) => {
-        if (typeof l === 'string' && isGotoPath(l)) {
+        if (typeof l === 'string' && google.isRedirectPath(l)) {
           return false;
         }
 
@@ -260,7 +353,7 @@ export const linksFilter = {
       }
 
       domainData.links.forEach(linkData => {
-        if (!linkData.isSafe && !linkData.isSuspicious && !linkData.isDead) {
+        if (!linkData.isSafe && !linkData.isSuspicious && !linkData.isDead && !linkData.isUnknown) {
           hasRedLinks = true;
         }
         if (linkData.isSuspicious && !linkData.isDead) {
@@ -327,11 +420,10 @@ export const linksFilter = {
     return displayName.startsWith('nimfomane.com ') || displayName.startsWith('nimfomane.com | ');
   },
 
-  processImageLinks(id: string, links: ImageResult[], itemUrl: string): ImageLinkDomainGroup[] {
+  processImageLinks(links: ImageResult[], itemUrl: string, publi24Statuses: Publi24StatusEntry[] = []): ImageLinkDomainGroup[] {
     const domainMap: { [domain: string]: DomainInfo } = {};
-    const duplicatesInOtherLoc: string[] = WWStorage.getAdDuplicatesInOtherLocation(id);
-    const duplicatesNotOldInOtherLoc: string[] = WWStorage.getAdNotOldDuplicatesInOtherLocation(id);
-    const deadLinks: string[] = WWStorage.getAdDeadLinks(id);
+    const seenPubli24Urls = new Set<string>();
+    let publi24Index = 0;
 
     function getPriority(l: ProcessedLink) {
       if (l.isDead) return 4;
@@ -343,16 +435,16 @@ export const linksFilter = {
 
     links.forEach((result: ImageResult) => {
       try {
+        const isPubli24 = isPubli24ImageResult(result);
+        const statusEntry = isPubli24 ? (publi24Statuses[publi24Index++] ?? null) : null;
         let link: string;
         let rawDomain: string;
-        let compressedLink: string | null;
         let escortListingFlag: string | null;
 
         if (Array.isArray(result)) {
           const [siteName, gotoPath] = result;
-          link = new URL(gotoPath, 'https://www.google.com').href;
+          link = google.toAbsoluteUrl(gotoPath);
           rawDomain = escortSiteNameToDomain.get(siteName.toLowerCase()) ?? siteName;
-          compressedLink = null;
           const cc = escortSiteNameToCountry.get(siteName.toLowerCase());
           escortListingFlag = cc !== undefined ? countryToFlag(cc) : null;
         } else {
@@ -361,34 +453,76 @@ export const linksFilter = {
           }
           link = result;
           rawDomain = new URL(link).hostname.replace(/^www\./, '');
-          const isPubliLink = linksFilter.isAdUrl(link);
-          compressedLink = isPubliLink ? dataCompression.compressAdLink(link) : link;
           escortListingFlag = getFlagForDomain(rawDomain);
         }
-        const isPubli24QueryLink = !Array.isArray(result)
-          && rawDomain === 'publi24.ro'
-          && link.includes('?q=');
+
+        let isListing = false;
+        let listingLabel: string | null = null;
+
+        if (isPubli24) {
+          link = normalizePubli24Url(link);
+          isListing = isPubli24ImageResult(link) && !isPubli24AdLink(link);
+          listingLabel = isListing ? getLastPathPart(link) : null;
+
+          const dedupeKey = isListing ? `listing:${listingLabel ?? link}` : link;
+
+          if (seenPubli24Urls.has(dedupeKey)) {
+            return;
+          }
+
+          seenPubli24Urls.add(dedupeKey);
+        }
+
+        if (isPubli24 && isSameAdResult(result, itemUrl)) {
+          return;
+        }
+
+        let linkObj: ProcessedLink;
         let isDomainSafe = false;
         let isDomainSuspicious = false;
         let isEscortListing = false;
         let flag: string | null = null;
 
-        if (escortListingFlag === '🇷🇴') {
-          isDomainSafe = compressedLink ? !duplicatesInOtherLoc.includes(compressedLink) : true;
-          isDomainSuspicious = !!compressedLink && duplicatesNotOldInOtherLoc.includes(compressedLink);
-          flag = '🇷🇴';
-        } else if (escortListingFlag) {
-          isDomainSuspicious = true;
-          isEscortListing = true;
-          flag = escortListingFlag;
-        }
+        if (isPubli24) {
+          const status = statusEntry?.status ?? null;
 
-        const linkObj: ProcessedLink = {
-          link,
-          isDead: isPubli24QueryLink || (!!compressedLink && deadLinks.includes(compressedLink)),
-          isSafe: isDomainSafe,
-          isSuspicious: isDomainSuspicious,
-        };
+          linkObj = {
+            link,
+            isDead: status === 'dead',
+            isSafe: status === 'safe',
+            isSuspicious: status === 'dup_old',
+            isUnknown: status === null,
+            isListing,
+            listingLabel,
+            city: statusEntry?.city ?? null,
+            status,
+          };
+
+          flag = escortListingFlag ?? getFlagForDomain(rawDomain);
+          isDomainSafe = status === 'safe';
+          isEscortListing = false;
+        } else {
+          if (escortListingFlag === '🇷🇴') {
+            isDomainSafe = true;
+            flag = '🇷🇴';
+          } else if (escortListingFlag) {
+            isDomainSuspicious = true;
+            isEscortListing = true;
+            flag = escortListingFlag;
+          }
+
+          linkObj = {
+            link,
+            isDead: false,
+            isSafe: isDomainSafe,
+            isSuspicious: isDomainSuspicious,
+            isUnknown: false,
+            isListing: false,
+            listingLabel: null,
+            city: null,
+            status: null,
+          };
+        }
 
         if (!domainMap[rawDomain]) {
           domainMap[rawDomain] = { rawDomain, links: [linkObj], isSafe: isDomainSafe, isEscortListing, flag };

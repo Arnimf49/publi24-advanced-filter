@@ -174,7 +174,7 @@ export const adData = {
     return titleElement ? titleElement.innerHTML : '';
   },
 
-  getItemLocation(item: Element | Document | string, itemIsOnAdPage: boolean = false): string {
+  getItemLocationParts(item: Element | Document | string, itemIsOnAdPage: boolean = false): string[] {
     let locationText: string | null | undefined;
 
     if (typeof item === "string") {
@@ -197,10 +197,18 @@ export const adData = {
     }
 
     if (!locationText) {
-      return '';
+      return [];
     }
 
-    return locationText.trim().split(',').map((l: string) => l.replace(/[ \n]+/g, '')).sort().join(', ');
+    return locationText
+      .trim()
+      .split(',')
+      .map((part: string) => part.replace(/[ \n]+/g, '').trim())
+      .filter(Boolean);
+  },
+
+  getItemLocation(item: Element | Document | string, itemIsOnAdPage: boolean = false): string {
+    return adData.getItemLocationParts(item, itemIsOnAdPage).sort().join(', ');
   },
 
   getItemUrl(itemOrUrl: Element | string): string {

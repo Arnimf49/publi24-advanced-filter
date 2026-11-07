@@ -1,3 +1,5 @@
+import {utils} from "./utils";
+
 export interface BrowserError extends Error {
   code?: number;
 }
@@ -85,10 +87,6 @@ function getTypeAndConfig(domain: string, json: LoadOptions['json']): { type: st
   return { type: domain, config: domainConfig };
 }
 
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 async function waitUntilAllowed(type: string, config: TypeConfig) {
   while (true) {
     const now = Date.now();
@@ -100,10 +98,10 @@ async function waitUntilAllowed(type: string, config: TypeConfig) {
       const delayBetween = config.delayBetween || 0;
       if (sinceLast >= delayBetween) return;
 
-      await sleep(delayBetween - sinceLast);
+      await utils.sleep(delayBetween - sinceLast);
     } else {
       const waitUntil = Math.min(...PAGE_TYPE[type].cooldowns);
-      await sleep(waitUntil - now);
+      await utils.sleep(waitUntil - now);
     }
   }
 }

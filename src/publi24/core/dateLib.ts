@@ -1,4 +1,13 @@
 export const dateLib = {
+  isValidDate(date: Date | null | undefined): date is Date {
+    if (!date) {
+      return false;
+    }
+
+    const time = date.getTime();
+    return !Number.isNaN(time) && time > 0;
+  },
+
   dayDiff(date: Date, compareDate?: Date): number {
     const compareTime = (compareDate || new Date()).getTime();
     const dateTime = date.getTime();

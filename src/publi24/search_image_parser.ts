@@ -1,4 +1,5 @@
 import {WWBrowserStorage} from "./core/browserStorage";
+import {google} from "../common/google";
 import {IS_MOBILE_VIEW} from "../common/globals";
 import {utils} from "../common/utils";
 import {addSearchLoader, addContinueButton, withRetry} from "./core/searchUI";
@@ -210,7 +211,7 @@ function getMobileResults(): ImageResult[] {
     .map((n): ImageResult | null => {
       const href = n.getAttribute('href');
       if (href === null) return null;
-      if (href.startsWith('/goto')) {
+      if (google.isRedirectPath(href)) {
         const siteNameEl = n.querySelector('.wyccme div:last-child');
         const siteName: string = siteNameEl?.textContent?.trim() ?? '';
         return [siteName, href];
@@ -234,7 +235,7 @@ function areLinksFullyLoaded(isMobile: boolean): boolean {
 
   return links.every(result => {
     const url = getResultUrl(result);
-    return !url.startsWith('/') || url.startsWith('/goto');
+    return !url.startsWith('/') || google.isRedirectPath(url);
   });
 }
 

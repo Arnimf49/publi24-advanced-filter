@@ -20,6 +20,10 @@ interface ImageLink {
   isDead?: boolean;
   isSafe?: boolean;
   isSuspicious?: boolean;
+  isUnknown?: boolean;
+  isListing?: boolean;
+  listingLabel?: string | null;
+  city?: string | null;
 }
 
 interface ImageSearchDomain {
@@ -125,10 +129,24 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
   const [showImageHelp, setShowImageHelp] = useState(false);
 
   const getImageLinkClassName = (link: ImageLink): string => {
-    if (link.isDead) return styles.linkDead;
+    if (link.isDead || link.isUnknown) return styles.linkDead;
     if (link.isSafe) return styles.linkSafe;
     if (link.isSuspicious) return styles.linkSuspicious;
     return styles.linkUnsafe;
+  };
+
+  const getImageLinkStatusMarker = (link: ImageLink): React.ReactNode => {
+    if (link.isListing && link.listingLabel) {
+      return <span style={{opacity: 0.75}}> {link.listingLabel}</span>;
+    }
+
+    if (link.city) {
+      return <span style={{opacity: 0.75}}> {link.city}</span>;
+    }
+
+    if (link.isDead) return <span style={{opacity: 0.75}}> x</span>;
+    if (link.isUnknown) return <span style={{opacity: 0.75}}> ?</span>;
+    return null;
   };
 
   const loading = !hasNoPhone && !phone && errors.length === 0;
@@ -391,28 +409,40 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                           )}
                           <div className={styles.imageResultsContainer}>
                             {analyzeImagesLoading && inlineLoader}
-                            {imageSearchDomains
-                              .filter(d => !analyzeImagesLoading || d.domain.indexOf('publi24.ro') === -1)
-                              .map((domainData) => (
-                              <React.Fragment key={domainData.domain}>
-                                {domainData.links.map((linkData, index) => (
-                                  <a
-                                    key={`${domainData.domain}-${index}`}
-                                    href={linkData.link}
-                                    className={`${styles.imageResultLink} ${getImageLinkClassName(linkData)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style={index === domainData.links.length - 1 ? {marginRight: '10px'} : undefined}
-                                  >
-                                    {index === 0 ? (
-                                      domainData.domain
-                                    ) : (
-                                      <><span className={styles.indexIndicator}>#</span>{index + 1}</>
-                                    )}
-                                  </a>
-                                ))}
-                              </React.Fragment>
-                            ))}
+                            {imageSearchDomains.map((domainData) => {
+                              const visibleLinks = domainData.links.filter(linkData =>
+                                !(analyzeImagesLoading && linkData.isUnknown)
+                              );
+
+                              if (visibleLinks.length === 0) {
+                                return null;
+                              }
+
+                              return (
+                                <React.Fragment key={domainData.domain}>
+                                  {visibleLinks.map((linkData, index) => {
+                                    const statusMarker = getImageLinkStatusMarker(linkData);
+
+                                    return (
+                                      <a
+                                        key={`${domainData.domain}-${index}`}
+                                        href={linkData.link}
+                                        className={`${styles.imageResultLink} ${getImageLinkClassName(linkData)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={index === visibleLinks.length - 1 ? {marginRight: '10px'} : undefined}
+                                      >
+                                        {index === 0 ? (
+                                          <>{domainData.domain}{statusMarker}</>
+                                        ) : (
+                                          <><span className={styles.indexIndicator}>#</span>{index + 1}{statusMarker}</>
+                                        )}
+                                      </a>
+                                    );
+                                  })}
+                                </React.Fragment>
+                              );
+                            })}
                           </div>
                         </>
                       )}

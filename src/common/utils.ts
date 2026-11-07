@@ -32,6 +32,10 @@ export const utils = {
     }
   },
 
+  sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  },
+
   throwInTestingIfConfigured(): void {
     if (typeof window !== 'undefined' && window.localStorage?.getItem('_pw_throw') === 'true') {
       throw new Error('Testing error.');

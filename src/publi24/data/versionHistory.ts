@@ -8,6 +8,19 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.16',
+    releaseDate: '',
+    changeNew: [
+      'Rezultatele de la publi24 la căutarea dupa poze afișează mai multe detalii: locație în cazul în care e diferită de cea curentă și \'x\' când anunțul specific nu se mai găsește.',
+    ],
+    changeImprove: [
+      'Deduplicare rezultate poze de la publi24 mai agresivă când acestea duc la pagini de listare.',
+    ],
+    changeFix: [
+      'Unele rezultate de la publi24 la căutarea după poze în unele cazuri se afișau ca și domeniul de la google.',
+    ]
+  },
+  {
     version: '3.14.1',
     releaseDate: '25 octombrie 2026',
     changeNew: [],

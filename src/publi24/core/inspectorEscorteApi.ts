@@ -1,4 +1,5 @@
 import {bgApi} from '../../common/background/bgApi';
+import {utils} from '../../common/utils';
 import {AdUuid} from './storage';
 import {dataCompression} from './dataCompression';
 
@@ -21,10 +22,6 @@ const RATE_LIMIT = 7;
 let tokens = RATE_LIMIT;
 let lastRefill = Date.now();
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 function refillTokens(): void {
   const now = Date.now();
   const elapsedSeconds = (now - lastRefill) / 1000;
@@ -45,7 +42,7 @@ async function waitForToken(): Promise<void> {
     return;
   }
 
-  await sleep(((1 - tokens) / RATE_LIMIT) * 1000);
+  await utils.sleep(((1 - tokens) / RATE_LIMIT) * 1000);
   return waitForToken();
 }
 

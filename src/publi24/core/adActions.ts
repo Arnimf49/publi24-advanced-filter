@@ -1,17 +1,14 @@
 import {adData} from "./adData";
 import {misc} from "./misc";
-import {dateLib} from "./dateLib";
 import {IS_AD_PAGE} from "./globals";
 import {WWBrowserStorage} from "./browserStorage";
 import {AutoHideCriterias, WWStorage} from "./storage";
 import {IS_MOBILE_VIEW, IS_PROMOTER, IS_SAFARI_IOS} from "../../common/globals";
-import {bgApi} from "../../common/background/bgApi";
 import {AUTO_HIDE_CRITERIA} from "./hideReasons";
 import {utils} from "../../common/utils";
 import {iosUtils} from "./iosUtils";
-import {ImageResult, ImageSearchError, linksFilter} from "./linksFilter";
-import {dataCompression} from "./dataCompression";
 import {WWMemoryStorage} from "./memoryStorage";
+import {publi24ImageAnalysis} from "./publi24ImageAnalysis";
 import {textParser, type AdContentTuple} from "./textParser";
 
 export type {AdContentTuple} from "./textParser";
@@ -175,40 +172,6 @@ async function searchPhoneResults(id: string, phoneNumber: string, item: HTMLEle
   }
 }
 
-function isImageResult(result: ImageResult | ImageSearchError): result is ImageResult {
-  return typeof result === 'string' || Array.isArray(result);
-}
-
-async function resolveGotoFinalUrls(id: string, allResults: Array<ImageResult | ImageSearchError>): Promise<Array<ImageResult | ImageSearchError>> {
-  const publi24GotoEntries = allResults
-    .map((entry, i) => ({ entry, i }))
-    .filter(({ entry }) => Array.isArray(entry) && (entry as [string, string])[0].toLowerCase() === 'publi24');
-
-  if (publi24GotoEntries.length === 0) {
-    return allResults;
-  }
-
-  const gotoPaths = publi24GotoEntries.map(({ entry }) => (entry as [string, string])[1]);
-  const locations = await bgApi.resolveGotoUrls(gotoPaths);
-
-  const result = [...allResults];
-  let changed = false;
-
-  publi24GotoEntries.forEach(({ i }, j) => {
-    const location = locations[j];
-    if (location) {
-      result[i] = location;
-      changed = true;
-    }
-  });
-
-  if (changed) {
-    await WWBrowserStorage.set(`ww:image_results:${id}`, result);
-  }
-
-  return changed ? result : allResults;
-}
-
 export const adActions = {
   resetExpiredHides(phone: string, id: string): boolean {
     utils.debugLog('checkExpiredHide called', {phone});
@@ -293,68 +256,6 @@ export const adActions = {
     return true;
   },
 
-  async analyzeFoundImages(id: string, item: Element): Promise<void> {
-    WWStorage.clearAdDeadLinks(id);
-    WWStorage.clearAdDuplicatesInOtherLocation(id);
-
-    const stored: { [key: string]: Array<ImageResult | ImageSearchError> } = await WWBrowserStorage.get(`ww:image_results:${id}`);
-    const storedResults: Array<ImageResult | ImageSearchError> = stored[`ww:image_results:${id}`] || [];
-    const rawImageLinks: ImageResult[] = storedResults.filter(isImageResult);
-
-    if (!rawImageLinks.some(linksFilter.isAdUrl)) {
-      return;
-    }
-
-    try {
-      WWMemoryStorage.setAnalyzeImagesLoading(id, true);
-      const imageLinks: Array<ImageResult | ImageSearchError> = await resolveGotoFinalUrls(id, storedResults);
-
-      const publi24AdLinks: string[] = imageLinks.flatMap((item: ImageResult | ImageSearchError): string[] => {
-        if (typeof item === 'string' && linksFilter.isAdUrl(item)) {
-          return [item];
-        }
-
-        return [];
-      });
-
-      const currentAdLocation: string = adData.getItemLocation(item);
-      const pageResultForDate = await adData.loadInAdPage(item);
-      const currentAdDate: Date = adData.getPageDate(pageResultForDate as Document);
-
-      const pageResults = await Promise.all(publi24AdLinks.map((link: string) =>
-        adData.loadInAdPage(null, link).catch((e) => {
-          console.error(e);
-          return {error: true, code: e.code};
-        })
-      ));
-
-      pageResults.forEach((pageResult, index: number) => {
-        const compressedLink = dataCompression.compressAdLink(publi24AdLinks[index]);
-        if (typeof pageResult === 'object' && pageResult !== null && (pageResult as any).error) {
-          if ((pageResult as any).code === 410 || (pageResult as any).code === 404) {
-            WWStorage.addAdDeadLink(id, compressedLink);
-          }
-          return;
-        }
-
-        const page = pageResult as Document;
-        const location: string = adData.getItemLocation(page, true);
-
-        if (location !== currentAdLocation && !(location.includes('Sector') && currentAdLocation.includes('Sector'))) {
-          const pageDate: Date = adData.getPageDate(page);
-          const dateDiff: number = dateLib.dayDiff(pageDate, currentAdDate);
-          WWStorage.addAdDuplicateInOtherLocation(id, compressedLink, dateDiff < 2);
-        }
-      });
-    }
-    catch (error) {
-      console.error('Error analyzing images for ad:', error);
-    }
-    finally {
-      WWMemoryStorage.setAnalyzeImagesLoading(id, false);
-    }
-  },
-
   createInvestigateImgClickHandler(id: string, item: HTMLElement): (this: GlobalEventHandlers, e: MouseEvent) => Promise<void> {
     const imageToLensUrl = (imgLink: string): string => {
       const encodedLink = encodeURIComponent(imgLink);
@@ -377,14 +278,19 @@ export const adActions = {
       try {
         utils.throwInTestingIfConfigured();
 
-        WWBrowserStorage.set(`ww:image_results:${id}`, null);
+        await WWBrowserStorage.set(`ww:image_results:${id}`, null);
+        await WWStorage.clearAdPubli24Statuses(id);
         let imgs: string[] = await adData.acquireSliderImages(item);
 
-        const done = (): void => {
+        const done = async (): Promise<void> => {
           WWMemoryStorage.setImageSearchLoading(id, false);
           WWStorage.setAdImagesInvestigatedTime(id, Date.now());
-          adActions.analyzeFoundImages(id, item);
-          if (this) (this as HTMLButtonElement).disabled = false;
+
+          try {
+            await publi24ImageAnalysis.analyzeFoundImages(id, item);
+          } finally {
+            if (this) (this as HTMLButtonElement).disabled = false;
+          }
         }
 
         await WWBrowserStorage.set(`ww:img_search_started_for`, {
@@ -411,7 +317,7 @@ export const adActions = {
             || (results as any).__from__cache
           ) {
             clearInterval(interval);
-            done();
+            done().catch(error => console.error('Error finishing image analysis:', error));
 
             if ((IS_SAFARI_IOS || localStorage.getItem('_testing_ios') === '1')) {
               const iosInterval = setInterval(() => {

@@ -1,5 +1,6 @@
 import {WWBrowserStorage} from "./core/browserStorage";
 import {addSearchLoader, addContinueButton, withRetry} from "./core/searchUI";
+import {google} from "../common/google";
 import {IS_MOBILE_VIEW} from "../common/globals";
 import {SearchResult} from "./core/linksFilter";
 
@@ -98,15 +99,6 @@ function deduplicateResults(results: SearchResult[]): SearchResult[] {
   });
 }
 
-function isGotoHref(href: string): boolean {
-  try {
-    return new URL(href, 'https://www.google.com').pathname === '/goto';
-  } catch (error) {
-    console.error(`Error parsing possible Google redirect URL "${href}":`, error);
-    return false;
-  }
-}
-
 function extractResultLinks(wwid: string) {
   const storageKey = `ww:search_results:${wwid}`;
 
@@ -133,7 +125,7 @@ function extractResultLinks(wwid: string) {
             if (href === null) {
               return null;
             }
-            if (isGotoHref(href)) {
+            if (google.isRedirectPath(href)) {
               return [buildGotoResultName(anchor), href];
             }
             return href;
