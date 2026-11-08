@@ -9,7 +9,6 @@ import Modal from "../../../../common/components/Modal/Modal";
 
 declare const Swiper: any;
 
-const CLOSE_ON_BACKGROUND_DELAY_MS = 320;
 const DRAG_THRESHOLD_PX = 10;
 
 type ImageSliderProps = {
@@ -30,26 +29,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   const toggleButtonClasses = `${styles.visibilityButton} ${visible ? styles.isVisible : ''}`;
   const hasMultipleImages = images.length > 1;
   const swiperElementRef = useRef<HTMLElement>(null);
-  const closeTimeoutRef = useRef<number | undefined>(undefined);
   const pointerStartRef = useRef<{ x: number, y: number } | null>(null);
-
-  const clearPendingClose = (): boolean => {
-    if (closeTimeoutRef.current === undefined) {
-      return false;
-    }
-
-    window.clearTimeout(closeTimeoutRef.current);
-    closeTimeoutRef.current = undefined;
-    return true;
-  };
-
-  useEffect(() => {
-    return () => {
-      if (closeTimeoutRef.current !== undefined) {
-        window.clearTimeout(closeTimeoutRef.current);
-      }
-    };
-  }, []);
 
   const visibilityClickHandler: MouseEventHandler = (event) => {
     onVisibilityClick(event);
@@ -68,13 +48,14 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     event.stopPropagation();
 
     // Controls and the image itself keep their own behaviour (image clicks are
-    // the first half of Swiper's double-tap zoom).
+    // the first half of Swiper's double-tap zoom). Pagination bullets are not
+    // included: they are handled below, depending on whether they cover the
+    // image or the background.
     const target = event.target as HTMLElement;
     const isImageOrControl = !!target.closest(
-      'img, button, a, .swiper-button-prev, .swiper-button-next, .swiper-pagination'
+      'img, button, a, .swiper-button-prev, .swiper-button-next'
     );
     if (isImageOrControl) {
-      clearPendingClose();
       return;
     }
 
@@ -85,20 +66,23 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     const wasDrag = !!pointerStart
       && Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y) > DRAG_THRESHOLD_PX;
     if (wasDrag) {
-      clearPendingClose();
       return;
     }
 
-    // A second click inside the double-tap window means the user wants Swiper
-    // to zoom, not to close the modal.
-    if (clearPendingClose()) {
+    // Pagination bullets sit on top of the image, so their target is never the
+    // image itself. If a slider image is underneath the tap, treat it as an
+    // image click rather than a background click. Restrict the lookup to this
+    // modal: elementsFromPoint also returns page elements visually covered by
+    // the modal background.
+    const isImageUnderPoint = document
+      .elementsFromPoint(event.clientX, event.clientY)
+      .some((element) => element instanceof HTMLImageElement
+        && element.closest('[data-wwid="images-slider"]'));
+    if (isImageUnderPoint) {
       return;
     }
 
-    closeTimeoutRef.current = window.setTimeout(() => {
-      closeTimeoutRef.current = undefined;
-      close();
-    }, CLOSE_ON_BACKGROUND_DELAY_MS);
+    close();
   };
 
   // Memoize the slides so React never reconciles this subtree. Swiper writes
