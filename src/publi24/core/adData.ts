@@ -109,7 +109,7 @@ function parsePubli24Date(input: string): Date | null {
   return null;
 }
 
-async function loadInspectorEscorteAd(phone: string, ad: InspectorAd): Promise<AdUuid | typeof NOT_FOUND | null> {
+async function loadInspectorEscorteAd(phone: string, ad: InspectorAd, priority: number): Promise<AdUuid | typeof NOT_FOUND | null> {
   const publi24Url = ad.urls.publi24
     // Ensure caching works and we don't double load the page.
     .replace('/-/', '/titlu-sters/');
@@ -117,7 +117,7 @@ async function loadInspectorEscorteAd(phone: string, ad: InspectorAd): Promise<A
   let itemPage: Document;
 
   try {
-    itemPage = await adData.loadInAdPage(publi24Url);
+    itemPage = await adData.loadInAdPage(publi24Url, undefined, priority);
   } catch (e) {
     const error = e as BrowserError;
     if (error.code && error.code >= 400 && error.code <= 499 && error.code !== 429) {
@@ -314,17 +314,17 @@ export const adData = {
     return thisSeenTime < newestTime;
   },
 
-  async loadInAdPage(itemOrUrl: Element | string | null, _url?: string): Promise<Document> {
+  async loadInAdPage(itemOrUrl: Element | string | null, _url?: string, priority?: number): Promise<Document> {
     const url: string = _url || (itemOrUrl ? adData.getItemUrl(itemOrUrl) : '');
 
     if (!url) {
       throw new Error("loadInAdPage requires a valid URL");
     }
 
-    return page.load(url);
+    return page.load(url, {priority});
   },
 
-  async loadInAdsData(adUuids: AdUuid[], clean?: (failedId: string) => void): Promise<AdLoadResult> {
+  async loadInAdsData(adUuids: AdUuid[], clean?: (failedId: string) => void, priority?: number): Promise<AdLoadResult> {
     let locationParts: string[] = [];
     let isBucharestSelection = false;
     let selectedBucharestSector: number | null = null;
@@ -352,7 +352,7 @@ export const adData = {
       let itemPage: Document;
 
       try {
-        itemPage = await adData.loadInAdPage(url);
+        itemPage = await adData.loadInAdPage(url, undefined, priority);
       } catch (e) {
         const error = e as BrowserError;
         if ((error.code === 404 || error.code === 410)) {
@@ -431,8 +431,9 @@ export const adData = {
     inspectorAds: InspectorAd[],
     phone: string,
     clean?: (failedId: string) => void,
+    priority?: number,
   ): Promise<AdLoadResult> {
-    const results = await Promise.all(inspectorAds.map((ad) => loadInspectorEscorteAd(phone, ad)));
+    const results = await Promise.all(inspectorAds.map((ad) => loadInspectorEscorteAd(phone, ad, priority ?? 100)));
 
     if (clean) {
       const notFoundCount = results.filter((r) => r === NOT_FOUND).length;
@@ -450,7 +451,7 @@ export const adData = {
     }
 
     const resolvedUuids = results.filter((r): r is AdUuid => r !== null && r !== NOT_FOUND);
-    const {ads, errors} = await adData.loadInAdsData(resolvedUuids, clean);
+    const {ads, errors} = await adData.loadInAdsData(resolvedUuids, clean, priority);
     return {ads, errors: [...inspectorErrors, ...errors]};
   },
 

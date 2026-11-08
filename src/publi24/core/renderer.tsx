@@ -55,18 +55,33 @@ function renderAdElement(item: HTMLElement, id: string, renderOptions?: RenderOp
   return () => root.unmount();
 }
 
-let CURRENT_INVESTIGATE_PROMISE: Promise<any> = Promise.resolve();
-let INVESTIGATE_TIMEOUT: number = 500;
+const DEFAULT_ANALYSIS_PRIORITY = 100;
+
+interface InvestigationChain {
+  promise: Promise<void>;
+  timeout: number;
+}
+
+const INVESTIGATION_CHAINS: Record<number, InvestigationChain> = {};
+
+function getInvestigationChain(priority: number): InvestigationChain {
+  if (!INVESTIGATION_CHAINS[priority]) {
+    INVESTIGATION_CHAINS[priority] = {promise: Promise.resolve(), timeout: 500};
+  }
+
+  return INVESTIGATION_CHAINS[priority];
+}
 
 interface RegisterAdsOptions {
   applyFocusMode?: boolean;
   isFromListing?: boolean;
   updateSeenTime?: boolean;
+  analysisPriority?: number;
   renderOptions?: RenderOptions;
 }
 
 export const renderer = {
-  registerAdItem(item: HTMLElement, id: string, renderOptions?: RenderOptions): () => void {
+  registerAdItem(item: HTMLElement, id: string, renderOptions?: RenderOptions, analysisPriority: number = DEFAULT_ANALYSIS_PRIORITY): () => void {
     const phone = WWStorage.getAdPhone(id);
 
     if (phone && WWStorage.isPhoneHidden(phone)) {
@@ -80,10 +95,13 @@ export const renderer = {
       || WWStorage.hasAdNoPhone(id)
       || adData.isStaleAnalyze(id)
     ) {
-      CURRENT_INVESTIGATE_PROMISE = CURRENT_INVESTIGATE_PROMISE
-        .then(() => adActions.investigateNumberAndSearch(item, id, false))
+      const chain = getInvestigationChain(analysisPriority);
+
+      chain.promise = chain.promise
+        .then(() => adActions.investigateNumberAndSearch(item, id, false, analysisPriority))
+        .catch((error) => console.error(`Failed to investigate ad ${id}:`, error))
         // Wait a bit to avoid triggering rate limits.
-        .then(() => new Promise(r => setTimeout(r, Math.min(2500, INVESTIGATE_TIMEOUT *= 1.3))));
+        .then(() => new Promise<void>(resolve => setTimeout(resolve, Math.min(2500, chain.timeout *= 1.3))));
     }
 
     if (phone) {
@@ -97,6 +115,7 @@ export const renderer = {
     applyFocusMode = false,
     isFromListing = false,
     updateSeenTime = false,
+    analysisPriority = DEFAULT_ANALYSIS_PRIORITY,
     renderOptions
   }: RegisterAdsOptions = {}): Array<() => void> {
     let itemsNodeList = context.querySelectorAll<HTMLElement>('[data-articleid]:not([data-ww-registered])');
@@ -153,7 +172,7 @@ export const renderer = {
         }
       }
 
-      return renderer.registerAdItem(item, articleId, renderOptions);
+      return renderer.registerAdItem(item, articleId, renderOptions, analysisPriority);
     });
   },
 

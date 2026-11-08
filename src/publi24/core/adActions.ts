@@ -13,8 +13,8 @@ import {textParser, type AdContentTuple} from "./textParser";
 
 export type {AdContentTuple} from "./textParser";
 
-async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
-  const page = await adData.loadInAdPage(item);
+async function investigateAdContent(item: Element, priority: number): Promise<AdContentTuple[]> {
+  const page = await adData.loadInAdPage(item, undefined, priority);
   const title: string = utils.removeDiacritics(adData.getPageTitle(page));
   const content: string = utils.removeDiacritics(adData.getPageTitle(page) + ' ' + adData.getPageDescription(page));
 
@@ -24,9 +24,9 @@ async function investigateAdContent(item: Element): Promise<AdContentTuple[]> {
 }
 
 
-async function acquirePhoneNumber(item: Element, id: string): Promise<string | false> {
+async function acquirePhoneNumber(item: Element, id: string, priority: number): Promise<string | false> {
   let phone: string | undefined;
-  let adPage: Document = await adData.loadInAdPage(item);
+  let adPage: Document = await adData.loadInAdPage(item, undefined, priority);
 
   if (IS_MOBILE_VIEW) {
     const phoneNumberMatch = adPage.body.innerHTML.match(/var cnt = ['"](\d+)['"]/);
@@ -250,14 +250,14 @@ export const adActions = {
     return currentSeen
   },
 
-  async investigateNumberAndSearch(item: HTMLElement, id: string, search: boolean = true): Promise<boolean> {
+  async investigateNumberAndSearch(item: HTMLElement, id: string, search: boolean = true, priority: number = 100): Promise<boolean> {
     let windowRef: Window | null = search ? window.open() : null;
     let phoneNumber: string | false, contentData: AdContentTuple[];
 
     try {
       [phoneNumber, contentData] = await Promise.all([
-        acquirePhoneNumber(item, id),
-        investigateAdContent(item)
+        acquirePhoneNumber(item, id, priority),
+        investigateAdContent(item, priority)
       ]);
 
       contentData

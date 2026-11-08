@@ -11,9 +11,14 @@ import {IS_MOBILE_VIEW} from "../../../../../common/globals";
 import {hostPermissions} from "../../../../core/hostPermissions";
 
 const PAGE_SIZE = 15;
+const MODAL_PRIORITY = 200;
 
 const registerAds = (context: HTMLElement, showDuplicates: boolean) => {
-  renderer.registerAdsInContext(context, {updateSeenTime: true, renderOptions: {showDuplicates}});
+  renderer.registerAdsInContext(context, {
+    updateSeenTime: true,
+    analysisPriority: MODAL_PRIORITY,
+    renderOptions: {showDuplicates},
+  });
 };
 
 type AdsModalRootProps = {
@@ -54,13 +59,13 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
 
       if (pendingInspectorAdsRef.current.length > 0) {
         const batch = pendingInspectorAdsRef.current.splice(0, PAGE_SIZE);
-        result = await adData.loadInInspectorAdsData(batch, phone, clean);
+        result = await adData.loadInInspectorAdsData(batch, phone, clean, MODAL_PRIORITY);
       } else {
         const batch = pendingUuidsRef.current.splice(0, PAGE_SIZE);
         if (batch.length === 0) {
           return;
         }
-        result = await adData.loadInAdsData(batch, clean);
+        result = await adData.loadInAdsData(batch, clean, MODAL_PRIORITY);
       }
 
       setListState((prev) => {
@@ -92,8 +97,8 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
         pendingUuidsRef.current = mergedSources.localOnlyAds.slice(firstLocalBatch.length);
 
         const [inspectorResult, localResult] = await Promise.all([
-          adData.loadInInspectorAdsData(firstInspectorBatch, phone, clean),
-          adData.loadInAdsData(firstLocalBatch, clean),
+          adData.loadInInspectorAdsData(firstInspectorBatch, phone, clean, MODAL_PRIORITY),
+          adData.loadInAdsData(firstLocalBatch, clean, MODAL_PRIORITY),
         ]);
         const localSectionBreak = inspectorResult.ads.length > 0 && localResult.ads.length > 0
           ? [inspectorResult.ads.length]
@@ -109,7 +114,7 @@ const AdsModalRoot: React.FC<AdsModalRootProps> = ({
 
         totalCountRef.current = localAds.length;
         const firstBatch = localAds.slice(0, PAGE_SIZE);
-        const {ads: items, errors} = await adData.loadInAdsData(firstBatch, clean);
+        const {ads: items, errors} = await adData.loadInAdsData(firstBatch, clean, MODAL_PRIORITY);
         setListState({ads: items, breaks: [], errors});
       }
     };

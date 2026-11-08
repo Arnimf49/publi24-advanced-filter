@@ -10,6 +10,7 @@ import {renderer} from '../../../core/renderer';
 import {IS_MOBILE_VIEW} from '../../../../common/globals';
 
 const PAGE_SIZE = 15;
+const MODAL_PRIORITY = 200;
 
 type PhoneSearchRootProps = {
   onClose: () => void;
@@ -18,7 +19,11 @@ type PhoneSearchRootProps = {
 const DEBOUNCE_DELAY = 1500;
 
 const registerAds = (context: HTMLElement, showDuplicates: boolean) => {
-  renderer.registerAdsInContext(context, {updateSeenTime: true, renderOptions: {showDuplicates}});
+  renderer.registerAdsInContext(context, {
+    updateSeenTime: true,
+    analysisPriority: MODAL_PRIORITY,
+    renderOptions: {showDuplicates},
+  });
 };
 
 const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
@@ -46,13 +51,13 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
 
       if (pendingInspectorAdsRef.current.length > 0) {
         const batch = pendingInspectorAdsRef.current.splice(0, PAGE_SIZE);
-        result = await adData.loadInInspectorAdsData(batch, searchedPhone!);
+        result = await adData.loadInInspectorAdsData(batch, searchedPhone!, undefined, MODAL_PRIORITY);
       } else {
         const batch = pendingUuidsRef.current.splice(0, PAGE_SIZE);
         if (batch.length === 0) {
           return;
         }
-        result = await adData.loadInAdsData(batch);
+        result = await adData.loadInAdsData(batch, undefined, MODAL_PRIORITY);
       }
 
       setListState((prev) => {
@@ -79,7 +84,8 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
       if (firstBatch.length > 0) {
         const {ads: items, errors} = await adData.loadInAdsData(
           firstBatch,
-          (uuid: string) => WWStorage.removePhoneAd(phoneToSearch, uuid)
+          (uuid: string) => WWStorage.removePhoneAd(phoneToSearch, uuid),
+          MODAL_PRIORITY,
         );
         setListState({ads: items, breaks: [], errors});
       } else {
@@ -104,7 +110,7 @@ const PhoneSearchModalRoot: React.FC<PhoneSearchRootProps> = ({ onClose }) => {
         totalCountRef.current = allInspectorAds.length;
         pendingInspectorAdsRef.current = allInspectorAds.slice(PAGE_SIZE);
         const firstBatch = allInspectorAds.slice(0, PAGE_SIZE);
-        const {ads: items, errors} = await adData.loadInInspectorAdsData(firstBatch, phoneToSearch);
+        const {ads: items, errors} = await adData.loadInInspectorAdsData(firstBatch, phoneToSearch, undefined, MODAL_PRIORITY);
         setListState({ads: items, breaks: [], errors});
 
         return;
