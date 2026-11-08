@@ -223,6 +223,21 @@
   }
 }
 
+.highlightSectorText {
+  color: #a06a00;
+  font-weight: bold;
+  :global(.dark) & {
+    color: #e6c35c;
+  }
+}
+
+.highlightSectorIcon {
+  fill: #a06a00 !important;
+  :global(.dark) & {
+    fill: #e6c35c !important;
+  }
+}
+
 .qrCode {
   float: right;
   img {

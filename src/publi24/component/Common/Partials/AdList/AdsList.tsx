@@ -22,9 +22,9 @@ const CalendarIcon = ({ isHighlighted }: { isHighlighted?: boolean }) => (
   </svg>
 );
 
-const LocationIcon = ({isHighlighted}: { isHighlighted?: boolean }) => (
+const LocationIcon = ({className}: {className?: string}) => (
   <svg
-    className={isHighlighted ? styles.highlightIcon : ''}
+    className={className}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 384 512"
   >
@@ -32,6 +32,22 @@ const LocationIcon = ({isHighlighted}: { isHighlighted?: boolean }) => (
       d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"></path>
   </svg>
 );
+
+const getLocationTextClassName = (item: AdData): string => {
+  if (item.isDifferentSector) {
+    return styles.highlightSectorText;
+  }
+
+  return item.isLocationDifferent ? styles.highlightText : '';
+};
+
+const getLocationIconClassName = (item: AdData): string => {
+  if (item.isDifferentSector) {
+    return styles.highlightSectorIcon;
+  }
+
+  return item.isLocationDifferent ? styles.highlightIcon : '';
+};
 
 
 const AdsList: React.FC<AdsListProps> = ({
@@ -122,10 +138,10 @@ const AdsList: React.FC<AdsListProps> = ({
                   <div className={`${styles.locationDateContainer} location-date-container`}>
                     <p className={`${styles.articleLocation} article-location`}>
                       <i className={`${styles.svgIconArticle} svg-icon svg-icon-article`}>
-                        <LocationIcon isHighlighted={item.isLocationDifferent} />
+                        <LocationIcon className={getLocationIconClassName(item)} />
                       </i>
                       &nbsp;
-                      <span className={item.isLocationDifferent ? styles.highlightText : ''}>
+                      <span className={getLocationTextClassName(item)}>
                         {item.location}
                       </span>
                     </p>

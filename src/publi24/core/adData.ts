@@ -22,6 +22,7 @@ export interface AdData {
   timestamp: number;
   isDateOld: boolean;
   isLocationDifferent: boolean;
+  isDifferentSector: boolean;
 }
 
 export interface AdLoadResult {
@@ -36,6 +37,41 @@ export interface FavoritesData {
 }
 
 const NOT_FOUND = Symbol('not_found');
+
+function normalizeLocationPart(value: string): string {
+  return value.replace(/\s+/g, ' ').trim();
+}
+
+function normalizeLocationForComparison(value: string): string {
+  // Faceted city filters use slugs like "sector-3", while ad pages render "Sector 3".
+  return normalizeLocationPart(value.replace(/-/g, ' ')).toLocaleLowerCase();
+}
+
+function isLocationPartInLocation(part: string, location: string): boolean {
+  return normalizeLocationForComparison(location).includes(normalizeLocationForComparison(part));
+}
+
+function getSectorNumber(value: string): number | null {
+  const match = normalizeLocationForComparison(value).match(/^sector(?:ul)?\s*(\d+)$/);
+  return match ? Number(match[1]) : null;
+}
+
+function getLocationSector(location: string): number | null {
+  for (const part of location.split(',')) {
+    const sector = getSectorNumber(part);
+    if (sector !== null) {
+      return sector;
+    }
+  }
+
+  return null;
+}
+
+function isBucharestLocation(location: string): boolean {
+  return location
+    .split(',')
+    .some((part) => normalizeLocationForComparison(part) === 'bucuresti');
+}
 
 function parsePubli24Date(input: string): Date | null {
   const dayFirstMatch = input.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?/);
@@ -203,7 +239,7 @@ export const adData = {
     return locationText
       .trim()
       .split(',')
-      .map((part: string) => part.replace(/[ \n]+/g, '').trim())
+      .map((part: string) => normalizeLocationPart(part))
       .filter(Boolean);
   },
 
@@ -290,15 +326,22 @@ export const adData = {
 
   async loadInAdsData(adUuids: AdUuid[], clean?: (failedId: string) => void): Promise<AdLoadResult> {
     let locationParts: string[] = [];
+    let isBucharestSelection = false;
+    let selectedBucharestSector: number | null = null;
     if (!IS_AD_PAGE()) {
       const countyInput = document.querySelector<HTMLInputElement>('[data-faceted="county_name"]');
       const locationInput = document.querySelector<HTMLInputElement>('[data-faceted="city_name"]');
+      const countyName = countyInput?.value ?? '';
+      const cityName = locationInput?.value || locationInput?.getAttribute('data-slug') || '';
 
-      if (countyInput?.value) {
-        locationParts.push(countyInput.value.toLocaleLowerCase());
+      isBucharestSelection = normalizeLocationForComparison(countyName) === 'bucuresti';
+      selectedBucharestSector = isBucharestSelection ? getSectorNumber(cityName) : null;
+
+      if (countyName) {
+        locationParts.push(countyName.toLocaleLowerCase());
       }
-      if (locationInput?.value) {
-        locationParts.push(locationInput.value.toLocaleLowerCase());
+      if (cityName) {
+        locationParts.push(cityName.toLocaleLowerCase());
       }
     }
 
@@ -328,6 +371,10 @@ export const adData = {
         const date = adData.getPageDate(itemPage);
         const dateDiffDays = dateLib.dayDiff(date);
         const pageLocationText = adData.getItemLocation(itemPage, true);
+        const pageSector = getLocationSector(pageLocationText);
+        // București ads stay "in location" when the current listing is București or any of its
+        // sectors; a different sector is still surfaced via isDifferentSector (yellow highlight).
+        const isSameBucharestLocation = isBucharestSelection && isBucharestLocation(pageLocationText);
 
         const phone = WWStorage.getAdPhone(id);
         let qrCode: string | null = null;
@@ -353,7 +400,13 @@ export const adData = {
           date: dateLib.diffDaysToDisplay(dateDiffDays, date),
           timestamp: date.getTime(),
           isDateOld: dateDiffDays >= 2,
-          isLocationDifferent: locationParts.length > 0 && pageLocationText ? locationParts.some(l => !pageLocationText!.toLocaleLowerCase().includes(l)) : false,
+          isLocationDifferent: locationParts.length > 0 && pageLocationText
+            ? !isSameBucharestLocation && locationParts.some(l => !isLocationPartInLocation(l, pageLocationText))
+            : false,
+          isDifferentSector: selectedBucharestSector !== null
+            && isBucharestLocation(pageLocationText)
+            && pageSector !== null
+            && pageSector !== selectedBucharestSector,
         };
       } catch (processingError) {
         console.error(`Failed processing ad data for ${id} after load:`, processingError);

@@ -47,6 +47,86 @@ test('Should group favorites based on location.', async ({ page, context }) => {
   expect(await secondHeader.innerText()).toEqual('În alte locații (1)');
 })
 
+test('Should group favorites based on location differently in Bucuresti.', async ({ page, context }, testInfo) => {
+  testInfo.setTimeout(90000);
+
+  await utilsPubli.open(context, page, {location: 'bucuresti/sector-3'});
+
+  const sourceAd = await utilsPubli.findFirstAdWithPhone(page);
+  const sourceAdId = await sourceAd.getAttribute('data-articleid');
+  const sourceAdUrl = await (await sourceAd.$('.article-title a'))?.getAttribute('href');
+  const phone = await (await sourceAd.$('[data-wwid="phone-number"]'))?.innerText() ?? '';
+  const sourceLocation = await (await sourceAd.$('.article-location'))?.innerText() ?? '';
+
+  expect(sourceAdId).toBeTruthy();
+  expect(sourceAdUrl).toBeTruthy();
+  expect(phone).toMatch(/^\d+$/);
+
+  const expectedLocation = sourceLocation
+    .split(',')
+    .map((part) => part.replace(/\s+/g, ' ').trim())
+    .filter(Boolean)
+    .sort()
+    .join(', ');
+
+  expect(expectedLocation).toMatch(/^Bucuresti, Sector \d+$/);
+
+  const sourceSector = Number(expectedLocation.match(/Sector (\d+)/)![1]);
+  const otherSector = sourceSector === 1 ? 2 : 1;
+
+  const favToggle = await sourceAd.$('[data-wwid="fav-toggle"][data-wwstate="off"]');
+  expect(favToggle).toBeTruthy();
+  await favToggle!.click();
+
+  await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite 1');
+
+  // Make sure the favorite resolves to the exact ad we inspected, not to a newer duplicate.
+  await page.evaluate(({phone, adId, adUrl}) => {
+    const key = `ww2:phone:${phone}`;
+    const data = JSON.parse(window.localStorage.getItem(key) || '{}');
+    data.ads = [`${adId}|${adUrl}`];
+    window.localStorage.setItem(key, JSON.stringify(data));
+  }, {phone, adId: sourceAdId!, adUrl: sourceAdUrl!});
+
+  const cases = [
+    {name: 'Bucuresti county', location: 'bucuresti/', highlighted: false},
+    {name: 'same sector', location: `bucuresti/sector-${sourceSector}`, highlighted: false},
+    {name: 'different sector', location: `bucuresti/sector-${otherSector}`, highlighted: true},
+  ];
+
+  for (const testCase of cases) {
+    await test.step(testCase.name, async () => {
+      await utilsPubli.open(context, page, {location: testCase.location});
+
+      await page.locator('[data-wwid="favs-button"]').click();
+      await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
+
+      const favoriteAd = page.locator('[data-wwid="favorites-modal"] [data-articleid]');
+      await expect(favoriteAd).toHaveCount(1);
+      await expect(page.locator('[data-wwid="favorites-modal"] [data-wwid="in-location"] [data-articleid]')).toHaveCount(1);
+      await expect(page.locator('[data-wwid="favorites-modal"] [data-wwid="not-in-location"]')).toHaveCount(0);
+
+      const locationText = favoriteAd.locator('.article-location span');
+      const locationIcon = favoriteAd.locator('.article-location svg');
+
+      await expect(locationText).toHaveText(expectedLocation);
+      await expect(locationText).not.toContainText(`Sector${sourceSector}`);
+
+      if (testCase.highlighted) {
+        await expect(locationText).toHaveClass(/highlightSectorText/);
+        await expect(locationText).not.toHaveClass(/highlightText/);
+        await expect(locationIcon).toHaveClass(/highlightSectorIcon/);
+      } else {
+        await expect(locationText).not.toHaveClass(/highlight(?:Sector)?Text/);
+        await expect(locationIcon).not.toHaveClass(/highlight(?:Sector)?Icon/);
+      }
+
+      await page.locator('[data-wwid="favorites-modal"] [data-wwid="close"]').click();
+      await expect(page.locator('[data-wwid="favorites-modal"]')).not.toBeVisible();
+    });
+  }
+})
+
 test('Should show favorites with no loading ads.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
   await page.evaluate(() => {
