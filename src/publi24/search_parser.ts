@@ -21,6 +21,7 @@ function buildGotoResultName(anchor: HTMLAnchorElement): string {
   const resultTitle = anchor.querySelector<HTMLElement>('[role="heading"]')?.textContent?.trim()
     ?? anchor.querySelector<HTMLElement>('h3')?.textContent?.trim()
     ?? '';
+  const fullText = (anchor.textContent ?? '').replace(/\s+/g, ' ').trim();
   const domainMatch = urlText.match(/https?:\/\/([^\s/]+)/);
 
   if (domainMatch) {
@@ -29,7 +30,15 @@ function buildGotoResultName(anchor: HTMLAnchorElement): string {
     return titleText ? `${domain} | ${titleText}` : domain;
   }
 
-  const fullText = (anchor.textContent ?? '').replace(/\s+/g, ' ').trim();
+  // Some Google cards (e.g. Facebook) show a site label and engagement
+  // metadata instead of a URL. Fall back to the label before the breadcrumb
+  // separator so the result still has a source.
+  const label = fullText.split('·')[0].trim();
+
+  if (label && label.length <= 40) {
+    return resultTitle ? `${label} | ${resultTitle}` : label;
+  }
+
   return resultTitle.split(/\s+/)[0] || fullText.split(/\s+/)[0] || 'unknown';
 }
 
