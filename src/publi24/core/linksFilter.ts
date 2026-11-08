@@ -62,6 +62,8 @@ const BLACKLISTED_DOMAIN_SUFFIXES: string[] = [
   'escorte.lol',
   'haisalut.ro',
   'tel-search.net',
+  'telefon.4id.ro',
+  'portabilitate.ro',
 ];
 
 const BLACKLISTED_DOMAIN_PATTERNS: RegExp[] = [

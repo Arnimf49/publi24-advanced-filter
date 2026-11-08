@@ -157,7 +157,7 @@ function extractResultLinks(wwid: string) {
             WWBrowserStorage.set('ww:search_started_for', null);
           }
         } else {
-          currentUrl.searchParams.set('q', q + ' site:nimfomane.com');
+          currentUrl.searchParams.set('q', 'site:nimfomane.com ' + q);
           console.log("Redirecting to:", currentUrl.toString());
           if (isManual) {
             addContinueButton(() => {

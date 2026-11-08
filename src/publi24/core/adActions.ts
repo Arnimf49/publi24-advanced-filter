@@ -143,7 +143,8 @@ async function searchPhoneResults(id: string, phoneNumber: string, item: HTMLEle
 
     const urlMatch: RegExpMatchArray | null = adData.getItemUrl(item).match(/\/([^./]+)\.html/);
     const addUrlId: string = urlMatch ? urlMatch[1] : '';
-    const encodedSearch: string = encodeURIComponent(`"${phoneNumber}" OR "${addUrlId}"`);
+    const adIdSearchTerm: string = addUrlId ? `"${addUrlId}.html"` : '';
+    const encodedSearch: string = encodeURIComponent(adIdSearchTerm ? `"${phoneNumber}" OR ${adIdSearchTerm}` : `"${phoneNumber}"`);
     const searchUrl = `https://www.google.com/search?q=${encodedSearch}`;
 
     if (windowRef) {
