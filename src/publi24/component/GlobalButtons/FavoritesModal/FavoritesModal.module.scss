@@ -1,14 +1,47 @@
 .clearFavoritesButton {
   border: none;
-  color: black;
-  background: rgba(255, 255, 255, 0.6);
-  padding: 13px 6px;
-  border-radius: 3px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 6px;
   cursor: pointer;
-  line-height: normal;
+  font-size: 13px;
+  line-height: 1;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  &[data-wwconfirm="true"] {
+    background: rgba(255, 255, 255, 0.4);
+  }
 
   b {
     font-weight: bold;
+  }
+
+  :global(.onMobile) & {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  :global(.dark) & {
+    color: #f0dfe4;
+    background: #4a2a35;
+
+    &:hover {
+      background: #58323f;
+    }
+
+    &[data-wwconfirm="true"] {
+      background: #6a3d4e;
+      color: #fff;
+
+      &:hover {
+        background: #7b4759;
+      }
+    }
   }
 }
 
@@ -125,7 +158,7 @@
   }
 
   :global(.onMobile) & {
-    top: 71px;
+    top: 57px;
     margin-top: 5px;
 
     .count {

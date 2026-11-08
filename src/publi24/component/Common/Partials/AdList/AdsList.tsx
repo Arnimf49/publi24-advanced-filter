@@ -1,6 +1,10 @@
 import React, {useEffect, useRef} from 'react';
 import styles from './AdsList.module.scss';
 import type {AdData} from "../../../../core/adData";
+import {misc} from "../../../../core/misc";
+
+const NO_IMAGE_LIGHT = 'https://s3.publi24.ro/vertical-ro-f646bd5a/no_img.gif';
+const NO_IMAGE_DARK = 'https://s3.publi24.ro/vertical-ro-f646bd5a/no_img.png';
 
 type AdsListProps = {
   adsData: AdData[];
@@ -74,6 +78,8 @@ const AdsList: React.FC<AdsListProps> = ({
     return <p className={styles.emptyMessage}>{emptyText}</p>;
   }
 
+  const noImage = misc.getPubliTheme() === 'dark' ? NO_IMAGE_DARK : NO_IMAGE_LIGHT;
+
   return (
     <div ref={ref}>
       {adsData.map((item, index) => (
@@ -99,7 +105,7 @@ const AdsList: React.FC<AdsListProps> = ({
                 <div className={`${styles.artImg} art-img`}>
                   <a href={item.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
                     <img
-                      src={item.image || 'https://s3.publi24.ro/vertical-ro-f646bd5a/no_img.gif'}
+                      src={item.image || noImage}
                       alt={item.title || 'Article image'}
                       width="200"
                       height="200"

@@ -374,9 +374,10 @@
   min-width: 200px;
 
   :global(.onMobile) &, .mobileGlobalButtons & {
+    position: absolute;
     left: 0px;
     transform: none;
-    bottom: calc(10px + 34px + 3px + 3px);
+    bottom: calc(100% + 2px);
   }
 }
 
@@ -392,7 +393,7 @@
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 
   :global(.onMobile) &, .mobileGlobalButtons & {
-    left: 55px;
+    left: 56px;
     margin-left: 0;
   }
 }

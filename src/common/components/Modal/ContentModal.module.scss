@@ -20,6 +20,10 @@
     background: rgba(60, 60, 60, 0.95);
   }
 
+  :global(.onMobile) & {
+    padding: 8px 10px;
+  }
+
   @media screen and (min-width: 1000px) {
     padding-left: 0px;
     padding-right: 20px;
@@ -62,6 +66,22 @@
     background: rgb(47, 73, 121);
   }
 
+  :global(.onMobile) & {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 25px;
+    line-height: 32px;
+    padding: 4px 12px;
+    border-radius: 9px;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      transform: none;
+    }
+  }
+
   @media screen and (min-width: 1000px) {
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
@@ -82,6 +102,10 @@
   :global(.isMobile) & {
     gap: 10px;
   }
+
+  :global(.onMobile) & {
+    gap: 12px;
+  }
 }
 
 .closeButton {
@@ -95,6 +119,15 @@
 
   :global(.dark) & {
     background: #2f2f2f;
+  }
+
+  :global(.onMobile) & {
+    padding: 9px;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
   }
 
   svg {
@@ -148,6 +181,10 @@
   }
   :global(.nimfomane) & {
     background: rgb(47, 73, 121);
+  }
+
+  :global(.onMobile) & {
+    top: 56px;
   }
 }
 

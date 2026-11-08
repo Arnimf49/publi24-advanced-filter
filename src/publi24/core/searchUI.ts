@@ -13,7 +13,9 @@ export function addSearchLoader(text: string, isManual: boolean, progress?: numb
   const loader = document.createElement('div');
   document.body.appendChild(loader);
 
-  loader.style.background = 'rgb(59 63 71)';
+  loader.style.background = 'rgba(59, 63, 71, 0.8)';
+  loader.style.backdropFilter = 'blur(8px)';
+  loader.style.setProperty('-webkit-backdrop-filter', 'blur(8px)');
   loader.style.position = 'fixed';
   loader.style.top = `${60 + (topOffset || 0)}px`;
   loader.style.width = IS_MOBILE_VIEW ? 'calc(100% - 50px)' : '50%';
@@ -32,7 +34,7 @@ export function addSearchLoader(text: string, isManual: boolean, progress?: numb
   const percent = progress !== undefined ? progress : 100;
   progressBar.style.width = `${Math.max(0, Math.min(100, percent))}%`;
   progressBar.style.height = '100%';
-  progressBar.style.background = 'rgb(97 147 59)';
+  progressBar.style.background = 'rgba(97, 147, 59, 0.85)';
   progressBar.style.borderRadius = '4px';
   progressBar.style.transition = 'width 0.2s ease-in-out';
 
@@ -55,10 +57,12 @@ export function addSearchLoader(text: string, isManual: boolean, progress?: numb
   document.body.appendChild(manualText);
 
   manualText.innerHTML = `control ${isManual ? 'manual' : 'automat'} (vezi setări)`;
-  manualText.style.background = 'rgb(40 41 43)';
+  manualText.style.background = 'rgba(40, 41, 43, 0.8)';
+  manualText.style.backdropFilter = 'blur(8px)';
+  manualText.style.setProperty('-webkit-backdrop-filter', 'blur(8px)');
   manualText.style.color = 'rgb(106 110 117)';
   manualText.style.position = 'fixed';
-  manualText.style.top = `${91 + (topOffset || 0)}px`;
+  manualText.style.top = `${90 + (topOffset || 0)}px`;
   manualText.style.left = '50%';
   manualText.style.transform = 'translateX(-50%)';
   manualText.style.padding = '6px 12px';
@@ -76,8 +80,15 @@ export function addContinueButton(onContinue: () => void): void {
   button.setAttribute('data-ww-search-continue', 'true');
   document.body.appendChild(button);
 
-  button.innerHTML = 'Continuă';
-  button.style.background = 'rgb(97 147 59)';
+  const buttonText = document.createElement('span');
+  buttonText.textContent = 'Continuă';
+  buttonText.style.color = 'white';
+  buttonText.style.mixBlendMode = 'overlay';
+  button.appendChild(buttonText);
+
+  button.style.background = 'rgba(97, 147, 59, 0.75)';
+  button.style.backdropFilter = 'blur(8px)';
+  button.style.setProperty('-webkit-backdrop-filter', 'blur(8px)');
   button.style.position = 'fixed';
   button.style.padding = '12px 24px';
   button.style.borderRadius = '4px';

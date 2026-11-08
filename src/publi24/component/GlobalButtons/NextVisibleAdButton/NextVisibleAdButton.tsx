@@ -52,7 +52,14 @@ const NextVisibleAdButton: React.FC = () => {
           trackColor="rgb(223 223 223 / 30%)"
         />
       )}
-      {noMore ? 'Final listă ✓' : 'Următorul >'}
+      {noMore ? 'Final listă ✓' : (
+        <>
+          Următorul
+          <svg className={styles.arrow} viewBox="0 0 24 14" aria-hidden="true">
+            <path d="M4 3L12 11L20 3"/>
+          </svg>
+        </>
+      )}
     </button>
   );
 };

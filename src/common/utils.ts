@@ -302,6 +302,7 @@ export const utils = {
 
     const stackLine = (error?.stack?.split('\n')[1] || '')
       .replace('at ', '')
+      .replace(/(?:chrome|moz)-extension:\/\/[^/]+/gi, 'ext:/')
       .trim();
     const baseMessage = error?.message || "Eroare necunoscută";
 

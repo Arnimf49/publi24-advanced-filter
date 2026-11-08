@@ -100,6 +100,77 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
 
   const LogoComponent = isDark ? P24faLogoDark : P24faLogoLight;
 
+  const menuDropdown = (
+    <div ref={menuRef} className={styles.menuDropdown}>
+      <div className={styles.menuArrow}/>
+      <div className={styles.menuHeader}>
+        <span className={styles.menuTitle}>Publi24 filtru avansat</span>
+        <span className={styles.menuVersion}>v{currentVersion}</span>
+      </div>
+      <button
+        type="button"
+        className={styles.menuItem}
+        data-wwid="tutorial-button"
+        onClick={(e) => {
+          onTutorialClick(e);
+          onMenuClose();
+        }}
+      >
+        <TutorialIcon fill="currentColor"/>
+        <span>Tutorial</span>
+      </button>
+      <button
+        type="button"
+        className={`${styles.menuItem} ${hasNewVersion ? styles.menuItemNewVersion : ''}`}
+        data-wwid="version-history-button"
+        data-wwanimating={hasNewVersion}
+        onClick={(e) => {
+          onVersionHistoryClick(e);
+          onMenuClose();
+        }}
+      >
+        <HistoryIcon fill="currentColor"/>
+        <span>Istoric verziuni</span>
+      </button>
+      <button
+        type="button"
+        className={styles.menuItem}
+        data-wwid="feedback-button"
+        onClick={(e) => {
+          onFeedbackClick(e);
+          onMenuClose();
+        }}
+      >
+        <FeedbackIcon fill="currentColor"/>
+        <span>Feedback</span>
+      </button>
+      <button
+        type="button"
+        className={styles.menuItem}
+        data-wwid="phone-search-button"
+        onClick={(e) => {
+          onSearchClick(e);
+          onMenuClose();
+        }}
+      >
+        <PhoneIcon fill='currentColor'/>
+        <span>Caută anunțuri</span>
+      </button>
+      <button
+        type="button"
+        className={styles.menuItem}
+        data-wwid="settings-button"
+        onClick={(e) => {
+          onSettingsClick(e);
+          onMenuClose();
+        }}
+      >
+        <SettingsIcon fill="currentColor"/>
+        <span>Setări</span>
+      </button>
+    </div>
+  );
+
   return (
     <div className={`${styles.globalButtonsContainer} ${isCollapsed ? styles.globalButtonsCollapsed : ''} ${isDemo ? styles.demoGlobalButtons : ''}`}>
       <div className={styles.logoWrapper}>
@@ -113,88 +184,23 @@ const GlobalButtons: React.FC<GlobalButtonsProps> =
         </button>
       </div>
 
-      <button
-        type="button"
-        className={`${styles.menuButton} ${hasNewVersion ? styles.menuButtonNewVersion: ''}`}
-        data-wwid="menu-button"
-        data-wwanimating={hasNewVersion}
-        title="Meniu"
-        onClick={onMenuClick}
-        aria-label="Menu"
-      >
-        <MenuIcon/>
-      </button>
+      <div className={styles.menuWrapper}>
+        <button
+          type="button"
+          className={`${styles.menuButton} ${hasNewVersion ? styles.menuButtonNewVersion: ''}`}
+          data-wwid="menu-button"
+          data-wwanimating={hasNewVersion}
+          title="Meniu"
+          onClick={onMenuClick}
+          aria-label="Menu"
+        >
+          <MenuIcon/>
+        </button>
 
-      {isMenuOpen && (
-        <div ref={menuRef} className={styles.menuDropdown}>
-          <div className={styles.menuArrow}/>
-          <div className={styles.menuHeader}>
-            <span className={styles.menuTitle}>Publi24 filtru avansat</span>
-            <span className={styles.menuVersion}>v{currentVersion}</span>
-          </div>
-          <button
-            type="button"
-            className={styles.menuItem}
-            data-wwid="tutorial-button"
-            onClick={(e) => {
-              onTutorialClick(e);
-              onMenuClose();
-            }}
-          >
-            <TutorialIcon fill="currentColor"/>
-            <span>Tutorial</span>
-          </button>
-          <button
-            type="button"
-            className={`${styles.menuItem} ${hasNewVersion ? styles.menuItemNewVersion : ''}`}
-            data-wwid="version-history-button"
-            data-wwanimating={hasNewVersion}
-            onClick={(e) => {
-              onVersionHistoryClick(e);
-              onMenuClose();
-            }}
-          >
-            <HistoryIcon fill="currentColor"/>
-            <span>Istoric verziuni</span>
-          </button>
-          <button
-            type="button"
-            className={styles.menuItem}
-            data-wwid="feedback-button"
-            onClick={(e) => {
-              onFeedbackClick(e);
-              onMenuClose();
-            }}
-          >
-            <FeedbackIcon fill="currentColor"/>
-            <span>Feedback</span>
-          </button>
-          <button
-            type="button"
-            className={styles.menuItem}
-            data-wwid="phone-search-button"
-            onClick={(e) => {
-              onSearchClick(e);
-              onMenuClose();
-            }}
-          >
-            <PhoneIcon fill='currentColor'/>
-            <span>Caută anunțuri</span>
-          </button>
-          <button
-            type="button"
-            className={styles.menuItem}
-            data-wwid="settings-button"
-            onClick={(e) => {
-              onSettingsClick(e);
-              onMenuClose();
-            }}
-          >
-            <SettingsIcon fill="currentColor"/>
-            <span>Setări</span>
-          </button>
-        </div>
-      )}
+        {isMenuOpen && !isMobile && menuDropdown}
+      </div>
+
+      {isMenuOpen && isMobile && menuDropdown}
 
       <div className={styles.logoButtonBg}/>
 

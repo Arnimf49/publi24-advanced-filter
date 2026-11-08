@@ -12,6 +12,10 @@
   :global(.dark) & {
     background: rgb(127 105 24);
   }
+
+  :global(.onMobile) & {
+    top: 56px;
+  }
 }
 
 .contentPadding {
