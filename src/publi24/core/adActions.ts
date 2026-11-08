@@ -115,16 +115,31 @@ function applyAutoHiding(phoneNumber: string, id: string, contentData: AdContent
   }
 
   if (matched.length) {
-    utils.debugLog('Auto-hiding ad', {matched, phoneNumber});
-    WWStorage.setAdVisibility(id, false);
-    WWStorage.setPhoneHidden(phoneNumber, true);
-    WWStorage.setPhoneHiddenReason(phoneNumber, 'automat: ' + matched.join(' / '));
-
+    const phoneCriteria = matchedCriteria.filter(props => props !== AUTO_HIDE_CRITERIA.onlyTrips);
     const expirableCriteria = matchedCriteria.find(props => props.expireDays);
-    if (expirableCriteria) {
-      const resetTimestamp = Date.now() + (expirableCriteria.expireDays * 24 * 60 * 60 * 1000);
-      WWStorage.setPhoneHideResetAt(phoneNumber, resetTimestamp);
-      utils.debugLog('Set hideResetAt', {phoneNumber, resetTimestamp, expireDays: expirableCriteria.expireDays});
+    const resetTimestamp = expirableCriteria
+      ? Date.now() + (expirableCriteria.expireDays * 24 * 60 * 60 * 1000)
+      : null;
+
+    utils.debugLog('Auto-hiding ad', {matched, phoneNumber, hidePhone: phoneCriteria.length > 0});
+    WWStorage.setAdVisibility(id, false);
+
+    if (phoneCriteria.length) {
+      // Some criteria affect the phone itself, so hide it for all of its ads.
+      WWStorage.setAdHiddenReason(id, null);
+      WWStorage.setAdHideResetAt(id, null);
+      WWStorage.setPhoneHidden(phoneNumber, true);
+      WWStorage.setPhoneHiddenReason(phoneNumber, 'automat: ' + matched.join(' / '));
+
+      if (resetTimestamp) {
+        WWStorage.setPhoneHideResetAt(phoneNumber, resetTimestamp);
+        utils.debugLog('Set hideResetAt', {phoneNumber, resetTimestamp, expireDays: expirableCriteria!.expireDays});
+      }
+    } else {
+      // Only-trips criteria hide just this ad and must never hide the phone.
+      WWStorage.setAdHiddenReason(id, 'automat: ' + matched.join(' / '));
+      WWStorage.setAdHideResetAt(id, resetTimestamp);
+      utils.debugLog('Set ad hideResetAt', {id, resetTimestamp, expireDays: expirableCriteria?.expireDays});
     }
   } else {
     utils.debugLog('No auto-hide criteria matched', {phoneNumber, availableData: contentData});
@@ -194,6 +209,26 @@ export const adActions = {
     }
 
     utils.debugLog('Hide not yet expired', {phone, timeLeft: hideResetAt - Date.now()});
+    return false;
+  },
+
+  resetExpiredAdHides(id: string): boolean {
+    const hideResetAt = WWStorage.getAdHideResetAt(id);
+    const hideReason = WWStorage.getAdHiddenReason(id);
+    utils.debugLog('Ad hide reset check', {id, hideResetAt, hideReason, now: Date.now()});
+
+    if (!hideResetAt) {
+      return false;
+    }
+
+    if (Date.now() >= hideResetAt) {
+      utils.debugLog('Resetting expired ad hide', {id, hideResetAt, hideReason});
+      WWStorage.setAdVisibility(id, true);
+      WWStorage.setAdHiddenReason(id, null);
+      WWStorage.setAdHideResetAt(id, null);
+      return true;
+    }
+
     return false;
   },
 

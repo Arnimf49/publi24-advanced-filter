@@ -85,6 +85,23 @@ test('Should automatically hide if only trips.', async ({ page, context }) => {
   await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'numai deplasări'});
 });
 
+test('Should hide only the ad for only trips and keep the phone visible.', async ({ page, context }) => {
+  await utilsPubli.open(context, page);
+
+  await setupHideSetting(page, 'onlyTrips');
+  let ad =  await utilsPubli.findAdWithDuplicates(page);
+  const adId = await ad.getAttribute('data-articleid');
+  ad =  await utilsPubli.mockAdContent(page, ad, 'Buna', 'Numai deplasari');
+  await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'numai deplasări'});
+
+  const phone = await utilsPubli.getPhoneByArticleId(page, adId!);
+  expect((await utilsPubli.getPhoneStorageData(page, phone)).hidden).not.toBe(1);
+
+  const duplicateId = (await utilsPubli.getDuplicateAdIds(page, ad))[0];
+  const duplicate = await page.$(`[data-articleid="${duplicateId}"]`);
+  await utilsPubli.assertAdHidden(duplicate!, {hidden: false});
+});
+
 test('Should automatically hide if show web.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 

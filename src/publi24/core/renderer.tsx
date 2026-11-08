@@ -73,6 +73,8 @@ export const renderer = {
       adActions.resetExpiredHides(phone, id);
     }
 
+    adActions.resetExpiredAdHides(id);
+
     if (
       !phone
       || WWStorage.hasAdNoPhone(id)

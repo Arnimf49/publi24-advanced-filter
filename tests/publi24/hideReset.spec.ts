@@ -18,6 +18,14 @@ const assertResetTimeIsSet = async (page: Page, phone: string, expectedDays: num
   expect(Math.abs(actualExpiry - expectedExpiry)).toBeLessThan(5000);
 }
 
+const assertAdResetTimeIsSet = async (page: Page, adId: string, expectedDays: number) => {
+  const adData = await utilsPubli.getAdStorageData(page, adId);
+  const hideResetAt = adData.hideResetAt;
+  const expectedExpiry = expectedDays * 24 * 60 * 60 * 1000;
+  const actualExpiry = hideResetAt - Date.now();
+  expect(Math.abs(actualExpiry - expectedExpiry)).toBeLessThan(5000);
+}
+
 test('Should reset manual hide after expiry.', async ({ page, context }) => {
   await utilsPubli.open(context, page);
 
@@ -50,14 +58,15 @@ test('Should reset auto-hide after expiry.', async ({ page, context }) => {
   await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'numai deplasări'});
 
   const phone = await utilsPubli.getPhoneByArticleId(page, adId);
-  await assertResetTimeIsSet(page, phone, 15);
+  expect((await utilsPubli.getPhoneStorageData(page, phone)).hidden).not.toBe(1);
+  await assertAdResetTimeIsSet(page, adId, 15);
 
   await page.locator('[data-wwid="menu-button"]').click();
   await page.locator('[data-wwid="settings-button"]').click();
   await page.locator('[data-wwid="auto-hiding"]').click();
   await page.locator('[data-wwid="close"]').click();
 
-  await utilsPubli.setPhoneStorageProp(page, phone, 'hideResetAt', Date.now() - 5000);
+  await utilsPubli.setAdStorageProp(page, adId, 'hideResetAt', Date.now() - 5000);
 
   await page.reload();
 
@@ -77,9 +86,10 @@ test('Should reset but reapply auto-hide after expiry when content still matches
   await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'numai deplasări'});
 
   const phone = await utilsPubli.getPhoneByArticleId(page, adId);
-  await assertResetTimeIsSet(page, phone, 15);
+  expect((await utilsPubli.getPhoneStorageData(page, phone)).hidden).not.toBe(1);
+  await assertAdResetTimeIsSet(page, adId, 15);
 
-  await utilsPubli.setPhoneStorageProp(page, phone, 'hideResetAt', Date.now() - 5000);
+  await utilsPubli.setAdStorageProp(page, adId, 'hideResetAt', Date.now() - 5000);
   await utilsPubli.forceAdNewAnalyze(page, adId);
 
   await Promise.all([
@@ -91,7 +101,7 @@ test('Should reset but reapply auto-hide after expiry when content still matches
 
   ad =  await utilsPubli.selectAd(page, adId);
   await utilsPubli.assertAdHidden(ad, {hidden: true, reason: 'numai deplasări'});
-  await assertResetTimeIsSet(page, phone, 15);
+  await assertAdResetTimeIsSet(page, adId, 15);
 });
 
 test('Should handle temporar hide with reset verification.', async ({ page, context }) => {

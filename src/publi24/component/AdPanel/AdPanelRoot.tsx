@@ -115,6 +115,11 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const isInTutorial = WWStorage.isAdTutorial(id);
   const visible = isInTutorial || adData.getItemVisibility(id);
   let hideReason = WWStorage.getPhoneHiddenReason(phone);
+  const adHideReason = WWStorage.getAdHiddenReason(id);
+
+  if (!hideReason && adHideReason) {
+    hideReason = adHideReason;
+  }
   const defaultHideReason = imageSearchDomains?.some(({links}) => links.some(({isSafe, isUnknown, isDead}) => !isSafe && !isUnknown && !isDead))
     ? 'poze false'
     : null;
@@ -302,6 +307,11 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
       WWStorage.setPhoneHidden(phoneNumber, !newVisible);
     }
 
+    if (newVisible) {
+      WWStorage.setAdHiddenReason(id, null);
+      WWStorage.setAdHideResetAt(id, null);
+    }
+
     adActions.setItemVisible(item, newVisible);
     WWStorage.setAdVisibility(id, newVisible);
     (e.target as HTMLButtonElement).disabled = false;
@@ -329,6 +339,8 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
 
   const onHideReasonCancel = useCallback(() => {
     WWStorage.setPhoneHidden(phone, false);
+    WWStorage.setAdHiddenReason(id, null);
+    WWStorage.setAdHideResetAt(id, null);
     WWStorage.setAdVisibility(id, true);
     setShowHideReason(false);
   }, [phone]);

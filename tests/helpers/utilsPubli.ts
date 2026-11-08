@@ -430,6 +430,14 @@ export const utilsPubli = {
     }, articleId);
   },
 
+  async setAdStorageProp(page: Page, articleId: string, key: string, value: any): Promise<void> {
+    await page.evaluate(({id, propKey, propValue}) => {
+      const item = JSON.parse(localStorage.getItem(`ww2:${id.toUpperCase()}`) || '{}');
+      item[propKey] = propValue;
+      localStorage.setItem(`ww2:${id.toUpperCase()}`, JSON.stringify(item));
+    }, {id: articleId, propKey: key, propValue: value});
+  },
+
   async getPhoneStorageData(page: Page, phone: string): Promise<any> {
     return await page.evaluate((phone) => {
       return JSON.parse(localStorage.getItem(`ww2:phone:${phone}`) || '{}');

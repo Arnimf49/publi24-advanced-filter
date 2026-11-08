@@ -205,6 +205,22 @@ export const WWStorage = {
     return value !== false && value !== 0;
   },
 
+  setAdHiddenReason(id: string, reason: string | null): void {
+    WWStorage.setAdProp(id, 'hideReason', reason);
+  },
+
+  getAdHiddenReason(id: string): string | undefined {
+    return WWStorage.getAdProp<string>(id, 'hideReason');
+  },
+
+  setAdHideResetAt(id: string, timestamp: number | null): void {
+    WWStorage.setAdProp(id, 'hideResetAt', timestamp);
+  },
+
+  getAdHideResetAt(id: string): number | undefined {
+    return WWStorage.getAdProp<number>(id, 'hideResetAt');
+  },
+
   setAdPhone(id: string, phone: string, firstSeenAt?: number): void {
     WWStorage.setAdProp(id, 'phone', phone);
     WWStorage.delAdProp(id, 'noPhone');
