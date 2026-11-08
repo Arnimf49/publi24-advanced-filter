@@ -109,7 +109,11 @@ function formatService(service: EscortServiceName, value: ServiceAvailability): 
   };
 }
 
-function formatRate(rate: number | string): string {
+function formatRate(rate: EscortRates[keyof EscortRates]): string {
+  if (rate === false) {
+    return 'nu';
+  }
+
   return typeof rate === 'string' ? rate : `${rate} lei`;
 }
 

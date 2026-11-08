@@ -120,6 +120,9 @@ const PersonalDetailsSection: React.FC<{details: PersonalDetails; escort: Escort
   </section>
 );
 
+const isUnavailableRateValue = (value: string): boolean =>
+  value === 'nu' || value.endsWith(': nu');
+
 const ServiceDetailsTable: React.FC<{details: ServiceDetails}> = ({details}) => {
   const rows = serviceDisplay.getRateRows(details);
   const schedules = details.schedule || [];
@@ -135,9 +138,11 @@ const ServiceDetailsTable: React.FC<{details: ServiceDetails}> = ({details}) => 
           <tr key={`rate-${row.key}`}>
             <th>{row.label}</th>
             <td>{row.values.map((value, index) => (
-              <React.Fragment key={value}>
+              <React.Fragment key={`${value}-${index}`}>
                 {index > 0 && ' · '}
-                {value}
+                <span className={isUnavailableRateValue(value) ? styles.notIncluded : undefined}>
+                  {value}
+                </span>
               </React.Fragment>
             ))}</td>
           </tr>

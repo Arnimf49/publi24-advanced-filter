@@ -1,7 +1,7 @@
 import React, {RefObject} from 'react';
 import styles from './EscortCard.module.scss';
 import type {EscortItem} from '../../../core/storage';
-import type {PersonalDetails, ServiceDetails} from '../../../core/escortInfoExtractor';
+import type {EscortRates, PersonalDetails, ServiceDetails} from '../../../core/escortInfoExtractor';
 import {InlineLoader} from '../../../../common/components/InlineLoader/InlineLoader';
 import {escortProfileImage} from '../../EscortProfileImage/EscortProfileImage';
 
@@ -53,10 +53,12 @@ export const EscortCard: React.FC<EscortCardProps> = ({
       ].filter((value): value is string => value !== null).join(', ')
     : null;
   const serviceRates = serviceDetails?.baseRates;
+  const formatServiceRate = (rate: EscortRates[keyof EscortRates], duration: string): string =>
+    rate === false ? `${duration} nu` : `${rate} ${duration}`;
   const serviceRatesValue = serviceRates && (serviceRates['30m'] !== undefined || serviceRates['1h'] !== undefined)
     ? [
-        serviceRates['30m'] !== undefined ? `${serviceRates['30m']} 30m` : null,
-        serviceRates['1h'] !== undefined ? `${serviceRates['1h']} 1h` : null,
+        serviceRates['30m'] !== undefined ? formatServiceRate(serviceRates['30m'], '30m') : null,
+        serviceRates['1h'] !== undefined ? formatServiceRate(serviceRates['1h'], '1h') : null,
       ].filter((value): value is string => value !== null).join(', ')
     : null;
 

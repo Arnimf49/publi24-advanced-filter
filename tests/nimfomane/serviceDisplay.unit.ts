@@ -135,3 +135,17 @@ test("preserves euro formatting for outcall rates", () => {
 test("does not create rate rows when no rate is available", () => {
   expect(serviceDisplay.getRateRows({baseRates: {}})).toEqual([]);
 });
+
+test("displays unavailable rates as nu for any rate field", () => {
+  expect(serviceDisplay.getRateRows({
+    baseRates: {"30m": false},
+    dominationRates: {"1h": false},
+    outcallRates: {"1.5h": false},
+    rateOverrides: [{after: "21:00", rates: {"2h": false}}],
+  })).toEqual([
+    {key: "30m", label: "30 minute", values: ["nu"]},
+    {key: "1h", label: "1 oră", values: ["dominare: nu"]},
+    {key: "1.5h", label: "1,5 ore", values: ["deplasare: nu"]},
+    {key: "2h", label: "2 ore", values: ["după 21:00: nu"]},
+  ]);
+});

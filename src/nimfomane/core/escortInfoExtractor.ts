@@ -4,11 +4,13 @@ export interface PersonalDetails {
   weight?: number;
 }
 
+export type EscortRate = number | string | false;
+
 export interface EscortRates {
-  '30m'?: number | string;
-  '1h'?: number | string;
-  '1.5h'?: number | string;
-  '2h'?: number | string;
+  '30m'?: EscortRate;
+  '1h'?: EscortRate;
+  '1.5h'?: EscortRate;
+  '2h'?: EscortRate;
 }
 
 export type ServiceAvailability = boolean | {extraCost: number};
@@ -90,7 +92,7 @@ const SMALL_CAPS = {
 
 const SERVICE_PATTERNS: Record<EscortServiceName, RegExp> = {
   op: /\b(?:op|bj|bj\s+p\s*\/\s*n|p\s*\/\s*n|oral\s*(?:sex\s+)?(?:protejat|prottejat|pro)|sex\s+oral\s*(?:protejat|prottejat|pro)|oral\s*\(\s*pro\b|sex\s+oral\s*\(\s*pro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:protejat|prottejat|pro)\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\bfunctie\s+de\s+igiena\b|\boral\s*(?:si\s+normal|cu\s+sau\s+fara)\b|(?<!cu\s)\bsex\s+oral\b(?!\s+(?:neprotejat|nepro|protejat|prottejat|pro))\b/g,
-  on: /\b(?:on|bj|bj\s+p\s*\/\s*n|p\s*\/\s*n|oral\s*(?:sex\s+)?(?:neprotejat|nepreotejat|nepro|nep)|sex\s+oral\s*(?:neprotejat|nepreotejat|nepro|nep)|oral\s*\(\s*pro\s*\/\s*nepro\b|oral\s*\(\s*nepro\b|sex\s+oral\s*\(\s*nepro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:neprotejat|nepreotejat|nepro|nep|fara\s+prezervativ)\b|\b(?:sex\s+oral|oral)\b[^\n.;]{0,35}\bfunctie\s+de\s+igiena\b|\boral\s*(?:si\s+normal|cu\s+sau\s+fara)\b|(?<!cu\s)\bsex\s+oral\b(?!\s+(?:neprotejat|nepro|protejat|pro))\b/g,
+  on: /\b(?:on|bj|bj\s+p\s*\/\s*n|p\s*\/\s*n|oral\s*(?:sex\s+)?(?:neprotejat|nepreotejat|nepro|nep)|sex\s+oral\s*(?:neprotejat|nepreotejat|nepro|nep)|oral\s*\(\s*pro\s*\/\s*nepro(?:doar)?\b|oral\s*\(\s*nepro\b|sex\s+oral\s*\(\s*nepro\b|oral\s+(?:p|n|np)\s*\/\s*(?:p|n|np))\b|\b(?:sex\s+)?oral\b[^\n.;]{0,35}\b(?:neprotejat|nepreotejat|nepro|nep|fara\s+prezervativ)\b|\b(?:sex\s+oral|oral)\b[^\n.;]{0,35}\bfunctie\s+de\s+igiena\b|\boral\s*(?:si\s+normal|cu\s+sau\s+fara)\b|(?<!cu\s)\bsex\s+oral\b(?!\s+(?:neprotejat|nepro|protejat|pro))\b/g,
   np: /\bnp\b|\b(?:sex(?:ul)?\s+)?normal(?:ul)?\b(?!\s+neprotejat)(?:\s*\(\s*(?:(?:obligatoriu|doar|strict)\s+)?(?:protejat|potejat)\w*\s*[!.,;]?\s*\)|\s+(?:(?:obligatoriu|doar|strict)\s+)?(?:protejat|potejat)\w*\b|\s+in\s+diferite\s+pozitii\b)|\bnormal\b[^\n.;]{0,30}\b(?:protejat|potejat)\w*\b|\bsex\s*\(\s*(?:(?:obligatoriu|doar|strict)\s+)?(?:protejat|potejat)\w*\s*\)|\bact(?:ul)?\s+sexual\s+(?:protejat|potejat)\w*\b|\bsex(?:ul)?\s+normal\b(?!\s+neprotejat)\b|\bsex\b[^\n.;]{0,30}\bdoar\s+protejat\w*\b/g,
   nn: /\b(?:sex\s+)?normal(?:ul)?\s+neprotejat\b|\bact(?:ul)?\s+sexual\s+neprotejat\b|\bsex(?:ul)?\s+neprotejat\b/g,
   showerSex: /\b(?:sex|partid[ăa])\s+(?:la|sub|in)\s+duș\b|\b(?:sex|partid[ăa])\s+(?:la|sub|in)\s+dus\b|\b(?:sex|partid[ăa])\s*\([^)]{0,60}\b(?:în|in)\s+(?:duș|dus)\b[^)]*\)|\bduș\s+(?:cu\s+sex|sex)\b|\bdus\s+(?:cu\s+sex|sex)\b|\bshower\s+together\b/g,
@@ -104,16 +106,16 @@ const SERVICE_PATTERNS: Record<EscortServiceName, RegExp> = {
   cim: /\bcim(?=\b|\d)|\bfin(?:aliz\w*)?\.?\s+orala\b|\bfinalizarea\s*[-:]\s*orala\b(?=[^.\n]{0,20}(?:\+|extra))|\bejacul\w*\s+orala\b|\b(?:orala|faciala)\s+(?:orala|faciala)\b|\b(?:orala|faciala)\s*(?:\/|,|sau)\s*orala\b/g,
   cof: /\bcof\b|\bfin(?:aliz\w*)?\s+faciala\b|\bejacul\w*\s+faciala\b|\b(?:orala|faciala)\s+(?:orala|faciala)\b|\b(?:orala|faciala)\s*(?:\/|,|sau)\s*faciala\b/g,
   cob: /\bcob\b|\bboob\s+job\b|\bfin\s+(?:pe\s+)?corp(?:orala)?\b|\b(?:fina|finaliz\w*)\s+(?:doar\s+)?corporala\b|\bfinaliz\w*\s+in\s+balon\w*\b|\b(?:orala|faciala)\s*(?:\/|,|sau)\s*corporala\b|\bfinaliz\w*\s+pe\s+(?:sani\w*|corp)\b|\bfinaliz\w*\s+sani\w*\s*\/\s*fund\b|\bating\w*\s+cu\s+sani\w*\b/g,
-  swallow: /\bswallow\b|\bthroatpie\b|\binghiț\w*\b|\binghit\w*\b|\binghiere\b/g,
+  swallow: /\bswallow(?:ing)?\b|\bthroatpie\b|\binghiț\w*\b|\binghit\w*\b|\binghiere\b/g,
   massage: /\bmasaj(?:e|ul)?\b|\bmassage\b/g,
   uro: /\buro(?=\d|\b)|\burin\w*\b/g,
   uroActive: /(?!x)x/g,
   uroPassive: /(?!x)x/g,
   squirt: /\bsquirt\w*\b/g,
-  rolePlay: /\brole\s*play\b|\bjoc\s+de\s+rol\b/g,
+  rolePlay: /\brole?\s*play\b|\bjoc\s+de\s+rol\b/g,
   ap: /\bap\b|\banal\s+protejat\w*\b/g,
   anal: /\banal\b/g,
-  hj: /\bhand\s*jo+b\b|\bjob\s+manual\b/g,
+  hj: /\bhand\s*jo+b\b|\bhand\s*hand\s*jo\b|\bjob\s+manual\b/g,
   '69': /(?<!\d['’])\b69\b|\b69(?=position\b)|\bpoziti(?:a|e|ile)?\s*69\b|6️⃣9️⃣/g,
   gfe: /\bgfe\b|\bgirlfriend\s+experience\b/g,
   prostateMassage: /\bmasaj\s+prostatic\b|\bprostat(?:a|ic)\b/g,
@@ -152,8 +154,62 @@ function isPriceAmount(amount: number): boolean {
   return amount % 10 === 0;
 }
 
-function numericRateAmount(rate: number | string): number {
-  return typeof rate === 'number' ? rate : Number.parseInt(rate, 10);
+function numericRateAmount(rate: EscortRate): number {
+  if (typeof rate === 'number') {
+    return rate;
+  }
+
+  return rate === false ? 0 : Number.parseInt(rate, 10);
+}
+
+const RATE_DURATION_KEYS = ['30m', '1h', '1.5h', '2h'] as const;
+
+function rateDurationFromText(text: string): keyof EscortRates | undefined {
+  const candidates: Array<{duration: keyof EscortRates; pattern: RegExp}> = [
+    {duration: '2h', pattern: /\b(?:120\s*(?:de\s*)?(?:min(?:ute)?s?|min)|2\s*(?:h|hr|ore|ora)|doua\s+ore)\b/gi},
+    {duration: '1.5h', pattern: /\b(?:90\s*(?:de\s*)?(?:min(?:ute)?s?|min)|1[.,]5\s*(?:h|hr|ore|ora)|o\s+ora\s+si\s+(?:30\s*(?:de\s*)?(?:min(?:ute)?s?|min)|jumatate(?:\s+de\s+ora)?))\b/gi},
+    {duration: '1h', pattern: /\b(?:60\s*(?:de\s*)?(?:min(?:ute)?s?|min)|1\s*(?:h|hr|ore|ora)|o\s+ora)\b/gi},
+    {duration: '30m', pattern: /\b(?:30\s*(?:de\s*)?(?:min(?:ute)?s?|min)|jumatate\s+(?:de\s+)?(?:ora|h))\b/gi},
+  ];
+  let best: {duration: keyof EscortRates; index: number; priority: number} | undefined;
+
+  for (const [priority, candidate] of candidates.entries()) {
+    const match = new RegExp(candidate.pattern.source, 'i').exec(text);
+    if (!match) {
+      continue;
+    }
+
+    const index = match.index ?? 0;
+    if (!best || index < best.index || (index === best.index && priority < best.priority)) {
+      best = {duration: candidate.duration, index, priority};
+    }
+  }
+
+  return best?.duration;
+}
+
+function extractUnavailableBaseRates(text: string): Array<keyof EscortRates> {
+  const unavailable = new Set<keyof EscortRates>();
+  const refusalPattern = /\b(?:nu\s+(?:mai\s+)?(?:fac|ofer|accept|prestez|lucrez)|fara)\s+(?:sedinte?\s+(?:de\s+)?|varianta\s+(?:de\s+)?|durata\s+(?:de\s+)?)?((?:30|60|90|120)\s*(?:de\s*)?(?:min(?:ute)?s?|min|h|hr|ore|ora)|(?:1|2)\s*(?:h|hr|ore|ora)|1[.,]5\s*(?:h|hr|ore|ora)|o\s+ora(?:\s+si\s+(?:30\s*(?:de\s*)?(?:min(?:ute)?s?|min)|jumatate(?:\s+de\s+ora)?))?|doua\s+ore|jumatate\s+(?:de\s+)?(?:ora|h))\b/gi;
+  for (const match of text.matchAll(refusalPattern)) {
+    const duration = rateDurationFromText(match[1]);
+    if (duration) {
+      unavailable.add(duration);
+    }
+  }
+
+  const minimumDurationMatch = /\bdurata\s+minim\w*\b([^\n.!?,]{0,50})/i.exec(text);
+  if (minimumDurationMatch) {
+    const minimumDuration = rateDurationFromText(minimumDurationMatch[1]);
+    if (minimumDuration) {
+      const minimumIndex = RATE_DURATION_KEYS.indexOf(minimumDuration);
+      for (const duration of RATE_DURATION_KEYS.slice(0, minimumIndex)) {
+        unavailable.add(duration);
+      }
+    }
+  }
+
+  return [...unavailable];
 }
 
 function normalizeText(text: string): string {
@@ -694,7 +750,7 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
     }
   }
   if (service === 'op'
-    && /\b(?:oral|sex\s+oral)\s+neprotejat\b[^.!?]{0,100}\bfunctie\s+de\s+igiena\b[^.!?]{0,100}?(\d{2,4})\s*(?:lei|ron)?\s+extra\b/i.test(text)) {
+    && /\b(?:oral|sex\s+oral)\s+neprotejat\b[^.!?]{0,100}\bfunctie\s+de\s+igiena\b(?:(?!\b(?:cim|cof|cob|finaliz\w*)\b)[^.!?]){0,100}?(\d{2,4})\s*(?:lei|ron)?\s+extra\b/i.test(text)) {
     return undefined;
   }
   if (service === 'massage'
@@ -749,6 +805,10 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
     return undefined;
   }
   if (service === 'ap') {
+    const labeledAnalPExtra = /\banal\s+p\b[^\n]{0,20}?\+\s*(\d{2,4})\b/i.exec(text);
+    if (labeledAnalPExtra && isPriceAmount(Number.parseInt(labeledAnalPExtra[1], 10))) {
+      return Number.parseInt(labeledAnalPExtra[1], 10);
+    }
     const analListedPrice = /(?:^|\n)[^A-Za-z\n]{0,20}anal\b(?!\s+plug\b)[^\n]*?(?:[-–—]\s*>\s*|:\s*)(\d{2,4})\b/i.exec(text);
     if (analListedPrice && isPriceAmount(Number.parseInt(analListedPrice[1], 10))) {
       return Number.parseInt(analListedPrice[1], 10);
@@ -1133,7 +1193,7 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
     if (prefixedOralUnprotectedPrice && isPriceAmount(Number.parseInt(prefixedOralUnprotectedPrice[1], 10))) {
       return Number.parseInt(prefixedOralUnprotectedPrice[1], 10);
     }
-    const oralUnprotectedExtra = /\b(?:oral|sex\s+oral)\s+neprotejat\b[^.!?]{0,100}\bfunctie\s+de\s+igiena\b[^.!?]{0,100}?(\d{2,4})\s*(?:lei|ron)?\s+extra\b/i.exec(text);
+    const oralUnprotectedExtra = /\b(?:oral|sex\s+oral)\s+neprotejat\b[^.!?]{0,100}\bfunctie\s+de\s+igiena\b(?:(?!\b(?:cim|cof|cob|finaliz\w*)\b)[^.!?]){0,100}?(\d{2,4})\s*(?:lei|ron)?\s+extra\b/i.exec(text);
     if (oralUnprotectedExtra && !/\bstrap[-\s]?on\b/i.test(oralUnprotectedExtra[0])) {
       return Number.parseInt(oralUnprotectedExtra[1], 10);
     }
@@ -1276,9 +1336,13 @@ function extraCostNearOccurrence(text: string, service: EscortServiceName, start
     }
   }
   if (service === 'swallow') {
-    const swallowExtra = /\bswallow\b[^\n]{0,40}\bextra\b[^\n]{0,15}\b(\d{2,4})\b|\binghi(?:ț\w*|t\w*|ere)\b[^\n]{0,40}\bextra\b[^\n]{0,15}\b(\d{2,4})\b/i.exec(nearby);
+    const swallowExtra = /\bswallow(?:ing)?\b[^\n]{0,40}\bextra\b[^\n]{0,15}\b(\d{2,4})\b|\binghi(?:ț\w*|t\w*|ere)\b[^\n]{0,40}\bextra\b[^\n]{0,15}\b(\d{2,4})\b/i.exec(nearby);
     if (swallowExtra) {
       return Number.parseInt(swallowExtra[1] || swallowExtra[2], 10);
+    }
+    const labeledSwallowExtra = /\bswallow(?:ing)?\b[^\n]{0,20}?\+\s*(\d{2,4})\b/i.exec(nearby);
+    if (labeledSwallowExtra && isPriceAmount(Number.parseInt(labeledSwallowExtra[1], 10))) {
+      return Number.parseInt(labeledSwallowExtra[1], 10);
     }
   }
   if (service === 'ap') {
@@ -3902,6 +3966,13 @@ function extractRates(text: string): {baseRates: EscortRates; outcallRates: Esco
       }
     }
   }
+  const primaryFinalizationPackageRates = /\b(\d{2,5})\s*(?:lei|ron)\s*(?:fin|finaliz\w*)\s*(?:on|op)\s*(?:\/\s*)?(?:p|np)[\s\S]{0,60}?(?:sau|si)\s*(\d{2,5})\s*(?:lei|ron)?\s*(?:ora|h)\b/i.exec(rateText);
+  if (primaryFinalizationPackageRates
+    && isPriceAmount(Number.parseInt(primaryFinalizationPackageRates[1], 10))
+    && isPriceAmount(Number.parseInt(primaryFinalizationPackageRates[2], 10))) {
+    baseRates['30m'] = Number.parseInt(primaryFinalizationPackageRates[1], 10);
+    baseRates['1h'] = Number.parseInt(primaryFinalizationPackageRates[2], 10);
+  }
   return {baseRates, outcallRates, dominationRates};
 }
 
@@ -4067,8 +4138,8 @@ function extractRateOverrides(text: string, baseRates: EscortRates): RateOverrid
 
 const DAY_NAME_PATTERN = '(?:luni|marti|miercuri|joi|vineri|sambata|duminica)';
 const DAY_ABBREVIATION_PATTERN = '(?:l|s|d)';
-const DAY_RANGE_ABBREVIATION_PATTERN = '(?:l\\s*-\\s*j|v\\s*-\\s*d)';
-const DAY_EXPRESSION_PATTERN = new RegExp(`\\b(?:week(?:\\s|-)?end|${DAY_NAME_PATTERN}(?:\\s*(?:-|–|—|\\/|➡️|pana(?:\\s+la)?|si\\s+pana(?:\\s+la)?)\\s*${DAY_NAME_PATTERN})?|${DAY_RANGE_ABBREVIATION_PATTERN}|${DAY_ABBREVIATION_PATTERN}(?:\\s*-\\s*${DAY_ABBREVIATION_PATTERN})?)\\b`, 'gi');
+const DAY_RANGE_ABBREVIATION_PATTERN = '(?:l\\s*-\\s*j|l\\s*-\\s*v|v\\s*-\\s*d)';
+const DAY_EXPRESSION_PATTERN = new RegExp(`\\b(?:week(?:\\s|-)?end|timpul\\s+saptamanii|${DAY_NAME_PATTERN}(?:\\s*(?:-|–|—|\\/|➡️|pana(?:\\s+la)?|si\\s+pana(?:\\s+la)?)\\s*${DAY_NAME_PATTERN})?|${DAY_RANGE_ABBREVIATION_PATTERN}|${DAY_ABBREVIATION_PATTERN}(?:\\s*-\\s*${DAY_ABBREVIATION_PATTERN})?)\\b`, 'gi');
 const SCHEDULE_TIME_RANGE_PATTERN = /\b([01]?\d|2[0-3]|24)(?:[:.]([0-5]\d))?\s*(?:h|ore?)?\s*(?:-|[–—/]|_+|\bsi\b)\s*([01]?\d|2[0-3]|24)(?:[:.]([0-5]\d))?\s*(?:h|ore?)?\b/gi;
 
 function containsScheduleTimeRange(text: string): boolean {
@@ -4089,6 +4160,9 @@ function normalizeScheduleDays(expression: string): string {
     d: 'duminica',
   };
   const compact = normalized.replace(/\s/g, '');
+  if (/^(?:in)?timpulsaptamanii$/.test(compact)) {
+    return 'luni-vineri';
+  }
   if (/^week-?end$/.test(compact)) {
     return 'sambata-duminica';
   }
@@ -4210,6 +4284,10 @@ function findHardPackageHeading(text: string): RegExpExecArray | null {
 function addRateSurcharge(rates: EscortRates, surcharge: number): EscortRates {
   return Object.fromEntries(
     Object.entries(rates).map(([duration, rate]) => {
+      if (rate === false) {
+        return [duration, false];
+      }
+
       const numericRate = numericRateAmount(rate!);
       return [duration, typeof rate === 'string' ? `${numericRate + surcharge}€` : numericRate + surcharge];
     }),
@@ -4228,6 +4306,9 @@ function extractAnalRateOverride(text: string): RateOverride | undefined {
       : undefined;
   }
   if (!analRate) {
+    return undefined;
+  }
+  if (/\b(?:submis\w*|np\s*\/\s*ap|ap\s*\/\s*np)\b/i.test(analRate[0])) {
     return undefined;
   }
 
@@ -4416,6 +4497,15 @@ function extractSchedule(text: string): EscortSchedule[] {
       schedules.push({
         start: `${approximateOvernightSchedule[1].padStart(2, '0')}:${approximateOvernightSchedule[2] || '00'}`,
         end: `${approximateOvernightSchedule[7].padStart(2, '0')}:${approximateOvernightSchedule[8] || '00'}`,
+      });
+      continue;
+    }
+
+    const alternativeStartSchedule = /\b([01]?\d|2[0-3])(?::([0-5]\d))?\s*\/\s*([01]?\d|2[0-3])(?::([0-5]\d))?\s*[-–—]\s*([01]?\d|2[0-3])(?::([0-5]\d))?\b(?!\s*\/\s*(?:[01]?\d|2[0-3]))/i.exec(line);
+    if (alternativeStartSchedule) {
+      schedules.push({
+        start: `${alternativeStartSchedule[1].padStart(2, '0')}:${alternativeStartSchedule[2] || '00'}`,
+        end: `${alternativeStartSchedule[5].padStart(2, '0')}:${alternativeStartSchedule[6] || '00'}`,
       });
       continue;
     }
@@ -5258,7 +5348,7 @@ export const escortInfoExtractor = {
         const prefixedAnalExtra = /\b(\d{2,4})\s*(?:lei|ron)\s+anal\s*[-–:]/i.exec(normalizedText);
         const explicitAnalPackageExtra = /\banal\s+p\b[^\n]{0,20}\+\s*(\d{2,4})\b/i.exec(normalizedText);
         const labeledPlusAnalExtra = /\bextra(?:uri)?\s*:\s*\+\s*(\d{2,4})\s+anal\b/i.exec(normalizedText);
-        const analExtra = /\banal\b(?!\s+plug\b)[^\n]{0,80}[-–:+]\s*(\d{2,4})\b/i.exec(normalizedText);
+        const analExtra = /\banal\b(?!\s+plug\b)[^\n]{0,80}?[-–:+]\s*(\d{2,4})\b/i.exec(normalizedText);
         const parenthesizedLabeledAnalExtra = /\banal\b[^\n]{0,180}\(\s*\+\s*(\d{2,4})\s*(?:lei|ron)?\s+extra\b/i.exec(normalizedText);
         const parenthesizedAnalExtra = /\banal\b(?!\s+plug\b)[^\n]{0,180}\(\s*(\d{2,4})\s*\)/i.exec(normalizedText);
         const analFinalizationExtra = /\banal\b(?!\s+plug\b)[^\n]{0,100}\(\s*finaliz\w*\)\s*(\d{2,4})\s*(?:lei|ron)\b/i.exec(normalizedText);
@@ -5322,7 +5412,7 @@ export const escortInfoExtractor = {
       if (protectedAnalSurcharge && services.ap !== false) {
         services.ap = {extraCost: Number.parseInt(protectedAnalSurcharge[1], 10)};
       }
-      const explicitAnalPExtra = /\banal\s+p\s*:\s*\+\s*(\d{2,4})\s*(?:lei|ron)?\b/i.exec(normalizedText);
+      const explicitAnalPExtra = /\banal\s+p\s*:?\s*\+\s*(\d{2,4})\s*(?:lei|ron)?\b/i.exec(normalizedText);
       if (explicitAnalPExtra && services.ap !== false) {
         services.ap = {extraCost: Number.parseInt(explicitAnalPExtra[1], 10)};
       }
@@ -5463,6 +5553,10 @@ export const escortInfoExtractor = {
     if (!Object.keys(rates.baseRates).length && !Object.keys(rates.outcallRates).length
       && !rateOverrides.length && !isDiscountOnlySchedule) {
       return null;
+    }
+
+    for (const duration of extractUnavailableBaseRates(normalizedText)) {
+      rates.baseRates[duration] = false;
     }
 
     if (typeof services.op === 'object'

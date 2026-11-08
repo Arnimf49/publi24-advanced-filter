@@ -5701,6 +5701,74 @@ const samples: Array<{file: string; expected: ServiceDetails}> = [
       },
     },
   },
+  {
+    file: "sample792.txt",
+    expected: {
+      baseRates: {'30m': 300, '1h': 500},
+      outcallRates: {'1h': 1000},
+      schedule: [{start: "09:30", end: "22:00"}],
+      services: {
+        '69': true, ap: false, cim: false, cob: true, cof: false, couples: true,
+        cuni: true, deepthroat: true, fingering: false, fk: {extraCost: 50},
+        footfetish: {extraCost: 50}, gfe: true, hj: true, massage: true, np: true,
+        on: true, op: true, pse: false, shower: {extraCost: 50}, showerSex: true,
+      },
+    },
+  },
+  {
+    file: "sample793.txt",
+    expected: {
+      baseRates: {'30m': 200, '1h': 400, '1.5h': 550},
+      schedule: [{days: "luni-duminica", start: "11:00", end: "21:00"}],
+      services: {
+        '69': true, np: true, op: true, on: true, facesitting: true, cob: true,
+        cim: {extraCost: 100},
+      },
+    },
+  },
+  {
+    file: "sample794.txt",
+    expected: {
+      baseRates: {'30m': 250, '1h': 450},
+      services: {
+        op: true, on: {extraCost: 50}, np: true, tj: true, deepthroat: true,
+        facesitting: true, cim: {extraCost: 100}, cob: true, massage: true,
+        uro: {extraCost: 100}, hj: true, cuni: true, ani: true,
+        footfetish: true, ap: false,
+      },
+    },
+  },
+  {
+    file: "sample795.txt",
+    expected: {
+      baseRates: {'30m': false, '1h': 500},
+      schedule: [
+        {days: "luni-vineri", start: "12:00", end: "22:00"},
+        {days: "sambata-duminica", start: "15:00", end: "00:00"},
+      ],
+      services: {
+        op: true, on: true, np: true, deepthroat: true, fk: true,
+        cim: {extraCost: 50}, cof: true, cob: true, massage: true, hj: true,
+        footfetish: true,
+      },
+    },
+  },
+  {
+    file: "sample796.txt",
+    expected: {
+      baseRates: {'30m': 300, '1h': 500},
+      schedule: [{days: "luni-vineri", start: "09:00", end: "18:00"}],
+      services: {
+        '69': true, op: true, on: true, np: true, deepthroat: true,
+        facesitting: true, facefuck: true, fk: true, cim: true,
+        cof: {extraCost: 50}, cob: true, swallow: {extraCost: 150},
+        massage: true, rolePlay: {extraCost: 50}, ap: {extraCost: 100},
+        hj: true, gfe: true, prostateMassage: {extraCost: 50}, pse: true,
+        cuni: true, ani: {extraCost: 100}, footfetish: true,
+        uroActive: {extraCost: 100},
+      },
+    },
+  },
 ];
 
 for (const sample of samples) {
