@@ -36,6 +36,97 @@ export const utils = {
     return new Promise(resolve => setTimeout(resolve, ms));
   },
 
+  copyToClipboard(text: string, html?: string): Promise<boolean> {
+    const fallbackCopyPlainText = (): boolean => {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      try {
+        return document.execCommand('copy');
+      } catch (error) {
+        console.error('Failed to copy to clipboard:', error);
+        return false;
+      } finally {
+        document.body.removeChild(textarea);
+      }
+    };
+
+    const fallbackCopyRichText = (): boolean => {
+      const container = document.createElement('div');
+      container.contentEditable = 'true';
+      container.innerHTML = html!;
+      container.style.position = 'fixed';
+      container.style.left = '-9999px';
+      container.style.top = '0';
+      document.body.appendChild(container);
+
+      const selection = window.getSelection();
+      const previousRanges: Range[] = [];
+
+      if (selection) {
+        for (let i = 0; i < selection.rangeCount; i++) {
+          previousRanges.push(selection.getRangeAt(i));
+        }
+      }
+
+      const range = document.createRange();
+      range.selectNodeContents(container);
+
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+
+      try {
+        return document.execCommand('copy');
+      } catch (error) {
+        console.error('Failed to copy rich text to clipboard:', error);
+        return false;
+      } finally {
+        if (selection) {
+          selection.removeAllRanges();
+          previousRanges.forEach((previousRange) => selection.addRange(previousRange));
+        }
+
+        document.body.removeChild(container);
+      }
+    };
+
+    const fallbackCopy = (): boolean => {
+      return html ? fallbackCopyRichText() : fallbackCopyPlainText();
+    };
+
+    if (html && navigator.clipboard?.write && typeof ClipboardItem !== 'undefined') {
+      const clipboardItem = new ClipboardItem({
+        'text/plain': new Blob([text], {type: 'text/plain'}),
+        'text/html': new Blob([html], {type: 'text/html'}),
+      });
+
+      return navigator.clipboard.write([clipboardItem])
+        .then(() => true)
+        .catch((error) => {
+          console.error('Failed to write rich text to clipboard, trying fallback:', error);
+          return fallbackCopy();
+        });
+    }
+
+    if (navigator.clipboard?.writeText) {
+      return navigator.clipboard.writeText(text)
+        .then(() => true)
+        .catch((error) => {
+          console.error('Failed to write to clipboard, trying fallback:', error);
+          return fallbackCopy();
+        });
+    }
+
+    return Promise.resolve(fallbackCopy());
+  },
+
   throwInTestingIfConfigured(): void {
     if (typeof window !== 'undefined' && window.localStorage?.getItem('_pw_throw') === 'true') {
       throw new Error('Testing error.');

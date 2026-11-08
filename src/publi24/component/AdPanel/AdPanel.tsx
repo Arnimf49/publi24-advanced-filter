@@ -13,23 +13,9 @@ import InfoIcon from "../Common/Icons/InfoIcon";
 import PhoneSearchResultsHelp from "./Help/PhoneSearchResultsHelp";
 import ImageSearchResultsHelp from "./Help/ImageSearchResultsHelp";
 import MissingPermissionsMessage from "../Common/Partials/MissingPermissions/MissingPermissionsMessage";
+import {ResultsCopy} from "./ResultsCopy";
+import type {ImageLink, ImageSearchDomain} from "./AdPanel.types";
 import type {SearchResult} from "../../core/linksFilter";
-
-interface ImageLink {
-  link: string;
-  isDead?: boolean;
-  isSafe?: boolean;
-  isSuspicious?: boolean;
-  isUnknown?: boolean;
-  isListing?: boolean;
-  listingLabel?: string | null;
-  city?: string | null;
-}
-
-interface ImageSearchDomain {
-  domain: string;
-  links: ImageLink[];
-}
 
 interface AdPanelProps {
   adId: string;
@@ -312,6 +298,14 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                   ({phoneInvestigatedSinceDays})
                 </span>
                   )}
+                  {!isPhoneSearchLoading && hasGooglePermission && (
+                    <ResultsCopy
+                      kind="phone"
+                      searchLinks={filteredSearchLinks}
+                      dataWwid="copy-phone-results"
+                      title="Copiază rezultatele telefonului"
+                    />
+                  )}
                 </h5>
                 <div data-wwid="search-results">
                   {!hasGooglePermission ? (
@@ -377,6 +371,15 @@ const AdPanel: React.FC<AdPanelProps> = (props) => {
                       className={`${styles.investigationStatus} ${imageInvestigateStale ? styles.stale : styles.fresh}`}>
                   ({imageInvestigatedSinceDays})
                 </span>
+                  )}
+                  {!isImageSearchLoading && hasGooglePermission && hasLensPermission && (
+                    <ResultsCopy
+                      kind="image"
+                      imageSearchDomains={imageSearchDomains}
+                      analyzeImagesLoading={analyzeImagesLoading}
+                      dataWwid="copy-image-results"
+                      title="Copiază rezultatele pozelor"
+                    />
                   )}
                 </h5>
                 {imageSearchErrorCount > 0 && hasGooglePermission && hasLensPermission && (
