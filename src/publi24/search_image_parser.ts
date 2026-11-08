@@ -4,6 +4,8 @@ import {IS_MOBILE_VIEW} from "../common/globals";
 import {utils} from "../common/utils";
 import {addSearchLoader, addContinueButton, withRetry} from "./core/searchUI";
 import {ImageResult, ImageSearchError} from "./core/linksFilter";
+import {lensSelection} from "./search/lensSelection";
+import {lensPage} from "./search/lensPage";
 
 interface ImageSearchData {
   wwid: string;
@@ -20,6 +22,11 @@ interface LockCheckData {
 
 const STORAGE_KEY_IMG_SEARCH = `ww:img_search_started_for`;
 const topOffset = IS_MOBILE_VIEW ? 0 : 20;
+const EXACT_BUTTON_TIMEOUT_MS = 3000;
+const EXACT_AVAILABLE_TIMEOUT_MS = 5000;
+const EXACT_SELECT_TIMEOUT_MS = 5000;
+const PROGRESS_TIMEOUT_MS = 5000;
+const EXACT_RESULTS_TIMEOUT_MS = 8000;
 
 function getStorageLock(): Promise<void> {
   return new Promise<void>(resolve => {
@@ -61,7 +68,6 @@ function releaseStorageLock(): Promise<void> {
   });
 }
 
-
 function deduplicateResults<T>(results: T[]): T[] {
   const seen = new Set<string>();
   return results.filter(item => {
@@ -88,21 +94,11 @@ function isImageSearchError(item: unknown): item is ImageSearchError {
 
 function getDesktopExactLink(): HTMLElement | null {
   return document.body.querySelector<HTMLElement>('[aria-describedby="reverse-image-search-button-tooltip"]')
-    ?? getExactMatchTextElement();
-}
-
-function getExactMatchTextElement(): HTMLElement | null {
-  const xpath = "//span[normalize-space(.)='Potriviri exacte' or normalize-space(.)='Exact matches']";
-  const matchingElement = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-  return matchingElement instanceof HTMLElement ? matchingElement : null;
+    ?? lensPage.getExactMatchTextElement();
 }
 
 function getMobileExactLink(): HTMLElement | null {
-  return getExactMatchTextElement();
-}
-
-function wait(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return lensPage.getExactMatchTextElement();
 }
 
 function waitForCondition(checkFn: () => boolean, intervalMs: number): Promise<void> {
@@ -116,9 +112,27 @@ function waitForCondition(checkFn: () => boolean, intervalMs: number): Promise<v
   });
 }
 
-function isExactMatchButtonSelected(button: HTMLElement): boolean {
-  const parent = button.parentElement;
-  return parent!.hasAttribute('selected');
+function waitForConditionOrTimeout(checkFn: () => boolean, intervalMs: number, timeoutMs: number): Promise<boolean> {
+  return new Promise<boolean>(resolve => {
+    if (checkFn()) {
+      resolve(true);
+      return;
+    }
+
+    const deadline = Date.now() + timeoutMs;
+    const intervalId = window.setInterval(() => {
+      if (checkFn()) {
+        clearInterval(intervalId);
+        resolve(true);
+        return;
+      }
+
+      if (Date.now() >= deadline) {
+        clearInterval(intervalId);
+        resolve(false);
+      }
+    }, intervalMs);
+  });
 }
 
 function hasNoResults(): boolean {
@@ -161,13 +175,19 @@ function isPubli24Result(result: ImageResult): boolean {
 
 function isPubli24AdPageResult(anchor: HTMLAnchorElement): boolean {
   const secondDiv = anchor.querySelector<HTMLElement>('.wyccme > div:nth-child(2)');
-  const spans = secondDiv?.querySelectorAll(':scope > span');
 
-  if ((spans?.length ?? 0) >= 3) {
+  if (!secondDiv) {
+    // The exact-match result layout has no listing metadata; keep it.
     return true;
   }
 
-  if (spans?.length === 1) {
+  const spans = secondDiv.querySelectorAll(':scope > span');
+
+  if (spans.length >= 3) {
+    return true;
+  }
+
+  if (spans.length === 1) {
     const match = spans[0].textContent?.trim().match(/(\d+)\s+x\s+(\d+)/);
     if (match) {
       return parseInt(match[1], 10) > 300 || parseInt(match[2], 10) > 550;
@@ -205,6 +225,26 @@ function getDesktopResults(): ImageResult[] {
     .filter((href): href is string => href !== null);
 }
 
+function getMobileSiteName(anchor: HTMLAnchorElement): string {
+  const siteNameElement = anchor.querySelector('.wyccme div:last-child');
+  const siteName = siteNameElement?.textContent?.trim();
+
+  if (siteName) {
+    return siteName;
+  }
+
+  const leaf = Array.from(anchor.querySelectorAll('div'))
+    .find(element => {
+      const text = element.textContent?.trim() ?? '';
+      return element.children.length === 0
+        && text.length > 0
+        && text.length <= 30
+        && !/^\d+\s*x\s*\d+$/.test(text);
+    });
+
+  return leaf?.textContent?.trim() ?? '';
+}
+
 function getMobileResults(): ImageResult[] {
   const linkItems: NodeListOf<HTMLAnchorElement> = document.body.querySelectorAll<HTMLAnchorElement>('[id="rso"] [href][data-hveid]');
   return Array.from(linkItems)
@@ -212,9 +252,7 @@ function getMobileResults(): ImageResult[] {
       const href = n.getAttribute('href');
       if (href === null) return null;
       if (google.isRedirectPath(href)) {
-        const siteNameEl = n.querySelector('.wyccme div:last-child');
-        const siteName: string = siteNameEl?.textContent?.trim() ?? '';
-        return [siteName, href];
+        return [getMobileSiteName(n), href];
       }
       return href;
     })
@@ -225,98 +263,121 @@ function getResultUrl(result: ImageResult): string {
   return Array.isArray(result) ? result[1] : result;
 }
 
-function areLinksFullyLoaded(isMobile: boolean): boolean {
-  const getResults = isMobile ? getMobileResults : getDesktopResults;
-  const links = getResults();
+function getResults(isMobile: boolean): ImageResult[] {
+  return isMobile ? getMobileResults() : getDesktopResults();
+}
 
-  if (links.length === 0) {
+function areLinksFullyLoaded(results: ImageResult[]): boolean {
+  if (results.length === 0) {
     return false;
   }
 
-  return links.every(result => {
+  return results.every(result => {
     const url = getResultUrl(result);
     return !url.startsWith('/') || google.isRedirectPath(url);
   });
 }
 
-function waitForStableResults(isMobile: boolean, stabilityMs: number): Promise<ImageResult[]> {
+function getResultSignature(isMobile: boolean): string {
+  return JSON.stringify(getResults(isMobile).map(getResultUrl));
+}
+
+function waitForResultsChange(isMobile: boolean, previousSignature: string | null, timeoutMs: number): Promise<ImageResult[]> {
   return new Promise<ImageResult[]>(resolve => {
-    const getResults = isMobile ? getMobileResults : getDesktopResults;
-    let lastResultsJson = '';
-    let stableStartTime: number | null = null;
+    const deadline = Date.now() + timeoutMs;
+    let lastSignature = '';
+    let stableSince = Date.now();
 
     const intervalId = window.setInterval(() => {
-      const currentResults = getResults();
-      const currentResultsJson = JSON.stringify(currentResults);
+      const results = getResults(isMobile);
+      const signature = JSON.stringify(results.map(getResultUrl));
+      const changed = previousSignature === null || signature !== previousSignature;
 
-      if (currentResultsJson === lastResultsJson) {
-        if (stableStartTime === null) {
-          stableStartTime = Date.now();
-        } else if (Date.now() - stableStartTime >= stabilityMs) {
-          clearInterval(intervalId);
-          resolve(currentResults);
-        }
-      } else {
-        stableStartTime = null;
-        lastResultsJson = currentResultsJson;
+      if (signature !== lastSignature) {
+        lastSignature = signature;
+        stableSince = Date.now();
       }
-    }, 50);
+
+      const settled = changed
+        && signature !== '[]'
+        && areLinksFullyLoaded(results)
+        && Date.now() - stableSince >= 500;
+
+      if (settled || Date.now() >= deadline) {
+        clearInterval(intervalId);
+        resolve(results);
+      }
+    }, 100);
   });
 }
 
 async function readImageLinks(isMobile: boolean, done: (results: ImageResult[]) => void): Promise<void> {
   try {
-    let exactButton = isMobile ? getMobileExactLink() : getDesktopExactLink();
+    if (isMobile) {
+      await lensSelection.expandToFullImage();
+    }
 
-    if (!exactButton) {
+    const getExactButton = (): HTMLElement | null => (isMobile ? getMobileExactLink() : getDesktopExactLink());
+    const isExactSelected = (): boolean => {
+      const button = getExactButton();
+      return !!button && lensPage.isExactMatchSelected(button);
+    };
+
+    const hasExactButton = await waitForConditionOrTimeout(() => !!getExactButton(), 50, EXACT_BUTTON_TIMEOUT_MS);
+
+    if (!hasExactButton) {
       console.error("Exact match button not found.");
       done([]);
       return;
     }
 
-    (exactButton as HTMLElement).click();
+    const isExactActionable = (): boolean => {
+      const button = getExactButton();
+      return !!button && lensPage.isExactMatchActionable(button);
+    };
 
-    utils.debugLog('Waiting for exact button to be selected...');
-    await waitForCondition(
-      () => isExactMatchButtonSelected((isMobile ? getMobileExactLink() : getDesktopExactLink()) as HTMLElement),
-      50
-    );
+    // Lens may render the exact tab before it has a usable link.
+    await waitForConditionOrTimeout(isExactActionable, 100, EXACT_AVAILABLE_TIMEOUT_MS);
 
-    await wait(50);
+    // Lens selects the exact tab by itself for some images (notably Firefox
+    // with a full-image crop). Clicking it again would restart a search that
+    // never completes, so only click when it is not already selected.
+    const alreadySelected = isExactSelected();
+    const previousSignature = alreadySelected ? null : getResultSignature(isMobile);
 
-    utils.debugLog('Waiting for progress bars to be gone...');
-    await waitForCondition(
-      () => !document.querySelector('[id="rso"] [role="progressbar"]'),
-      50
-    );
+    if (alreadySelected) {
+      utils.debugLog('Exact matches are already selected; waiting for their results.');
+    } else {
+      (getExactButton() as HTMLElement).click();
 
-    await wait(50);
-
-    utils.debugLog( 'Waiting for links to be fully loaded (none start with /)...');
-    await waitForCondition(
-      () => hasSearchError() || hasNoResults() || areLinksFullyLoaded(isMobile),
-      50
-    );
-
-    if (hasSearchError() && hasNoResults()) {
-      done([]);
-      return;
+      utils.debugLog('Waiting for exact button to be selected...');
+      await waitForConditionOrTimeout(isExactSelected, 50, EXACT_SELECT_TIMEOUT_MS);
     }
 
-    const results = await waitForStableResults(isMobile, 150);
+    await utils.sleep(50);
+
+    utils.debugLog('Waiting for progress bars to be gone...');
+    await waitForConditionOrTimeout(
+      () => !document.querySelector('[id="rso"] [role="progressbar"]'),
+      50,
+      PROGRESS_TIMEOUT_MS
+    );
+
+    utils.debugLog('Waiting for the exact result set to replace the visual one...');
+    const results = await waitForResultsChange(isMobile, previousSignature, EXACT_RESULTS_TIMEOUT_MS);
 
     if (hasSearchError() || hasNoResults()) {
       done([]);
       return;
     }
 
-    done(filterPubli24AdPageResults(isMobile, results));
+    const filtered = filterPubli24AdPageResults(isMobile, results);
+    done(filtered);
   } catch (error) {
     console.error("Error reading image links:", error);
     done([]);
   }
 }
-
 
 async function parseResults(wwid: string): Promise<void> {
   const callback = (results: ImageResult[]): void => {
