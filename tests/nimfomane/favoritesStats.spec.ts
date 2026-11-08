@@ -429,6 +429,34 @@ test('Should mark the current city unavailable after a last-day availability pos
   await expect(page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-unavailable"]')).toHaveText('indisponibilă');
 });
 
+test('Should mark the current city unavailable after a last-day post without an availability word has passed.', async ({ page }) => {
+  test.setTimeout(30000);
+  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'});
+  const {user, id} = await utilsNimfomane.waitForNthImage(page);
+  const clujUrl = 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/';
+  const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString();
+
+  await page.locator(`[data-wwtopic="${id}"] [data-wwid="fav-toggle"][data-wwstate="off"]`).click();
+  await interceptProfileActivity(page, user, [{
+    cityUrl: clujUrl,
+    topicUrl: 'https://nimfomane.com/forum/topic/last-day-only-cluj/',
+    text: 'ultima zi 💋💋',
+    date: twoDaysAgo,
+  }]);
+  await interceptProfileStats(page, user);
+
+  await page.locator('[data-wwid="favs-button"]').click();
+  await page.waitForFunction((user) => {
+    const escort = JSON.parse(localStorage.getItem(`p24fa:nimfo:escort:${user}`) || '{}');
+    return escort.profileStats?.currentCity?.unavailable === true;
+  }, user, {timeout: 15000});
+
+  const escort = await utilsNimfomane.getEscortStorageProp(page, user, 'profileStats');
+  expect(escort?.currentCity?.name).toBe('Cluj');
+  expect(escort?.currentCity?.unavailable).toBe(true);
+  await expect(page.locator('[data-wwid="favorites-modal"] [data-wwid="escort-unavailable"]')).toHaveText('indisponibilă');
+});
+
 test('Should keep the current city available while a last-day availability post is still today.', async ({ page }) => {
   test.setTimeout(30000);
   await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/35-escorte-din-cluj/'});

@@ -128,18 +128,12 @@ function getCityLinkStatus(cityLink: CityLink, now: number): AvailabilityStatus 
   const status = getAvailabilityStatus(cityLink.topicTitle)
     ?? getAvailabilityStatus(activityText);
 
-  if (status !== 'available') {
-    return status;
-  }
-
   const signal = getVisitEndSignal(cityLink.topicTitle) ?? getVisitEndSignal(activityText);
-  if (!signal || signal.kind === 'unavailable') {
-    return status;
-  }
-
-  const endTime = getVisitEndTime(signal, cityLink.date);
-  if (endTime !== undefined && now >= endTime) {
-    return 'unavailable';
+  if (signal && signal.kind !== 'unavailable') {
+    const endTime = getVisitEndTime(signal, cityLink.date);
+    if (endTime !== undefined && now >= endTime) {
+      return 'unavailable';
+    }
   }
 
   return status;
