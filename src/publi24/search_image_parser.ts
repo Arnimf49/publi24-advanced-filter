@@ -292,16 +292,21 @@ function waitForResultsChange(isMobile: boolean, previousSignature: string | nul
       const results = getResults(isMobile);
       const signature = JSON.stringify(results.map(getResultUrl));
       const changed = previousSignature === null || signature !== previousSignature;
+      const noResultsOrError = hasNoResults() || hasSearchError();
 
       if (signature !== lastSignature) {
         lastSignature = signature;
         stableSince = Date.now();
       }
 
-      const settled = changed
-        && signature !== '[]'
-        && areLinksFullyLoaded(results)
-        && Date.now() - stableSince >= 500;
+      // Lens can end up with an empty exact-match result set. Waiting for a
+      // non-empty signature in that case would keep us blocked until the
+      // timeout, delaying the continue button on mobile.
+      const settled = noResultsOrError
+        || (changed
+          && signature !== '[]'
+          && areLinksFullyLoaded(results)
+          && Date.now() - stableSince >= 500);
 
       if (settled || Date.now() >= deadline) {
         clearInterval(intervalId);
