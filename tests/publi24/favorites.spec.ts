@@ -81,12 +81,18 @@ test('Should group favorites based on location differently in Bucuresti.', async
   await expect(page.locator('[data-wwid="favs-button"]')).toHaveText('Favorite 1');
 
   // Make sure the favorite resolves to the exact ad we inspected, not to a newer duplicate.
-  await page.evaluate(({phone, adId, adUrl}) => {
-    const key = `ww2:phone:${phone}`;
-    const data = JSON.parse(window.localStorage.getItem(key) || '{}');
-    data.ads = [`${adId}|${adUrl}`];
-    window.localStorage.setItem(key, JSON.stringify(data));
-  }, {phone, adId: sourceAdId!, adUrl: sourceAdUrl!});
+  const favoriteAds = [`${sourceAdId}|${sourceAdUrl}`];
+
+  const setFavoriteAds = async () => {
+    await page.evaluate(({phone, ads}) => {
+      const key = `ww2:phone:${phone}`;
+      const data = JSON.parse(window.localStorage.getItem(key) || '{}');
+      data.ads = ads;
+      window.localStorage.setItem(key, JSON.stringify(data));
+    }, {phone, ads: favoriteAds});
+  };
+
+  await setFavoriteAds();
 
   const cases = [
     {name: 'Bucuresti county', location: 'bucuresti/', highlighted: false},
@@ -98,11 +104,14 @@ test('Should group favorites based on location differently in Bucuresti.', async
     await test.step(testCase.name, async () => {
       await utilsPubli.open(context, page, {location: testCase.location});
 
+      await setFavoriteAds();
+
       await page.locator('[data-wwid="favs-button"]').click();
       await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
 
       const favoriteAd = page.locator('[data-wwid="favorites-modal"] [data-articleid]');
       await expect(favoriteAd).toHaveCount(1);
+
       await expect(page.locator('[data-wwid="favorites-modal"] [data-wwid="in-location"] [data-articleid]')).toHaveCount(1);
       await expect(page.locator('[data-wwid="favorites-modal"] [data-wwid="not-in-location"]')).toHaveCount(0);
 

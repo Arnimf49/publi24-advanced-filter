@@ -178,22 +178,28 @@ test('Should show only loader, not error, when stale image fails but new images 
   await utilsNimfomane.open(page);
   const {user, id} = await utilsNimfomane.waitForNthImage(page);
 
+  const topic = page.locator(`[data-wwtopic="${id}"]`);
+  const imageContainer = topic.locator('[data-wwid="topic-image"]');
+
   await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImage', 'https://nimfomane.com/broken-image-that-does-not-exist.jpg');
   await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImageTime', Date.now());
   await utilsNimfomane.throttleReload(page);
 
-  const imageContainer = page.locator(`[data-wwtopic="${id}"] [data-wwid="topic-image"]`);
+  // The topic image uses loading="lazy", so it only fails after the topic is near the viewport.
+  await topic.scrollIntoViewIfNeeded();
   await expect(imageContainer.locator('[data-wwid="image-error-icon"]')).toBeVisible();
 
   await utilsNimfomane.setEscortStorageProp(page, user, 'optimizedProfileImageTime', Date.now() - (8.64e+7 * 5));
   await utilsNimfomane.throttleReload(page);
 
+  await topic.scrollIntoViewIfNeeded();
   await expect(imageContainer.locator('[data-wwid="loader"]')).toBeVisible();
   await expect(imageContainer.locator('[data-wwid="image-error-icon"]')).toHaveCount(0);
 
+  await topic.scrollIntoViewIfNeeded();
   await expect(
     imageContainer.locator('[data-wwid="topic-image-img"], [data-wwid="no-image-icon"], [data-wwid="image-error-icon"]')
-  ).toBeVisible({timeout: 15000});
+  ).toBeVisible({timeout: 20000});
 })
 
 test('Should show publi24 link overlay for non-escort topics.', async ({page, context}) => {

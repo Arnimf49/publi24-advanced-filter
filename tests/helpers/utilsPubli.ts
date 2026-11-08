@@ -470,6 +470,27 @@ export const utilsPubli = {
     }, delay)
   },
 
+  async waitForAdAnalysis(page: Page, id: string, since: number = Date.now(), timeout: number = 30000): Promise<void> {
+    await page.waitForFunction(
+      ({id, since}) => {
+        const rawData = window.localStorage.getItem(`ww2:${id.toUpperCase()}`);
+        if (!rawData) {
+          return false;
+        }
+
+        try {
+          const data = JSON.parse(rawData);
+          return typeof data.analyzedAt === 'number' && data.analyzedAt >= since;
+        } catch (error) {
+          console.error('Failed to parse ad data while waiting for analysis:', error);
+          return false;
+        }
+      },
+      {id, since},
+      {timeout},
+    );
+  },
+
   async mockAdContent(page: Page, article: ElementHandle, title: string, description: string) {
     const id = await article.getAttribute('data-articleid');
     const url = await (await article.$('.article-title a')).getAttribute('href');
@@ -477,11 +498,10 @@ export const utilsPubli = {
     await utilsPubli.mockAdContentResponse(page, url, { title, description });
     await utilsPubli.forceAdNewAnalyze(page, id);
 
-    await Promise.all([
-      page.reload(),
-      page.waitForResponse(response => response.url() === url),
-    ]);
+    const analysisStartedAt = Date.now();
+    await page.reload();
     const newArticle = await utilsPubli.selectAd(page, id);
+    await utilsPubli.waitForAdAnalysis(page, id, analysisStartedAt);
     await page.waitForTimeout(500);
 
     return newArticle;

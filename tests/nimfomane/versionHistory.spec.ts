@@ -14,7 +14,12 @@ test('Should display version history modal.', async ({ page }) => {
 });
 
 test('Should add animations for new version.', async ({ page }) => {
-  await utilsNimfomane.open(page, {url: 'https://nimfomane.com/forum/forum/201-discutii-generale-cluj/'});
+  // Start from a clean state so the result does not depend on the cached
+  // version-seen value in the generated localStorage fixture.
+  await utilsNimfomane.open(page, {
+    url: 'https://nimfomane.com/forum/forum/201-discutii-generale-cluj/',
+    loadStorage: false,
+  });
 
   const menuButton = page.locator('[data-wwid="menu-button"]');
   await expect(menuButton).toHaveAttribute('data-wwanimating', 'false');

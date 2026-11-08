@@ -165,8 +165,12 @@ test('Should fallback to phone number parsed from description when standard sour
 
   await utilsPubli.forceAdNewAnalyze(page, id, ['phone']);
 
+  const analysisStartedAt = Date.now();
   await page.goto(url);
 
-  await expect(page.locator(`[data-articleid="${id}"] [data-wwid="phone-number"]`)).toHaveText('0754951989', {timeout: 25000});
+  const adLocator = page.locator(`[data-articleid="${id}"]`);
+  await expect(adLocator).toBeAttached({timeout: 15000});
+  await utilsPubli.waitForAdAnalysis(page, id, analysisStartedAt);
+  await expect(adLocator.locator('[data-wwid="phone-number"]')).toHaveText('0754951989', {timeout: 25000});
 });
 

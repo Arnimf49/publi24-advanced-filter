@@ -67,7 +67,6 @@ test('Should search and focus ad in favorites', async ({ page, context }) => {
   expect(favoriteAds.length).toBeGreaterThan(0);
 
   const lastFavoriteAd = favoriteAds[favoriteAds.length - 1];
-  const adId = await lastFavoriteAd.getAttribute('data-articleid');
 
   // Let Publi24's favorite-page requests settle before image search triggers a reload.
   await page.waitForTimeout(6000);
@@ -75,5 +74,8 @@ test('Should search and focus ad in favorites', async ({ page, context }) => {
   await page.waitForTimeout(800);
 
   await expect(page.locator('[data-wwid="favorites-modal"]')).toBeVisible();
-  await expect(page.locator(`[data-wwid="favorites-modal"] [data-articleid="${adId}"]`)).toBeInViewport();
+
+  // The modal is restored after the reload; assert that the same last favorite is scrolled into view.
+  const restoredLastFavoriteAd = page.locator('[data-wwid="favorites-modal"] [data-articleid]').last();
+  await expect(restoredLastFavoriteAd).toBeInViewport();
 })

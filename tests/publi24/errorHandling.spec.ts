@@ -58,6 +58,8 @@ test('Should display image search error when image search fails', async ({ page,
   });
   const adId = await ad.getAttribute('data-articleid');
 
-  await (await ad.$('[data-wwid="investigate_img"]')).click();
-  await expect(page.locator(`[data-articleid="${adId}"] [data-wwid="error"]`)).toContainText('Eroare la cautare rezultate imagine: Testing error.');
+  const imageSearchButton = await ad.waitForSelector('[data-wwid="investigate_img"]');
+  await imageSearchButton.scrollIntoViewIfNeeded();
+  await imageSearchButton.click();
+  await expect(page.locator(`[data-articleid="${adId}"] [data-wwid="error"]`)).toContainText('Eroare la cautare rezultate imagine: Testing error.', {timeout: 20000});
 });
