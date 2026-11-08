@@ -15,6 +15,8 @@ import {inspectorEscorteApi, InspectorAd} from "../../core/inspectorEscorteApi";
 import PhoneAndTagsRoot from "../Common/Partials/PhoneAndTags/PhoneAndTagsRoot";
 import {misc} from "../../core/misc";
 import {hostPermissions} from "../../core/hostPermissions";
+import {IS_MOBILE_VIEW} from "../../../common/globals";
+import {utils} from "../../../common/utils";
 
 interface AdPanelRootProps {
   id: string;
@@ -60,6 +62,7 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
   const [memoryState, setMemoryState] = useState(WWMemoryStorage.getAdState(id));
   const [phoneSearchJustCompleted, setPhoneSearchJustCompleted] = useState(false);
   const [imageSearchJustCompleted, setImageSearchJustCompleted] = useState(false);
+  const [pendingImageResultsScroll, setPendingImageResultsScroll] = useState(false);
   const [prevPhoneTime, setPrevPhoneTime] = useState<number | null | 'unset'>('unset');
   const [prevImageTime, setPrevImageTime] = useState<number | null | 'unset'>('unset');
   const [duplicatesSource, setDuplicatesSource] = useState<'inspector-escorte' | 'local'>('local');
@@ -201,9 +204,33 @@ const AdPanelRoot: FC<AdPanelRootProps> = ({ id, item, renderOptions }) => {
 
     if (imageTime !== prevImageTime && prevImageTime !== 'unset') {
       setImageSearchJustCompleted(true);
+      setPendingImageResultsScroll(true);
       setTimeout(() => setImageSearchJustCompleted(false), 4000);
     }
   }, [imageTime]);
+
+  useEffect(() => {
+    if (!IS_MOBILE_VIEW || !pendingImageResultsScroll) {
+      return;
+    }
+
+    if (memoryState.isImageSearchLoading) {
+      return;
+    }
+
+    const title = item.querySelector<HTMLElement>('[data-wwid="image-results-title"]');
+
+    if (!title) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      utils.scrollElementToViewportRatio(title, 0.35);
+      setPendingImageResultsScroll(false);
+    }, 50);
+
+    return () => clearTimeout(timeout);
+  }, [pendingImageResultsScroll, memoryState.isImageSearchLoading]);
 
   useEffect(() => {
     if (!phone) {

@@ -103,6 +103,29 @@ export const utils = {
     window.scrollTo({left: 0, top, behavior: 'instant'});
   },
 
+  scrollElementToViewportRatio(element: HTMLElement, ratio: number, options: {smooth?: boolean} = {}): void {
+    const behavior = options?.smooth === false ? 'instant' : 'smooth';
+    const viewportOffset = window.innerHeight * ratio;
+    const scrollParent = utils.getScrollParent(element);
+
+    if (scrollParent === window) {
+      const top = element.getBoundingClientRect().top + window.scrollY - viewportOffset;
+
+      // In tests somehow, or with Electron, it only works with this line.
+      window.scrollTo({ top: window.scrollY, behavior: 'instant' });
+      setTimeout(() => window.scrollTo({ top, behavior }), 20);
+      return;
+    }
+
+    const scrollEl = scrollParent as HTMLElement;
+    const top = scrollEl.scrollTop
+      + element.getBoundingClientRect().top
+      - scrollEl.getBoundingClientRect().top
+      - viewportOffset;
+
+    setTimeout(() => scrollEl.scrollTo({ top, behavior }), 20);
+  },
+
   normalizeDigits(str: string): string {
     // Handle emoji keycap digits
     str = str.replace(/(\d)\uFE0F\u20E3/g, '$1');
