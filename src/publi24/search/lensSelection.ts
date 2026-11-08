@@ -25,6 +25,8 @@ const CORNER_BOTTOM = '2';
 const CORNER_RIGHT = '3';
 const DRAG_STEPS = 5;
 const DRAG_WAIT_MS = 1200;
+const DRAG_MARGIN_PX = 10;
+const MAX_FULL_IMAGE_PASSES = 3;
 const READY_STABLE_MS = 500;
 const READY_SETTLE_MS = 1500;
 const READY_TIMEOUT_MS = 5000;
@@ -67,9 +69,31 @@ function findCropControls(): CropControls | null {
     return null;
   }
 
-  // The crop image is the largest one with four range controls nearby.
-  candidates.sort((a, b) => (b.imageRect.width * b.imageRect.height) - (a.imageRect.width * a.imageRect.height));
-  return candidates[0];
+  // The crop controls belong to the image they are drawn on. Other, larger
+  // images on the Lens page (for example a zoomed preview) can share an
+  // ancestor with the same sliders, and picking one of those would make the
+  // corner drags target the wrong coordinates.
+  const containing = candidates.filter(candidate => imageContainsSliders(candidate));
+  const pool = containing.length > 0 ? containing : candidates;
+
+  // Prefer the largest remaining image.
+  pool.sort((a, b) => (b.imageRect.width * b.imageRect.height) - (a.imageRect.width * a.imageRect.height));
+  return pool[0];
+}
+
+function imageContainsSliders({imageRect, sliders}: CropControls): boolean {
+  const margin = 1;
+
+  return sliders.every(slider => {
+    const rect = slider.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+
+    return x >= imageRect.left - margin
+      && x <= imageRect.right + margin
+      && y >= imageRect.top - margin
+      && y <= imageRect.bottom + margin;
+  });
 }
 
 async function waitForCropControls(timeoutMs: number): Promise<CropControls | null> {
@@ -272,11 +296,15 @@ function dragCornerTo(corner: string, toX: number, toY: number): boolean {
 }
 
 function getFullImageDrags(imageRect: DOMRect): Array<{corner: string, x: number, y: number}> {
+  // Aim a bit past the edges: the slider thumb is centered on its value, so a
+  // drag that stops exactly on the edge can leave the crop a few percent short.
+  const margin = DRAG_MARGIN_PX;
+
   return [
-    {corner: CORNER_LEFT, x: imageRect.left, y: imageRect.top},
-    {corner: CORNER_TOP, x: imageRect.right, y: imageRect.top},
-    {corner: CORNER_RIGHT, x: imageRect.right, y: imageRect.bottom},
-    {corner: CORNER_BOTTOM, x: imageRect.left, y: imageRect.bottom},
+    {corner: CORNER_LEFT, x: imageRect.left - margin, y: imageRect.top - margin},
+    {corner: CORNER_TOP, x: imageRect.right + margin, y: imageRect.top - margin},
+    {corner: CORNER_RIGHT, x: imageRect.right + margin, y: imageRect.bottom + margin},
+    {corner: CORNER_BOTTOM, x: imageRect.left - margin, y: imageRect.bottom + margin},
   ];
 }
 
@@ -360,16 +388,16 @@ async function expandToFullImage(): Promise<void> {
   // sequence schedules a second crop search while the first one is still
   // running; Lens then keeps the result container stuck on its loading state
   // and the exact tab never renders its results.
-  await dragToFullImage(controls.imageRect);
+  for (let pass = 0; pass < MAX_FULL_IMAGE_PASSES && !isCropFull(); pass++) {
+    const passControls = pass === 0 ? controls : findCropControls();
 
-  // Slider thumbs can stop a few percent short of the edge on the first pass.
-  // Only repeat when the crop is actually still small.
-  if (!isCropFull()) {
-    const retryControls = findCropControls();
-
-    if (retryControls) {
-      await dragToFullImage(retryControls.imageRect);
+    if (!passControls) {
+      break;
     }
+
+    // Slider thumbs can stop a few percent short of the edge on the first
+    // pass, so repeat until the crop actually covers the whole image.
+    await dragToFullImage(passControls.imageRect);
   }
 
   await waitForExactMatchRefresh(initialExactHref);
