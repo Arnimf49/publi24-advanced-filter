@@ -9,17 +9,24 @@ export type VersionData = {
 export const versionHistory: VersionData[] = [
   {
     version: '3.16',
-    releaseDate: '',
+    releaseDate: '8 noiembrie 2026',
     changeNew: [
-      'Rezultatele de la publi24 la căutarea dupa poze afișează mai multe detalii: locație în cazul în care e diferită de cea curentă și \'x\' când anunțul specific nu se mai găsește.',
+      'Rezultatele de la publi24 la căutarea dupa poze afișează mai multe detalii: locație în cazul în care e diferită de cea curentă și \'x\' când anunțul specific mai există.',
+      'Căutarea după poze acum automat face în Lens zoom-out când este necesar, găsind astfel rezultate mai exacte.',
+      'Rezultatele după telefon sau poze se pot copia ușor acum, în format \'rich text\'.',
     ],
     changeImprove: [
       'Deduplicare rezultate poze de la publi24 mai agresivă când acestea duc la pagini de listare.',
+      'După căutare poze se scrolează la secțiunea de rezultate poze.',
       'Setarea \'Numai deplasări\' ascunde doar anunțul, fără a ascunde toate anunțurile cu același număr de telefon.',
       'Înălțimea este detectată și când este scrisă sub forma „1 metru 43”.',
+      'Pentru București diferitele sectoare nu se mai arată ca și alte localități în favorite.',
+      'Îmbunătățiri mici la afiș.',
     ],
     changeFix: [
+      'Pentru București sectoarele nu se afișau corect în modalul cu favorite sau anunțuri.',
       'Unele rezultate de la publi24 la căutarea după poze în unele cazuri se afișau ca și domeniul de la google.',
+      'Unele rezultate la căutarea după număr telefon se afișau fară domeniu sau titlul paginii.',
     ]
   },
   {

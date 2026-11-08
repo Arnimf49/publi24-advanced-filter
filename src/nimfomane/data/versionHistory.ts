@@ -8,6 +8,19 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.16',
+    releaseDate: '8 noiembrie 2026',
+    changeNew: [],
+    changeImprove: [
+      'Îmbunătățiri la afiș în modalul cu poze, când pozele se încarcă încet.',
+      'Cazuri adiționale în care lista de servicii nu se extrăgeau corect.',
+      'Îmbunătățiri mici la afiș.',
+    ],
+    changeFix: [
+      'Nu se afișa \'indisponibilă\' în lista de favorite când ultima zi era anunțată într-un mesaj fără un cuvânt de disponibilitate, de exemplu doar \'ultima zi\'.'
+    ]
+  },
+  {
     version: '3.15.1',
     releaseDate: '31 octombrie 2026',
     changeNew: [],
