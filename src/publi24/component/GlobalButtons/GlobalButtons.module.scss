@@ -319,18 +319,33 @@
 }
 
 .menuButtonNewVersion {
-  animation: newVersionPulse 7.2s ease-in-out infinite;
+  --wave-color: rgba(224, 185, 77, 0.7);
 
-  &::before {
-    animation: newVersionPulseColor 7.2s ease-in-out infinite;
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: calc(-50% + 3%);
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent 0,
+      var(--wave-color) 22.63px,
+      transparent 45.25px
+    );
+    background-size: 64px 64px;
+    animation: globalButtonsWave 6s linear infinite;
+    pointer-events: none;
+  }
+
+  svg {
+    position: relative;
+    z-index: 1;
   }
 
   :global(.dark) & {
-    animation: newVersionPulseDark 7.2s ease-in-out infinite;
-
-    &::before {
-      animation: newVersionPulseColorDark 7.2s ease-in-out infinite;
-    }
+    --wave-color: rgba(190, 160, 80, 0.16);
   }
 }
 
@@ -448,115 +463,15 @@
   }
 }
 
-@keyframes newVersionPulse {
-  0%, 100% {
-    transform: scale(1);
-    background: #c59b2f;
+@keyframes globalButtonsWave {
+  from {
+    background-position: 0 0;
   }
-  3.75% {
-    transform: scale(1.08);
-    background: #d4b050;
-  }
-  7.5% {
-    transform: scale(1);
-    background: #c59b2f;
-  }
-  11.25% {
-    transform: scale(1.08);
-    background: #d4b050;
-  }
-  15% {
-    transform: scale(1);
-    background: #c59b2f;
-  }
-  18.75% {
-    transform: scale(1.08);
-    background: #d4b050;
-  }
-  22.5%, 97.5% {
-    transform: scale(1);
-    background: #c59b2f;
+  to {
+    background-position: 64px -64px;
   }
 }
 
-@keyframes newVersionPulseColor {
-  0%, 100% {
-    background: #c59b2f;
-  }
-  3.75% {
-    background: #d4b050;
-  }
-  7.5% {
-    background: #c59b2f;
-  }
-  11.25% {
-    background: #d4b050;
-  }
-  15% {
-    background: #c59b2f;
-  }
-  18.75% {
-    background: #d4b050;
-  }
-  22.5%, 97.5% {
-    background: #c59b2f;
-  }
-}
-
-@keyframes newVersionPulseDark {
-  0%, 100% {
-    transform: scale(1);
-    background: rgb(84, 71, 30);
-  }
-  3.75% {
-    transform: scale(1.08);
-    background: rgb(104, 91, 50);
-  }
-  7.5% {
-    transform: scale(1);
-    background: rgb(84, 71, 30);
-  }
-  11.25% {
-    transform: scale(1.08);
-    background: rgb(104, 91, 50);
-  }
-  15% {
-    transform: scale(1);
-    background: rgb(84, 71, 30);
-  }
-  18.75% {
-    transform: scale(1.08);
-    background: rgb(104, 91, 50);
-  }
-  22.5%, 97.5% {
-    transform: scale(1);
-    background: rgb(84, 71, 30);
-  }
-}
-
-@keyframes newVersionPulseColorDark {
-  0%, 100% {
-    background: rgb(84, 71, 30);
-  }
-  3.75% {
-    background: rgb(104, 91, 50);
-  }
-  7.5% {
-    background: rgb(84, 71, 30);
-  }
-  11.25% {
-    background: rgb(104, 91, 50);
-  }
-  15% {
-    background: rgb(84, 71, 30);
-  }
-  18.75% {
-    background: rgb(104, 91, 50);
-  }
-  22.5%, 97.5% {
-    background: rgb(84, 71, 30);
-  }
-}
 
 .menuDropdown {
   position: fixed;
@@ -705,71 +620,31 @@
 }
 
 .menuItemNewVersion {
-  animation: menuItemVersionPulse 7.2s ease-in-out infinite;
+  --wave-color: rgba(190, 195, 218, 0.47);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent 0,
+      var(--wave-color) 22.63px,
+      transparent 45.25px
+    );
+    background-size: 64px 64px;
+    animation: globalButtonsWave 6s linear infinite;
+    pointer-events: none;
+  }
+
+  svg,
+  span {
+    position: relative;
+    z-index: 1;
+  }
 
   :global(.dark) & {
-    animation: menuItemVersionPulseDark 7.2s ease-in-out infinite;
-  }
-}
-
-@keyframes menuItemVersionPulse {
-  0%, 100% {
-    transform: scale(1);
-    background: rgb(234 234 243);
-  }
-  3.75% {
-    transform: scale(1.05);
-    background: rgb(213 216 237);
-  }
-  7.5% {
-    transform: scale(1);
-    background: rgb(234 234 243);
-  }
-  11.25% {
-    transform: scale(1.05);
-    background: rgb(213 216 237);
-  }
-  15% {
-    transform: scale(1);
-    background: rgb(234 234 243);
-  }
-  18.75% {
-    transform: scale(1.05);
-    background: rgb(213 216 237);
-  }
-  22.5%, 97.5% {
-    transform: scale(1);
-    background: rgb(234 234 243);
-  }
-}
-
-@keyframes menuItemVersionPulseDark {
-  0%, 100% {
-    transform: scale(1);
-    background: rgba(255, 255, 255, 0.05);
-  }
-  3.75% {
-    transform: scale(1.05);
-    background: rgba(255, 255, 255, 0.12);
-  }
-  7.5% {
-    transform: scale(1);
-    background: rgba(255, 255, 255, 0.05);
-  }
-  11.25% {
-    transform: scale(1.05);
-    background: rgba(255, 255, 255, 0.12);
-  }
-  15% {
-    transform: scale(1);
-    background: rgba(255, 255, 255, 0.05);
-  }
-  18.75% {
-    transform: scale(1.05);
-    background: rgba(255, 255, 255, 0.12);
-  }
-  22.5%, 97.5% {
-    transform: scale(1);
-    background: rgba(255, 255, 255, 0.05);
+    --wave-color: rgba(140, 132, 112, 0.15);
   }
 }

@@ -8,6 +8,7 @@ type VersionNotesProps = {
   changeImprove?: string[];
   changeFix?: string[];
   separatorColor?: string;
+  isNew?: boolean;
 };
 
 const VersionNotes: React.FC<VersionNotesProps> = ({
@@ -17,11 +18,12 @@ const VersionNotes: React.FC<VersionNotesProps> = ({
   changeImprove = [],
   changeFix = [],
   separatorColor,
+  isNew = false,
 }) => {
   return (
     <div className={styles.versionNotes} style={separatorColor ? {'--separator-color': separatorColor} as React.CSSProperties : undefined}>
       <div className={styles.header}>
-        <h2 className={styles.version}>{version}</h2>
+        <h2 className={`${styles.version} ${isNew ? styles.versionNew : ''}`}>{version}</h2>
         <span className={styles.releaseDate}>{releaseDate}</span>
       </div>
 

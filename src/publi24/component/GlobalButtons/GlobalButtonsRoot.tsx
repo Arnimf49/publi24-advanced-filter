@@ -8,6 +8,7 @@ import VersionHistoryModal from "../../../common/components/VersionHistoryModal/
 import FeedbackModal from "../../../common/components/FeedbackModal/FeedbackModal";
 import {modalState} from "../../../common/modalState";
 import {versionHistory} from "../../data/versionHistory";
+import {versionUtils} from "../../../common/versionUtils";
 import {renderer} from "../../core/renderer";
 import NextVisibleAdButton from "./NextVisibleAdButton/NextVisibleAdButton";
 import {IS_MOBILE_VIEW} from "../../../common/globals";
@@ -30,6 +31,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
   const [favsCount, setFavsCount] = useState<number | null>(null);
   const [favsWithNoAdsCount, setFavsWithNoAdsCount] = useState<number | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
+  const [newVersions, setNewVersions] = useState<string[]>([]);
 
   useEffect(() => {
     const onFavsChanged = () => {
@@ -56,9 +58,10 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
     if (!seenVersion) {
       WWStorage.setVersionSeen(currentVersion);
       setHasNewVersion(false);
-    } else if (seenVersion !== currentVersion) {
-      setHasNewVersion(true);
+      return;
     }
+
+    setHasNewVersion(versionUtils.getNewVersions(versionHistory, seenVersion).length > 0);
   }, []);
 
   const onFavsClick: MouseEventHandler = useCallback(() => setFavsOpen(true), []);
@@ -66,9 +69,12 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
   const onSettingsClick: MouseEventHandler = useCallback(() => setSettingsOpen(true), []);
   const onFeedbackClick: MouseEventHandler = useCallback(() => setFeedbackOpen(true), []);
   const onVersionHistoryClick: MouseEventHandler = useCallback(() => {
+    const seenVersion = WWStorage.getVersionSeen();
+    const newVersionEntries = versionUtils.getNewVersions(versionHistory, seenVersion);
+
+    setNewVersions(newVersionEntries.map(entry => entry.version));
     setVersionHistoryOpen(true);
-    const currentVersion = versionHistory[0]?.version;
-    WWStorage.setVersionSeen(currentVersion);
+    WWStorage.setVersionSeen(versionHistory[0]?.version);
     setHasNewVersion(false);
   }, []);
   const onMenuClick: MouseEventHandler = useCallback(() => setMenuOpen(prev => !prev), []);
@@ -107,7 +113,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = ({
       {isSettingsOpen &&
         <SettingsModalRoot onClose={() => setSettingsOpen(false)}/>}
       {isVersionHistoryOpen &&
-        <VersionHistoryModal onClose={() => setVersionHistoryOpen(false)} versionHistory={versionHistory} />}
+        <VersionHistoryModal onClose={() => setVersionHistoryOpen(false)} versionHistory={versionHistory} newVersions={newVersions} variant="publi24" />}
       {isFeedbackOpen &&
         <FeedbackModal onClose={() => setFeedbackOpen(false)} />}
     </>

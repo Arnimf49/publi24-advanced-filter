@@ -6,6 +6,7 @@ import VersionHistoryModal from '../../../common/components/VersionHistoryModal/
 import FeedbackModal from '../../../common/components/FeedbackModal/FeedbackModal';
 import SettingsModalRoot from './SettingsModal/SettingsModalRoot';
 import {versionHistory} from '../../data/versionHistory';
+import {versionUtils} from '../../../common/versionUtils';
 import {IS_MOBILE_VIEW} from '../../../common/globals';
 import {utils} from '../../../common/utils';
 import {darkTheme} from '../../core/darkTheme';
@@ -20,6 +21,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [favsCount, setFavsCount] = useState<number | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
+  const [newVersions, setNewVersions] = useState<string[]>([]);
   const [isDark, setIsDark] = useState(() => darkTheme.isEnabled());
 
   useEffect(() => darkTheme.onChange(setIsDark), []);
@@ -41,18 +43,22 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
     if (!seenVersion) {
       NimfomaneStorage.setVersionSeen(currentVersion);
       setHasNewVersion(false);
-    } else if (seenVersion !== currentVersion) {
-      setHasNewVersion(true);
+      return;
     }
+
+    setHasNewVersion(versionUtils.getNewVersions(versionHistory, seenVersion).length > 0);
   }, []);
 
   const onFavsClick: MouseEventHandler = useCallback(() => setFavsOpen(true), []);
   const onFeedbackClick: MouseEventHandler = useCallback(() => setFeedbackOpen(true), []);
   const onSettingsClick: MouseEventHandler = useCallback(() => setSettingsOpen(true), []);
   const onVersionHistoryClick: MouseEventHandler = useCallback(() => {
+    const seenVersion = NimfomaneStorage.getVersionSeen();
+    const newVersionEntries = versionUtils.getNewVersions(versionHistory, seenVersion);
+
+    setNewVersions(newVersionEntries.map(entry => entry.version));
     setVersionHistoryOpen(true);
-    const currentVersion = versionHistory[0]?.version;
-    NimfomaneStorage.setVersionSeen(currentVersion);
+    NimfomaneStorage.setVersionSeen(versionHistory[0]?.version);
     setHasNewVersion(false);
   }, []);
   const onMenuClick: MouseEventHandler = useCallback(() => setMenuOpen(prev => !prev), []);
@@ -81,7 +87,7 @@ const GlobalButtonsRoot: React.FC<GlobalButtonsRootProps> = () => {
         <FavoritesModalRoot onClose={() => setFavsOpen(false)}/>
       }
       {isVersionHistoryOpen &&
-        <VersionHistoryModal onClose={() => setVersionHistoryOpen(false)} versionHistory={versionHistory} />
+        <VersionHistoryModal onClose={() => setVersionHistoryOpen(false)} versionHistory={versionHistory} newVersions={newVersions} variant="nimfomane" />
       }
       {isFeedbackOpen &&
         <FeedbackModal onClose={() => setFeedbackOpen(false)} />

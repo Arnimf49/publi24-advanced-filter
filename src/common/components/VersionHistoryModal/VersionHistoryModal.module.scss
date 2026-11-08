@@ -1,0 +1,45 @@
+.newVersionsInfo {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--version-info-border, #c9dbf7);
+  border-radius: 8px;
+  background: var(--version-info-bg, #eef4ff);
+  color: var(--version-info-color, #1d4ed8);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.45;
+
+  :global(.dark) & {
+    border-color: var(--version-info-border-dark, rgba(96, 165, 250, 0.35));
+    background: var(--version-info-bg-dark, rgba(59, 130, 246, 0.16));
+    color: var(--version-info-color-dark, #93c5fd);
+  }
+}
+
+.publi24 {
+  --version-info-bg: #e9eff7;
+  --version-info-border: rgba(17, 119, 187, 0.25);
+  --version-info-color: #1177bb;
+  --version-new-color: #1177bb;
+
+  :global(.dark) & {
+    --version-info-bg-dark: #222b37;
+    --version-info-border-dark: rgba(110, 161, 234, 0.28);
+    --version-info-color-dark: #8ab4f8;
+    --version-new-color-dark: #8ab4f8;
+  }
+}
+
+.nimfomane {
+  --version-info-bg: #e9eff7;
+  --version-info-border: rgba(47, 73, 121, 0.22);
+  --version-info-color: #2f4979;
+  --version-new-color: #2f4979;
+
+  :global(.dark) & {
+    --version-info-bg-dark: #1d2430;
+    --version-info-border-dark: rgba(143, 179, 239, 0.25);
+    --version-info-color-dark: #8fb3ef;
+    --version-new-color-dark: #8fb3ef;
+  }
+}

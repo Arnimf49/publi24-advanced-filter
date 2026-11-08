@@ -31,6 +31,14 @@
   }
 }
 
+.versionNew {
+  color: var(--version-new-color, #1d4ed8) !important;
+
+  :global(.dark) & {
+    color: var(--version-new-color-dark, #93c5fd) !important;
+  }
+}
+
 .releaseDate {
   font-size: 14px;
   color: #666;
