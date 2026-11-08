@@ -41,6 +41,7 @@ const samples: Array<{file: string; expected: PersonalDetails}> = [
   {file: "sample36.txt", expected: {height: 160}},
   {file: "sample37.txt", expected: null},
   {file: "sample38.txt", expected: null},
+  {file: "sample39.txt", expected: {height: 143, weight: 45}},
 ];
 
 for (const sample of samples) {

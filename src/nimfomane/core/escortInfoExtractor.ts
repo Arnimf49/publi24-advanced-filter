@@ -395,7 +395,7 @@ function findAge(text: string): number | undefined {
 }
 
 function findHeight(text: string): number | undefined {
-  const decimalHeight = /(?:^|[^\d])1(?:[.,':]|\s+)\s*([3-9]\d)(?=\s*(?:m(?:etri)?\b|cm\b|inaltime\b|si\b|$|[|#]|[^\da-z]))/g;
+  const decimalHeight = /(?:^|[^\d])(?:1(?:[.,':]|\s+)\s*([3-9]\d)|(?:1|un)\s*(?:metru|metri)\s*(?:si\s*)?([3-9]\d))(?=\s*(?:m(?:etri)?\b|cm\b|inaltime\b|si\b|$|[|#]|[^\da-z]))/g;
   const centimetreHeight = /(?:^|[^\d])(1[3-9]\d)\s*(?:cm\b|centimetri?\b|inaltime\b)/g;
   const heightBeforeWeight = /(?:^|[^\d])(1[3-9]\d)\s+(?:și|si)\s+\d{2,3}\s*(?:de\s*)?(?:kg|kilo(?:grame)?s?)\b/giu;
   const correctedHeight = /\bnu\s+(?:am|sunt)\s+1[.,']\s*\d{2}\s*m?\s*,?\s*ci\s+1[.,']\s*(\d{2})\s*m?\b/i.exec(text);
@@ -419,7 +419,8 @@ function findHeight(text: string): number | undefined {
       && !isNegatedHeight
       && !isAddressingAnotherPerson
       && !isQuestionSentence(text, matchStart, matchEnd)) {
-      return 100 + Number.parseInt(decimalMatch[1], 10);
+      const height = decimalMatch[1] ?? decimalMatch[2] ?? '';
+      return 100 + Number.parseInt(height, 10);
     }
   }
 

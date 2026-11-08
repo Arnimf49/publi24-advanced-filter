@@ -16,6 +16,7 @@ export const versionHistory: VersionData[] = [
     changeImprove: [
       'Deduplicare rezultate poze de la publi24 mai agresivă când acestea duc la pagini de listare.',
       'Setarea \'Numai deplasări\' ascunde doar anunțul, fără a ascunde toate anunțurile cu același număr de telefon.',
+      'Înălțimea este detectată și când este scrisă sub forma „1 metru 43”.',
     ],
     changeFix: [
       'Unele rezultate de la publi24 la căutarea după poze în unele cazuri se afișau ca și domeniul de la google.',

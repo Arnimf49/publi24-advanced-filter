@@ -21,6 +21,16 @@ test('Should show age, height, weight and bmi from description.', async ({ page,
   expect(await (await ad.waitForSelector('[data-wwid="bmi"]')).getAttribute('data-wwstatus')).toEqual('warn');
 });
 
+test('Should show height written as "1 metru 43".', async ({ page, context }) => {
+  await utilsPubli.open(context, page, {loadStorage: false});
+
+  let ad =  await utilsPubli.findFirstAdWithPhone(page);
+
+  ad = await utilsPubli.mockAdContent(page, ad, 'Buna', 'Am 1 metru 43.');
+
+  expect(await (await ad.waitForSelector('[data-wwid="height"]')).innerText()).toEqual('143cm');
+});
+
 test('Should show age, height, weight variation between ads of same phone number.', async ({ page, context }, testInfo) => {
   testInfo.setTimeout(60000);
 

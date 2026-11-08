@@ -90,6 +90,9 @@ export const textParser = {
       const str: string = match[1].replace(/[,'" ]/, '.').replace(' ', '');
       attemptApplyHeight(Number.parseFloat(str) * 100);
     }
+    if (!data.find(d => d[0] === 'height') && (match = content.match(/(?:^|[^\d])(?:1|un)\s*(?:metru|metri)\s*(?:si\s*)?([3-9]\d)(?!\d)/i))) {
+      attemptApplyHeight(100 + Number.parseInt(match[1], 10));
+    }
     if (!data.find(d => d[0] === 'height') && (match = content.match(/[^\d%](1[3-9]\d) ?[^\d%]/))) {
       attemptApplyHeight(Number.parseInt(match[1], 10));
     }
