@@ -8,6 +8,16 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.16.1',
+    releaseDate: '9 noiembrie 2026',
+    changeNew: [],
+    changeImprove: [],
+    changeFix: [
+      'iOS: Rezultatele erau blocate din cauza verificării permisiilor incorecte',
+      'iOS: Loader principal nu se anima.',
+    ]
+  },
+  {
     version: '3.16',
     releaseDate: '8 noiembrie 2026',
     changeNew: [
