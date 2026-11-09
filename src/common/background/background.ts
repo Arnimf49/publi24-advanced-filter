@@ -14,8 +14,22 @@ const GOOGLE_ORIGIN = 'https://www.google.com/*';
 const LENS_ORIGIN = 'https://lens.google.com/*';
 const INSPECTOR_ESCORTE_ORIGIN = 'https://api.inspector-escorte.com/*';
 const GOTO_RESOLVE_TIMEOUT_MS = 15_000;
+// Every iOS browser is WebKit and this extension only runs in Orion on iOS.
+const IS_IOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
+  || /iPhone|iPad|iPod/.test(navigator.platform)
+  // iPad desktop-mode user agents report Macintosh; real Macs have no touch.
+  || (navigator.userAgent.includes('Mac') && navigator.maxTouchPoints > 1);
 
 async function getHostPermissions(): Promise<HostPermissionsResponse> {
+  // Orion on iOS declares the host permissions but does not expose a usable
+  // permission state through browser.permissions.contains(). The user cannot
+  // toggle these permissions either, so treat the manifest grants as active
+  // instead of showing false "missing permissions" warnings.
+  if (IS_IOS) {
+    console.warn('Orion iOS: assuming declared host permissions are granted.');
+    return { google: true, lens: true, inspectorEscorte: true };
+  }
+
   const [google, lens, inspectorEscorte] = await Promise.all([
     browserApi.permissions.contains({ origins: [GOOGLE_ORIGIN] }),
     browserApi.permissions.contains({ origins: [LENS_ORIGIN] }),

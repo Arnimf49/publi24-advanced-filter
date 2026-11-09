@@ -1,6 +1,9 @@
 export const browserApi = typeof browser !== "undefined" ? browser : chrome;
 export const IS_PROMOTER = process.env.PROMOTER === 'true';
-export const IS_MOBILE_VIEW: boolean = ('ontouchstart' in document.documentElement);
+
+const HAS_DOCUMENT = typeof document !== 'undefined';
+
+export const IS_MOBILE_VIEW: boolean = HAS_DOCUMENT && ('ontouchstart' in document.documentElement);
 export const IS_SAFARI_IOS: boolean = [
     'iPad Simulator',
     'iPhone Simulator',
@@ -10,7 +13,7 @@ export const IS_SAFARI_IOS: boolean = [
     'iPod'
   ].includes(navigator.platform)
   // iPad on iOS 13 detection
-  || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+  || (navigator.userAgent.includes("Mac") && HAS_DOCUMENT && "ontouchend" in document);
 
 // Used for ios debugging.
 // export const htmlLog = (data: any): void => {
