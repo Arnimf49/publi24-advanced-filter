@@ -2,7 +2,7 @@
 # Show the current mobile-testing state: device, forwarded ports, and the
 # extension loaded in each browser.
 #
-# Usage: ./status.sh [yandex|firefox|all]
+# Usage: ./status.sh [yandex|firefox|orion|all]
 
 set -euo pipefail
 
@@ -44,6 +44,11 @@ if [[ "$TARGET" == "firefox" || "$TARGET" == "all" ]]; then
   else
     echo "No forward on tcp:$FIREFOX_RDP_PORT (run: deploy.sh firefox)"
   fi
+fi
+
+if [[ "$TARGET" == "orion" || "$TARGET" == "all" ]]; then
+  log "Orion iOS"
+  node "$SCRIPTS/orion.mjs" status || true
 fi
 
 log "Local build"

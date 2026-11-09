@@ -4,12 +4,14 @@
 # Usage:
 #   ./deploy.sh yandex [--all]   # copy dist + manifest to /sdcard/Download/extension and reload
 #   ./deploy.sh firefox          # build an .xpi from the local build and install it temporarily
+#   ./deploy.sh orion            # build .crx/.xpi and serve them over the LAN for Orion on iOS
 #   ./deploy.sh all
 #
 # Environment:
 #   ANDROID_SERIAL       Device serial when several devices are connected.
 #   YANDEX_CDP_PORT      CDP port for Yandex (default 9223).
 #   FIREFOX_RDP_PORT     RDP port for Firefox (default 9226).
+#   ORION_PORT           LAN port for Orion packages (default 8088).
 #   YANDEX_EXT_DIR       Unpacked extension directory on the phone.
 #
 # This script assumes the rollup watcher is already writing ./dist.
@@ -22,6 +24,7 @@ SKILL_DIR="$ROOT/.agents/skills/mobile-tester"
 SCRIPTS="$SKILL_DIR/scripts"
 YANDEX_CDP_PORT="${YANDEX_CDP_PORT:-9223}"
 FIREFOX_RDP_PORT="${FIREFOX_RDP_PORT:-9226}"
+ORION_PORT="${ORION_PORT:-8088}"
 YANDEX_EXT_DIR="${YANDEX_EXT_DIR:-/sdcard/Download/extension}"
 FIREFOX_DEVICE_DIR="/data/local/tmp/mobile-tester"
 FIREFOX_XPI_DEVICE="$FIREFOX_DEVICE_DIR/publi24.xpi"
@@ -157,6 +160,12 @@ deploy_firefox() {
   log "Firefox temporary add-ons are lost when Firefox restarts; run this script again after a restart."
 }
 
+deploy_orion() {
+  log "Building Orion packages (no Android device is needed)"
+  log "Serving them on the LAN at port $ORION_PORT"
+  ORION_PORT="$ORION_PORT" node "$SCRIPTS/orion.mjs" serve "$ORION_PORT"
+}
+
 main() {
   require_build
 
@@ -167,12 +176,15 @@ main() {
     firefox)
       deploy_firefox
       ;;
+    orion)
+      deploy_orion
+      ;;
     all)
       deploy_yandex
       deploy_firefox
       ;;
     *)
-      echo "Usage: deploy.sh <yandex|firefox|all> [--all]" >&2
+      echo "Usage: deploy.sh <yandex|firefox|orion|all> [--all]" >&2
       exit 1
       ;;
   esac
