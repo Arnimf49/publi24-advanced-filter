@@ -40,6 +40,11 @@
 // Expanded view.
 :global(.ww_topic_image_registered .ipsTopicSnippet__top){
   margin-left: 110px;
+
+  :global(.onMobile) & {
+    position: relative;
+    margin-left: 80px;
+  }
 }
 :global(.ww_topic_image_registered .ipsTopicSnippet__bottom),
 :global(.ww_topic_image_registered .ipsTopicSnippet__snippet) {
@@ -64,12 +69,15 @@
     margin: 0;
 
     :global(body:not(.onMobile)) & {
-      height: 110px;
+      top: 20px;
+      bottom: 20px;
+      height: auto;
     }
 
     :global(.onMobile) & {
-      height: 85px;
-      top: initial;
+      top: 0;
+      left: -80px;
+      height: 100%;
       transform: none;
     }
   }

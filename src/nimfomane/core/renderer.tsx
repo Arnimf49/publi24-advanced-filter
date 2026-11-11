@@ -193,7 +193,12 @@ export const renderer = {
 
     const mainDataContainer = container.querySelector('.ipsDataItem_main, .ipsTopicSnippet__top');
     if (mainDataContainer) {
-      container.insertBefore(imageContainer, mainDataContainer);
+      if (IS_MOBILE_VIEW && mainDataContainer.classList.contains('ipsTopicSnippet__top')) {
+        mainDataContainer.insertBefore(imageContainer, mainDataContainer.firstChild);
+      } else {
+        container.insertBefore(imageContainer, mainDataContainer);
+      }
+
       container.classList.add('ww_topic_image_registered');
     } else {
       console.error('Main data container not found');
