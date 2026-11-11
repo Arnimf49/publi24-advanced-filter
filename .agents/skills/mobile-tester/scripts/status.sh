@@ -49,6 +49,9 @@ fi
 if [[ "$TARGET" == "orion" || "$TARGET" == "all" ]]; then
   log "Orion iOS"
   node "$SCRIPTS/orion.mjs" status || true
+
+  log "Orion iOS inspection (CDP)"
+  node "$SCRIPTS/orion-cdp.mjs" status || true
 fi
 
 log "Local build"

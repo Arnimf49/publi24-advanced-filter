@@ -4,7 +4,9 @@
 # Usage:
 #   ./deploy.sh yandex [--all]   # copy dist + manifest to /sdcard/Download/extension and reload
 #   ./deploy.sh firefox          # build an .xpi from the local build and install it temporarily
-#   ./deploy.sh orion            # build .crx/.xpi and serve them over the LAN for Orion on iOS
+#   ./deploy.sh orion [--stamp] [--lan]
+#                        # build .crx/.xpi and copy them into Orion's container over USB
+#                        # (falls back to a LAN server when no iPhone is connected)
 #   ./deploy.sh all
 #
 # Environment:
@@ -12,6 +14,7 @@
 #   YANDEX_CDP_PORT      CDP port for Yandex (default 9223).
 #   FIREFOX_RDP_PORT     RDP port for Firefox (default 9226).
 #   ORION_PORT           LAN port for Orion packages (default 8088).
+#   ORION_CDP_PORT       CDP port for Orion over USB (default 9222).
 #   YANDEX_EXT_DIR       Unpacked extension directory on the phone.
 #
 # This script assumes the rollup watcher is already writing ./dist.
@@ -34,11 +37,19 @@ FIREFOX_XPI_LOCAL="$SKILL_DIR/.mobile/publi24.xpi"
 TARGET="${1:-all}"
 shift || true
 PUSH_ALL_LIBRARIES=false
+ORION_LAN=false
+ORION_STAMP=false
 
 for arg in "$@"; do
   case "$arg" in
     --all)
       PUSH_ALL_LIBRARIES=true
+      ;;
+    --lan)
+      ORION_LAN=true
+      ;;
+    --stamp)
+      ORION_STAMP=true
       ;;
     *)
       echo "Unknown option: $arg" >&2
@@ -161,9 +172,29 @@ deploy_firefox() {
 }
 
 deploy_orion() {
-  log "Building Orion packages (no Android device is needed)"
-  log "Serving them on the LAN at port $ORION_PORT"
-  ORION_PORT="$ORION_PORT" node "$SCRIPTS/orion.mjs" serve "$ORION_PORT"
+  local node_args=()
+
+  if [[ "$ORION_STAMP" == true ]]; then
+    node_args+=(--stamp)
+  fi
+
+  if [[ "$ORION_LAN" == true ]]; then
+    log "Building Orion packages and serving them over the LAN on port $ORION_PORT"
+    ORION_PORT="$ORION_PORT" node "$SCRIPTS/orion.mjs" serve "$ORION_PORT"
+    return
+  fi
+
+  log "Syncing the installed extension folder over USB and reloading it"
+  if node "$SCRIPTS/orion.mjs" sync "${node_args[@]}"; then
+    log "Extension updated in place (no taps needed)."
+    log "Content scripts only re-run on reload: node orion-cdp.mjs reload-tab <url-substring>"
+    return
+  fi
+
+  log "Sync unavailable; falling back to a first-time package push"
+  node "$SCRIPTS/orion.mjs" push "${node_args[@]}"
+  log "Install on the phone: Orion -> ••• -> Extensions -> + -> install from file -> On My iPhone -> Orion"
+  log "Pick the folder publi24-ext (preferred), or one of the .crx/.xpi files."
 }
 
 main() {
@@ -184,7 +215,7 @@ main() {
       deploy_firefox
       ;;
     *)
-      echo "Usage: deploy.sh <yandex|firefox|orion|all> [--all]" >&2
+      echo "Usage: deploy.sh <yandex|firefox|orion|all> [--all] [--lan] [--stamp]" >&2
       exit 1
       ;;
   esac

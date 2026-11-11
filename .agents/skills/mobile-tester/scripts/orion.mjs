@@ -1,15 +1,21 @@
 #!/usr/bin/env node
-// Build and serve the extension packages used by Orion on iPhone/iPad.
+// Build the extension packages used by Orion on iPhone/iPad and deliver them.
 //
 // Orion iOS installs local extensions from a file, not from a desktop debugger.
 // This script stages the current ./dist build and produces:
 //   - a CRX3 package (Chrome-extension mode)
 //   - an XPI package (Firefox-extension mode, background scripts instead of a
 //     MV3 service worker)
-// and, when asked to serve, exposes them over the LAN with a QR code.
+//
+// Delivery is either:
+//   - `push`: copy both packages straight into Orion's Documents folder over
+//     USB, so nothing has to be downloaded on the phone (preferred), or
+//   - `serve`: expose them over the LAN with a QR code (no USB needed).
 //
 // Usage:
-//   node orion.mjs build
+//   node orion.mjs build [--stamp]
+//   node orion.mjs push [--stamp]        # first-time install: packages + unpacked folder
+//   node orion.mjs sync [--stamp]        # update the installed folder + reload (no taps)
 //   node orion.mjs serve [port]
 //   node orion.mjs status
 //
@@ -25,6 +31,7 @@ import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {crx3} from './crx3.mjs';
+import {ios} from './ios.mjs';
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_DIR = path.resolve(SCRIPT_DIR, '..');
@@ -32,6 +39,8 @@ const ROOT = path.resolve(SKILL_DIR, '../../..');
 const MOBILE_DIR = path.join(SKILL_DIR, '.mobile', 'orion');
 const PACKAGE_DIR = path.join(MOBILE_DIR, 'packages');
 const KEY_PATH = path.join(MOBILE_DIR, 'signing-key.pem');
+const STAMP_PATH = path.join(MOBILE_DIR, 'stamp.json');
+const REMOTE_EXT_DIR = 'publi24-ext';
 const DEFAULT_PORT = Number(process.env.ORION_PORT ?? 8088);
 
 const MIME_TYPES = {
@@ -48,7 +57,7 @@ function readManifest() {
   return JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.json'), 'utf8'));
 }
 
-function stageExtension(mode) {
+function stageExtension(mode, version) {
   const stagePath = path.join(MOBILE_DIR, mode);
 
   fs.rmSync(stagePath, {recursive: true, force: true});
@@ -69,6 +78,10 @@ function stageExtension(mode) {
   }
 
   const manifest = readManifest();
+
+  if (version) {
+    manifest.version = version;
+  }
 
   if (mode === 'firefox') {
     // WebKit/Gecko use an event page, not a MV3 service worker.
@@ -94,20 +107,32 @@ function zipDirectory(directory, zipPath) {
   return zipPath;
 }
 
-function buildPackages() {
+function stageBuild({stamp = false} = {}) {
   if (!fs.existsSync(path.join(ROOT, 'dist/common/background/background.js'))) {
     throw new Error('Missing ./dist build. Start the rollup watcher first (npm run rollup).');
   }
 
+  const version = stamp ? stampedVersion() : readManifest().version;
+  const stagePath = stageExtension('chrome', version);
+
+  return {version, stagePath};
+}
+
+function buildPackages({stamp = false} = {}) {
+  const {version, stagePath: chromeStage} = stageBuild({stamp});
+  const firefoxStage = stageExtension('firefox', version);
+
   fs.rmSync(PACKAGE_DIR, {recursive: true, force: true});
   fs.mkdirSync(PACKAGE_DIR, {recursive: true});
 
-  const version = readManifest().version;
-  const chromeStage = stageExtension('chrome');
-  const firefoxStage = stageExtension('firefox');
-
   const crxPath = path.join(PACKAGE_DIR, `publi24-${version}-chrome.crx`);
   const xpiPath = path.join(PACKAGE_DIR, `publi24-${version}-firefox.xpi`);
+
+  log(`Packaging version ${version}`);
+
+  if (stamp) {
+    log('Stamped version (Orion may refuse to replace an identical version)');
+  }
 
   log('Packaging Chrome-extension build (CRX3)');
   crx3.pack(chromeStage, crxPath, KEY_PATH);
@@ -118,7 +143,128 @@ function buildPackages() {
   log(`Created ${crxPath}`);
   log(`Created ${xpiPath}`);
 
-  return {version, crxPath, xpiPath};
+  return {version, crxPath, xpiPath, stagePath: chromeStage};
+}
+
+// Pushes the unpacked build into the folder Orion installed from. Pushing each
+// top-level entry into an existing directory keeps the layout flat (AFC nests a
+// pushed directory under its own name).
+function uploadExtensionFolder(stagePath, version) {
+  ios.ensureDirectory(REMOTE_EXT_DIR);
+
+  const entries = fs.readdirSync(stagePath);
+
+  log(`Syncing ${entries.length} entries to ${REMOTE_EXT_DIR} (version ${version})`);
+  ios.pushFiles(
+    entries.map((name) => ({
+      local: path.join(stagePath, name),
+      remote: `${REMOTE_EXT_DIR}/${name}`,
+    })),
+  );
+
+  return entries.length;
+}
+
+// Orion keeps a reference to the folder it was installed from, so overwriting
+// the files in that folder and reloading the extension is enough to update it -
+// no picker interaction.
+function syncExtension({stamp = false, reload = true} = {}) {
+  const {version, stagePath} = stageBuild({stamp});
+
+  if (!ios.listDocuments().includes(REMOTE_EXT_DIR)) {
+    throw new Error(
+      `Orion has no "${REMOTE_EXT_DIR}" folder yet. Install it once:\n`
+      + '  1. node orion.mjs push\n'
+      + '  2. On the phone: Orion -> ••• -> Extensions -> + -> install from file\n'
+      + `  3. Install the unpacked folder ${REMOTE_EXT_DIR} (On My iPhone -> Orion)\n`
+      + 'Then run sync again.',
+    );
+  }
+
+  uploadExtensionFolder(stagePath, version);
+
+  if (!reload) {
+    log('Skipped the extension reload (--no-reload)');
+    return {version, reloaded: false};
+  }
+
+  log('Reloading the extension over CDP');
+  const result = spawnSync(
+    process.execPath,
+    [path.join(SCRIPT_DIR, 'orion-cdp.mjs'), 'reload-extension', '--expect', version],
+    {encoding: 'utf8', timeout: 180_000},
+  );
+  const output = `${result.stdout ?? ''}${result.stderr ?? ''}`.trim();
+
+  if (output) {
+    console.log(output);
+  }
+
+  if (result.status !== 0) {
+    throw new Error(
+      `Files were synced but the reload failed (exit ${result.status}). `
+      + 'Bring Orion to the foreground and run: node orion-cdp.mjs reload-extension',
+    );
+  }
+
+  return {version, reloaded: true};
+}
+
+// Chrome-style versions allow up to four numeric components. Bumping the last
+// one keeps the extension id stable while giving Orion a fresh version to
+// install over the previous build.
+function stampedVersion() {
+  const base = readManifest().version;
+  const parts = base.split('.').map((part) => Number.parseInt(part, 10) || 0);
+  const counter = readStampCounter() + 1;
+
+  fs.writeFileSync(STAMP_PATH, `${JSON.stringify({counter}, null, 2)}\n`);
+
+  if (parts.length < 4) {
+    parts.push(counter);
+  } else {
+    parts[3] += counter;
+  }
+
+  return parts.join('.');
+}
+
+function readStampCounter() {
+  if (!fs.existsSync(STAMP_PATH)) {
+    return 0;
+  }
+
+  try {
+    const parsed = JSON.parse(fs.readFileSync(STAMP_PATH, 'utf8'));
+
+    return Number.isInteger(parsed.counter) ? parsed.counter : 0;
+  } catch (error) {
+    log(`Ignoring unreadable ${STAMP_PATH}: ${error.message}`);
+
+    return 0;
+  }
+}
+
+function pushPackages({stamp = false} = {}) {
+  const packages = buildPackages({stamp});
+  const files = [
+    {local: packages.crxPath, remote: path.basename(packages.crxPath)},
+    {local: packages.xpiPath, remote: path.basename(packages.xpiPath)},
+  ];
+
+  ios.pruneDocuments(
+    /^publi24-.*\.(crx|xpi)$/,
+    files.map((file) => file.remote),
+  );
+  ios.pushFiles(files);
+  uploadExtensionFolder(packages.stagePath, packages.version);
+
+  log('Uploaded to Orion -> Documents');
+  log(`Prefer the folder: Orion -> ••• -> Extensions -> + -> install from file -> On My iPhone -> Orion -> ${REMOTE_EXT_DIR}`);
+  log('The folder build can be updated later with "node orion.mjs sync" (no taps).');
+  log('The .crx/.xpi are fallbacks if folder install misbehaves.');
+
+  return packages;
 }
 
 function localAddress() {
@@ -267,17 +413,6 @@ async function serve(port) {
   });
 }
 
-function runCommand(command, args) {
-  const result = spawnSync(command, args, {encoding: 'utf8'});
-
-  return {
-    found: result.error?.code !== 'ENOENT',
-    stdout: result.stdout ?? '',
-    stderr: result.stderr ?? '',
-    status: result.status,
-  };
-}
-
 function status() {
   const files = packageFiles();
 
@@ -290,36 +425,59 @@ function status() {
     }
   }
 
+  log('iPhone/iPad');
+  if (!ios.available()) {
+    console.log(`  ${ios.installHint}`);
+    console.log('  Without it only the LAN flow works (node orion.mjs serve).');
+  } else {
+    const devices = ios.devices();
+
+    if (devices.length === 0) {
+      console.log('  No iPhone/iPad over USB. LAN install still works.');
+    } else {
+      for (const device of devices) {
+        console.log(
+          `  ${device.DeviceName ?? device.DeviceClass} ${device.ProductType} `
+          + `iOS ${device.ProductVersion} (${device.Identifier})`,
+        );
+      }
+
+      console.log('  USB push and CDP inspection are available.');
+
+      const documents = ios.listDocuments();
+      console.log(
+        `  ${REMOTE_EXT_DIR}: ${documents.includes(REMOTE_EXT_DIR) ? 'installed folder present' : 'missing (run: node orion.mjs push, then install it on the phone)'}`,
+      );
+    }
+  }
+
+  log('CDP bridge');
+  console.log(`  http://127.0.0.1:${process.env.ORION_CDP_PORT ?? 9222}/ (node orion-cdp.mjs status)`);
+
   log('Local address');
   console.log(`  http://${localAddress()}:${DEFAULT_PORT}/`);
-
-  log('iPhone/iPad');
-  const idevice = runCommand('idevice_id', ['-l']);
-
-  if (!idevice.found) {
-    console.log('  libimobiledevice-utils is not installed (optional; only needed for USB inspection).');
-  } else if (idevice.stdout.trim()) {
-    console.log(`  ${idevice.stdout.trim()}`);
-  } else {
-    console.log('  No paired iOS device over USB.');
-  }
-
-  const usb = runCommand('lsusb', []);
-  const apple = usb.stdout.split('\n').filter((line) => line.includes('05ac:'));
-
-  if (apple.length > 0) {
-    console.log(`  Apple USB device present: ${apple.join(', ')}`);
-  } else {
-    console.log('  No Apple USB device visible. LAN install does not need USB.');
-  }
 }
 
 async function main() {
-  const [command = 'status', portArg] = process.argv.slice(2);
+  const args = process.argv.slice(2);
+  const flags = new Set(args.filter((arg) => arg.startsWith('--')));
+  const positional = args.filter((arg) => !arg.startsWith('--'));
+  const [command = 'status', portArg] = positional;
   const port = Number(portArg ?? DEFAULT_PORT);
+  const stamp = flags.has('--stamp');
 
   if (command === 'build') {
-    buildPackages();
+    buildPackages({stamp});
+    return;
+  }
+
+  if (command === 'push') {
+    pushPackages({stamp});
+    return;
+  }
+
+  if (command === 'sync') {
+    syncExtension({stamp, reload: !flags.has('--no-reload')});
     return;
   }
 
@@ -337,7 +495,7 @@ async function main() {
     return;
   }
 
-  throw new Error('Usage: orion.mjs <build|serve|status> [port]');
+  throw new Error('Usage: orion.mjs <build|push|sync|serve|status> [port] [--stamp] [--no-reload]');
 }
 
 main().catch((error) => {
