@@ -6,7 +6,6 @@ import {AutoHideCriterias, WWStorage} from "./storage";
 import {IS_MOBILE_VIEW, IS_PROMOTER, IS_SAFARI_IOS} from "../../common/globals";
 import {AUTO_HIDE_CRITERIA} from "./hideReasons";
 import {utils} from "../../common/utils";
-import {iosUtils} from "./iosUtils";
 import {WWMemoryStorage} from "./memoryStorage";
 import {publi24ImageAnalysis} from "./publi24ImageAnalysis";
 import {textParser, type AdContentTuple} from "./textParser";
@@ -167,20 +166,54 @@ async function searchPhoneResults(id: string, phoneNumber: string, item: HTMLEle
 
       windowRef.location = searchUrl;
 
-      WWBrowserStorage.when(`ww:search_started_for`, null, () => {
+      let finished = false;
+      let closedInterval: ReturnType<typeof setInterval> | null = null;
+
+      const finishPhoneSearch = (): void => {
+        if (finished) {
+          return;
+        }
+        finished = true;
+
+        if (closedInterval) {
+          clearInterval(closedInterval);
+        }
+
         WWMemoryStorage.setPhoneSearchLoading(id, false);
-        WWStorage.setInvestigatedTime(id, Date.now())
-      });
+        WWStorage.setInvestigatedTime(id, Date.now());
+      };
+
+      WWBrowserStorage.when(`ww:search_started_for`, null, finishPhoneSearch);
+
+      // Fallback for a search tab that is closed without clearing the flag
+      // (e.g. closed by the user, or the child never got to write it).
+      // Orion needs this; other browsers clear the flag reliably from the tab.
+      if (IS_SAFARI_IOS) {
+        closedInterval = setInterval(async () => {
+          if (!windowRef?.closed) {
+            return;
+          }
+
+          clearInterval(closedInterval!);
+
+          try {
+            const data = await WWBrowserStorage.get('ww:search_started_for');
+            const startedFor = data['ww:search_started_for'];
+
+            if (!(data as any).__from__cache && startedFor && startedFor.wwid === id) {
+              await WWBrowserStorage.set('ww:search_started_for', null);
+            }
+          } catch (error) {
+            console.error('Error clearing phone search state:', error);
+          }
+
+          finishPhoneSearch();
+        }, 500);
+      }
     }
 
-    if ((IS_SAFARI_IOS || localStorage.getItem('_testing_ios') === '1') && windowRef) {
+    if (IS_SAFARI_IOS && windowRef) {
       setTimeout(() => windowRef.location = `${searchUrl}&br=orion`, 400);
-      const interval = setInterval(() => {
-        if (windowRef?.closed) {
-          setTimeout(() => iosUtils.reloadAndFocus(id), 200);
-          clearInterval(interval);
-        }
-      }, 100);
     }
   } catch (error) {
     WWMemoryStorage.setAdAnalyzeError(id, "Eroare căutare rezultate telefon: " + utils.formatError(error));
@@ -336,33 +369,32 @@ export const adActions = {
           manual: WWStorage.isManualImageSearchEnabled(),
         });
 
-        let windows = []
         if (IS_MOBILE_VIEW && imgs.length > 0) {
-          windows.push(openImageInvestigation(imgs[0]));
+          openImageInvestigation(imgs[0]);
         }
         else {
-          windows = imgs.map(img => openImageInvestigation(img));
+          imgs.forEach(img => openImageInvestigation(img));
         }
 
+        let searchFinished = false;
+
         const interval = setInterval(async() => {
+          if (searchFinished) {
+            return;
+          }
+
           const results = await WWBrowserStorage.get(`ww:img_search_started_for`);
           const searchData = results[`ww:img_search_started_for`];
+
           if (
             !searchData || searchData.count === 0
-            // On safari the browser storage api breaks after returning from another tab. Reload to reset.
+            // The storage bridge stayed unavailable long enough that the cached
+            // value is all we have. Finish rather than polling forever.
             || (results as any).__from__cache
           ) {
+            searchFinished = true;
             clearInterval(interval);
             done().catch(error => console.error('Error finishing image analysis:', error));
-
-            if ((IS_SAFARI_IOS || localStorage.getItem('_testing_ios') === '1')) {
-              const iosInterval = setInterval(() => {
-                if (windows.every(w => w?.closed)) {
-                  clearInterval(iosInterval);
-                  setTimeout(() => iosUtils.reloadAndFocus(id), 200);
-                }
-              }, 300);
-            }
           }
         }, 300);
       } catch (error) {
@@ -477,7 +509,7 @@ export const adActions = {
     }
   },
 
-  scrollIntoView(element: HTMLDivElement, options: {smooth?: boolean} = {}) {
+  scrollIntoView(element: HTMLElement, options: {smooth?: boolean} = {}) {
     const panel = element.querySelector<HTMLElement>('[data-wwid="control-panel"]');
     const target = panel ?? element;
     const offset = panel

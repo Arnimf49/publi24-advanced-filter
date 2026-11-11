@@ -1,7 +1,7 @@
 import {WWBrowserStorage} from "./core/browserStorage";
 import {addSearchLoader, addContinueButton, withRetry} from "./core/searchUI";
 import {google} from "../common/google";
-import {IS_MOBILE_VIEW} from "../common/globals";
+import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../common/globals";
 import {SearchResult} from "./core/linksFilter";
 
 let isManual: boolean = false;
@@ -147,7 +147,25 @@ function extractResultLinks(wwid: string) {
       })
       .then(() => {
         if (isSecondSearch) {
-          if (isManual) {
+          if (IS_SAFARI_IOS) {
+            const finishSearch = async (): Promise<void> => {
+              try {
+                // Clear the flag before closing: on iOS the page is destroyed by
+                // window.close() and any storage call after it never runs.
+                await WWBrowserStorage.set('ww:search_started_for', null);
+              } finally {
+                window.close();
+              }
+            };
+
+            if (isManual) {
+              addContinueButton(() => {
+                void finishSearch();
+              });
+            } else {
+              void finishSearch();
+            }
+          } else if (isManual) {
             addContinueButton(() => {
               window.close();
               WWBrowserStorage.set('ww:search_started_for', null);

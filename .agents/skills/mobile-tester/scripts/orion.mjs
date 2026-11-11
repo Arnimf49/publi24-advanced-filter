@@ -146,23 +146,56 @@ function buildPackages({stamp = false} = {}) {
   return {version, crxPath, xpiPath, stagePath: chromeStage};
 }
 
-// Pushes the unpacked build into the folder Orion installed from. Pushing each
-// top-level entry into an existing directory keeps the layout flat (AFC nests a
-// pushed directory under its own name).
+// Pushes the unpacked build into the folder Orion installed from.
+//
+// AFC's `push` nests a directory under its own name, so pushing the top-level
+// `dist` entry produces `publi24-ext/dist/dist` instead of replacing
+// `publi24-ext/dist`. Content scripts then silently keep running the old build.
+// Walk the staged tree and push every file to its exact remote path instead.
+function collectStagedFiles(stagePath) {
+  const files = [];
+  const directories = [];
+
+  const walk = (localDir, relativeDir) => {
+    for (const entry of fs.readdirSync(localDir, {withFileTypes: true})) {
+      const local = path.join(localDir, entry.name);
+      const relative = relativeDir ? `${relativeDir}/${entry.name}` : entry.name;
+
+      if (entry.isDirectory()) {
+        directories.push(relative);
+        walk(local, relative);
+      } else {
+        files.push({local, remote: `${REMOTE_EXT_DIR}/${relative}`});
+      }
+    }
+  };
+
+  walk(stagePath, '');
+
+  return {files, directories};
+}
+
 function uploadExtensionFolder(stagePath, version) {
   ios.ensureDirectory(REMOTE_EXT_DIR);
 
-  const entries = fs.readdirSync(stagePath);
+  const {files, directories} = collectStagedFiles(stagePath);
 
-  log(`Syncing ${entries.length} entries to ${REMOTE_EXT_DIR} (version ${version})`);
-  ios.pushFiles(
-    entries.map((name) => ({
-      local: path.join(stagePath, name),
-      remote: `${REMOTE_EXT_DIR}/${name}`,
-    })),
-  );
+  log(`Syncing ${files.length} files in ${directories.length} directories to ${REMOTE_EXT_DIR} (version ${version})`);
 
-  return entries.length;
+  if (directories.length > 0) {
+    const mkdirs = directories
+      .map((directory) => `mkdir "${REMOTE_EXT_DIR}/${directory}"`)
+      .join('\n');
+
+    ios.run(
+      ['apps', 'afc', '--documents', ios.orionBundleId],
+      {input: `${mkdirs}\n`},
+    );
+  }
+
+  ios.pushFiles(files);
+
+  return files.length;
 }
 
 // Orion keeps a reference to the folder it was installed from, so overwriting

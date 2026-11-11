@@ -5,7 +5,6 @@ import {adActions} from "./core/adActions";
 import {favorites} from "./core/favorites";
 import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../common/globals";
 import {misc} from "./core/misc";
-import {iosUtils} from "./core/iosUtils";
 import {sendAnalyticsEvent} from "./core/analytics";
 import {userId} from "../common/userId";
 import {modalState} from "../common/modalState";
@@ -101,8 +100,6 @@ const initializeListingPage = async () => {
     renderer.renderInfo();
     WWStorage.setHasBeenShownInfo();
   }
-
-  iosUtils.focusListingAdIfNeeded();
 };
 
 WWStorage.upgrade()
