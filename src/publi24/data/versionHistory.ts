@@ -8,6 +8,17 @@ export type VersionData = {
 
 export const versionHistory: VersionData[] = [
   {
+    version: '3.16.2',
+    releaseDate: '12 noiembrie 2026',
+    changeNew: [],
+    changeImprove: [
+      'iOS: Pagina publi24 nu se mai reîncarcă la cautare după telefon sau poze.',
+    ],
+    changeFix: [
+      'iOS: Nu funcționa analiza rezultatelor de poze publi24.'
+    ]
+  },
+  {
     version: '3.16.1',
     releaseDate: '9 noiembrie 2026',
     changeNew: [],
