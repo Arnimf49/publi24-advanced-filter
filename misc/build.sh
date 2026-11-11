@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-rm ./dist/ -r
+rm ./dist/ -r || true
 
 echo "Building with rollup..."
 rollup -c
