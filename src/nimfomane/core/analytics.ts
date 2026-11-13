@@ -1,6 +1,6 @@
 import {NimfomaneStorage} from "./storage";
 import {userId} from "../../common/userId";
-import {permissions} from "../../common/permissions";
+import {HostPermissionsResponse, permissions} from "../../common/permissions";
 import {supabaseClient} from "../../common/supabase/supabaseClient";
 import {browserApi} from "../../common/globals";
 import {utils} from "../../common/utils";
@@ -22,6 +22,10 @@ interface AnalyticsData {
   user_agent: string;
   storage_size: number | null;
   is_incognito: boolean | null;
+  platform: string;
+  max_touch_points: number | null;
+  permissions: HostPermissionsResponse;
+  version: string | null;
 }
 
 function detectIncognito(): boolean | null {
@@ -49,7 +53,7 @@ function getLast6Months(): string[] {
   return months;
 }
 
-function collectAnalyticsData(): AnalyticsData {
+async function collectAnalyticsData(): Promise<AnalyticsData> {
   const infoAnalyzeMonthly: MonthCount = {};
   const last6Months = getLast6Months();
   let hiddenCount = 0;
@@ -101,6 +105,8 @@ function collectAnalyticsData(): AnalyticsData {
     }
   });
 
+  const hostPermissions = await permissions.getHostPermissions();
+
   return {
     id: userId.get()!,
     favs_count: NimfomaneStorage.getFavorites().length,
@@ -114,6 +120,10 @@ function collectAnalyticsData(): AnalyticsData {
     user_agent: navigator.userAgent,
     storage_size: utils.getStorageSizeKb(),
     is_incognito: detectIncognito(),
+    platform: navigator.platform,
+    max_touch_points: navigator.maxTouchPoints ?? null,
+    permissions: hostPermissions,
+    version: utils.getExtensionVersion(),
   };
 }
 
@@ -154,7 +164,7 @@ export const analytics = {
       return;
     }
 
-    const analyticsData = collectAnalyticsData();
+    const analyticsData = await collectAnalyticsData();
 
     try {
       const response = await supabaseClient.request('/rest/v1/analytics_nimfomane', {
@@ -170,6 +180,10 @@ export const analytics = {
           user_agent: analyticsData.user_agent,
           storage_size: analyticsData.storage_size,
           is_incognito: analyticsData.is_incognito,
+          platform: analyticsData.platform,
+          max_touch_points: analyticsData.max_touch_points,
+          permissions: analyticsData.permissions,
+          version: analyticsData.version,
           updated_at: new Date().toISOString(),
         }),
       });

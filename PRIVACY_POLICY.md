@@ -19,6 +19,8 @@ The extension collects anonymous usage statistics:
 - Phone search and image search total counts and grouped by month.
 - Enabled feature settings (focus mode, auto-hide, etc.).
 - Operating system and browser user agent.
+- Browser platform, maximum number of touch points, and extension version.
+- Status of the optional site permissions (Google, Google Lens, Inspector Escorte) — only whether they are granted, never their content.
 
 This data is:
 

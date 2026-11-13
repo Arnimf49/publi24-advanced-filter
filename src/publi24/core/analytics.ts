@@ -1,6 +1,6 @@
 import {WWStorage} from "./storage";
 import {userId} from "../../common/userId";
-import {permissions} from "../../common/permissions";
+import {HostPermissionsResponse, permissions} from "../../common/permissions";
 import {supabaseClient} from "../../common/supabase/supabaseClient";
 import {browserApi} from "../../common/globals";
 import {utils} from "../../common/utils";
@@ -31,6 +31,10 @@ interface AnalyticsData {
   user_agent: string;
   storage_size: number | null;
   is_incognito: boolean | null;
+  platform: string;
+  max_touch_points: number | null;
+  permissions: HostPermissionsResponse;
+  version: string | null;
 }
 
 function detectIncognito(): boolean | null {
@@ -58,7 +62,7 @@ function getLast6Months(): string[] {
   return months;
 }
 
-function collectAnalyticsData(): AnalyticsData {
+async function collectAnalyticsData(): Promise<AnalyticsData> {
   const phoneSearchMonthly: MonthCount = {};
   const imageSearchMonthly: MonthCount = {};
   const last6Months = getLast6Months();
@@ -113,6 +117,7 @@ function collectAnalyticsData(): AnalyticsData {
   });
 
   const favsCount = WWStorage.getFavorites().length;
+  const hostPermissions = await permissions.getHostPermissions();
 
   const settingsEnabled = {
     focusMode: WWStorage.isFocusMode(),
@@ -138,6 +143,10 @@ function collectAnalyticsData(): AnalyticsData {
     user_agent: navigator.userAgent,
     storage_size: utils.getStorageSizeKb(),
     is_incognito: detectIncognito(),
+    platform: navigator.platform,
+    max_touch_points: navigator.maxTouchPoints ?? null,
+    permissions: hostPermissions,
+    version: utils.getExtensionVersion(),
   };
 }
 
@@ -177,7 +186,7 @@ export async function sendAnalyticsEvent(): Promise<void> {
     return;
   }
 
-  const analyticsData = collectAnalyticsData();
+  const analyticsData = await collectAnalyticsData();
 
   try {
     const response = await supabaseClient.request('/rest/v1/analytics_v2', {
@@ -195,6 +204,10 @@ export async function sendAnalyticsEvent(): Promise<void> {
         user_agent: analyticsData.user_agent,
         storage_size: analyticsData.storage_size,
         is_incognito: analyticsData.is_incognito,
+        platform: analyticsData.platform,
+        max_touch_points: analyticsData.max_touch_points,
+        permissions: analyticsData.permissions,
+        version: analyticsData.version,
         updated_at: new Date().toISOString(),
       }),
     });

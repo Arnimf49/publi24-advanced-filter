@@ -19,6 +19,8 @@ Extensia colectează statistici anonime de utilizare:
 - Numărul total și grupate pe luni de căutări după telefon și căutări după poze.
 - Setările funcționalităților activate (focus mode, auto-hide, etc.).
 - Sistemul de operare și user agent-ul browser-ului.
+- Platforma browser-ului, numărul maxim de puncte de atingere și versiunea extensiei.
+- Starea permisiunilor opționale pentru site-uri (Google, Google Lens, Inspector Escorte) — doar dacă sunt acordate, niciodată conținutul acestora.
 
 Aceste date sunt:
 

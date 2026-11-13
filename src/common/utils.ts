@@ -1,3 +1,5 @@
+import {browserApi} from "./globals";
+
 const MAX_LOCAL_STORAGE_BYTES = 5 * 1024 * 1024;
 
 export const utils = {
@@ -24,6 +26,15 @@ export const utils = {
     }
 
     return storageSizeKb * 1024 / MAX_LOCAL_STORAGE_BYTES * 100;
+  },
+
+  getExtensionVersion(): string | null {
+    try {
+      return browserApi.runtime.getManifest().version;
+    } catch (error) {
+      console.error('Failed to read extension version:', error);
+      return null;
+    }
   },
 
   debugLog(message: string | number, data?: any) {
