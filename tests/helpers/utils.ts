@@ -194,6 +194,17 @@ const utils = {
       ...(proxyConfig ? { proxy: proxyConfig } : {}),
     });
 
+    // Never submit analytics from tests or fixture-generation runs.
+    await context.route(/\/rest\/v1\/analytics_/, route => route.fulfill({
+      status: 200,
+      headers: {
+        'access-control-allow-origin': '*',
+        'access-control-allow-methods': 'POST, OPTIONS',
+        'access-control-allow-headers': '*',
+      },
+      body: '',
+    }));
+
     if (preserveFocus) {
       context.on('page', () => {
         void restoreWindowFocusAfterTabChange(activeWindow);
