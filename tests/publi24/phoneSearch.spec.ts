@@ -10,10 +10,18 @@ test('Should search for phone number and list all attached ads.', async ({ page,
   await page.locator('[data-wwid="phone-search-button"]').click();
   await expect(page.locator('[data-wwid="ads-modal"]')).toBeVisible();
 
-  await page.locator('[data-wwid="phone-input"]').type(phone);
-  await page.waitForTimeout(2000);
+  const modalAds = page.locator('[data-wwid="ads-modal"] [data-articleid]');
 
-  expect((await page.$$('[data-wwid="ads-modal"] [data-articleid]')).length).toBeGreaterThanOrEqual(1);
-  expect((await page.$$('[data-wwid="ads-modal"] [data-articleid] [data-wwid="control-panel"]')).length).toBeGreaterThanOrEqual(1);
+  await page.locator('[data-wwid="phone-input"]').type(phone);
+
+  // While the search runs the counter shows animated dots ("Rezultate ...").
+  // A numeric "Rezultate: N" means loading finished.
+  await expect(page.locator('[data-wwid="ads-modal"] [data-wwid="results-count"]')).toHaveText(/^Rezultate: \d+$/);
+
+  await expect(modalAds.first()).toBeVisible();
+
+  const renderedCount = await modalAds.count();
+  expect(renderedCount).toBeGreaterThanOrEqual(1);
+  await expect(page.locator('[data-wwid="ads-modal"] [data-articleid] [data-wwid="control-panel"]')).toHaveCount(renderedCount);
 })
 

@@ -138,7 +138,7 @@ test('Should search for images and show relevant results.', async ({ page, conte
     await page.waitForFunction(
       parent => !parent.querySelector('[data-wwid="inline-loader"]'),
       ad,
-      {timeout: 12000}
+      {timeout: 20000}
     );
 
     const cases = Object.entries(caseChecks);

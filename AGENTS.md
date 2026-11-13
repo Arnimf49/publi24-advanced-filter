@@ -27,6 +27,7 @@ Never silently catch and discard errors. If you catch, either rethrow or log mea
 
 - Always use braces for `if`/`else`/`for`/`while` bodies, even for single-line instructions. No braceless one-liners.
 - Within a function, group related statements logically and separate distinct logical parts with a blank line.
+- Inline variables that are only used once. Only extract a named variable when it is used more than once or when it meaningfully clarifies complex logic.
 
 ## Verifying changes
 
