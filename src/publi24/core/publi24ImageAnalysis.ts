@@ -11,6 +11,9 @@ import {utils} from "../../common/utils";
 
 const GOTO_RESOLVE_DELAY_MS = 1000;
 const GOTO_WAIT_INCREMENT_MS = 20;
+const GOTO_WAIT_MAX_MS = 2000;
+const GOTO_RETRY_COUNT = 2;
+const GOTO_RETRY_DELAY_MS = 4000;
 
 function isImageResult(result: ImageResult | ImageSearchError): result is ImageResult {
   return typeof result === 'string' || Array.isArray(result);
@@ -276,7 +279,7 @@ export const publi24ImageAnalysis = {
 
       const waitForNextRequest = async (): Promise<void> => {
         await utils.sleep(waitMs);
-        waitMs += GOTO_WAIT_INCREMENT_MS;
+        waitMs = Math.min(waitMs + GOTO_WAIT_INCREMENT_MS, GOTO_WAIT_MAX_MS);
       };
 
       const retryIndexes: number[] = [];
@@ -295,8 +298,8 @@ export const publi24ImageAnalysis = {
 
       let pendingRetries = retryIndexes;
 
-      while (pendingRetries.length > 0) {
-        await waitForNextRequest();
+      for (let attempt = 0; attempt < GOTO_RETRY_COUNT && pendingRetries.length > 0; attempt++) {
+        await utils.sleep(GOTO_RETRY_DELAY_MS);
 
         const nextRetries: number[] = [];
 
