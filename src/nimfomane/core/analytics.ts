@@ -142,6 +142,10 @@ async function acquirePermission(): Promise<boolean> {
 
 export const analytics = {
   async sendEvent(): Promise<void> {
+    if (process.env.WATCH_MODE) {
+      return;
+    }
+
     if (!userId.get()) {
       console.log('Analytics user ID not set, skipping');
       return;

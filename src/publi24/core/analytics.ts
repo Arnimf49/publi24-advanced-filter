@@ -164,6 +164,10 @@ async function acquirePermission() {
 }
 
 export async function sendAnalyticsEvent(): Promise<void> {
+  if (process.env.WATCH_MODE) {
+    return;
+  }
+
   if (!userId.get()) {
     console.log('Analytics user ID not set, skipping');
     return;
