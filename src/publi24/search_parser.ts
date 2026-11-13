@@ -1,15 +1,31 @@
 import {WWBrowserStorage} from "./core/browserStorage";
 import {addSearchLoader, addContinueButton, withRetry} from "./core/searchUI";
 import {google} from "../common/google";
-import {IS_MOBILE_VIEW, IS_SAFARI_IOS} from "../common/globals";
+import {IS_MOBILE_VIEW} from "../common/globals";
 import {SearchResult} from "./core/linksFilter";
 
 let isManual: boolean = false;
+let finished: boolean = false;
 
 const currentUrl = new URL(window.location.href);
 const q: string | null = currentUrl.searchParams.get('q');
 const isSecondSearch = q?.includes('site:nimfomane.com');
 const topOffset = IS_MOBILE_VIEW ? 50 : 20;
+
+function finishSearch(): void {
+  if (finished) {
+    return;
+  }
+  finished = true;
+
+  WWBrowserStorage.set('ww:search_started_for', null)
+    .catch((error) => {
+      console.error('Failed to clear phone search state:', error);
+    })
+    .finally(() => {
+      window.close();
+    });
+}
 
 function getResults() {
   return document.body.querySelectorAll<HTMLAnchorElement>('#rso a[data-ved]') ??
@@ -147,32 +163,12 @@ function extractResultLinks(wwid: string) {
       })
       .then(() => {
         if (isSecondSearch) {
-          if (IS_SAFARI_IOS) {
-            const finishSearch = async (): Promise<void> => {
-              try {
-                // Clear the flag before closing: on iOS the page is destroyed by
-                // window.close() and any storage call after it never runs.
-                await WWBrowserStorage.set('ww:search_started_for', null);
-              } finally {
-                window.close();
-              }
-            };
-
-            if (isManual) {
-              addContinueButton(() => {
-                void finishSearch();
-              });
-            } else {
-              void finishSearch();
-            }
-          } else if (isManual) {
+          if (isManual) {
             addContinueButton(() => {
-              window.close();
-              WWBrowserStorage.set('ww:search_started_for', null);
+              finishSearch();
             });
           } else {
-            window.close();
-            WWBrowserStorage.set('ww:search_started_for', null);
+            finishSearch();
           }
         } else {
           currentUrl.searchParams.set('q', 'site:nimfomane.com ' + q);
