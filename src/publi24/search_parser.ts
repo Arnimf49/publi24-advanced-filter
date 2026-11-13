@@ -27,9 +27,23 @@ function finishSearch(): void {
     });
 }
 
-function getResults() {
-  return document.body.querySelectorAll<HTMLAnchorElement>('#rso a[data-ved]') ??
-    document.body.querySelectorAll<Element>('[eid] [jsaction][jscontroller] > [href]');
+function isResultAnchor(anchor: Element): anchor is HTMLAnchorElement {
+  // Google injects utility links (e.g. "Traducerea acestei pagini") into the
+  // results column. They are plain text anchors, while a real result link
+  // always carries a result identity: the title heading or the site/cite line.
+  return anchor.querySelector('h3, [role="heading"], cite, [role="text"]') !== null;
+}
+
+function getResults(): HTMLAnchorElement[] {
+  const anchors = document.body.querySelectorAll<HTMLAnchorElement>('#rso a[data-ved]');
+  const results = Array.from(anchors).filter(isResultAnchor);
+
+  if (results.length > 0) {
+    return results;
+  }
+
+  return Array.from(document.body.querySelectorAll<HTMLAnchorElement>('[eid] [jsaction][jscontroller] > a[href]'))
+    .filter(isResultAnchor);
 }
 
 function buildGotoResultName(anchor: HTMLAnchorElement): string {
@@ -47,9 +61,12 @@ function buildGotoResultName(anchor: HTMLAnchorElement): string {
   }
 
   // Some Google cards (e.g. Facebook) show a site label and engagement
-  // metadata instead of a URL. Fall back to the label before the breadcrumb
-  // separator so the result still has a source.
-  const label = fullText.split('·')[0].trim();
+  // metadata instead of a URL. The anchor text starts with the title, so strip
+  // it before falling back to the label before the breadcrumb separator.
+  const textAfterTitle = resultTitle && fullText.startsWith(resultTitle)
+    ? fullText.slice(resultTitle.length).trim()
+    : fullText;
+  const label = textAfterTitle.split('·')[0].trim();
 
   if (label && label.length <= 40) {
     return resultTitle ? `${label} | ${resultTitle}` : label;
@@ -138,14 +155,13 @@ function extractResultLinks(wwid: string) {
   }
 
   setTimeout(() => {
-    const results: NodeListOf<Element> = getResults();
+    const results = getResults();
     WWBrowserStorage.get(storageKey)
       .then((data) => {
         const currentUrls: SearchResult[] = data[storageKey] || [];
 
-        const resultUrls: SearchResult[] = Array.from(results)
-          .map((n: Element): SearchResult | null => {
-            const anchor = n as HTMLAnchorElement;
+        const resultUrls: SearchResult[] = results
+          .map((anchor): SearchResult | null => {
             const href = anchor.getAttribute('href');
             if (href === null) {
               return null;
